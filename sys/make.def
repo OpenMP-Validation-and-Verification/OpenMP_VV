@@ -45,25 +45,28 @@ endif
 
 # GCC compiler
 ifeq ($(CC), gcc)
-  CFLAGS = -O3 -std=c99 -fopenmp -foffload="-lm" -lm
+  COFFLOADING = -foffload="-lm"
+  CFLAGS = -O3 -std=c99 -fopenmp $(COFFLOADING) -lm
   CLINK = gcc
-  CLINKFLAGS = -O3 -fopenmp -foffload="-lm" -lm
+  CLINKFLAGS = -O3 -fopenmp $(COFFLOADING) -lm
   C_COMPILER_MODULE = gcc/7.1.1-20170802
 endif
 
 # IBM XL compiler
 ifeq ($(CC), xlc)
-  CFLAGS = -O3 -qsmp=omp -qoffload 
+  COFFLOADING = -qoffload
+  CFLAGS = -O3 -qsmp=omp $(COFFLOADING)
   CLINK = xlc
-  CLINKFLAGS = -O3 -qsmp=omp -qoffload 
+  CLINKFLAGS = -O3 -qsmp=omp $(COFFLOADING)
   C_COMPILER_MODULE = xl/20170914-beta
 endif
 
 # Clang compiler
 ifeq ($(CC), clang)
-  CFLAGS = -O3 -std=c99 -fopenmp -fopenmp-targets=nvptx64-nvida-cuda 
+  COFFLOADING = -fopenmp-targets=nvptx64-nvida-cuda
+  CFLAGS = -O3 -std=c99 -fopenmp $(COFFLOADING)
   CLINK = clang
-  CLINKFLAGS = -O3 -fopenmp -fopenmp-targets=nvptx64-nvida-cuda
+  CLINKFLAGS = -O3 -fopenmp $(COFFLOADING)
   C_COMPILER_MODULE = clang/20170629
 endif
 
@@ -74,25 +77,28 @@ CXXCOMPILERS="clang++, g++, xlc++"
 
 # GCC compiler
 ifeq ($(CXX), g++)
-  CXXFLAGS = -O3 -fopenmp -foffload="-lm" -lm
+  CXXOFFLOADING = -foffload="-lm"
+  CXXFLAGS = -O3 -fopenmp $(CXXOFFLOADING) -lm
   CXXLINK = g++
-  CXXLINKFLAGS = -O3 -fopenmp -foffload="-lm" -lm
+  CXXLINKFLAGS = -O3 -fopenmp $(CXXOFFLOADING) -lm
   CXX_COMPILER_MODULE = gcc/7.1.1-20170802
 endif
 
 # IBM XL compiler
 ifeq ($(CXX), xlc++)
-  CXXFLAGS = -O3 -qsmp=omp -qoffload 
+  CXXOFFLOADING = -qoffload
+  CXXFLAGS = -O3 -qsmp=omp $(CXXOFFLOADING)
   CXXLINK = xlc++
-  CXXLINKFLAGS = -O3 -qsmp=omp -qoffload 
+  CXXLINKFLAGS = -O3 -qsmp=omp $(CXXOFFLOADING)
   CXX_COMPILER_MODULE = xl/20170914-beta
 endif
 
 # Clang compiler
 ifeq ($(CXX), clang++)
-  CXXFLAGS = -O3 -fopenmp -fopenmp-targets=nvptx64-nvida-cuda 
+  CXXOFFLOADING = -fopenmp-targets=nvptx64-nvida-cuda 
+  CXXFLAGS = -O3 -fopenmp $(CXXOFFLOADING) 
   CXXLINK = clang++
-  CXXLINKFLAGS = -O3 -fopenmp -fopenmp-targets=nvptx64-nvida-cuda
+  CXXLINKFLAGS = -O3 -fopenmp $(CXXOFFLOADING)
   CXX_COMPILER_MODULE = clang/20170629
 endif
 
