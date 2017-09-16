@@ -13,7 +13,7 @@ RECORD:=
 ifdef LOGS
 	RECORD:= | tee -a logs.txt
 endif
-ifdef LOGS_ALL
+ifdef LOG_ALL
 	RECORD:= 2>&1 | tee -a logs.txt
 endif
 
@@ -117,7 +117,17 @@ compilers:
 help:
 	@echo "OpenMP Offloading Validation Suite"
 	@echo ""
-	@echo "Do make CC=ccompiler CXX=cppcompiler [VERBOSE=1] [LOGS=1] [LOGS_ALL=1] [SOURCES_C=file.c] [SOURCES_CPP=file.cpp] [TESTS_TO_RUN=bin/file.o] [rule] (e.g. make CC=clang CXX=clang++ all), where rule may be one of:"
+	@echo " === USE ==="
+	@echo "  make CC=ccompiler CXX=cppcompiler [OPTIONS] [RULE]"
+	@echo ""
+	@echo " === OPTIONS === "
+	@echo "  LOG=1        Enables dump of the make process output into logs.txt"
+	@echo "  LOG_ALL=1    Enables dump of the make process output, errors, and binary execution outputs into logs.txt"
+	@echo "  SOURCES_C    Specify the C file(s) that you want to apply the rule to. Cannot be combined with SOURCES_CPP"
+	@echo "  SOURCES_CPP  Specify the CPP file(s) that you want to apply the rule to. Cannot be combined with SOURCES_C"
+	@echo "  TESTS_TO_RUN Specify the binaries to run"
+	@echo ""
+	@echo " === RULES ==="
 	@echo "  all"
 	@echo "    Build and run SOURCES_CPP or SOURCES_C. If none is specified build and run all the OpenMP test files"
 	@echo "  run"
@@ -128,4 +138,14 @@ help:
 	@echo "    Remove all executables from bin/ directory"
 	@echo "  compilers"
 	@echo "    Shows available compiler configuration"
+	@echo ""
+	@echo " === EXAMPLES ==="
+	@echo "  make CC=gcc CXX=g++ all                 ==> compile and run all test cases with GCC"
+	@echo "  make CC=gcc SOURCES_C=a.c all           ==> compile and run a.c with gcc"
+	@echo "  make CXX=g++ SOURCES_CPP=a.cpp all      ==> compile and run a.cpp with g++"
+	@echo "  make CC=xlc CXX=xlc++ compile           ==> compile all test cases with XL"
+	@echo "  make run                                ==> run all the cases that exist inside bin/"
+	@echo "  make TESTS_TO_RUN=bin/myTest run        ==> run myTest "
+	@echo ""
+	
 
