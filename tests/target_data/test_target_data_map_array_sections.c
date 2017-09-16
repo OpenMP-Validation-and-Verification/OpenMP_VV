@@ -25,7 +25,8 @@ int test_lower_length_1d() {
 
 #pragma omp target data map(from: a1d[1:N - 2])
   {
-#pragma omp target map(tofrom: isHost)
+#pragma omp target map(tofrom: isHost) \
+ map(alloc: a1d[1:N - 2]) // to avoid default mapping tofrom
     {
       isHost = omp_is_initial_device();
       for (int i = 1; i < N - 1; ++i)
@@ -64,7 +65,8 @@ int test_lower_length_2d() {
   // If a list item is an array section, it must specify contiguous storage.
 #pragma omp target data map(from: a2d[1:N - 2][0:2])
   {
-#pragma omp target map(tofrom: isHost)
+#pragma omp target map(tofrom: isHost) \
+ map(alloc: a2d[1:N - 2][0:2]) // to avoid default mapping tofrom
     {
       isHost = omp_is_initial_device();
       for (int i = 1; i < N - 1; ++i) {
@@ -109,7 +111,8 @@ int test_lower_length_3d() {
 #pragma omp target data map(from: a3d[1:N - 2][0:2][0:2])  \
         map(from: a3d2[0:N][0:2][0:2])
   {
-#pragma omp target map(tofrom: isHost)
+#pragma omp target map(tofrom: isHost) \
+ map(alloc: a3d[1:N - 2][0:2][0:2] ,a3d2[0:N][0:2][0:2]) // to avoid default mapping tofrom
     {
       isHost = omp_is_initial_device();
       for (int i = 0; i < N; ++i) {
@@ -160,7 +163,8 @@ int test_length_1d() {
   // When the lower-bound is absent it defaults to 0.
 #pragma omp target data map(from: a1d[:N - 2]) 
   {
-#pragma omp target map(tofrom: isHost)
+#pragma omp target map(tofrom: isHost) \
+ 	map(alloc: a1d[:N - 2]) // to avoid default mapping tofrom
     {
       isHost = omp_is_initial_device();
       for (int i = 0; i < N - 2; ++i)
@@ -200,7 +204,8 @@ int test_length_2d() {
   // If a list item is an array section, it must specify contiguous storage.
 #pragma omp target data map(from: a2d[:N - 2][:2])
   {
-#pragma omp target map(tofrom: isHost)
+#pragma omp target map(tofrom: isHost) \
+ 	map(alloc: a2d[:N - 2][:2]) // To avoid default mapping tofrom
     {
       isHost = omp_is_initial_device();
       for (int i = 0; i < N - 2; ++i) {
@@ -243,7 +248,8 @@ int test_length_3d() {
 #pragma omp target data map(from: a3d[:N - 2][:2][:2])   \
         map(from: a3d2[:N][:2][:2])
   {
-#pragma omp target map(tofrom: isHost)
+#pragma omp target map(tofrom: isHost) \
+        map(alloc: a3d[:N - 2][:2][:2], a3d2[:N][:2][:2]) // To avoid default mapping tofrom
     {
       isHost = omp_is_initial_device();
       for (int i = 0; i < N; ++i) {
@@ -294,7 +300,8 @@ int test_lower_1d() {
   // dimension minus the lower-bound.
 #pragma omp target data map(from: a1d[1:])
   {
-#pragma omp target map(tofrom: isHost)
+#pragma omp target map(tofrom: isHost) \
+	map(alloc: a1d[1:]) // To avoid default mapping tofrom
     {
       isHost = omp_is_initial_device();
       for (int i = 1; i < N; ++i)
@@ -335,7 +342,8 @@ int test_lower_2d() {
   // If a list item is an array section, it must specify contiguous storage.
 #pragma omp target data map(from: a2d[1:][0:])
   {
-#pragma omp target map(tofrom: isHost)
+#pragma omp target map(tofrom: isHost) \
+	map(alloc: a2d[1:][0:]) // To avoid default mapping tofrom
     {
       isHost = omp_is_initial_device();
       for (int i = 1; i < N; ++i) {
@@ -381,7 +389,8 @@ int test_lower_3d() {
 #pragma omp target data map(from: a3d[1:][0:][0:])   \
         map(from: a3d2[0:][0:][0:])
   {
-#pragma omp target map(tofrom: isHost)
+#pragma omp target map(tofrom: isHost) \
+	map(alloc: a3d[1:][0:][0:], a3d2[0:][0:][0:]) // To avoid default mapping tofrom
     {
       isHost = omp_is_initial_device();
       for (int i = 0; i < N; ++i) {
