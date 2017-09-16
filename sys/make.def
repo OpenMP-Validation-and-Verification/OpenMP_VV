@@ -1,0 +1,122 @@
+#---------------------------------------------------------------------------
+#
+#                SITE- AND/OR PLATFORM-SPECIFIC DEFINITIONS. 
+#
+#---------------------------------------------------------------------------
+
+#---------------------------------------------------------------------------
+# Items in this file will need to be changed for each platform.
+#---------------------------------------------------------------------------
+
+#---------------------------------------------------------------------------
+#
+# CC/CXX         - C/C++ compiler 
+# CFLAGS/CXXFLAG     - C/C++ compilation arguments
+# C_INC/CXX_INC      - any -I arguments required for compiling C/C++
+# CLINK/CXXLINK     - C/C++ linker
+# CLINKFLAGS/CXXLINKFLAGS - C/C++ linker flags
+# C_LIB/CXX_LIB      - any -L and -l arguments required for linking C/C++ 
+#
+# For C compilations are done with $(CC) $(C_INC) $(CFLAGS) or
+#                            $(CC) $(CFLAGS)
+# linking is done with       $(CLINK) $(C_LIB) $(CLINKFLAGS)
+#
+# For C++ compilations are done with $(CXX) $(CXX_INC) $(CXXFLAGS) or
+#                            $(CXX) $(CXXFLAGS)
+# linking is done with       $(CXXLINK) $(CXX_LIB) $(CXXLINKFLAGS)
+#---------------------------------------------------------------------------
+
+#---------------------------------------------------------------------------
+# C compilers
+#---------------------------------------------------------------------------
+CCOMPILERS="cc, clang, gcc, xlc"
+
+# CRAY compiler
+ifeq ($(CC), cc)
+  CFLAGS = 
+  CLINK = cc
+  CLINKFLAGS =
+endif
+
+# GCC compiler
+ifeq ($(CC), gcc)
+  CFLAGS = -O3 -std=c99 -fopenmp -foffload="-lm" -lm
+  CLINK = gcc
+  CLINKFLAGS = -O3 -fopenmp -foffload="-lm" -lm
+endif
+
+# IBM XL compiler
+ifeq ($(CC), xlc)
+  CFLAGS = -O3 -qsmp=omp -qoffload 
+  CLINK = xlc
+  CLINKFLAGS = -O3 -qsmp=omp -qoffload 
+endif
+
+# Clang compiler
+ifeq ($(CC), clang)
+  CFLAGS = -O3 -std=c99 -fopenmp -fopenmp-targets=nvptx64-nvida-cuda 
+  CLINK = clang
+  CLINKFLAGS = -O3 -fopenmp -fopenmp-targets=nvptx64-nvida-cuda
+endif
+
+#---------------------------------------------------------------------------
+# C++ compilers
+#---------------------------------------------------------------------------
+CXXCOMPILERS="clang++, g++, xlc++"
+
+# GCC compiler
+ifeq ($(CXX), g++)
+  CXXFLAGS = -O3 -fopenmp -foffload="-lm" -lm
+  CXXLINK = g++
+  CXXLINKFLAGS = -O3 -fopenmp -foffload="-lm" -lm
+endif
+
+# IBM XL compiler
+ifeq ($(CXX), xlc++)
+  CXXFLAGS = -O3 -qsmp=omp -qoffload 
+  CXXLINK = xlc++
+  CXXLINKFLAGS = -O3 -qsmp=omp -qoffload 
+endif
+
+# Clang compiler
+ifeq ($(CXX), clang++)
+  CXXFLAGS = -O3 -fopenmp -fopenmp-targets=nvptx64-nvida-cuda 
+  CXXLINK = clang++
+  CXXLINKFLAGS = -O3 -fopenmp -fopenmp-targets=nvptx64-nvida-cuda
+endif
+
+#---------------------------------------------------------------------------
+# These macros are passed to the linker 
+#---------------------------------------------------------------------------
+C_LIB  = 
+CXX_LIB  = 
+
+#---------------------------------------------------------------------------
+# These macros are passed to the compiler 
+#---------------------------------------------------------------------------
+#C_INC = -I../common
+#CXX_INC = -I../common
+
+#---------------------------------------------------------------------------
+# Destination of executables, relative to subdirs of the main directory. . 
+#---------------------------------------------------------------------------
+BINDIR = bin
+
+#---------------------------------------------------------------------------
+# COMPILER DEF
+#---------------------------------------------------------------------------
+CCOMPILE = $(CC) $(C_INC) $(CFLAGS)
+CXXCOMPILE = $(CXX) $(CXX_INC) $(CXXFLAGS)
+
+#---------------------------------------------------------------------------
+# COLORS DEF
+#---------------------------------------------------------------------------
+TXTBLK := "\033[0;30m" # Black - Regular
+TXTRED := "\033[0;31m" # Red
+TXTGRN := "\033[0;32m" # Green
+TXTYLW := "\033[0;33m" # Yellow
+TXTBLU := "\033[0;34m" # Blue
+TXTPUR := "\033[0;35m" # Purple
+TXTCYN := "\033[0;36m" # Cyan
+TXTWHT := "\033[0;37m" # White
+TXTNOC := "\033[0m"
