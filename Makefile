@@ -56,7 +56,7 @@ endif
 TESTS_TO_RUN ?= $(shell find $(BINDIR) -name *.o)
 define run_test
 	@echo -e $(TXTGRN)"\n\n" running: $(1) $(TXTNOC) ${RECORD}
-	-@$(call loadModules) $(RUN_TEST) $(1) $(VERBOSE) $(RECORD)
+	-@$(call loadModules,$(C_COMPILER_MODULE) $(CXX_COMPILER_MODULE)) $(RUN_TEST) $(1) $(VERBOSE) $(RECORD)
 endef
 
 .PHONY: all
@@ -79,10 +79,9 @@ MessageDisplay:
 	@echo "Running make with the following compilers"
 	@echo "CC = "$(CC)
 	@echo "CXX = "$(GCC)
-	$(if $(MODULE_LOAD), @echo "C_MODULE = "$(C_COMPILER_MODULE); echo "CXX_MODULE = "$(C_COMPILER_MODULE);,)
+	$(if $(MODULE_LOAD), @echo "C_MODULE = "$(C_COMPILER_MODULE); echo "CXX_MODULE = "$(CXX_COMPILER_MODULE);,)
 
 define loadModules
-	echo $(1)
 	$(if $(MODULE_LOAD), module load $(1) $(CUDA_MODULE) $(if $(QUIET), > /dev/null 2> /dev/null,);,)
 endef
 
@@ -105,12 +104,12 @@ endef
 # run c app rule
 %.c.run: $(OBJS_C)
 	@echo -e $(TXTGRN)"\n\n" running: $@ $(TXTNOC) ${RECORD}
-	-@$(RUN_TEST) $(@:.run=.o) $(VERBOSE) $(RECORD)
+	-@$(call loadModules,$(C_COMPILER_MODULE)) $(RUN_TEST) $(@:.run=.o) $(VERBOSE) $(RECORD)
 
 # run cpp app rule
 %.cpp.run: $(OBJS_CPP)
 	@echo -e $(TXTGRN)"\n\n" running: $@ $(TXTNOC) ${RECORD}
-	-@$(RUN_TEST) $(@:.run=.o) $(VERBOSE) $(RECORD)
+	-@$(call loadModules,$(CXX_COMPILER_MODULE)) $(RUN_TEST) $(@:.run=.o) $(VERBOSE) $(RECORD)
 
 # Creates the BINDIR folder
 $(BINDIR):
