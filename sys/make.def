@@ -27,6 +27,10 @@
 #---------------------------------------------------------------------------
 
 #---------------------------------------------------------------------------
+# CUDA Module 
+#---------------------------------------------------------------------------
+CUDA_MODULE = cuda/8.0.61-1
+#---------------------------------------------------------------------------
 # C compilers
 #---------------------------------------------------------------------------
 CCOMPILERS="cc, clang, gcc, xlc"
@@ -43,6 +47,7 @@ ifeq ($(CC), gcc)
   CFLAGS = -O3 -std=c99 -fopenmp -foffload="-lm" -lm
   CLINK = gcc
   CLINKFLAGS = -O3 -fopenmp -foffload="-lm" -lm
+  C_COMPILER_MODULE = gcc/7.1.1-20170802
 endif
 
 # IBM XL compiler
@@ -50,6 +55,7 @@ ifeq ($(CC), xlc)
   CFLAGS = -O3 -qsmp=omp -qoffload 
   CLINK = xlc
   CLINKFLAGS = -O3 -qsmp=omp -qoffload 
+  C_COMPILER_MODULE = xl/20170914-beta
 endif
 
 # Clang compiler
@@ -57,6 +63,7 @@ ifeq ($(CC), clang)
   CFLAGS = -O3 -std=c99 -fopenmp -fopenmp-targets=nvptx64-nvida-cuda 
   CLINK = clang
   CLINKFLAGS = -O3 -fopenmp -fopenmp-targets=nvptx64-nvida-cuda
+  C_COMPILER_MODULE = clang/20170629
 endif
 
 #---------------------------------------------------------------------------
@@ -69,6 +76,7 @@ ifeq ($(CXX), g++)
   CXXFLAGS = -O3 -fopenmp -foffload="-lm" -lm
   CXXLINK = g++
   CXXLINKFLAGS = -O3 -fopenmp -foffload="-lm" -lm
+  CXX_COMPILER_MODULE = gcc/7.1.1-20170802
 endif
 
 # IBM XL compiler
@@ -76,6 +84,7 @@ ifeq ($(CXX), xlc++)
   CXXFLAGS = -O3 -qsmp=omp -qoffload 
   CXXLINK = xlc++
   CXXLINKFLAGS = -O3 -qsmp=omp -qoffload 
+  CXX_COMPILER_MODULE = xl/20170914-beta
 endif
 
 # Clang compiler
@@ -83,6 +92,7 @@ ifeq ($(CXX), clang++)
   CXXFLAGS = -O3 -fopenmp -fopenmp-targets=nvptx64-nvida-cuda 
   CXXLINK = clang++
   CXXLINKFLAGS = -O3 -fopenmp -fopenmp-targets=nvptx64-nvida-cuda
+  CXX_COMPILER_MODULE = clang/20170629
 endif
 
 #---------------------------------------------------------------------------

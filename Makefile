@@ -56,36 +56,48 @@ endif
 TESTS_TO_RUN ?= $(shell find $(BINDIR) -name *.o)
 define run_test
 	@echo -e $(TXTGRN)"\n\n" running: $(1) $(TXTNOC) ${RECORD}
-	-@$(RUN_TEST) $(1) $(VERBOSE) $(RECORD)
+	-@$(call loadModules) $(RUN_TEST) $(1) $(VERBOSE) $(RECORD)
 endef
 
 .PHONY: all
-all: $(ALL_DEP)
+all: MessageDisplay $(ALL_DEP)
 	@echo "====COMPILE AND RUN DONE====" ${RECORD}
 	
 
 .PHONY: compile
-compile: $(COMP_DEP)
+compile: MessageDisplay $(COMP_DEP)
 	@echo "====COMPILE DONE====" ${RECORD}
 
 .PHONY: run
-run: 
+run:
 	$(foreach TEST, $(TESTS_TO_RUN), $(call run_test,$(TEST)))
 	@echo "====RUN DONE=====" ${RECORD}
 
+.PHONY: MessageDisplay
+MessageDisplay:
+	@echo "    ====    SOLLVE PROJECT MAKEFILE   ====   "
+	@echo "Running make with the following compilers"
+	@echo "CC = "$(CC)
+	@echo "CXX = "$(GCC)
+	$(if $(MODULE_LOAD), @echo "C_MODULE = "$(C_COMPILER_MODULE); echo "CXX_MODULE = "$(C_COMPILER_MODULE);,)
+
+define loadModules
+	echo $(1)
+	$(if $(MODULE_LOAD), module load $(1) $(CUDA_MODULE) $(if $(QUIET), > /dev/null 2> /dev/null,);,)
+endef
 
 ##################################################
 # Compilation rules
 ##################################################
 # c files rule
-%.c.o: %.c $(BINDIR)
+%.c.o: %.c $(BINDIR) 
 	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC) ${RECORD}
-	-$(QUIET)$(CCOMPILE) $< -o $(BINDIR)/$(notdir $@) $(RECORD)
+	-$(QUIET)$(call loadModules,$(C_COMPILER_MODULE)) $(CCOMPILE) $< -o $(BINDIR)/$(notdir $@) $(RECORD)
 	
 # c++ files rule
 %.cpp.o: %.cpp $(BINDIR)
 	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC) ${RECORD}
-	-$(QUIET)$(CXXCOMPILE) $< -o $(BINDIR)/$(notdir $@) $(RECORD)
+	-$(QUIET)$(call loadModules,$(CXX_COMPILER_MODULE)) $(CXXCOMPILE) $< -o $(BINDIR)/$(notdir $@) $(RECORD)
 
 ##################################################
 # Running tests rules
