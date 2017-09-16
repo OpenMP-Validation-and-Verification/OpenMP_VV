@@ -45,16 +45,18 @@ endif
 
 # GCC compiler
 ifeq ($(CC), gcc)
-  COFFLOADING = -foffload="-lm"
-  CFLAGS = -O3 -std=c99 -fopenmp $(COFFLOADING) -lm
+  COFFLOADING = -foffload="-lm" -lm
+  C_NO_OFFLOADING = -foffload=disable
+  CFLAGS = -O3 -std=c99 -fopenmp $(COFFLOADING) 
   CLINK = gcc
-  CLINKFLAGS = -O3 -fopenmp $(COFFLOADING) -lm
+  CLINKFLAGS = -O3 -fopenmp $(COFFLOADING)
   C_COMPILER_MODULE = gcc/7.1.1-20170802
 endif
 
 # IBM XL compiler
 ifeq ($(CC), xlc)
   COFFLOADING = -qoffload
+  C_NO_OFFLOADING = 
   CFLAGS = -O3 -qsmp=omp $(COFFLOADING)
   CLINK = xlc
   CLINKFLAGS = -O3 -qsmp=omp $(COFFLOADING)
@@ -64,6 +66,7 @@ endif
 # Clang compiler
 ifeq ($(CC), clang)
   COFFLOADING = -fopenmp-targets=nvptx64-nvida-cuda
+  C_NO_OFFLOADING = 
   CFLAGS = -O3 -std=c99 -fopenmp $(COFFLOADING)
   CLINK = clang
   CLINKFLAGS = -O3 -fopenmp $(COFFLOADING)
@@ -77,16 +80,18 @@ CXXCOMPILERS="clang++, g++, xlc++"
 
 # GCC compiler
 ifeq ($(CXX), g++)
-  CXXOFFLOADING = -foffload="-lm"
-  CXXFLAGS = -O3 -fopenmp $(CXXOFFLOADING) -lm
+  CXXOFFLOADING = -foffload="-lm" -lm
+  CXX_NO_OFFLOADING = -foffload=disable
+  CXXFLAGS = -O3 -fopenmp $(CXXOFFLOADING)
   CXXLINK = g++
-  CXXLINKFLAGS = -O3 -fopenmp $(CXXOFFLOADING) -lm
+  CXXLINKFLAGS = -O3 -fopenmp $(CXXOFFLOADING)
   CXX_COMPILER_MODULE = gcc/7.1.1-20170802
 endif
 
 # IBM XL compiler
 ifeq ($(CXX), xlc++)
   CXXOFFLOADING = -qoffload
+  CXX_NO_OFFLOADING = 
   CXXFLAGS = -O3 -qsmp=omp $(CXXOFFLOADING)
   CXXLINK = xlc++
   CXXLINKFLAGS = -O3 -qsmp=omp $(CXXOFFLOADING)
@@ -96,6 +101,7 @@ endif
 # Clang compiler
 ifeq ($(CXX), clang++)
   CXXOFFLOADING = -fopenmp-targets=nvptx64-nvida-cuda 
+  CXX_NO_OFFLOADING = 
   CXXFLAGS = -O3 -fopenmp $(CXXOFFLOADING) 
   CXXLINK = clang++
   CXXLINKFLAGS = -O3 -fopenmp $(CXXOFFLOADING)
