@@ -37,9 +37,10 @@ CCOMPILERS="cc, clang, gcc, xlc"
 
 # CRAY compiler
 ifeq ($(CC), cc)
-  CFLAGS = 
+  CFLAGS = -homp -O3
   CLINK = cc
-  CLINKFLAGS =
+  CLINKFLAGS = -homp -lm
+  C_COMPILER_MODULE = PrgEnv-cray cce/8.6.1 craype-accel-nvidia35 cudatoolkit craype/2.5.12 cray-mpich/7.6.1
 endif
 
 # GCC compiler
