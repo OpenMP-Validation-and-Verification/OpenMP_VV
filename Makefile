@@ -81,9 +81,22 @@ MessageDisplay:
 	@echo "CXX = "$(GCC)
 	$(if $(MODULE_LOAD), @echo "C_MODULE = "$(C_COMPILER_MODULE); echo "CXX_MODULE = "$(CXX_COMPILER_MODULE);,)
 
+##################################################
+# Loading modules
+##################################################
+
 define loadModules
 	$(if $(MODULE_LOAD), module load $(1) $(CUDA_MODULE) $(if $(QUIET), > /dev/null 2> /dev/null,);,)
 endef
+
+##################################################
+# Turn off offloading
+##################################################
+
+ifdef NO_OFFLOADING
+	COFFLOADING = $(C_NO_OFFLOADING)
+	CXXOFFLOADING = $(CXX_NO_OFFLOADING)
+endif
 
 ##################################################
 # Compilation rules
@@ -135,6 +148,7 @@ help:
 	@echo "  LOG=1                     Enables dump of the make process output into logs.txt"
 	@echo "  LOG_ALL=1                 Enables dump of the make process output, errors, and binary execution outputs into logs.txt"
 	@echo "  MODULE_LOAD=1             Before compiling or running, module load is called"
+	@echo "  NO_OFFLOADING=1           Turn off offloading"
 	@echo "  SOURCES_C=file.c          Specify the C file(s) that you want to apply the rule to. Cannot be combined with SOURCES_CPP"
 	@echo "  SOURCES_CPP=file.cxx      Specify the CPP file(s) that you want to apply the rule to. Cannot be combined with SOURCES_C"
 	@echo "  TESTS_TO_RUN=bin/file.o   Specify the binaries to run"
