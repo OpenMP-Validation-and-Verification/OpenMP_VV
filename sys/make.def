@@ -117,8 +117,8 @@ CXX_LIB  =
 #---------------------------------------------------------------------------
 # These macros are passed to the compiler 
 #---------------------------------------------------------------------------
-#C_INC = -I../common
-#CXX_INC = -I../common
+C_INC = -I./ompvv
+CXX_INC = -I./ompvv
 
 #---------------------------------------------------------------------------
 # Destination of executables, relative to subdirs of the main directory. . 
