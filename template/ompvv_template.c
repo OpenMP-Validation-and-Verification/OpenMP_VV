@@ -16,16 +16,28 @@
 #include "ompvv.h"
 
 int test_function() {
-  int errors = 0;
-  //
-  // WRITE YOUR TEST HERE
-  //
+  int errors = 1;
+
+#pragma omp target map(from: errors)
+  {
+    errors = 0;
+  }
 
   return errors;
 }
 
 int main() {
-  OMPVV_TEST_OFFLOADING;
+  OMPVV_TEST_OFFLOADING; // This should be at the beginning of all tests
+
+  // Here are some examples on how to use the VERBOSE_MODE messages
+  OMPVV_INFOMSG("THIS IS IS AN EXAMPLE OF AN INFOMSG");
+  OMPVV_INFOMSG("THIS IS IS AN EXAMPLE OF AN INFOMSG WITH PARAMETERS (%d, %s, %f)", 3, "ompvv", 3.3);
+  OMPVV_WARNING("THIS IS IS AN EXAMPLE OF A WARNING");
+  OMPVV_WARNING("THIS IS IS AN EXAMPLE OF A WARNING WITH PARAMETERS (%d, %s, %f)", 3, "ompvv", 3.3);
+  OMPVV_ERROR("THIS IS IS AN EXAMPLE OF AN ERROR");
+  OMPVV_ERROR("THIS IS IS AN EXAMPLE OF AN ERROR WITH PARAMETERS (%d, %s, %f)", 3, "ompvv", 3.3);
+
+
   int errors = 0;
   errors = test_function();
   // CALL OTHER FUNCTIONS HERE

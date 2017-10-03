@@ -4,20 +4,23 @@
 // 
 //===----------------------------------------------------------------------===//
 
+#include <stdio.h>
+#include <string.h>
+
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
 // Macro for output of information, warning and error messages
 #ifdef VERBOSE_MODE
   #define OMPVV_WARNING(message, ...) { \
-    printf("[OMPVV_WARNING: %s:%i] " #message "\n", __FILENAME__, __LINE__, ##__VA_ARGS__); \
+    printf("[OMPVV_WARNING: %s:%i] " message "\n", __FILENAME__, __LINE__, ##__VA_ARGS__); \
   }
   
   #define OMPVV_ERROR(message, ...) { \
-    fprintf(stderr, "[OMPVV_ERROR: %s:%i] " #message "\n", __FILENAME__, __LINE__, ##__VA_ARGS__); \
+    fprintf(stderr, "[OMPVV_ERROR: %s:%i] " message "\n", __FILENAME__, __LINE__, ##__VA_ARGS__); \
   }
   
   #define OMPVV_INFOMSG(message, ...) { \
-    fprintf("[OMPVV_INFO: %s:%i] " #message "\n", __FILENAME__, __LINE__, ##__VA_ARGS__); \
+    printf("[OMPVV_INFO: %s:%i] " message "\n", __FILENAME__, __LINE__, ##__VA_ARGS__); \
   }
 #else
   #define OMPVV_WARNING(message, ...) {}
@@ -30,12 +33,12 @@
   int _ompvv_isOffloadingOn = 0; \
 _Pragma("omp target map (from: _ompvv_isOffloadingOn)") \
   {  _ompvv_isOffloadingOn = !omp_is_initial_device();  } \
-  OMPVV_INFOMSG("Test is running on %s.\n",(_ompvv_isOffloadingOn)? "device" : "host");
+  OMPVV_INFOMSG("Test is running on %s.",(_ompvv_isOffloadingOn)? "device" : "host");
 
 // Macro for reporting results
 #define OMPVV_REPORT(err) { \
   printf("[OMPVV_RESULT] Test %s on the %s.\n", (err == 0)? "passed":"failed", (_ompvv_isOffloadingOn)? "device" : "host"); \
-  OMPVV_INFOMSG("The value of "#err" is %d.\n", err); \
+  OMPVV_INFOMSG("The value of " #err " is %d.", err); \
 }
 
 // Macro for correct exit code

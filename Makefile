@@ -17,6 +17,10 @@ ifdef LOG_ALL
 	RECORD:= 2>&1 | tee -a logs.txt
 endif
 
+ifdef VERBOSE_TESTS
+	VERBOSE_MODE = -DVERBOSE_MODE=1
+endif
+
 RUN_TEST=sys/run_test.sh
 
 
@@ -104,12 +108,12 @@ endif
 # c files rule
 %.c.o: %.c $(BINDIR) 
 	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC) ${RECORD}
-	-$(QUIET)$(call loadModules,$(C_COMPILER_MODULE)) $(CCOMPILE) $< -o $(BINDIR)/$(notdir $@) $(RECORD)
+	-$(QUIET)$(call loadModules,$(C_COMPILER_MODULE)) $(CCOMPILE) $(VERBOSE_MODE) $< -o $(BINDIR)/$(notdir $@) $(RECORD)
 	
 # c++ files rule
 %.cpp.o: %.cpp $(BINDIR)
 	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC) ${RECORD}
-	-$(QUIET)$(call loadModules,$(CXX_COMPILER_MODULE)) $(CXXCOMPILE) $< -o $(BINDIR)/$(notdir $@) $(RECORD)
+	-$(QUIET)$(call loadModules,$(CXX_COMPILER_MODULE)) $(CXXCOMPILE) $(VERBOSE_MODE) $< -o $(BINDIR)/$(notdir $@) $(RECORD)
 
 ##################################################
 # Running tests rules
@@ -145,6 +149,8 @@ help:
 	@echo "  make CC=ccompiler CXX=cppcompiler [OPTIONS] [RULE]"
 	@echo ""
 	@echo " === OPTIONS === "
+	@echo "  VERBOSE=1                 Enables output of the commands that the make process executes"
+	@echo "  VERBOSE_TESTS=1           Enables extra information display in the tests"
 	@echo "  LOG=1                     Enables dump of the make process output into logs.txt"
 	@echo "  LOG_ALL=1                 Enables dump of the make process output, errors, and binary execution outputs into logs.txt"
 	@echo "  MODULE_LOAD=1             Before compiling or running, module load is called"
