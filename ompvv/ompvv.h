@@ -37,7 +37,7 @@ _Pragma("omp target map (from: _ompvv_isOffloadingOn)") \
 
 // Macro for reporting results
 #define OMPVV_REPORT(err) { \
-  printf("[OMPVV_RESULT] Test %s on the %s.\n", (err == 0)? "passed":"failed", (_ompvv_isOffloadingOn)? "device" : "host"); \
+  printf("[OMPVV_RESULT: %s] Test %s on the %s.\n", __FILENAME__, (err == 0)? "passed":"failed", (_ompvv_isOffloadingOn)? "device" : "host"); \
   OMPVV_INFOMSG("The value of " #err " is %d.", err); \
 }
 
