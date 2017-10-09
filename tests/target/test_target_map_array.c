@@ -20,17 +20,16 @@
 int main() {
   int compute_array[N];
   int sum = 0, result = 0;
-  int i, isHost = -1, exeW = -1;
+  int i, isHost = -1;
 
   // Host initialization of the array 
   for (i = 0; i < N; i++) 
     compute_array[i] = 0;
 
-#pragma omp target map(from: compute_array) map(tofrom: isHost,exeW)
+#pragma omp target map(from: compute_array) map(tofrom: isHost)
   {
     // Record where the computation was executed
     isHost = omp_is_initial_device();
-    exeW = (isHost== 0)? 1 : 0; // 1 = device, 0 = host 
 	
 	  // Updating the compute_array
     for (i = 0; i < N; i++)
@@ -46,11 +45,11 @@ int main() {
     result += i;
 
   if (result != sum) {
-    printf("Test failed on %s\n",exeW > 0? "device":"host");
+    printf("Test failed on %s\n",isHost ? "host":"device");
     return 1;
   }
   else {
-    printf("Test passed on %s\n",exeW > 0? "device":"host");
+    printf("Test passed on %s\n",isHost? "host":"device");
     return 0;
   }
 }
