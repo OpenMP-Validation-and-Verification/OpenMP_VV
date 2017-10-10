@@ -28,15 +28,20 @@
   #define OMPVV_INFOMSG(message, ...) {}
 #endif // END IF VERBOSE_MODE
 
-// Macro for checking if offloading is enabled or not
-#define OMPVV_TEST_OFFLOADING \
+#define OMPVV_TEST_OFFLOADING_PROBE \
   int _ompvv_isOffloadingOn = 0; \
 _Pragma("omp target map (from: _ompvv_isOffloadingOn)") \
-  {  _ompvv_isOffloadingOn = !omp_is_initial_device();  } \
-  OMPVV_INFOMSG("Test is running on %s.",(_ompvv_isOffloadingOn)? "device" : "host");
+  {  _ompvv_isOffloadingOn = !omp_is_initial_device();  }
+
+// Macro for checking if offloading is enabled or not
+#define OMPVV_TEST_OFFLOADING { \
+  OMPVV_TEST_OFFLOADING_PROBE \
+  OMPVV_INFOMSG("Test is running on %s.",(_ompvv_isOffloadingOn)? "device" : "host"); \
+}
 
 // Macro for reporting results
 #define OMPVV_REPORT(err) { \
+  OMPVV_TEST_OFFLOADING_PROBE \
   printf("[OMPVV_RESULT: %s] Test %s on the %s.\n", __FILENAME__, (err == 0)? "passed":"failed", (_ompvv_isOffloadingOn)? "device" : "host"); \
   OMPVV_INFOMSG("The value of " #err " is %d.", err); \
 }
