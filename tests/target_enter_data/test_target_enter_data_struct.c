@@ -7,23 +7,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <omp.h>
+#include "ompvv.h"
 
 #define N 1000
 #define ARRAY_SIZE 5
-
-#define DEBUG_MODE 1
-#define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
-#define TEST_ERRORS(var, test, ...) {         \
-  var |= test;                          \
-if (DEBUG_MODE && test) {                  \
-fprintf(stderr, "[%s] ERROR reported in line %i, test = " #test "\n", __FILENAME__, __LINE__);     \
-__VA_ARGS__;                            \
-}  \
-}
-
 int test_struct() {
 
-  printf("test_struct\n");
+  OMPVV_INFOMSG("test_struct");
 
   int errors = 0, isHost = -1;
   int* pointers[ARRAY_SIZE + 1];
@@ -65,7 +55,6 @@ int test_struct() {
     for (int i = 0; i < N; ++i)
       singleCopy.b[i] = single.b[i];
 
-    // Array initialization on host. Using map(to)
     for (int i = 0; i < ARRAY_SIZE; ++i) {
       arrayCopy[i].a = array[i].a;
       arrayCopy[i].p = array[i].p;
@@ -75,33 +64,28 @@ int test_struct() {
   }
 
   // checking results
-  TEST_ERRORS(errors, (singleCopy.a != single.a)); 
+  OMPVV_TEST_AND_SET(errors, (singleCopy.a != single.a)); 
   for (int i = 0; i < N; ++i)
-    TEST_ERRORS(errors, (singleCopy.b[i] != single.b[i]));
-  TEST_ERRORS(errors, (pointers[0] != singleCopy.p));
+    OMPVV_TEST_AND_SET(errors, (singleCopy.b[i] != single.b[i]));
+  OMPVV_TEST_AND_SET(errors, (pointers[0] != singleCopy.p));
   for (int i = 0; i < ARRAY_SIZE; ++i) {
-    TEST_ERRORS(errors, (arrayCopy[i].a != array[i].a)); 
+    OMPVV_TEST_AND_SET(errors, (arrayCopy[i].a != array[i].a)); 
     for (int j = 0; j < N; ++j)
-      TEST_ERRORS(errors, (arrayCopy[i].b[j] != array[i].b[j]));
-    TEST_ERRORS(errors, (pointers[i + 1] != arrayCopy[i].p));
+      OMPVV_TEST_AND_SET(errors, (arrayCopy[i].b[j] != array[i].b[j]));
+    OMPVV_TEST_AND_SET(errors, (pointers[i + 1] != arrayCopy[i].p));
   }
-
-  if (!errors)
-    printf("Test passed on %s\n", (isHost ? "host" : "device"));
-  else
-    printf("Test failed on %s\n", (isHost ? "host" : "device"));
 
   return errors;
 }
 
 int test_typedef() {
 
-  printf("test_typedef\n");
+  OMPVV_INFOMSG("test_typedef");
 
   int errors = 0, isHost = -1;
   int* pointers[ARRAY_SIZE + 1];
 
-  typedef struct {
+  typedef struct /* __attribute__((packed)) */{
     int a;
     int b[N];
     int *p;
@@ -130,7 +114,8 @@ int test_typedef() {
     printf(""); // forcing the compiler to not moving out of the scope
   }
   // operation
-#pragma omp target map(from: singleCopy) map(from: arrayCopy[0:ARRAY_SIZE]) map(tofrom: isHost)
+#pragma omp target map(from: singleCopy) map(from: arrayCopy[0:ARRAY_SIZE]) map(tofrom: isHost) \
+ map(alloc: single)  map(alloc: array[0:ARRAY_SIZE])
   {
     isHost = omp_is_initial_device();
     singleCopy.a = single.a;
@@ -148,28 +133,24 @@ int test_typedef() {
   }
 
   // checking results
-  TEST_ERRORS(errors, (singleCopy.a != single.a)); 
+  OMPVV_TEST_AND_SET(errors, (singleCopy.a != single.a));
   for (int i = 0; i < N; ++i)
-    TEST_ERRORS(errors, (singleCopy.b[i] != single.b[i]));
-  TEST_ERRORS(errors, (pointers[0] != singleCopy.p));
+    OMPVV_TEST_AND_SET(errors, (singleCopy.b[i] != single.b[i]));
+  OMPVV_TEST_AND_SET(errors, (pointers[0] != singleCopy.p));
   for (int i = 0; i < ARRAY_SIZE; ++i) {
-    TEST_ERRORS(errors, (arrayCopy[i].a != array[i].a)); 
+    OMPVV_TEST_AND_SET(errors, (arrayCopy[i].a != array[i].a)); 
     for (int j = 0; j < N; ++j)
-      TEST_ERRORS(errors, (arrayCopy[i].b[j] != array[i].b[j]));
-    TEST_ERRORS(errors, (pointers[i + 1] != arrayCopy[i].p));
+      OMPVV_TEST_AND_SET(errors, (arrayCopy[i].b[j] != array[i].b[j]));
+    OMPVV_TEST_AND_SET(errors, (pointers[i + 1] != arrayCopy[i].p));
   }
-
-  if (!errors)
-    printf("Test passed on %s\n", (isHost ? "host" : "device"));
-  else
-    printf("Test failed on %s\n", (isHost ? "host" : "device"));
 
   return errors;
 }
 
 int main () {
+  OMPVV_TEST_OFFLOADING;
   int errors = 0;
-  errors += test_struct();
-  errors += test_typedef();
-  return errors;
+  OMPVV_TEST_AND_SET(errors, test_struct());
+  OMPVV_TEST_AND_SET(errors, test_typedef());
+  OMPVV_REPORT_AND_RETURN(errors);
 }
