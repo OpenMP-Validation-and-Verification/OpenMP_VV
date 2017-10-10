@@ -41,8 +41,9 @@ _Pragma("omp target map (from: _ompvv_isOffloadingOn)") \
 
 // Macro for setting errors on condition
 #define OMPVV_TEST_AND_SET(err, condition) { \
-  err |= (condition); \
-  if ((condition)) { \
+  int _ompvv_conditionEval = condition; \
+  err += (_ompvv_conditionEval); \
+  if ((_ompvv_conditionEval)) { \
     OMPVV_ERROR(" Condition " #condition " failed "); \
   } \
 }
