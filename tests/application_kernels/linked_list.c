@@ -3,7 +3,7 @@
  * The data is mapped back and contents are verified 
  * 
  * Last modified by Swaroop Pophale, October 2, 2017
- * /
+ */
 
 #include <stdlib.h>
 #include <omp.h>
@@ -52,15 +52,21 @@ int  map_ll(node_t * head) {
     return((exeW[0] && exeW[1])? 1:0);
 }
 void unmap_ll(node_t * head) {
-    node_t * temp = head;
+    node_t * temp = head, *tempNext;
     if (!temp) return;
-
-    #pragma omp target exit data map(from:temp[0].data)
+    tempNext = temp->next;
+    #pragma omp target exit data map(from:temp[0:1])
+    temp->next = tempNext;
     while(temp->next) {
         // Note: only copies back the data element to avoid overwriting next
         // pointer
-        #pragma omp target exit data map(from:temp[0].next[0].data)
-        temp=temp->next;
+        
+    	temp = temp->next;
+	// Save broken link
+    	tempNext = temp->next;
+        #pragma omp target exit data map(from: temp[0:1])
+	// Fix broken link
+	temp->next = tempNext;
     }
     //printf("Leaving unmap_ll\n");
 }
