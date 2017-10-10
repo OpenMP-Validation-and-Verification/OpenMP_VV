@@ -39,6 +39,14 @@ _Pragma("omp target map (from: _ompvv_isOffloadingOn)") \
   OMPVV_INFOMSG("Test is running on %s.",(_ompvv_isOffloadingOn)? "device" : "host"); \
 }
 
+// Macro for setting errors on condition
+#define OMPVV_TEST_AND_SET(err, condition) { \
+  err |= (condition); \
+  if (!(condition)) { \
+    OMPVV_ERROR(" Condition " #condition " failed "); \
+  } \
+}
+
 // Macro for reporting results
 #define OMPVV_REPORT(err) { \
   OMPVV_TEST_OFFLOADING_PROBE \

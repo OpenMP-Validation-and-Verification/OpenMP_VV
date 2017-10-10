@@ -39,6 +39,8 @@ int main() {
 
 
   int errors = 0;
+  OMPVV_TEST_AND_SET(errors, 1==0);
+  errors = 0;
   errors = test_function();
   // CALL OTHER FUNCTIONS HERE
 
