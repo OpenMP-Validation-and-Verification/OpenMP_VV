@@ -16,9 +16,9 @@
 #include <stdio.h>
 
 #define N 1000
+int compute_array[N];
 
 int main() {
-  int compute_array[N];
   int sum = 0, result = 0;
   int i, isHost = -1;
 
@@ -38,11 +38,10 @@ int main() {
   } // end target
 
   // Comparing the results
-  for (i = 0; i < N; i++)
+  for (i = 0; i < N; i++){
     sum = sum + compute_array[i];    
-  
-  for (i = 0; i < N; i++)
     result += i;
+  }
 
   if (result != sum) {
     printf("Test failed on %s\n",isHost ? "host":"device");
