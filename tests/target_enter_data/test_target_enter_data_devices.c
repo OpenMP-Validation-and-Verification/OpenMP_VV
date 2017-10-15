@@ -15,8 +15,6 @@ int test_set_default_dev() {
 
   OMPVV_INFOMSG("test_set_default_dev");
 
-  OMPVV_TEST_OFFLOADING_PROBE; // _ompvv_isOffloadingOn definied here
-
   // Get number of devices
   int num_dev = omp_get_num_devices();
   OMPVV_INFOMSG("num_devices: %d", num_dev);
@@ -50,13 +48,16 @@ int test_set_default_dev() {
       }
     }
   // Since we don't do enter exit data we copy the values from the device
-#pragma omp target map(delete: h_matrix[dev][0:N]) map(from: h_matrix_copy[dev][0:N]) // map(alloc: ) to avoid target to map the entire matrix h_matrix[dev][:]
+#pragma omp target data map(delete:h_matrix[dev][0:N])
+{ 
+#pragma omp target map(from: h_matrix_copy[dev][0:N]) // map(alloc: ) to avoid target to map the entire matrix h_matrix[dev][:]
     {
       for (int i = 0; i < N; ++i) {
         h_matrix_copy[dev][i] = h_matrix[dev][i];
       }
     }
   }
+}
 
   // checking results
   for (int dev = 0; dev < num_dev; ++dev) {
@@ -104,13 +105,16 @@ int test_device() {
         h_matrix[dev][i] = dev;
     }
   // Since we don't do enter exit data we copy the values from the device
-#pragma omp target map(delete: h_matrix[dev][0:N]) map(from: h_matrix_copy[dev][0:N]) device(dev) // map(alloc: ) to avoid target to map the entire matrix h_matrix[dev][:]
+#pragma omp target data map(delete:h_matrix[dev][0:N])
+{ 
+#pragma omp target map(from: h_matrix_copy[dev][0:N]) device(dev) // map(alloc: ) to avoid target to map the entire matrix h_matrix[dev][:]
     {
       for (int i = 0; i < N; ++i) {
         h_matrix_copy[dev][i] = h_matrix[dev][i];
       }
     }
   }
+}
 
   // checking results
   for (int dev = 0; dev < num_dev; ++dev) {
