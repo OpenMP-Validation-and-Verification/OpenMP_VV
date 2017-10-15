@@ -82,7 +82,7 @@ MessageDisplay:
 	@echo "    ====    SOLLVE PROJECT MAKEFILE   ====   "
 	@echo "Running make with the following compilers"
 	@echo "CC = "$(CC)
-	@echo "CXX = "$(GCC)
+	@echo "CXX = "$(CXX)
 	$(if $(MODULE_LOAD), @echo "C_MODULE = "$(C_COMPILER_MODULE); echo "CXX_MODULE = "$(CXX_COMPILER_MODULE);,)
 
 ##################################################
