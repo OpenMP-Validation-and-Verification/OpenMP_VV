@@ -14,18 +14,36 @@
   #define OMPVV_WARNING(message, ...) { \
     printf("[OMPVV_WARNING: %s:%i] " message "\n", __FILENAME__, __LINE__, ##__VA_ARGS__); \
   }
+  #define OMPVV_WARNING_IF(condition, message, ...) { \
+    if(condition) { \
+      printf("[OMPVV_WARNING: %s:%i] " message "\n", __FILENAME__, __LINE__, ##__VA_ARGS__); \
+    } \
+  }
   
   #define OMPVV_ERROR(message, ...) { \
     fprintf(stderr, "[OMPVV_ERROR: %s:%i] " message "\n", __FILENAME__, __LINE__, ##__VA_ARGS__); \
+  }
+  #define OMPVV_ERROR_IF(condition, message, ...) { \
+    if(condition) { \
+      fprintf(stderr, "[OMPVV_ERROR: %s:%i] " message "\n", __FILENAME__, __LINE__, ##__VA_ARGS__); \
+    } \
   }
   
   #define OMPVV_INFOMSG(message, ...) { \
     printf("[OMPVV_INFO: %s:%i] " message "\n", __FILENAME__, __LINE__, ##__VA_ARGS__); \
   }
+  #define OMPVV_INFOMSG_IF(condition, message, ...) { \
+    if(condition) { \
+      printf("[OMPVV_INFO: %s:%i] " message "\n", __FILENAME__, __LINE__, ##__VA_ARGS__); \
+    } \
+  }
 #else
   #define OMPVV_WARNING(message, ...) {}
+  #define OMPVV_WARNING_IF(message, ...) {}
   #define OMPVV_ERROR(message, ...) {}
+  #define OMPVV_ERROR_IF(message, ...) {}
   #define OMPVV_INFOMSG(message, ...) {}
+  #define OMPVV_INFOMSG_IF(message, ...) {}
 #endif // END IF VERBOSE_MODE
 
 #define OMPVV_TEST_OFFLOADING_PROBE \
@@ -39,15 +57,23 @@ _Pragma("omp target map (from: _ompvv_isOffloadingOn)") \
   OMPVV_INFOMSG("Test is running on %s.",(_ompvv_isOffloadingOn)? "device" : "host"); \
 }
 
+// Macro for checking if offloading is enabled or not and set a variable with the result
+#define OMPVV_TEST_AND_SET_OFFLOADING(var2set) { \
+  OMPVV_TEST_OFFLOADING_PROBE \
+  OMPVV_INFOMSG("Test is running on %s.",(_ompvv_isOffloadingOn)? "device" : "host"); \
+  var2set = _ompvv_isOffloadingOn; \
+}
 // Macro for setting errors on condition
 #define OMPVV_TEST_AND_SET(err, condition) { \
   int _ompvv_conditionEval = condition; \
   err += (_ompvv_conditionEval); \
-  if ((_ompvv_conditionEval)) { \
-    OMPVV_ERROR(" Condition " #condition " failed "); \
-  } \
 }
-
+// Macro for setting errors on condition and displaying an error if something went wrong
+#define OMPVV_TEST_AND_SET_VERBOSE(err, condition) { \
+  int _ompvv_conditionEval = condition; \
+  err += (_ompvv_conditionEval); \
+  OMPVV_ERROR_IF(_ompvv_conditionEval, " Condition " #condition " failed "); \
+}
 // Macro for reporting results
 #define OMPVV_REPORT(err) { \
   OMPVV_TEST_OFFLOADING_PROBE \
