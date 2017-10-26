@@ -180,4 +180,4 @@ help:
 	@echo "  make TESTS_TO_RUN=bin/myTest run        ==> run myTest "
 	@echo ""
 	
-
+.DEFAULT_GOAL := help
