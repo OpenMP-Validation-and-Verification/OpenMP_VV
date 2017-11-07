@@ -30,7 +30,7 @@ elif [ ! -f "$1" ]; then
 fi
 
 app=$1
-output=`$app`
+output=`timeout 15s $app`
 status=$?
 
 if [ -z $2 ]; then
