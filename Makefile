@@ -10,7 +10,7 @@ ifdef VERBOSE
 	QUIET:=
 endif
 RECORD:= 
-ifdef LOGS
+ifdef LOG
 	RECORD:= | tee -a logs.txt
 endif
 ifdef LOG_ALL
