@@ -25,26 +25,24 @@
 
 #include <omp.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include "ompvv.h" 
 
 #define SIZE_THRESHOLD 512
 
 // Test for OpenMP 4.5 target data with if
 int main() {
+  int isOffloading = 0; 
+  OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
   int a[1024];
   int b[1024];
   int c[1024];
-  int size, i = 0, errors = 0, isHost = -1, isOffloading = 0;
+  int size, i = 0, errors[2] = {0,0}, isHost = -1;
 
   // a and b array initialization
   for (i = 0; i < 1024; i++) {
     a[i] = 1;
     b[i] = i;
-  }
-
-  // We test for offloading
-#pragma omp target data map(from: isOffloading)
-  {
-    isOffloading = !omp_is_initial_device();
   }
 
   // check multiple sizes. 
@@ -57,7 +55,8 @@ int main() {
         map(tofrom: c[0:size])                                       \
         map(to: a[0:size], b[0:size]) 
     {
-#pragma omp target if(size > SIZE_THRESHOLD) map(tofrom: isHost)
+#pragma omp target if(size > SIZE_THRESHOLD) map(tofrom: isHost) \
+        map (alloc: a[0:size], b[0:size], c[0:size]) // avoid default mapping
       {
         isHost = omp_is_initial_device();
         int alpha = (isHost ? 0 : 1);
@@ -70,32 +69,30 @@ int main() {
       } // end target
     } // end target data 
 
-    printf("size: %d, isHost: %d", size, isHost);
     // checking results 
     for (i = 0; i < size; i++) {
       if (isOffloading && size > SIZE_THRESHOLD) {
         // Should have executed on the device
         // if offloading was used
-        if (c[i] != i + 1) {
-          // c[i] is zero if it was executed in the host
-          errors = 1;
-        }
+        // c[i] is zero if it was executed in the host
+        OMPVV_TEST_AND_SET(errors[0], (c[i] != i + 1)); //error when executed on the device
       } else {
         // Should have executed in the host
         // with or without offloading
-        if (c[i] != 0) {
-          errors = 1;
-        }
+        OMPVV_TEST_AND_SET(errors[1], (c[i] != 0));
       } //end-else 
     }
-    puts("");
-    printf("errors: %d\n", errors);
   } // end-for size
 
-  if (!errors)
-    printf("Test passed with offloading %s\n", (isOffloading ? "enabled" : "disabled"));
-  else
-    printf("Test failed with offloading %s\n", (isOffloading ? "enabled" : "disabled"));
-
-  return errors;
+  if (!errors[0] && !errors[1]) {
+    OMPVV_INFOMSG("Test passed with offloading %s", (isOffloading ? "enabled" : "disabled"));
+  } else if (errors[0]==0 && errors[1]!=0) {
+    OMPVV_ERROR("Test failed on host with offloading %s.", (isOffloading ? "enabled" : "disabled"));
+  } else if (errors[0]!=0 && errors[1]==0) {
+    OMPVV_ERROR("Test failed on device with offloading %s.", (isOffloading ? "enabled" : "disabled"));
+  } else if (errors[0]!=0 && errors[1]!=0) {
+    OMPVV_ERROR("Test failed on host and device with offloading %s.", (isOffloading ? "enabled" : "disabled"));
+  }
+  
+  OMPVV_REPORT_AND_RETURN((errors[0] + errors[1]));
 }
