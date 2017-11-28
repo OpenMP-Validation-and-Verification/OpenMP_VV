@@ -46,7 +46,8 @@ int test_struct() {
     printf(""); // forcing the compiler to not moving out of the scope
   }
   // operation
-#pragma omp target map(from: singleCopy) map(from: arrayCopy[0:ARRAY_SIZE]) map(tofrom: isHost)
+#pragma omp target map(from: singleCopy) map(from: arrayCopy[0:ARRAY_SIZE]) map(tofrom: isHost) 
+
   {
     isHost = omp_is_initial_device();
 
@@ -74,6 +75,10 @@ int test_struct() {
       OMPVV_TEST_AND_SET(errors, (arrayCopy[i].b[j] != array[i].b[j]));
     OMPVV_TEST_AND_SET(errors, (pointers[i + 1] != arrayCopy[i].p));
   }
+
+  // This is outside of the testing. Even thoug we want to test enter data only, there is no way
+  // to do garbage collection without target exit data
+#pragma omp target exit data map(delete: single, array[0:ARRAY_SIZE])
 
   return errors;
 }
@@ -114,8 +119,7 @@ int test_typedef() {
     printf(""); // forcing the compiler to not moving out of the scope
   }
   // operation
-#pragma omp target map(from: singleCopy) map(from: arrayCopy[0:ARRAY_SIZE]) map(tofrom: isHost) \
- map(alloc: single)  map(alloc: array[0:ARRAY_SIZE])
+#pragma omp target map(from: singleCopy) map(from: arrayCopy[0:ARRAY_SIZE]) map(tofrom: isHost)
   {
     isHost = omp_is_initial_device();
     singleCopy.a = single.a;
@@ -143,6 +147,10 @@ int test_typedef() {
       OMPVV_TEST_AND_SET(errors, (arrayCopy[i].b[j] != array[i].b[j]));
     OMPVV_TEST_AND_SET(errors, (pointers[i + 1] != arrayCopy[i].p));
   }
+
+  // This is outside of the testing. Even thoug we want to test enter data only, there is no way
+  // to do garbage collection without target exit data
+#pragma omp target exit data map(delete: single, array[0:ARRAY_SIZE])
 
   return errors;
 }
