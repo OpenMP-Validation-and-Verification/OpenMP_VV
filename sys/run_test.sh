@@ -40,3 +40,4 @@ else
 fi
 
 unset report
+exit $status
