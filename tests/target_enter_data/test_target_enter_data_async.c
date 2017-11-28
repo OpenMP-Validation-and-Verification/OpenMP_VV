@@ -107,7 +107,7 @@ int test_async_between_task_target() {
   }
   OMPVV_ERROR_IF(h_task1 != 0, "Error in host task 1");
   OMPVV_ERROR_IF(h_task2 != 0, "Error in host task 2");
-  OMPVV_ERROR_IF(h_task2 != 0, "Error in host task 2");
+  OMPVV_ERROR_IF(h_task2 != 0, "Error in host task 3");
   OMPVV_ERROR_IF(d_task1 != 0, "Error in device task 1");
   OMPVV_ERROR_IF(d_task2 != 0, "Error in device task 2");
 
