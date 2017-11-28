@@ -46,7 +46,8 @@ int test_struct() {
     printf(""); // forcing the compiler to not moving out of the scope
   }
   // operation
-#pragma omp target map(from: singleCopy) map(from: arrayCopy[0:ARRAY_SIZE]) map(tofrom: isHost)
+#pragma omp target map(from: singleCopy) map(from: arrayCopy[0:ARRAY_SIZE]) map(tofrom: isHost)\
+  map(alloc: single, array[0:ARRAY_SIZE])
   {
     isHost = omp_is_initial_device();
 
@@ -115,7 +116,7 @@ int test_typedef() {
   }
   // operation
 #pragma omp target map(from: singleCopy) map(from: arrayCopy[0:ARRAY_SIZE]) map(tofrom: isHost) \
- map(alloc: single)  map(alloc: array[0:ARRAY_SIZE])
+  map(alloc: single, array[0:ARRAY_SIZE])
   {
     isHost = omp_is_initial_device();
     singleCopy.a = single.a;
