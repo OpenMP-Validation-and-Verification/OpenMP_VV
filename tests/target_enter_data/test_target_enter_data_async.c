@@ -113,7 +113,12 @@ int test_async_between_task_target() {
 
   OMPVV_TEST_AND_SET(errors, (N * ALL_TASKS_BITS != sum));
   OMPVV_INFOMSG("Test test_async_between_task_target ran on the %s", (isHost ? "host" : "device"));
-  
+ 
+// Garbage collection
+// This is outside of the testing area but we need to clear memory on the device 
+// created with the target enter data
+#pragma omp target exit data map(delete: h_array[0:N])
+
   return errors;
 }
 
@@ -169,6 +174,11 @@ int test_async_between_target() {
 
   OMPVV_TEST_AND_SET(errors, (N * (DEVICE_TASK1_BIT | DEVICE_TASK2_BIT) != sum));
   OMPVV_INFOMSG("Test test_async_between_task_target ran on the %s", (isHost ? "host" : "device"));
+
+// Garbage collection
+// This is outside of the testing area but we need to clear memory on the device 
+// created with the target enter data
+#pragma omp target exit data map(delete: h_array[0:N])
 
   return errors;
 }
