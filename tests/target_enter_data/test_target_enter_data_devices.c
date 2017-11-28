@@ -48,15 +48,12 @@ int test_set_default_dev() {
       }
     }
   // Since we don't do enter exit data we copy the values from the device
-#pragma omp target data map(delete:h_matrix[dev][0:N])
-{ 
-#pragma omp target map(from: h_matrix_copy[dev][0:N]) // map(alloc: ) to avoid target to map the entire matrix h_matrix[dev][:]
+#pragma omp target map(from: h_matrix_copy[dev][0:N]) map(alloc: h_matrix[dev][0:N])
     {
       for (int i = 0; i < N; ++i) {
         h_matrix_copy[dev][i] = h_matrix[dev][i];
       }
     }
-  }
 }
 
   // checking results
@@ -68,6 +65,12 @@ int test_set_default_dev() {
   }
 
   omp_set_default_device(def_dev);
+
+  // Avoiding memory leaks this is outside of testing area
+  // Iterate over all the devices and delete the memory
+  for (int dev = 0; dev < num_dev; ++dev) {
+#pragma omp target exit data map(delete: h_matrix[dev][0:N]) device(dev)
+  }
 
   return errors;
 }
@@ -98,23 +101,20 @@ int test_device() {
         printf("");
     }
     // operation
-#pragma omp target map(alloc: h_matrix[dev][0:N]) map(tofrom: isHost[dev:1]) device(dev)
+#pragma omp target map(alloc: h_matrix[dev][0:N]) map(tofrom: isHost[dev:1]) device(dev) // map(alloc: ) to avoid target to map the entire matrix h_matrix[dev][:]
     {
       isHost[dev] = omp_is_initial_device();
       for (int i = 0; i < N; ++i)
         h_matrix[dev][i] = dev;
     }
   // Since we don't do enter exit data we copy the values from the device
-#pragma omp target data map(delete:h_matrix[dev][0:N])
-{ 
-#pragma omp target map(from: h_matrix_copy[dev][0:N]) device(dev) // map(alloc: ) to avoid target to map the entire matrix h_matrix[dev][:]
+#pragma omp target map(from: h_matrix_copy[dev][0:N])  map(alloc: h_matrix[dev][0:N]) device(dev)
     {
       for (int i = 0; i < N; ++i) {
         h_matrix_copy[dev][i] = h_matrix[dev][i];
       }
     }
   }
-}
 
   // checking results
   for (int dev = 0; dev < num_dev; ++dev) {
@@ -122,6 +122,12 @@ int test_device() {
     for (int i = 0; i < N; ++i)
       sum[dev] += h_matrix_copy[dev][i];
     OMPVV_TEST_AND_SET(errors, (dev * N != sum[dev]));
+  }
+
+  // Avoiding memory leaks
+  // Iterate over all the devices and delete the memory
+  for (int dev = 0; dev < num_dev; ++dev) {
+#pragma omp target exit data map(delete: h_matrix[dev][0:N]) device(dev)
   }
 
   return errors;
