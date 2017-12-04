@@ -10,14 +10,15 @@
 // Test for OpenMP 4.5 target enter and target exit data with global arrays.
 
 int n=10;
-int x[10];
+int *x;
+int A[10]={0,0,0,0,0,0,0,0,0,0};
 
 void init(){
- #pragma omp target enter data map(to:x[:n])
+ #pragma omp target enter data map(to:A[:n])
 }
 
 void finalize(){
- #pragma omp target exit data map(from:x[:n])
+ #pragma omp target exit data map(from:A[:n])
 }
 
 int main (){
@@ -25,18 +26,18 @@ int isHost=-1,i,errors=0;
 
 init();
 
-#pragma omp target map(tofrom: isHost) map(to: n) 
+#pragma omp target map(tofrom: isHost)  
 {
  /*Record where the computation was executed*/
  isHost = omp_is_initial_device();
 
  for(i=0;i< n; i++)
-   x[i] = 10;
+   A[i] = 10;
 }
 
  finalize();
  for(i=0; i<n; i++)
-   if(x[i] != 10){
+   if(A[i] != 10){
      errors += 1;
    }
 

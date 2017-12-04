@@ -9,7 +9,6 @@
 //
 //Testing private clause with target directive
 ////===----------------------------------------------------------------------===//
-
 #include <omp.h>
 #include <stdio.h>
 
@@ -18,7 +17,7 @@
 int main() {
   int compute_array[4][N];
   int errors = 0;
-  int i,j, isHost = -1;//, p_val=-1;
+  int i,j, isHost = -1;
   
  
   for (i=0; i<4; i++) 
@@ -28,13 +27,15 @@ int main() {
   omp_set_num_threads(4);
 #pragma omp parallel
 {
+  int fp_val = omp_get_thread_num();
   int p_val=0;
-  int fp_val = omp_get_num_threads();
-#pragma omp target map(tofrom:compute_array,isHost) firstprivate(fp_val) private(p_val)
+
+#pragma omp target map(tofrom:compute_array) map(tofrom: isHost) firstprivate(fp_val) private(p_val)
   {
-    p_val= fp_val;
+    p_val = fp_val;
     /*Record where the computation was executed*/
     isHost = omp_is_initial_device();
+
     for (i = 0; i < N; i++)
       compute_array[p_val][i] = 100;
   } // End target
@@ -57,3 +58,4 @@ int main() {
   return errors;
 
 }
+
