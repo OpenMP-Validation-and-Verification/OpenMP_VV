@@ -33,7 +33,7 @@ int main() {
   int a[1024];
   int b[1024];
   int c[1024];
-  int size, i = 0, errors = 0, isHost = -1, isOffloading = 0;
+  int size, i = 0, errors[2] = {0,0}, isHost = -1, isOffloading = 0;
 
   // a and b array initialization
   for (i = 0; i < 1024; i++) {
@@ -42,7 +42,7 @@ int main() {
   }
 
   // We test for offloading
-#pragma omp target data map(from: isOffloading)
+#pragma omp target map(from: isOffloading)
   {
     isOffloading = !omp_is_initial_device();
   }
@@ -53,12 +53,11 @@ int main() {
     for (i = 0; i < size; i++) {
       c[i] = -1;
     }
-#pragma omp target data if(size > SIZE_THRESHOLD) map(to: size)  \
-        map(tofrom: c[0:size])                                       \
-        map(to: a[0:size], b[0:size]) 
-    {
-#pragma omp target if(size > SIZE_THRESHOLD) map(tofrom: isHost)
-      {
+#pragma omp target data if(size > SIZE_THRESHOLD) map(to: size) 
+{
+#pragma omp target if(size > SIZE_THRESHOLD)  \
+        map(to: a[0:size], b[0:size])  map(tofrom: c[0:size], isHost)
+{
         isHost = omp_is_initial_device();
         int alpha = (isHost ? 0 : 1);
         int j = 0;
@@ -67,10 +66,9 @@ int main() {
           // c[j] is 1+j if executed on the device
           c[j] = alpha*(a[j] + b[j]);
         }
-      } // end target
-    } // end target data 
+} // end target
+}//end-target data
 
-    printf("size: %d, isHost: %d", size, isHost);
     // checking results 
     for (i = 0; i < size; i++) {
       if (isOffloading && size > SIZE_THRESHOLD) {
@@ -78,24 +76,27 @@ int main() {
         // if offloading was used
         if (c[i] != i + 1) {
           // c[i] is zero if it was executed in the host
-          errors = 1;
+          errors[0] += 1;//error when executed on the device
         }
       } else {
         // Should have executed in the host
         // with or without offloading
         if (c[i] != 0) {
-          errors = 1;
+          errors[1] += 1;
         }
       } //end-else 
     }
-    puts("");
-    printf("errors: %d\n", errors);
+    //puts("");
   } // end-for size
 
-  if (!errors)
+  if (!errors[0] && !errors[1])
     printf("Test passed with offloading %s\n", (isOffloading ? "enabled" : "disabled"));
-  else
-    printf("Test failed with offloading %s\n", (isOffloading ? "enabled" : "disabled"));
+  else if (errors[0]==0 && errors[1]!=0)
+         printf("Test failed on host with offloading %s.\n", (isOffloading ? "enabled" : "disabled"));
+       else if (errors[0]!=0 && errors[1]==0)
+              printf("Test failed on device with offloading %s.\n", (isOffloading ? "enabled" : "disabled"));
+            else if (errors[0]!=0 && errors[1]!=0)
+              printf("Test failed on host and device with offloading %s.\n", (isOffloading ? "enabled" : "disabled"));
 
-  return errors;
+  return (errors[0] && errors[1]);
 }
