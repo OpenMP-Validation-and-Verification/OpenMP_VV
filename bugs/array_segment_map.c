@@ -27,19 +27,19 @@ int fail_on_map() {
   // dimension minus the lower-bound.
   // This default mapping is failing. It seems like it is not substracting
   // the lower-bound. a1d[1:N-1] works fine
-#pragma omp target data map(from: a1d[1:])
+#pragma omp target data map(from: a1d[5:])
   {
-#pragma omp target map(tofrom: isHost) map(alloc: a1d[1:])
+#pragma omp target map(tofrom: isHost) map(alloc: a1d[5:])
     {
       isHost = omp_is_initial_device();
-      for (int i = 1; i < N; ++i)
+      for (int i = 5; i < N; ++i)
         a1d[i] = 1;
     } // end target
   } // end target data
 
   // checking errors 
   for (int i = 0; i < N; ++i) {
-    if (i == 0)
+    if (i < 5)
       errors += a1d[i] == 0 ? 0 : 1;
     else
       errors += a1d[i] == 1 ? 0 : 1;

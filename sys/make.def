@@ -34,6 +34,8 @@ CUDA_MODULE = cuda/8.0.61-1
 # C compilers
 #---------------------------------------------------------------------------
 CCOMPILERS="cc, clang, gcc, xlc"
+JSRUN_COMMAND = jsrun -n 1 -g 4 -a 1 
+APRUN_COMMAND = aprun -n 1 -d 1 
 
 # CRAY compiler
 ifeq ($(CC), cc)
@@ -41,6 +43,7 @@ ifeq ($(CC), cc)
   CLINK = cc
   CLINKFLAGS = -homp -lm
   C_COMPILER_MODULE = PrgEnv-cray cce/8.6.1 craype-accel-nvidia35 cudatoolkit craype/2.5.12 cray-mpich/7.6.1
+  BATCH_SCHEDULER = $(APRUN_COMMAND)
 endif
 
 # GCC compiler
@@ -51,6 +54,7 @@ ifeq ($(CC), gcc)
   CLINK = gcc
   CLINKFLAGS = -O3 -fopenmp $(COFFLOADING)
   C_COMPILER_MODULE = gcc/7.1.1-20170802
+  BATCH_SCHEDULER = $(JSRUN_COMMAND)
 endif
 
 # IBM XL compiler
@@ -61,6 +65,7 @@ ifeq ($(CC), xlc)
   CLINK = xlc
   CLINKFLAGS = -O3 -qsmp=omp $(COFFLOADING)
   C_COMPILER_MODULE = xl/20170914-beta
+  BATCH_SCHEDULER = $(JSRUN_COMMAND)
 endif
 
 # Clang compiler
@@ -71,12 +76,22 @@ ifeq ($(CC), clang)
   CLINK = clang
   CLINKFLAGS = -O3 -fopenmp $(COFFLOADING)
   C_COMPILER_MODULE = clang/20170925
+  BATCH_SCHEDULER = $(JSRUN_COMMAND)
 endif
 
 #---------------------------------------------------------------------------
 # C++ compilers
 #---------------------------------------------------------------------------
 CXXCOMPILERS="clang++, g++, xlc++"
+
+# CRAY compiler
+ifeq ($(CC), CC)
+  CFLAGS = -homp -O3
+  CLINK = cc
+  CLINKFLAGS = -homp -lm
+  C_COMPILER_MODULE = PrgEnv-cray cce/8.6.1 craype-accel-nvidia35 cudatoolkit craype/2.5.12 cray-mpich/7.6.1
+  BATCH_SCHEDULER = $(APRUN_COMMAND)
+endif
 
 # GCC compiler
 ifeq ($(CXX), g++)
@@ -86,6 +101,7 @@ ifeq ($(CXX), g++)
   CXXLINK = g++
   CXXLINKFLAGS = -O3 -fopenmp $(CXXOFFLOADING)
   CXX_COMPILER_MODULE = gcc/7.1.1-20170802
+  BATCH_SCHEDULER = $(JSRUN_COMMAND)
 endif
 
 # IBM XL compiler
@@ -96,6 +112,7 @@ ifeq ($(CXX), xlc++)
   CXXLINK = xlc++
   CXXLINKFLAGS = -O3 -qsmp=omp $(CXXOFFLOADING)
   CXX_COMPILER_MODULE = xl/20170914-beta
+  BATCH_SCHEDULER = $(JSRUN_COMMAND)
 endif
 
 # Clang compiler
@@ -106,6 +123,7 @@ ifeq ($(CXX), clang++)
   CXXLINK = clang++
   CXXLINKFLAGS = -O3 -fopenmp $(CXXOFFLOADING)
   CXX_COMPILER_MODULE = clang/20170925
+  BATCH_SCHEDULER = $(JSRUN_COMMAND)
 endif
 
 #---------------------------------------------------------------------------
