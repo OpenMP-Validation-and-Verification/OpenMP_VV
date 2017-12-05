@@ -66,8 +66,8 @@ int main() {
           // c[j] is 1+j if executed on the device
           c[j] = alpha*(a[j] + b[j]);
         }
-      } // end target
-    } // end target data 
+} // end target
+}//end-target data
 
     // checking results 
     for (i = 0; i < size; i++) {

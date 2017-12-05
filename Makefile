@@ -12,7 +12,7 @@ ifdef VERBOSE
   QUIET:=
 endif
 
-RECORD:=
+RECORD:= \#
 LOGDIR:= 
 ifdef LOG
   LOGDIR:= logs
