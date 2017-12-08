@@ -3,7 +3,7 @@
 // RUN: %libomptarget-compile-run-and-check-powerpc64le-ibm-linux-gnu
 // RUN: %libomptarget-compile-run-and-check-x86_64-pc-linux-gnu
 
-//===---- test_target_data_if.c - check the if clause of target data ------===//
+//===---- test_target_if.c -  --------------------------------------------===//
 // 
 // OpenMP API Version 4.5 Nov 2015
 // 
