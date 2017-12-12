@@ -12,7 +12,7 @@ ifdef VERBOSE
   QUIET:=
 endif
 
-RECORD:= \#
+RECORD:=
 LOGDIR:= 
 ifdef LOG
   LOGDIR:= logs
@@ -71,7 +71,7 @@ endif
 
 TESTS_TO_RUN ?= $(shell find $(BINDIR) -name *.o)
 define run_test
-	@echo -e $(TXTGRN)"\n\n" running: $(1) $(TXTNOC) ${RECORD}$(1)
+	@echo -e $(TXTGRN)"\n\n" running: $(1) $(TXTNOC) $(if $(LOG), ${RECORD}$(1))
 	-@$(call loadModules,$(C_COMPILER_MODULE) $(CXX_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(1) $(VERBOSE) $(RECORD)$(1)
 endef
 
@@ -131,21 +131,21 @@ endif
 %.c.o: %.c $(BINDIR) $(LOGDIR)
 	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC)
 	$(call log_section_header,"COMPILE",$<,$(notdir $(@:.o=.log)))
-	-$(QUIET)$(call loadModules,$(C_COMPILER_MODULE)) $(CCOMPILE) $(VERBOSE_MODE) $< -o $(BINDIR)/$(notdir $@) $(RECORD)$(if $(LOG),$(notdir $(@:.o=.log)))\
+	-$(QUIET)$(call loadModules,$(C_COMPILER_MODULE)) $(CCOMPILE) $(VERBOSE_MODE) $< -o $(BINDIR)/$(notdir $@) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
-		|| echo "FAIL" > $(LOGTEMPFILE) 
+		|| echo "FAIL" > $(LOGTEMPFILE))
 	-$(call log_section_footer,"COMPILE",$$(cat $(LOGTEMPFILE)),$(notdir $(@:.o=.log)))
-	-@rm $(LOGTEMPFILE)
+	-@$(if $(LOG), rm $(LOGTEMPFILE))
 	
 # c++ files rule
 %.cpp.o: %.cpp $(BINDIR) $(LOGDIR)
 	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC) 
 	$(call log_section_header,"COMPILE",$<,$(notdir $(@:.o=.log)))
-	-$(QUIET)$(call loadModules,$(CXX_COMPILER_MODULE)) $(CXXCOMPILE) $(VERBOSE_MODE) $< -o $(BINDIR)/$(notdir $@) $(RECORD)$(if $(LOG),$(notdir $(@:.o=.log)))\
+	-$(QUIET)$(call loadModules,$(CXX_COMPILER_MODULE)) $(CXXCOMPILE) $(VERBOSE_MODE) $< -o $(BINDIR)/$(notdir $@) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
-		|| echo "FAIL" > $(LOGTEMPFILE)
+		|| echo "FAIL" > $(LOGTEMPFILE))
 	-$(call log_section_footer,"COMPILE",$$(cat $(LOGTEMPFILE)),$(notdir $(@:.o=.log)))
-	-@rm $(LOGTEMPFILE)
+	-@$(if $(LOG), rm $(LOGTEMPFILE))
 
 ##################################################
 # Running tests rules
@@ -153,22 +153,22 @@ endif
 # run c app rule
 %.c.run: $(OBJS_C)
 	$(call log_section_header,"RUN",$(@:.run=),$(notdir $(@:.run=.log)))
-	@echo -e $(TXTGRN)"\n\n" running: $@ $(TXTNOC) ${RECORD}$(notdir $(@:.run=.log))
-	-$(call loadModules,$(C_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.run=.o) $(VERBOSE) $(RECORD)$(if $(LOG),$(notdir $(@:.run=.log)))\
+	@echo -e $(TXTGRN)"\n\n" running: $@ $(TXTNOC) $(if $(LOG), ${RECORD}$(notdir $(@:.run=.log)))
+	-$(call loadModules,$(C_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.run=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.run=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
-		|| echo "FAIL" > $(LOGTEMPFILE)
+		|| echo "FAIL" > $(LOGTEMPFILE))
 	-$(call log_section_footer,"RUN",$$(cat $(LOGTEMPFILE)),$(notdir $(@:.run=.log)))
-	-@rm $(LOGTEMPFILE)
+	-@$(if $(LOG), rm $(LOGTEMPFILE))
 
 # run cpp app rule
 %.cpp.run: $(OBJS_CPP)
 	$(call log_section_header,"RUN",$(@:.run=),$(notdir $(@:.run=.log)))
-	@echo -e $(TXTGRN)"\n\n" running: $@ $(TXTNOC) ${RECORD}$(notdir $(@:.run=.log))
-	-$(call loadModules,$(CXX_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.run=.o) $(VERBOSE) $(RECORD)$(if $(LOG),$(notdir $(@:.run=.log)))\
+	@echo -e $(TXTGRN)"\n\n" running: $@ $(TXTNOC) $(if $(LOG), ${RECORD}$(notdir $(@:.run=.log)))
+	-$(call loadModules,$(CXX_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.run=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.run=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
-		|| echo "FAIL" > $(LOGTEMPFILE)
+		|| echo "FAIL" > $(LOGTEMPFILE))
 	-$(call log_section_footer,"RUN",$$(cat $(LOGTEMPFILE)),$(notdir $(@:.run=.log)))
-	-@rm $(LOGTEMPFILE)
+	-@$(if $(LOG), rm $(LOGTEMPFILE))
 
 # Creates the BINDIR folder
 $(BINDIR):
