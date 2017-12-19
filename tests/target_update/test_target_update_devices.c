@@ -79,7 +79,7 @@ int test_set_default_dev() {
   for (int i = 0; i < N; ++i) {
     sum += h_matrix[i];
   }
-  OMPVV_TEST_AND_SET(errors, (num_dev * N != sum));
+  OMPVV_TEST_AND_SET_VERBOSE(errors, (num_dev * N != sum));
 
   omp_set_default_device(def_dev);
 
@@ -151,7 +151,7 @@ int test_device() {
   for (int i = 0; i < N; ++i) {
     sum += h_matrix[i];
   }
-  OMPVV_TEST_AND_SET(errors, (num_dev * N != sum));
+  OMPVV_TEST_AND_SET_VERBOSE(errors, (num_dev * N != sum));
 
 
   return errors;
@@ -165,5 +165,5 @@ int main() {
   OMPVV_TEST_AND_SET(errors, test_set_default_dev());
   OMPVV_TEST_AND_SET(errors, test_device());
 
-  return errors;
+  OMPVV_REPORT_AND_RETURN(errors);
 }
