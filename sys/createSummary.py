@@ -77,6 +77,12 @@ class testResult:
     self.runtimePass = itPassed
     self.runtimeOutput = outputText
     self.endingRuntimeDate = newEndingRuntimeDate
+  
+  def makePathRelative(self, basePath=None):
+    if (basePath):
+      self.testPath = os.path.relpath(self.testPath, basePath)
+    else:
+      self.testPath = os.path.relpath(self.testPath)
 
   def convert2CSV(self):
     ''' Comma Separated Values printing '''
@@ -246,7 +252,8 @@ def main():
   parser = argparse.ArgumentParser(description="Process the log files from the SOLLVE OMPVV project")
   parser.add_argument('logFiles', metavar="LOGFILES", type=str, nargs='+', help='the log files to parse')
   parser.add_argument('-f', '--format', dest='format', type=str, nargs=1, default=['JSON'], help='the format to be printed [JSON or CSV]')
-  parser.add_argument('-o', '--output', dest='output', type=str, nargs=1, help='output file')
+  parser.add_argument('-o', '--output', dest='output', type=str, nargs=1, help='output file name')
+  parser.add_argument('-r', '--relative-path', dest='relativePath', action='store_true', help="Make paths relative to the path where script is executing")
 
   args = parser.parse_args()
   
@@ -260,6 +267,10 @@ def main():
     for fileName in files: 
       results.extend(parseFile(fileName))
   
+  if args.relativePath:
+    for result in results:
+      result.makePathRelative()
+
   formatedResults = []
   formatedOutput = ""
 
