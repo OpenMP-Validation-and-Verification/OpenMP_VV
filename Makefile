@@ -82,7 +82,7 @@ endef
 
 # parameters (1) Action (2) Output status (3) Log File 
 define log_section_footer
-  -$(if $(LOG), @echo -e "*-*-*END*-*-*"$(1)"*-*-*"$(2)"*-*-*\n" >> $(LOGDIR)/$(3);,)
+  -$(if $(LOG), @echo -e "*-*-*END*-*-*"$(1)"*-*-*$$(date)*-*-*"$(2)"*-*-*\n" >> $(LOGDIR)/$(3);,)
 endef
 
 .PHONY: all
@@ -130,17 +130,17 @@ endif
 # c files rule
 %.c.o: %.c $(BINDIR) $(LOGDIR)
 	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC)
-	$(call log_section_header,"COMPILE",$<,$(notdir $(@:.o=.log)))
+	$(call log_section_header,"COMPILE CC="${CCOMPILE},$<,$(notdir $(@:.o=.log)))
 	-$(QUIET)$(call loadModules,$(C_COMPILER_MODULE)) $(CCOMPILE) $(VERBOSE_MODE) $< -o $(BINDIR)/$(notdir $@) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
 		|| echo "FAIL" > $(LOGTEMPFILE))
-	-$(call log_section_footer,"COMPILE",$$(cat $(LOGTEMPFILE)),$(notdir $(@:.o=.log)))
+	-$(call log_section_footer,"COMPILE CC="${CCOMPILE},$$(cat $(LOGTEMPFILE)),$(notdir $(@:.o=.log)))
 	-@$(if $(LOG), rm $(LOGTEMPFILE))
 	
 # c++ files rule
 %.cpp.o: %.cpp $(BINDIR) $(LOGDIR)
 	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC) 
-	$(call log_section_header,"COMPILE",$<,$(notdir $(@:.o=.log)))
+	$(call log_section_header,"COMPILE CPP="${CXXCOMPILE},$<,$(notdir $(@:.o=.log)))
 	-$(QUIET)$(call loadModules,$(CXX_COMPILER_MODULE)) $(CXXCOMPILE) $(VERBOSE_MODE) $< -o $(BINDIR)/$(notdir $@) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
 		|| echo "FAIL" > $(LOGTEMPFILE))
