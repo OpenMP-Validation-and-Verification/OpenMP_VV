@@ -3,7 +3,7 @@
 // RUN: %libomptarget-compile-run-and-check-powerpc64le-ibm-linux-gnu
 // RUN: %libomptarget-compile-run-and-check-x86_64-pc-linux-gnu
 
-//===---- test_target_data_if.c - check the if clause of target data ------===//
+//===---- test_target_enter_exit_data_if.c - check the if clause of target data ------===//
 // 
 // OpenMP API Version 4.5 Nov 2015
 // 
@@ -56,7 +56,8 @@ int main() {
 #pragma omp target enter data if(size > SIZE_THRESHOLD) map(to: size) map(to: c[0:size])
            
 #pragma omp target if(size > SIZE_THRESHOLD)  \
-        map(to: a[0:size], b[0:size])  map(tofrom: isHost)
+        map(to: a[0:size], b[0:size])  map(tofrom: isHost) map(to: c[0:size]) //Mapping c again will not be required in OpenMP 4.5.
+									     // Refer to https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83295
 {
         isHost = omp_is_initial_device();
         int alpha = (isHost ? 0 : 1);
