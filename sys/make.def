@@ -42,7 +42,7 @@ ifeq ($(CC), cc)
   CFLAGS = -homp -O3
   CLINK = cc
   CLINKFLAGS = -homp -lm
-  C_COMPILER_MODULE = PrgEnv-cray cce/8.6.1 craype-accel-nvidia35 cudatoolkit craype/2.5.12 cray-mpich/7.6.1
+  C_COMPILER_MODULE = PrgEnv-cray cce/8.6.5 craype-accel-nvidia35 cudatoolkit craype/2.5.12 cray-mpich/7.6.1
   BATCH_SCHEDULER = $(APRUN_COMMAND)
 endif
 
@@ -89,7 +89,7 @@ ifeq ($(CC), CC)
   CFLAGS = -homp -O3
   CLINK = cc
   CLINKFLAGS = -homp -lm
-  C_COMPILER_MODULE = PrgEnv-cray cce/8.6.1 craype-accel-nvidia35 cudatoolkit craype/2.5.12 cray-mpich/7.6.1
+  C_COMPILER_MODULE = PrgEnv-cray cce/8.6.5 craype-accel-nvidia35 cudatoolkit craype/2.5.12 cray-mpich/7.6.1
   BATCH_SCHEDULER = $(APRUN_COMMAND)
 endif
 
