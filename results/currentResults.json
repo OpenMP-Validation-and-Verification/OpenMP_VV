@@ -13,7 +13,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:45:30 EST 2018",
     "Test name": "array_segment_map.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/bugs/array_segment_map.c"
+    "Test path": "bugs/array_segment_map.c"
   },
   {
     "Binary path": "bin/array_segment_map.c",
@@ -93,7 +93,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:45:20 EST 2018",
     "Test name": "depend_between_task_target.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/bugs/depend_between_task_target.c"
+    "Test path": "bugs/depend_between_task_target.c"
   },
   {
     "Binary path": "bin/depend_between_task_target.c",
@@ -173,7 +173,7 @@
     "Runtime result": "FAIL",
     "Runtime starting date": "Wed Jan 31 15:45:12 EST 2018",
     "Test name": "dereference.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/bugs/dereference.c"
+    "Test path": "bugs/dereference.c"
   },
   {
     "Binary path": "bin/dereference.c",
@@ -253,7 +253,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:46:48 EST 2018",
     "Test name": "linked_list.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/application_kernels/linked_list.c"
+    "Test path": "tests/application_kernels/linked_list.c"
   },
   {
     "Binary path": "bin/linked_list.c",
@@ -333,7 +333,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:45:35 EST 2018",
     "Test name": "map_struct_on_cray.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/bugs/map_struct_on_cray.c"
+    "Test path": "bugs/map_struct_on_cray.c"
   },
   {
     "Binary path": "bin/map_struct_on_cray.c",
@@ -477,7 +477,7 @@
     "Runtime result": "FAIL",
     "Runtime starting date": "Wed Jan 31 15:45:15 EST 2018",
     "Test name": "multidim_array_map_default_size.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/bugs/multidim_array_map_default_size.c"
+    "Test path": "bugs/multidim_array_map_default_size.c"
   },
   {
     "Binary path": "bin/multidim_array_map_default_size.c",
@@ -557,7 +557,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:45:45 EST 2018",
     "Test name": "offloading_success.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/offloading_success.c"
+    "Test path": "tests/offloading_success.c"
   },
   {
     "Binary path": "bin/offloading_success.c",
@@ -637,7 +637,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:49:30 EST 2018",
     "Test name": "offloading_success.cpp",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/offloading_success.cpp"
+    "Test path": "tests/offloading_success.cpp"
   },
   {
     "Binary path": "bin/offloading_success.cpp",
@@ -717,7 +717,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:45:27 EST 2018",
     "Test name": "omp_alloc_free.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/bugs/omp_alloc_free.c"
+    "Test path": "bugs/omp_alloc_free.c"
   },
   {
     "Binary path": "bin/omp_alloc_free.c",
@@ -797,7 +797,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:49:05 EST 2018",
     "Test name": "ompvv_template.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/template/ompvv_template.c"
+    "Test path": "template/ompvv_template.c"
   },
   {
     "Binary path": "bin/ompvv_template.c",
@@ -877,7 +877,7 @@
     "Runtime result": "FAIL",
     "Runtime starting date": "Wed Jan 31 15:49:10 EST 2018",
     "Test name": "target_map_method_array.cpp",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/bugs/target_map_method_array.cpp"
+    "Test path": "bugs/target_map_method_array.cpp"
   },
   {
     "Binary path": "bin/target_map_method_array.cpp",
@@ -957,7 +957,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:49:16 EST 2018",
     "Test name": "target_map_static_member.cpp",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/bugs/target_map_static_member.cpp"
+    "Test path": "bugs/target_map_static_member.cpp"
   },
   {
     "Binary path": "bin/target_map_static_member.cpp",
@@ -1037,7 +1037,7 @@
     "Runtime result": "FAIL",
     "Runtime starting date": "Wed Jan 31 15:49:22 EST 2018",
     "Test name": "target_map_this_pointer.cpp",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/bugs/target_map_this_pointer.cpp"
+    "Test path": "bugs/target_map_this_pointer.cpp"
   },
   {
     "Binary path": "bin/target_map_this_pointer.cpp",
@@ -1117,7 +1117,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:48:09 EST 2018",
     "Test name": "test_target_async.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target/test_target_async.c"
+    "Test path": "tests/target/test_target_async.c"
   },
   {
     "Binary path": "bin/test_target_async.c",
@@ -1197,7 +1197,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:47:10 EST 2018",
     "Test name": "test_target_data_if.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target_data/test_target_data_if.c"
+    "Test path": "tests/target_data/test_target_data_if.c"
   },
   {
     "Binary path": "bin/test_target_data_if.c",
@@ -1277,7 +1277,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:47:15 EST 2018",
     "Test name": "test_target_data_map.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target_data/test_target_data_map.c"
+    "Test path": "tests/target_data/test_target_data_map.c"
   },
   {
     "Binary path": "bin/test_target_data_map.c",
@@ -1357,7 +1357,7 @@
     "Runtime result": "FAIL",
     "Runtime starting date": "Wed Jan 31 15:47:03 EST 2018",
     "Test name": "test_target_data_map_array_sections.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target_data/test_target_data_map_array_sections.c"
+    "Test path": "tests/target_data/test_target_data_map_array_sections.c"
   },
   {
     "Binary path": "bin/test_target_data_map_array_sections.c",
@@ -1437,7 +1437,7 @@
     "Runtime result": "FAIL",
     "Runtime starting date": "Wed Jan 31 15:49:35 EST 2018",
     "Test name": "test_target_data_map_classes.cpp",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target_data/test_target_data_map_classes.cpp"
+    "Test path": "tests/target_data/test_target_data_map_classes.cpp"
   },
   {
     "Binary path": "bin/test_target_data_map_classes.cpp",
@@ -1517,7 +1517,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:46:53 EST 2018",
     "Test name": "test_target_data_map_devices.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target_data/test_target_data_map_devices.c"
+    "Test path": "tests/target_data/test_target_data_map_devices.c"
   },
   {
     "Binary path": "bin/test_target_data_map_devices.c",
@@ -1597,7 +1597,7 @@
     "Runtime result": "FAIL",
     "Runtime starting date": "Wed Jan 31 15:46:58 EST 2018",
     "Test name": "test_target_data_use_device_ptr.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target_data/test_target_data_use_device_ptr.c"
+    "Test path": "tests/target_data/test_target_data_use_device_ptr.c"
   },
   {
     "Binary path": "bin/test_target_data_use_device_ptr.c",
@@ -1677,7 +1677,7 @@
     "Runtime result": "FAIL",
     "Runtime starting date": "Wed Jan 31 15:47:31 EST 2018",
     "Test name": "test_target_defaultmap.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target/test_target_defaultmap.c"
+    "Test path": "tests/target/test_target_defaultmap.c"
   },
   {
     "Binary path": "bin/test_target_defaultmap.c",
@@ -1757,7 +1757,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:48:14 EST 2018",
     "Test name": "test_target_device.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target/test_target_device.c"
+    "Test path": "tests/target/test_target_device.c"
   },
   {
     "Binary path": "bin/test_target_device.c",
@@ -1837,7 +1837,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:45:51 EST 2018",
     "Test name": "test_target_enter_data_async.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target_enter_data/test_target_enter_data_async.c"
+    "Test path": "tests/target_enter_data/test_target_enter_data_async.c"
   },
   {
     "Binary path": "bin/test_target_enter_data_async.c",
@@ -1917,7 +1917,7 @@
     "Runtime result": "FAIL",
     "Runtime starting date": "Wed Jan 31 15:49:25 EST 2018",
     "Test name": "test_target_enter_data_classes.cpp",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target_enter_data/test_target_enter_data_classes.cpp"
+    "Test path": "tests/target_enter_data/test_target_enter_data_classes.cpp"
   },
   {
     "Binary path": "bin/test_target_enter_data_classes.cpp",
@@ -1997,7 +1997,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:46:06 EST 2018",
     "Test name": "test_target_enter_data_devices.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target_enter_data/test_target_enter_data_devices.c"
+    "Test path": "tests/target_enter_data/test_target_enter_data_devices.c"
   },
   {
     "Binary path": "bin/test_target_enter_data_devices.c",
@@ -2077,7 +2077,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:45:56 EST 2018",
     "Test name": "test_target_enter_data_global_array.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target_enter_data/test_target_enter_data_global_array.c"
+    "Test path": "tests/target_enter_data/test_target_enter_data_global_array.c"
   },
   {
     "Binary path": "bin/test_target_enter_data_global_array.c",
@@ -2157,7 +2157,7 @@
     "Runtime result": "FAIL",
     "Runtime starting date": "Wed Jan 31 15:46:17 EST 2018",
     "Test name": "test_target_enter_data_if.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target_enter_data/test_target_enter_data_if.c"
+    "Test path": "tests/target_enter_data/test_target_enter_data_if.c"
   },
   {
     "Binary path": "bin/test_target_enter_data_if.c",
@@ -2237,7 +2237,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:46:11 EST 2018",
     "Test name": "test_target_enter_data_malloced_array.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target_enter_data/test_target_enter_data_malloced_array.c"
+    "Test path": "tests/target_enter_data/test_target_enter_data_malloced_array.c"
   },
   {
     "Binary path": "bin/test_target_enter_data_malloced_array.c",
@@ -2317,7 +2317,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:46:01 EST 2018",
     "Test name": "test_target_enter_data_struct.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target_enter_data/test_target_enter_data_struct.c"
+    "Test path": "tests/target_enter_data/test_target_enter_data_struct.c"
   },
   {
     "Binary path": "bin/test_target_enter_data_struct.c",
@@ -2397,7 +2397,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:48:34 EST 2018",
     "Test name": "test_target_enter_exit_data_async.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target_enter_exit_data/test_target_enter_exit_data_async.c"
+    "Test path": "tests/target_enter_exit_data/test_target_enter_exit_data_async.c"
   },
   {
     "Binary path": "bin/test_target_enter_exit_data_async.c",
@@ -2477,7 +2477,7 @@
     "Runtime result": "FAIL",
     "Runtime starting date": "Wed Jan 31 15:49:46 EST 2018",
     "Test name": "test_target_enter_exit_data_classes.cpp",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target_enter_exit_data/test_target_enter_exit_data_classes.cpp"
+    "Test path": "tests/target_enter_exit_data/test_target_enter_exit_data_classes.cpp"
   },
   {
     "Binary path": "bin/test_target_enter_exit_data_classes.cpp",
@@ -2557,7 +2557,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:48:39 EST 2018",
     "Test name": "test_target_enter_exit_data_devices.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target_enter_exit_data/test_target_enter_exit_data_devices.c"
+    "Test path": "tests/target_enter_exit_data/test_target_enter_exit_data_devices.c"
   },
   {
     "Binary path": "bin/test_target_enter_exit_data_devices.c",
@@ -2637,7 +2637,7 @@
     "Runtime result": "FAIL",
     "Runtime starting date": "Wed Jan 31 15:49:00 EST 2018",
     "Test name": "test_target_enter_exit_data_if.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target_enter_exit_data/test_target_enter_exit_data_if.c"
+    "Test path": "tests/target_enter_exit_data/test_target_enter_exit_data_if.c"
   },
   {
     "Binary path": "bin/test_target_enter_exit_data_if.c",
@@ -2717,7 +2717,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:48:55 EST 2018",
     "Test name": "test_target_enter_exit_data_map_global_array.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target_enter_exit_data/test_target_enter_exit_data_map_global_array.c"
+    "Test path": "tests/target_enter_exit_data/test_target_enter_exit_data_map_global_array.c"
   },
   {
     "Binary path": "bin/test_target_enter_exit_data_map_global_array.c",
@@ -2797,7 +2797,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:48:49 EST 2018",
     "Test name": "test_target_enter_exit_data_map_malloced_array.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target_enter_exit_data/test_target_enter_exit_data_map_malloced_array.c"
+    "Test path": "tests/target_enter_exit_data/test_target_enter_exit_data_map_malloced_array.c"
   },
   {
     "Binary path": "bin/test_target_enter_exit_data_map_malloced_array.c",
@@ -2877,7 +2877,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:48:44 EST 2018",
     "Test name": "test_target_enter_exit_data_struct.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target_enter_exit_data/test_target_enter_exit_data_struct.c"
+    "Test path": "tests/target_enter_exit_data/test_target_enter_exit_data_struct.c"
   },
   {
     "Binary path": "bin/test_target_enter_exit_data_struct.c",
@@ -2957,7 +2957,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:48:24 EST 2018",
     "Test name": "test_target_firstprivate.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target/test_target_firstprivate.c"
+    "Test path": "tests/target/test_target_firstprivate.c"
   },
   {
     "Binary path": "bin/test_target_firstprivate.c",
@@ -3037,7 +3037,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:47:49 EST 2018",
     "Test name": "test_target_if.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target/test_target_if.c"
+    "Test path": "tests/target/test_target_if.c"
   },
   {
     "Binary path": "bin/test_target_if.c",
@@ -3117,7 +3117,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:47:20 EST 2018",
     "Test name": "test_target_is_device_ptr.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target/test_target_is_device_ptr.c"
+    "Test path": "tests/target/test_target_is_device_ptr.c"
   },
   {
     "Binary path": "bin/test_target_is_device_ptr.c",
@@ -3197,7 +3197,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:48:04 EST 2018",
     "Test name": "test_target_map_array_default.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target/test_target_map_array_default.c"
+    "Test path": "tests/target/test_target_map_array_default.c"
   },
   {
     "Binary path": "bin/test_target_map_array_default.c",
@@ -3277,7 +3277,7 @@
     "Runtime result": "FAIL",
     "Runtime starting date": "Wed Jan 31 15:49:41 EST 2018",
     "Test name": "test_target_map_classes_default.cpp",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target/test_target_map_classes_default.cpp"
+    "Test path": "tests/target/test_target_map_classes_default.cpp"
   },
   {
     "Binary path": "bin/test_target_map_classes_default.cpp",
@@ -3357,7 +3357,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:47:42 EST 2018",
     "Test name": "test_target_map_global_arrays.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target/test_target_map_global_arrays.c"
+    "Test path": "tests/target/test_target_map_global_arrays.c"
   },
   {
     "Binary path": "bin/test_target_map_global_arrays.c",
@@ -3437,7 +3437,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:48:31 EST 2018",
     "Test name": "test_target_map_local_array.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target/test_target_map_local_array.c"
+    "Test path": "tests/target/test_target_map_local_array.c"
   },
   {
     "Binary path": "bin/test_target_map_local_array.c",
@@ -3517,7 +3517,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:47:46 EST 2018",
     "Test name": "test_target_map_pointer.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target/test_target_map_pointer.c"
+    "Test path": "tests/target/test_target_map_pointer.c"
   },
   {
     "Binary path": "bin/test_target_map_pointer.c",
@@ -3597,7 +3597,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:47:59 EST 2018",
     "Test name": "test_target_map_pointer_default.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target/test_target_map_pointer_default.c"
+    "Test path": "tests/target/test_target_map_pointer_default.c"
   },
   {
     "Binary path": "bin/test_target_map_pointer_default.c",
@@ -3677,7 +3677,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:47:55 EST 2018",
     "Test name": "test_target_map_scalar_default.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target/test_target_map_scalar_default.c"
+    "Test path": "tests/target/test_target_map_scalar_default.c"
   },
   {
     "Binary path": "bin/test_target_map_scalar_default.c",
@@ -3757,7 +3757,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:47:25 EST 2018",
     "Test name": "test_target_map_struct_default.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target/test_target_map_struct_default.c"
+    "Test path": "tests/target/test_target_map_struct_default.c"
   },
   {
     "Binary path": "bin/test_target_map_struct_default.c",
@@ -3837,7 +3837,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:47:36 EST 2018",
     "Test name": "test_target_private.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target/test_target_private.c"
+    "Test path": "tests/target/test_target_private.c"
   },
   {
     "Binary path": "bin/test_target_private.c",
@@ -3917,7 +3917,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:46:37 EST 2018",
     "Test name": "test_target_update_async.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target_update/test_target_update_async.c"
+    "Test path": "tests/target_update/test_target_update_async.c"
   },
   {
     "Binary path": "bin/test_target_update_async.c",
@@ -3997,7 +3997,7 @@
     "Runtime result": "FAIL",
     "Runtime starting date": "Wed Jan 31 15:46:43 EST 2018",
     "Test name": "test_target_update_devices.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target_update/test_target_update_devices.c"
+    "Test path": "tests/target_update/test_target_update_devices.c"
   },
   {
     "Binary path": "bin/test_target_update_devices.c",
@@ -4077,7 +4077,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:46:32 EST 2018",
     "Test name": "test_target_update_from.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target_update/test_target_update_from.c"
+    "Test path": "tests/target_update/test_target_update_from.c"
   },
   {
     "Binary path": "bin/test_target_update_from.c",
@@ -4157,7 +4157,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:46:22 EST 2018",
     "Test name": "test_target_update_if.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target_update/test_target_update_if.c"
+    "Test path": "tests/target_update/test_target_update_if.c"
   },
   {
     "Binary path": "bin/test_target_update_if.c",
@@ -4237,7 +4237,7 @@
     "Runtime result": "PASS",
     "Runtime starting date": "Wed Jan 31 15:46:27 EST 2018",
     "Test name": "test_target_update_to.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/tests/target_update/test_target_update_to.c"
+    "Test path": "tests/target_update/test_target_update_to.c"
   },
   {
     "Binary path": "bin/test_target_update_to.c",
@@ -4317,7 +4317,7 @@
     "Runtime result": "FAIL",
     "Runtime starting date": "Wed Jan 31 15:45:40 EST 2018",
     "Test name": "upperLimit.c",
-    "Test path": "../../../../../lustre/atlas1/gen010/scratch/josed/SOLLVE/sollve_vv/bugs/upperLimit.c"
+    "Test path": "bugs/upperLimit.c"
   },
   {
     "Binary path": "bin/upperLimit.c",
