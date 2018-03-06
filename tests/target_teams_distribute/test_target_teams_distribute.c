@@ -37,51 +37,27 @@ int main() {
   int a[1024];
   int b[1024];
   int num_teams = 0;
-  int devtest = 1;
   int errors = 0;
 
-
-  #pragma omp target enter data map(to: devtest)
-  #pragma omp target map(alloc: devtest)
-  {
-      devtest = 0;
-  }
   // a and b array initialization
   for (int x = 0; x < 1024; ++x) {
       a[x] = 1;
       b[x] = x;
   }
 
-  if (devtest == 1){
-      #pragma omp target data map(tofrom: a[0:1024], num_teams) map(to: b[0:1024]) map(alloc: devtest)
-      {
-          #pragma omp target teams distribute
-          for (int x = 0; x < 1024; ++x){
-              num_teams = omp_get_num_teams();
-              a[x] += b[x] + devtest;
-          }
-      }
-
+  #pragma omp target data map(tofrom: a[0:1024], num_teams) map(to: b[0:1024])
+  {
+      #pragma omp target teams distribute
       for (int x = 0; x < 1024; ++x){
-          OMPVV_TEST_AND_SET(errors, (a[x] != 1 + b[x]));
-      }
-  }
-  else{
-      #pragma omp target data map(tofrom: a[0:1024], num_teams) map(to: b[0:1024]) map(alloc: devtest)
-      {
-          #pragma omp target teams distribute
-          for (int x = 0; x < 1024; ++x){
-              num_teams = omp_get_num_teams();
-              a[x] += b[x] + devtest;
-          }
-      }
-
-      for (int x = 0; x < 1024; ++x){
-          OMPVV_TEST_AND_SET(errors, a[x] != b[x] + 1);
+          num_teams = omp_get_num_teams();
+          a[x] += b[x];
       }
   }
 
-  #pragma omp target exit data map(delete: devtest)
+  for (int x = 0; x < 1024; ++x){
+      OMPVV_TEST_AND_SET(errors, (a[x] != 1 + b[x]));
+  }
+
 
   if (!errors) {
     OMPVV_INFOMSG("Test passed with offloading %s", (isOffloading ? "enabled" : "disabled"));

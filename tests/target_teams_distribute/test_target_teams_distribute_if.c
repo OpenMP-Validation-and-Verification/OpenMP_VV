@@ -41,7 +41,7 @@ int main() {
 
 
   #pragma omp target enter data map(to: devtest)
-  #pragma omp target map(alloc: devtest)
+  #pragma omp target
   {
       devtest = 0;
   }
@@ -53,7 +53,7 @@ int main() {
 
   if (devtest == 1){
       //There is a separate memory device, full data environment tests can procede
-      #pragma omp target data map(tofrom: a[0:1024]) map(to: b[0:1024]) map(alloc: devtest)
+      #pragma omp target data map(tofrom: a[0:1024]) map(to: b[0:1024])
       {
           #pragma omp target teams distribute if(b[0] > 1)
           for (int x = 0; x < 1024; ++x){
@@ -65,7 +65,7 @@ int main() {
           OMPVV_TEST_AND_SET(errors[1], (a[x] != 1));
       }
 
-      #pragma omp target data map(tofrom: a[0:1024]) map(to: b[0:1024]) map(alloc: devtest)
+      #pragma omp target data map(tofrom: a[0:1024]) map(to: b[0:1024])
       {
           #pragma omp target teams distribute if(b[0] < 1)
           for (int x = 0; x < 1024; ++x){
@@ -77,7 +77,7 @@ int main() {
           OMPVV_TEST_AND_SET(errors[0], (a[x] != 1 + b[x]));
       }
 
-      #pragma omp target data map(to: a[0:1024], b[0:1024]) map(alloc: devtest)
+      #pragma omp target data map(to: a[0:1024], b[0:1024])
       {
           #pragma omp target teams distribute if(b[0] > 1)
           for (int x = 0; x < 1024; ++x){
@@ -90,7 +90,7 @@ int main() {
       }
   }
   else{
-      #pragma omp target data map(tofrom: a[0:1024]) map(to: b[0:1024]) map(alloc: devtest)
+      #pragma omp target data map(tofrom: a[0:1024]) map(to: b[0:1024])
       {
           #pragma omp target teams distribute if(b[0] > 1)
           for (int x = 0; x < 1024; ++x){
@@ -102,7 +102,7 @@ int main() {
           OMPVV_TEST_AND_SET(errors[1], a[x] != b[x] + 1);
       }
 
-      #pragma omp target data map(tofrom: a[0:1024]) map(to: b[0:1024]) map(alloc: devtest)
+      #pragma omp target data map(tofrom: a[0:1024]) map(to: b[0:1024])
       {
           #pragma omp target teams distribute if(b[0] < 1)
           for (int x = 0; x < 1024; ++x){
