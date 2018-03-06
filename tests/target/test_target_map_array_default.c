@@ -24,7 +24,7 @@ int main() {
   
  
   for (i=0; i<N; i++) 
-    compute_array[i] = 0;
+    compute_array[i] = 10;
 
 #pragma omp target map(compute_array) map(tofrom: isHost)
   {
@@ -32,15 +32,15 @@ int main() {
     isHost = omp_is_initial_device();
 
     for (i = 0; i < N; i++)
-      compute_array[i] = i;
+      compute_array[i] += i;
    
   } // End target
 
   for (i = 0; i < N; i++)
-    sum = sum + compute_array[i];    
+    sum = sum + compute_array[i];
   
   for (i = 0; i < N; i++)
-    result += i;
+    result += 10 + i;
 
   if (result != sum) {
     printf("Test failed on %s\n",isHost ? "host":"device");
