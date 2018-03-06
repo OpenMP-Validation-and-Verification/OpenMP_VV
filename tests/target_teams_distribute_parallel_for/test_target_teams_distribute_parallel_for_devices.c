@@ -1,15 +1,12 @@
-// RUN: %libomptarget-compile-run-and-check-aarch64-unknown-linux-gnu
-// RUN: %libomptarget-compile-run-and-check-powerpc64-ibm-linux-gnu
-// RUN: %libomptarget-compile-run-and-check-powerpc64le-ibm-linux-gnu
-// RUN: %libomptarget-compile-run-and-check-x86_64-pc-linux-gnu
-
-//===---- test_target_teams_distribute_parallel_for.c - combined consutrct -===//
+//===---- test_target_teams_distribute_parallel_for_devices.c - combined consutrct -===//
 // 
 // OpenMP API Version 4.5 Nov 2015
 // 
-// Testing
+// Testing for multiple devices checking if it is possible to send work and data 
+// to different devices with the device clause used with omp target teams distribute 
+// parallel for 
 //
-//===------------------------------------------------------------------------===//
+//===-------------------------------------------------------------------------------===//
 
 #include <omp.h>
 #include "ompvv.h"
