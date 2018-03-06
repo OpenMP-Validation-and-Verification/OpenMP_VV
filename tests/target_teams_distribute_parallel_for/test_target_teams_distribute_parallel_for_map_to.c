@@ -41,9 +41,9 @@ int test_target_teams_distribute_parallel_for_map_to() {
       d[j] = c[j] * (a[j] + b[j] + scalar);
       if (!omp_is_initial_device()) {
         scalar2 = -1;
-        a[i] = -1;
-        b[i] = -1;
-        c[i] = -1;
+        a[j] = -1;
+        b[j] = -1;
+        c[j] = -1;
       }
     }
   }
@@ -54,6 +54,7 @@ int test_target_teams_distribute_parallel_for_map_to() {
     OMPVV_TEST_AND_SET(errors, b[i] != i);
     OMPVV_TEST_AND_SET(errors, c[i] != 2*i);
     OMPVV_TEST_AND_SET(errors, d[i] != (1 + i + 50)*2*i);
+    if( d[i] != (1 + i + 50)*2*i ) printf("i = %d, d[i] = %d\n", i, d[i]);
   }
 
   return errors;
