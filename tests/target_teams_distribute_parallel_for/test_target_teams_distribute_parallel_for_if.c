@@ -43,10 +43,7 @@ int test_target_teams_distribute_if_no_modifier() {
     isOffloading = !omp_is_initial_device();
   }
   
-  if (!isOffloading) {
-    OMPVV_ERROR("With offloading off, it is not possible to test if");
-    return 1;
-  }
+  OMPVV_WARNING_IF(!isOffloading, "With offloading off, it is not possible to test if");
 
   // a, init_num_threads_dev and init_num_threads_host arrays initialization
   for (i = 0; i < SIZE_N; i++) {
@@ -63,7 +60,7 @@ int test_target_teams_distribute_if_no_modifier() {
     init_num_threads_dev[i] = omp_get_num_threads();
   }
 
-#pragma omp parallel for
+#pragma omp parallel for num_threads(10)
   for (i = 0; i < SIZE_N; i++) {
     init_num_threads_host[i] = omp_get_num_threads();
   }
@@ -123,10 +120,7 @@ int test_target_teams_distribute_if_target_modifier() {
     isOffloading = !omp_is_initial_device();
   }
   
-  if (!isOffloading) {
-    OMPVV_ERROR("With offloading off, it is not possible to test if");
-    return 1;
-  }
+  OMPVV_WARNING_IF(!isOffloading, "With offloading off, it is not possible to test if");
 
   // a, init_num_threads_dev and init_num_threads_host arrays initialization
   for (i = 0; i < SIZE_N; i++) {
@@ -143,7 +137,7 @@ int test_target_teams_distribute_if_target_modifier() {
     init_num_threads_dev[i] = omp_get_num_threads();
   }
 
-#pragma omp parallel for
+#pragma omp parallel for num_threads(10)
   for (i = 0; i < SIZE_N; i++) {
     init_num_threads_host[i] = omp_get_num_threads();
   }
@@ -203,10 +197,7 @@ int test_target_teams_distribute_if_parallel_modifier() {
     isOffloading = !omp_is_initial_device();
   }
   
-  if (!isOffloading) {
-    OMPVV_ERROR("With offloading off, it is not possible to test if");
-    return 1;
-  }
+  OMPVV_WARNING_IF(!isOffloading, "With offloading off, it is not possible to test if");
 
   // a, init_num_threads_dev and init_num_threads_host arrays initialization
   for (i = 0; i < SIZE_N; i++) {
@@ -223,7 +214,7 @@ int test_target_teams_distribute_if_parallel_modifier() {
     init_num_threads_dev[i] = omp_get_num_threads();
   }
 
-#pragma omp parallel for
+#pragma omp parallel for num_threads(10)
   for (i = 0; i < SIZE_N; i++) {
     init_num_threads_host[i] = omp_get_num_threads();
   }
