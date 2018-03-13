@@ -101,6 +101,8 @@ int test_defaultmap_off() {
 }
 int main() {
   OMPVV_TEST_OFFLOADING;
+  OMPVV_TEST_SHARED_ENVIRONMENT;
+
   int errors = 0;
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_defaultmap_on());
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_defaultmap_off());
