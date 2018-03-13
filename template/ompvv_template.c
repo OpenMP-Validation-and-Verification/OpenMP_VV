@@ -43,6 +43,7 @@ int main() {
   OMPVV_ERROR_IF(1==1, "THIS IS IS AN EXAMPLE OF AN ERROR_IF 1==1");
   OMPVV_ERROR_IF(1==0, "THIS IS IS AN EXAMPLE OF AN ERROR_IF 1==0 (THIS SHOULD NOT BE DISPLAYED)");
 
+  OMPVV_TEST_SHARED_ENVIRONMENT;
 
   int errors = 0;
   OMPVV_TEST_AND_SET(errors, 1!=0); // Condition to generate an error
