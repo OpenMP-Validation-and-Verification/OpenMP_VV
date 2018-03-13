@@ -36,15 +36,16 @@ int test_target_teams_distribute_parallel_for_private() {
 
   // check multiple sizes. 
 #pragma omp target data map(to: a[0:SIZE_N], b[0:SIZE_N], c[0:SIZE_N]) map(from: d[0:SIZE_N])
-  {
-    for (i = 0; i < 1000; ++i) {
+      {
 #pragma omp target teams distribute parallel for private(privatized)
-      for (j = 0; j < SIZE_N; ++j) {
-        privatized = a[j] + b[j];
-        d[j] = c[j] * privatized;
+        for (j = 0; j < SIZE_N; ++j) {
+          privatized = 0;
+          for (i = 0; i < a[j] + b[j]; ++i) {
+            privatized++;
+          }
+            d[j] = c[j] * privatized;
+        }
       }
-    }
-  }
 
   for (i = 0; i < SIZE_N; i++) {
     OMPVV_TEST_AND_SET(errors, d[i] != (1 + i)*2*i);

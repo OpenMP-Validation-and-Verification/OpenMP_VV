@@ -15,8 +15,8 @@
 
 #define SIZE_N 1024
 
-int test_target_teams_distribute_parallel_for_private() {
-  OMPVV_INFOMSG("test_target_teams_distribute_parallel_for_devices");
+int test_target_teams_distribute_parallel_for_firstprivate() {
+  OMPVV_INFOMSG("test_target_teams_distribute_parallel_for_firstprivate");
   
   int a[SIZE_N];
   int b[SIZE_N];
@@ -37,16 +37,18 @@ int test_target_teams_distribute_parallel_for_private() {
   // check multiple sizes. 
 #pragma omp target data map(to: a[0:SIZE_N], b[0:SIZE_N], c[0:SIZE_N]) map(from: d[0:SIZE_N])
   {
-    for (i = 0; i < 1000; ++i) {
 #pragma omp target teams distribute parallel for firstprivate(privatized)
       for (j = 0; j < SIZE_N; ++j) {
-        privatized += a[j] + b[j];
+        for (i = 0; i < a[j] + b[j]; ++i) {
+          privatized++;
+        }
         d[j] = c[j] * privatized;
       }
-    }
   }
 
   for (i = 0; i < SIZE_N; i++) {
+    // 10 = initial value of privatized + 1 initial value of a[i] 
+    // + i initial value of b[i]
     OMPVV_TEST_AND_SET(errors, d[i] != (10 + 1 + i)*2*i);
   }
 
@@ -58,7 +60,7 @@ int main() {
   OMPVV_TEST_OFFLOADING;
   int errors = 0;
 
-  OMPVV_TEST_AND_SET_VERBOSE(errors, test_target_teams_distribute_parallel_for_private());
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_target_teams_distribute_parallel_for_firstprivate());
 
   OMPVV_REPORT_AND_RETURN(errors);
 }
