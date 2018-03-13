@@ -12,7 +12,7 @@ ifdef VERBOSE
   QUIET:=
 endif
 
-RECORD:= \#
+RECORD:=
 LOGDIR:= 
 ifdef LOG
   LOGDIR:= logs
@@ -33,7 +33,7 @@ ifdef ADD_BATCH_SCHED
   BSRUN:= $(BATCH_SCHEDULER)  
 endif
 
-RUN_TEST=sys/run_test.sh
+RUN_TEST=$(CURDIR)/sys/run_test.sh
 
 
 ##################################################
@@ -43,14 +43,14 @@ RUN_TEST=sys/run_test.sh
 
 ifneq "$(SOURCES_C)" ""
 OBJS_C := $(SOURCES_C:.c=.c.o)
-RUN_C := $(addprefix $(BINDIR)/,$(notdir $(SOURCES_C:.c=.c.run)))
-ALL_DEP := $(RUN_C)
+RUN_DEP := $(addprefix $(BINDIR)/,$(notdir $(SOURCES_C:.c=.c.run)))
+ALL_DEP := $(RUN_DEP)
 COMP_DEP := $(OBJS_C)
 endif
 ifneq "$(SOURCES_CPP)" ""
 OBJS_CPP := $(SOURCES_CPP:.cpp=.cpp.o)
-RUN_CPP := $(addprefix $(BINDIR)/,$(notdir $(SOURCES_CPP:.cpp=.cpp.run)))
-ALL_DEP := $(RUN_CPP)
+RUN_DEP := $(addprefix $(BINDIR)/,$(notdir $(SOURCES_CPP:.cpp=.cpp.run)))
+ALL_DEP := $(RUN_DEP)
 COMP_DEP := $(OBJS_CPP)
 endif
 
@@ -59,21 +59,11 @@ SOURCES_C := $(shell find $(CURDIR) -name *.c)
 SOURCES_CPP := $(shell find $(CURDIR) -name *.cpp)
 OBJS_C := $(SOURCES_C:.c=.c.o)
 OBJS_CPP := $(SOURCES_CPP:.cpp=.cpp.o)
-RUN_C := $(addprefix $(BINDIR)/,$(notdir $(SOURCES_C:.c=.c.run)))
-RUN_CPP := $(addprefix $(BINDIR)/,$(notdir $(SOURCES_CPP:.cpp=.cpp.run)))
-ALL_DEP := $(RUN_C) $(RUN_CPP)
+RUN_DEP := $(addprefix $(BINDIR)/,$(notdir $(SOURCES_C:.c=.c.run)))
+RUN_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_CPP:.cpp=.cpp.run)))
+ALL_DEP := $(RUN_DEP)
 COMP_DEP := $(OBJS_C) $(OBJS_CPP) 
 endif
-
-##################################################
-# FOR RUNNING TESTS ONLY
-#################################################
-
-TESTS_TO_RUN ?= $(shell find $(BINDIR) -name *.o)
-define run_test
-	@echo -e $(TXTGRN)"\n\n" running: $(1) $(TXTNOC) ${RECORD}$(1)
-	-@$(call loadModules,$(C_COMPILER_MODULE) $(CXX_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(1) $(VERBOSE) $(RECORD)$(1)
-endef
 
 # parameters (1) Action (2) Filename (3) Log File 
 define log_section_header
@@ -82,7 +72,7 @@ endef
 
 # parameters (1) Action (2) Output status (3) Log File 
 define log_section_footer
-  -$(if $(LOG), @echo -e "*-*-*END*-*-*"$(1)"*-*-*"$(2)"*-*-*\n" >> $(LOGDIR)/$(3);,)
+  -$(if $(LOG), @echo -e "*-*-*END*-*-*"$(1)"*-*-*$$(date)*-*-*"$(2)"*-*-*\n" >> $(LOGDIR)/$(3);,)
 endef
 
 .PHONY: all
@@ -94,10 +84,20 @@ all: MessageDisplay $(ALL_DEP)
 compile: MessageDisplay $(COMP_DEP)
 	@echo "====COMPILE DONE===="
 
+##################################################
+# FOR RUNNING TESTS ONLY
+#################################################
+
+TESTS_TO_RUN ?= $(shell find $(BINDIR) -name *.o)
+RUN_TESTS = $(TESTS_TO_RUN:.o=.o.run)
+
 .PHONY: run
-run:
-	$(foreach TEST, $(TESTS_TO_RUN), $(call run_test,$(TEST)))
+run: $(RUN_TESTS)
 	@echo "====RUN DONE====="
+
+%.o.run: 
+	@echo -e $(TXTGRN)"\n\n running:" $(@:.run=) $(TXTNOC) ${RECORD}$(notdir $(@:.run=))
+	-@$(call loadModules,$(C_COMPILER_MODULE) $(CXX_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.run=) $(VERBOSE) $(RECORD)$(notdir $(@:.run=))
 
 .PHONY: MessageDisplay
 MessageDisplay:
@@ -130,45 +130,35 @@ endif
 # c files rule
 %.c.o: %.c $(BINDIR) $(LOGDIR)
 	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC)
-	$(call log_section_header,"COMPILE",$<,$(notdir $(@:.o=.log)))
-	-$(QUIET)$(call loadModules,$(C_COMPILER_MODULE)) $(CCOMPILE) $(VERBOSE_MODE) $< -o $(BINDIR)/$(notdir $@) $(RECORD)$(if $(LOG),$(notdir $(@:.o=.log)))\
+	$(call log_section_header,"COMPILE CC="${CCOMPILE},$<,$(notdir $(@:.o=.log)))
+	-$(QUIET)$(call loadModules,$(C_COMPILER_MODULE)) $(CCOMPILE) $(VERBOSE_MODE) $< -o $(BINDIR)/$(notdir $@) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
-		|| echo "FAIL" > $(LOGTEMPFILE) 
-	-$(call log_section_footer,"COMPILE",$$(cat $(LOGTEMPFILE)),$(notdir $(@:.o=.log)))
-	-@rm $(LOGTEMPFILE)
+		|| echo "FAIL" > $(LOGTEMPFILE))
+	-$(call log_section_footer,"COMPILE CC="${CCOMPILE},$$(cat $(LOGTEMPFILE)),$(notdir $(@:.o=.log)))
+	-@$(if $(LOG), rm $(LOGTEMPFILE))
 	
 # c++ files rule
 %.cpp.o: %.cpp $(BINDIR) $(LOGDIR)
 	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC) 
-	$(call log_section_header,"COMPILE",$<,$(notdir $(@:.o=.log)))
-	-$(QUIET)$(call loadModules,$(CXX_COMPILER_MODULE)) $(CXXCOMPILE) $(VERBOSE_MODE) $< -o $(BINDIR)/$(notdir $@) $(RECORD)$(if $(LOG),$(notdir $(@:.o=.log)))\
+	$(call log_section_header,"COMPILE CPP="${CXXCOMPILE},$<,$(notdir $(@:.o=.log)))
+	-$(QUIET)$(call loadModules,$(CXX_COMPILER_MODULE)) $(CXXCOMPILE) $(VERBOSE_MODE) $< -o $(BINDIR)/$(notdir $@) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
-		|| echo "FAIL" > $(LOGTEMPFILE)
+		|| echo "FAIL" > $(LOGTEMPFILE))
 	-$(call log_section_footer,"COMPILE",$$(cat $(LOGTEMPFILE)),$(notdir $(@:.o=.log)))
-	-@rm $(LOGTEMPFILE)
+	-@$(if $(LOG), rm $(LOGTEMPFILE))
 
 ##################################################
 # Running tests rules
 ##################################################
 # run c app rule
-%.c.run: $(OBJS_C)
+%.run: $(OBJS_C) $(OBJS_CPP)
 	$(call log_section_header,"RUN",$(@:.run=),$(notdir $(@:.run=.log)))
-	@echo -e $(TXTGRN)"\n\n" running: $@ $(TXTNOC) ${RECORD}$(notdir $(@:.run=.log))
-	-$(call loadModules,$(C_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.run=.o) $(VERBOSE) $(RECORD)$(if $(LOG),$(notdir $(@:.run=.log)))\
+	@echo -e $(TXTGRN)"\n\n" running: $@ $(TXTNOC) $(if $(LOG), ${RECORD}$(notdir $(@:.run=.log)))
+	-$(call loadModules,$(C_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.run=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.run=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
-		|| echo "FAIL" > $(LOGTEMPFILE)
+		|| echo "FAIL" > $(LOGTEMPFILE))
 	-$(call log_section_footer,"RUN",$$(cat $(LOGTEMPFILE)),$(notdir $(@:.run=.log)))
-	-@rm $(LOGTEMPFILE)
-
-# run cpp app rule
-%.cpp.run: $(OBJS_CPP)
-	$(call log_section_header,"RUN",$(@:.run=),$(notdir $(@:.run=.log)))
-	@echo -e $(TXTGRN)"\n\n" running: $@ $(TXTNOC) ${RECORD}$(notdir $(@:.run=.log))
-	-$(call loadModules,$(CXX_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.run=.o) $(VERBOSE) $(RECORD)$(if $(LOG),$(notdir $(@:.run=.log)))\
-		&& echo "PASS" > $(LOGTEMPFILE) \
-		|| echo "FAIL" > $(LOGTEMPFILE)
-	-$(call log_section_footer,"RUN",$$(cat $(LOGTEMPFILE)),$(notdir $(@:.run=.log)))
-	-@rm $(LOGTEMPFILE)
+	-@$(if $(LOG), rm $(LOGTEMPFILE))
 
 # Creates the BINDIR folder
 $(BINDIR):
