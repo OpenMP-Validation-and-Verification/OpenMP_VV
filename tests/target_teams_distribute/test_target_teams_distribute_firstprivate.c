@@ -1,28 +1,3 @@
-// RUN: %libomptarget-compile-run-and-check-aarch64-unknown-linux-gnu
-// RUN: %libomptarget-compile-run-and-check-powerpc64-ibm-linux-gnu
-// RUN: %libomptarget-compile-run-and-check-powerpc64le-ibm-linux-gnu
-// RUN: %libomptarget-compile-run-and-check-x86_64-pc-linux-gnu
-
-//===---- test_target_if.c -  --------------------------------------------===//
-//
-// OpenMP API Version 4.5 Nov 2015
-//
-// The if clause determines if the section should be executed in the host or
-// the device. There are three things to test here:
-// (a) with offloading when 'if' clause evaluates to true then code
-// be executed on the device
-// (b) with offloading when 'if' clause evaluates to false then code should
-// be executed on the host
-// (c) without offloading all the code should be executed on the device
-// The if clause is evaluated on runtime which means that variables could
-// determine this behavior. We use a SIZE_THRESHOLD variable to check if we
-// should execute on the device or the host. Before starting the test we
-// sample offloading to see if it was enabled or not. If the code is executed
-// in the device, the result should be c[i] = a[i] + b[i] = i + 1.
-// If the code is executed on the host the result should be c[i] = -1
-//
-//===----------------------------------------------------------------------===//
-
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -60,7 +35,9 @@ int main() {
   {
       #pragma omp target teams distribute firstprivate(privatized)
       for (int x = 0; x < 1024; ++x){
-          privatized = a[x] + b[x];
+          for (int y = 0; y < a[x] + b[x]; ++y){
+              privatized++;
+          }
           d[x] = c[x] * privatized;
       }
   }
@@ -78,7 +55,7 @@ int main() {
   //Test initialization of data in firstprivate clause
   #pragma omp target data map(from: d[0:1024]) map(to: a[0:1024], b[0:1024], c[0:1024])
   {
-      #pragma omp target teams distribute firstprivate(privatized_array[0:10])
+      #pragma omp target teams distribute firstprivate(privatized_array)
       for (int x = 0; x < 1024; ++x){
           d[x] = a[x] + b[x] + c[x] + privatized_array[x%10];
       }
