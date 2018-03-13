@@ -101,13 +101,13 @@ int test_async_between_task_target() {
   for (int i = 0; i < N; ++i) {
     h_task1 |= !(h_array_copy[i] & HOST_TASK1_BIT);
     h_task2 |= !(h_array_copy[i] & HOST_TASK2_BIT);
-    h_task2 |= !(h_array_copy[i] & HOST_TASK2_BIT);
+    h_task2 |= !(h_array_copy[i] & HOST_TASK3_BIT);
     d_task1 |= !(h_array_copy[i] & DEVICE_TASK1_BIT);
     d_task2 |= !(h_array_copy[i] & DEVICE_TASK2_BIT);
   }
   OMPVV_ERROR_IF(h_task1 != 0, "Error in host task 1");
   OMPVV_ERROR_IF(h_task2 != 0, "Error in host task 2");
-  OMPVV_ERROR_IF(h_task2 != 0, "Error in host task 3");
+  OMPVV_ERROR_IF(h_task3 != 0, "Error in host task 3");
   OMPVV_ERROR_IF(d_task1 != 0, "Error in device task 1");
   OMPVV_ERROR_IF(d_task2 != 0, "Error in device task 2");
 
