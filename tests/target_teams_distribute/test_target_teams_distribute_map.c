@@ -102,7 +102,8 @@ int main() {
   }
 
   OMPVV_TEST_AND_SET(errors, !omp_target_is_present(&a, omp_get_default_device()));
-  #pragma omp target exit data map(delete: a[0:1024])
+  #pragma omp target exit data map(release: a[0:1024])
+  OMPVV_TEST_AND_SET(errors, omp_target_is_present(&a, omp_get_default_device()));
   for (int x = 0; x < 1024; ++x){
       OMPVV_TEST_AND_SET(errors, b[x] != a[x]);
       b[x] = 0;
