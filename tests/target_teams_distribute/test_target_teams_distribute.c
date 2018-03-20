@@ -13,6 +13,7 @@ int main() {
   int b[1024];
   int num_teams = 0;
   int errors = 0;
+  int is_host;
 
   // a and b array initialization
   for (int x = 0; x < 1024; ++x) {
@@ -20,10 +21,11 @@ int main() {
       b[x] = x;
   }
 
-  #pragma omp target data map(tofrom: a[0:1024], num_teams) map(to: b[0:1024])
+  #pragma omp target data map(tofrom: a[0:1024], num_teams, is_host) map(to: b[0:1024])
   {
       #pragma omp target teams distribute
       for (int x = 0; x < 1024; ++x){
+          is_host = omp_is_initial_device();
           num_teams = omp_get_num_teams();
           a[x] += b[x];
       }
@@ -39,9 +41,9 @@ int main() {
     if (num_teams == 1){
         OMPVV_WARNING("Test operated with one team.  Parallelism of teams distribute can't be guarunteed.");
     }
-  } else if (devtest == 1) {
+  } else if (!is_host) {
     OMPVV_ERROR("Test failed on device with offloading %s.", (isOffloading ? "enabled" : "disabled"));
-  } else if (devtest == 0) {
+  } else if (is_host) {
     OMPVV_ERROR("Test failed on host with offloading %s.", (isOffloading ? "enabled" : "disabled"));
   }
 

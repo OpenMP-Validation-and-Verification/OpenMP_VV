@@ -14,7 +14,7 @@ int main() {
   int c[1024];
   int d[1024];
   int privatized_array[10];
-  int privatized;
+  int privatized = 0;
   int ishost;
   int errors[2] = {0,0};
 
