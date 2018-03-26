@@ -8,16 +8,16 @@
 #define ISIZ3  12
 
 
-double u[5][ISIZ3][ISIZ2/2*2+1][ISIZ1/2*2+1];
+double u[5][ISIZ2*2];
 
 void omp_device_mem_init() {
   #pragma omp target enter data \
-          map (alloc: u[0:5][0:ISIZ3][0:(ISIZ2/2*2+1)][0:(ISIZ1/2*2+1)])
+          map (to: u[0:5][0:(ISIZ2*2)])
 }
 
 void omp_device_mem_delete() {
   #pragma omp target exit data \
-          map (delete: u[0:5][0:ISIZ3][0:(ISIZ2/2*2+1)][0:(ISIZ1/2*2+1)])
+          map (delete: u[0:5][0:(ISIZ2*2)])
 } 
 
 int main () {
