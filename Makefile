@@ -2,6 +2,10 @@ SHELL=/bin/bash -o pipefail
 
 .DEFAULT_GOAL:=help
 
+ifdef SYSTEM
+	-include sys/$(SYSTEM).def
+endif
+
 include sys/make.def
 
 ##################################################
@@ -188,6 +192,8 @@ help:
 	@echo "  VERBOSE_TESTS=1           Enables extra information display in the tests"
 	@echo "  LOG=1                     Enables dump of the make process output into logs.txt"
 	@echo "  LOG_ALL=1                 Enables dump of the make process output, errors, and binary execution outputs into logs.txt"
+	@echo "  SYSTEM=sys_name           Includes the definitions for the requires modules and batch schedulers in the different systems"
+	@echo "                            This definitions must be in sys/SYSTEM.def. (Do not include the .def extension)"
 	@echo "  MODULE_LOAD=1             Before compiling or running, module load is called"
 	@echo "  ADD_BATCH_SCHED=1         Add the jsrun command before the execution of the running script to send it to a compute node"
 	@echo "  NO_OFFLOADING=1           Turn off offloading"

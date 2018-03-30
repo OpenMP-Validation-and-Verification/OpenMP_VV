@@ -27,23 +27,15 @@
 #---------------------------------------------------------------------------
 
 #---------------------------------------------------------------------------
-# CUDA Module 
-#---------------------------------------------------------------------------
-#---------------------------------------------------------------------------
 # C compilers
 #---------------------------------------------------------------------------
-CCOMPILERS="cc, clang, gcc, xlc"
-JSRUN_COMMAND = jsrun -n 1 -g 4 -a 1 
-APRUN_COMMAND = aprun -n 1 -d 1 
+CCOMPILERS?="cc, clang, gcc, xlc"
 
 # CRAY compiler
 ifeq ($(CC), cc)
   CFLAGS = -homp -O3
   CLINK = cc
   CLINKFLAGS = -homp -lm
-  C_COMPILER_MODULE = PrgEnv-cray cce/8.6.5 craype-accel-nvidia35 cudatoolkit craype/2.5.13 cray-mpich/7.7.0
-  CUDA_MODULE = cudatoolkit
-  BATCH_SCHEDULER = $(APRUN_COMMAND)
 endif
 
 # GCC compiler
@@ -53,9 +45,6 @@ ifeq ($(CC), gcc)
   CFLAGS = -O3 -std=c99 -fopenmp $(COFFLOADING) 
   CLINK = gcc
   CLINKFLAGS = -O3 -fopenmp $(COFFLOADING)
-  CUDA_MODULE = cuda/8.0.61-1
-  C_COMPILER_MODULE = gcc/7.1.1-20170802
-  BATCH_SCHEDULER = $(JSRUN_COMMAND)
 endif
 
 # IBM XL compiler
@@ -65,9 +54,6 @@ ifeq ($(CC), xlc)
   CFLAGS = -O3 -qsmp=omp $(COFFLOADING)
   CLINK = xlc
   CLINKFLAGS = -O3 -qsmp=omp $(COFFLOADING)
-  CUDA_MODULE = cuda/8.0.61-1
-  C_COMPILER_MODULE = xl/20180125
-  BATCH_SCHEDULER = $(JSRUN_COMMAND)
 endif
 
 # Clang compiler
@@ -77,9 +63,6 @@ ifeq ($(CC), clang)
   CFLAGS = -O3 -std=c99 -fopenmp $(COFFLOADING)
   CLINK = clang
   CLINKFLAGS = -O3 -fopenmp $(COFFLOADING)
-  CUDA_MODULE = cuda/8.0.61-1
-  C_COMPILER_MODULE = clang/20170925
-  BATCH_SCHEDULER = $(JSRUN_COMMAND)
 endif
 
 #---------------------------------------------------------------------------
@@ -92,9 +75,6 @@ ifeq ($(CC), CC)
   CFLAGS = -homp -O3
   CLINK = cc
   CLINKFLAGS = -homp -lm
-  C_COMPILER_MODULE = PrgEnv-cray cce/8.6.5 craype-accel-nvidia35 craype/2.5.13 cray-mpich/7.7.0
-  CUDA_MODULE = cudatoolkit
-  BATCH_SCHEDULER = $(APRUN_COMMAND)
 endif
 
 # GCC compiler
@@ -104,9 +84,6 @@ ifeq ($(CXX), g++)
   CXXFLAGS = -O3 -fopenmp $(CXXOFFLOADING)
   CXXLINK = g++
   CXXLINKFLAGS = -O3 -fopenmp $(CXXOFFLOADING)
-  CXX_COMPILER_MODULE = gcc/7.1.1-20170802
-  CUDA_MODULE = cuda/8.0.61-1
-  BATCH_SCHEDULER = $(JSRUN_COMMAND)
 endif
 
 # IBM XL compiler
@@ -116,9 +93,6 @@ ifeq ($(CXX), xlc++)
   CXXFLAGS = -O3 -qsmp=omp $(CXXOFFLOADING)
   CXXLINK = xlc++
   CXXLINKFLAGS = -O3 -qsmp=omp $(CXXOFFLOADING)
-  CXX_COMPILER_MODULE = xl/20180125
-  CUDA_MODULE = cuda/8.0.61-1
-  BATCH_SCHEDULER = $(JSRUN_COMMAND)
 endif
 
 # Clang compiler
@@ -128,9 +102,6 @@ ifeq ($(CXX), clang++)
   CXXFLAGS = -O3 -fopenmp $(CXXOFFLOADING) 
   CXXLINK = clang++
   CXXLINKFLAGS = -O3 -fopenmp $(CXXOFFLOADING)
-  CXX_COMPILER_MODULE = clang/20170925
-  CUDA_MODULE = cuda/8.0.61-1
-  BATCH_SCHEDULER = $(JSRUN_COMMAND)
 endif
 
 #---------------------------------------------------------------------------
