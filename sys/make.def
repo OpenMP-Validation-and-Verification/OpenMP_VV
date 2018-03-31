@@ -30,6 +30,7 @@
 # C compilers
 #---------------------------------------------------------------------------
 CCOMPILERS?="cc, clang, gcc, xlc"
+C_VERSION?= echo "<version unknown>"
 
 # CRAY compiler
 ifeq ($(CC), cc)
@@ -68,7 +69,8 @@ endif
 #---------------------------------------------------------------------------
 # C++ compilers
 #---------------------------------------------------------------------------
-CXXCOMPILERS="clang++, g++, xlc++"
+CXXCOMPILERS?="clang++, g++, xlc++"
+CXX_VERSION?= echo "<version unknown>"
 
 # CRAY compiler
 ifeq ($(CC), CC)

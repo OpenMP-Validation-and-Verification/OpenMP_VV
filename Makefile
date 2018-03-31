@@ -8,6 +8,8 @@ endif
 
 include sys/make.def
 
+LOG_NOTE?="none"
+
 ##################################################
 # Verbose & Log
 #################################################
@@ -69,14 +71,14 @@ ALL_DEP := $(RUN_DEP)
 COMP_DEP := $(OBJS_C) $(OBJS_CPP) 
 endif
 
-# parameters (1) Action (2) Filename (3) Log File 
+# parameters (1) Action (2) System (3) Filename (4) other Info (compiler) (5) Log File 
 define log_section_header
-  -$(if $(LOG), @echo -e "*-*-*"$(1)"*-*-*"$(2)"*-*-*$$(date)*-*-*" >> $(LOGDIR)/$(3);,)
+  -$(if $(LOG), @echo -e "*-*-*BEGIN*-*-*"$(1)"*-*-*$$(date)*-*-*"$(2)"*-*-*"$(3)"*-*-*"$(4)"*-*-*" >> $(LOGDIR)/$(5);,)
 endef
 
-# parameters (1) Action (2) Output status (3) Log File 
+# parameters (1) Action (2) System (3) Output status  (4) other Info (compiler) (5) Log File 
 define log_section_footer
-  -$(if $(LOG), @echo -e "*-*-*END*-*-*"$(1)"*-*-*$$(date)*-*-*"$(2)"*-*-*\n" >> $(LOGDIR)/$(3);,)
+  -$(if $(LOG), @echo -e "*-*-*END*-*-*"$(1)"*-*-*$$(date)*-*-*"$(2)"*-*-*"$(3)"*-*-*"$(4)"\n" >> $(LOGDIR)/$(5);,)
 endef
 
 .PHONY: all
@@ -107,8 +109,8 @@ run: $(RUN_TESTS)
 MessageDisplay:
 	@echo "    ====    SOLLVE PROJECT MAKEFILE   ====   "
 	@echo "Running make with the following compilers"
-	@echo "CC = "$(CC)
-	@echo "CXX = "$(CXX)
+	@echo "CC = "$(CC) $(shell $(C_VERSION))
+	@echo "CXX = "$(CXX) $(shell $(CXX_VERSION))
 	$(if $(MODULE_LOAD), @echo "C_MODULE = "$(C_COMPILER_MODULE); echo "CXX_MODULE = "$(CXX_COMPILER_MODULE);,)
 
 ##################################################
@@ -134,21 +136,21 @@ endif
 # c files rule
 %.c.o: %.c $(BINDIR) $(LOGDIR)
 	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC)
-	$(call log_section_header,"COMPILE CC="${CCOMPILE},$<,$(notdir $(@:.o=.log)))
+	$(call log_section_header,"COMPILE CC="${CCOMPILE},$(SYSTEM),$<,$(CC) $$($(C_VERSION)),$(notdir $(@:.o=.log)))
 	-$(QUIET)$(call loadModules,$(C_COMPILER_MODULE)) $(CCOMPILE) $(VERBOSE_MODE) $< -o $(BINDIR)/$(notdir $@) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
 		|| echo "FAIL" > $(LOGTEMPFILE))
-	-$(call log_section_footer,"COMPILE CC="${CCOMPILE},$$(cat $(LOGTEMPFILE)),$(notdir $(@:.o=.log)))
+	-$(call log_section_footer,"COMPILE CC="${CCOMPILE},$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.o=.log)))
 	-@$(if $(LOG), rm $(LOGTEMPFILE))
 	
 # c++ files rule
 %.cpp.o: %.cpp $(BINDIR) $(LOGDIR)
 	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC) 
-	$(call log_section_header,"COMPILE CPP="${CXXCOMPILE},$<,$(notdir $(@:.o=.log)))
+	$(call log_section_header,"COMPILE CPP="${CXXCOMPILE},$(SYSTEM),$<,$(CC) $$($(C_VERSION)),$(notdir $(@:.o=.log)))
 	-$(QUIET)$(call loadModules,$(CXX_COMPILER_MODULE)) $(CXXCOMPILE) $(VERBOSE_MODE) $< -o $(BINDIR)/$(notdir $@) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
 		|| echo "FAIL" > $(LOGTEMPFILE))
-	-$(call log_section_footer,"COMPILE",$$(cat $(LOGTEMPFILE)),$(notdir $(@:.o=.log)))
+	-$(call log_section_footer,"COMPILE",$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.o=.log)))
 	-@$(if $(LOG), rm $(LOGTEMPFILE))
 
 ##################################################
@@ -156,12 +158,12 @@ endif
 ##################################################
 # run c app rule
 %.run: $(OBJS_C) $(OBJS_CPP)
-	$(call log_section_header,"RUN",$(@:.run=),$(notdir $(@:.run=.log)))
+	$(call log_section_header,"RUN",$(SYSTEM),$(@:.run=),$(LOG_NOTE),$(notdir $(@:.run=.log)))
 	@echo -e $(TXTGRN)"\n\n" running: $@ $(TXTNOC) $(if $(LOG), ${RECORD}$(notdir $(@:.run=.log)))
 	-$(call loadModules,$(C_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.run=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.run=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
 		|| echo "FAIL" > $(LOGTEMPFILE))
-	-$(call log_section_footer,"RUN",$$(cat $(LOGTEMPFILE)),$(notdir $(@:.run=.log)))
+	-$(call log_section_footer,"RUN",$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.run=.log)))
 	-@$(if $(LOG), rm $(LOGTEMPFILE))
 
 # Creates the BINDIR folder
