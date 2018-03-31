@@ -16,6 +16,8 @@ class testResult:
   testPath = ""
   compilerName = ""
   compilerCommand = ""
+  testSystem = ""
+  testComments = ""
 
   # Compiler results
   startingCompilerDate = ""
@@ -59,24 +61,28 @@ class testResult:
     self.compilerName = newCompilerName if newCompilerName else ""
     self.compilerCommand = newCompilerCommand if newCompilerCommand else ""
 
-  def setCompilerInit(self, newStartingCompilerDate):
+  def setCompilerInit(self, newStartingCompilerDate, newSystem):
     self.startingCompilerDate = newStartingCompilerDate
+    self.testSystem = newSystem if newSystem else ""
 
-  def setRuntimeInit(self, newBinaryPath, newStartingRuntimeDate):
+  def setRuntimeInit(self, newBinaryPath, newStartingRuntimeDate, newSystem):
     self.binaryPath = newBinaryPath
     self.startingRuntimeDate= newStartingRuntimeDate
+    self.testSystem = newSystem if newSystem else ""
 
-  def setCompilerResult(self, itPassed, outputText, newEndingCompilerDate):
+  def setCompilerResult(self, itPassed, outputText, newEndingCompilerDate, newComments=None):
     ''' setters for compiler results'''
     self.compilerPass = itPassed
     self.compilerOutput = outputText
     self.endingCompilerDate = newEndingCompilerDate
+    self.testComments = newComments if newComments else ""
 
-  def setRuntimeResult(self, itPassed, outputText, newEndingRuntimeDate):
+  def setRuntimeResult(self, itPassed, outputText, newEndingRuntimeDate, newComments=None):
     ''' setters for runtime results'''
     self.runtimePass = itPassed
     self.runtimeOutput = outputText
     self.endingRuntimeDate = newEndingRuntimeDate
+    self.testComments = newComments if newComments else ""
   
   def makePathRelative(self, basePath=None):
     if (basePath):
@@ -86,8 +92,9 @@ class testResult:
 
   def convert2CSV(self):
     ''' Comma Separated Values printing '''
-    return "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s" \
-           % (self.testName.replace('\n',''), self.testPath.replace('\n',''), self.compilerName.replace('\n',''),
+    return "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s" \
+           % (self.testName.replace('\n',''), self.testPath.replace('\n',''), self.testSystem.replace('\n',''),
+           self.testComments.replace('\n',''), self.compilerName.replace('\n',''),
            self.compilerCommand.replace('\n',''), self.startingCompilerDate.replace('\n',''), 
            self.endingCompilerDate.replace('\n',''), self.compilerPass.replace('\n',''), self.compilerOutput.replace('\n',''),
            str(self.runtimeOnly), self.binaryPath.replace('\n',''), self.startingRuntimeDate.replace('\n',''), 
@@ -98,6 +105,8 @@ class testResult:
     return {
         "Test name": self.testName, 
         "Test path": self.testPath,
+        "Test system": self.testSystem,
+        "Test comments": self.testComments,
         "Runtime only": self.runtimeOnly,
         "Compiler name": self.compilerName,
         "Compiler result": self.compilerPass,
@@ -116,6 +125,8 @@ class testResult:
       # Test values
       testName = "%s"
       testPath = "%s"
+      testSystem = "%s"
+      testComments = "%s"
       compilerName = "%s"
       compilerCommand = "%s"
 
@@ -132,7 +143,7 @@ class testResult:
       endingRuntimeDate = "%s"
       runtimePass = "%s"
       runtimeOutput = "%s"
-    """ % (self.testName, self.testPath, self.compilerName,
+    """ % (self.testName, self.testPath, self.testSystem, self.testComments, self.compilerName,
            self.compilerCommand, self.startingCompilerDate, 
            self.endingCompilerDate, self.compilerPass, self.compilerOutput,
            str(self.runtimeOnly), self.binaryPath, self.startingRuntimeDate, 
@@ -160,20 +171,20 @@ def parseFile(log_file):
           if header_info["type"] == "COMPILE":
             # We are starting a compiler section
             current_test.setTestParameters(header_info["testName"], header_info["file"], header_info["compiler"], header_info["compilerCommand"])
-            current_test.setCompilerInit(header_info["date"])
+            current_test.setCompilerInit(header_info["date"], header_info["system"])
             current_state = header_info["type"]
           elif header_info["type"] == "RUN":
             # we are starting a runtime section
             if (current_test.testName == ""):
               current_test.setTestParameters(header_info["testName"])
-            current_test.setRuntimeInit(header_info["file"], header_info["date"])
+            current_test.setRuntimeInit(header_info["file"], header_info["date"], header_info["system"])
             current_state = header_info["type"]
           elif header_info["type"] == "END":
             # We are ending a section
             if current_state == "COMPILE":
-              current_test.setCompilerResult(header_info["result"], current_buffer, header_info["date"])
+              current_test.setCompilerResult(header_info["result"], current_buffer, header_info["date"], header_info["comments"])
             elif current_state == "RUN":
-              current_test.setRuntimeResult(header_info["result"], current_buffer, header_info["date"])
+              current_test.setRuntimeResult(header_info["result"], current_buffer, header_info["date"], header_info["comments"])
               returned_value.append(current_test)
               # Runtime is the last thing that should happen
               current_test = testResult()
@@ -204,40 +215,40 @@ def interpretHeader(header):
     header_split = header.split("*-*-*")[1:] # first element always empty
     # get the date 
     returned_value["date"] = header_split[2]
-    if header_split[0].startswith('COMPILE'):
-      # case when the header is a compiler header.
-      # Example of a compiler line is:
-      #   *-*-*COMPILE CC=xlc -I./ompvv -O3 *-*-*path/to/test/test.c*-*-*Thu Jan 18 19:53:25 EST 2018*-*-*
+    returned_value["system"] = header_split[3]
+    if header_split[0].startswith("BEGIN"):
+      if header_split[1].startswith('COMPILE'):
+        # case when the header is a compiler header.
+        # Example of a compiler line is:
+        #   *-*-*COMPILE CC=xlc -I./ompvv -O3 *-*-*path/to/test/test.c*-*-*Thu Jan 18 19:53:25 EST 2018*-*-*
 
-      returned_value["type"] = "COMPILE";
-      returned_value["file"] = header_split[1]
-      returned_value["testName"] = os.path.basename(header_split[1])
-      
-      # remove the "COMPILE " part
-      compilation_info = header_split[0][8:];
-      if compilation_info[:2] == "CC":
-        # C Compiler
-        returned_value["compiler"] = compilation_info[3:].split(" ")[0]
-        returned_value["compilerCommand"] = compilation_info[3:]
-      elif compilation_info[:3] == "CPP":
-        returned_value["compiler"] = compilation_info[4:].split(" ")[0]
-        returned_value["compilerCommand"] = compilation_info[4:]
-      else:
-        returned_value["compiler"] = "undefined"
-        returned_value["compilerCommand"] = "undefined"
-    elif header_split[0].startswith('RUN'):
-      # case when the header is a runtime header.
-      # Example of a runtime line is:
-      #   *-*-*RUN*-*-*bin/array_segment_map.c*-*-*Thu Jan 18 19:54:32 EST 2018*-*-*
-      returned_value["type"] = "RUN";
-      returned_value["file"] = header_split[1]
-      returned_value["testName"] = os.path.basename(header_split[1])
+        returned_value["type"] = "COMPILE"
+        returned_value["file"] = header_split[4]
+        returned_value["testName"] = os.path.basename(header_split[4])
+        
+        # remove the "COMPILE " part
+        compilation_info = header_split[1][8:]
+        returned_value["compiler"] = header_split[5]
+        if compilation_info[:2] == "CC":
+          returned_value["compilerCommand"] = compilation_info[3:]
+        elif compilation_info[:3] == "CPP":
+          returned_value["compilerCommand"] = compilation_info[4:]
+        else:
+          returned_value["compilerCommand"] = "undefined"
+      elif header_split[1].startswith('RUN'):
+        # case when the header is a runtime header.
+        # Example of a runtime line is:
+        #   *-*-*RUN*-*-*bin/array_segment_map.c*-*-*Thu Jan 18 19:54:32 EST 2018*-*-*
+        returned_value["type"] = "RUN"
+        returned_value["file"] = header_split[4]
+        returned_value["testName"] = os.path.basename(header_split[4])
     elif header_split[0].startswith('END'):
       # case when the header is a closing header.
       # Example of a closing line is:
       #  *-*-*END*-*-*RUN*-*-*Thu Jan 18 19:54:32 EST 2018*-*-*PASS*-*-*
-      returned_value["type"] = "END";
-      returned_value["result"] = header_split[3];
+      returned_value["type"] = "END"
+      returned_value["result"] = header_split[4]
+      returned_value["comments"] = header_split[5]
     else:
       # For some reason, none of the above. Should not happen
       returned_value["type"] = "undefined"
