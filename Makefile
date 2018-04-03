@@ -109,8 +109,8 @@ run: $(RUN_TESTS)
 MessageDisplay:
 	@echo "    ====    SOLLVE PROJECT MAKEFILE   ====   "
 	@echo "Running make with the following compilers"
-	@echo "CC = "$(CC) $(shell $(C_VERSION))
-	@echo "CXX = "$(CXX) $(shell $(CXX_VERSION))
+	@echo "CC = "$(CC) $(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") ${C_VERSION})
+	@echo "CXX = "$(CXX) $(shell $(call loadModules,$(CXX_COMPILER_MODULE),"shut up") ${CXX_VERSION})
 	$(if $(MODULE_LOAD), @echo "C_MODULE = "$(C_COMPILER_MODULE); echo "CXX_MODULE = "$(CXX_COMPILER_MODULE);,)
 
 ##################################################
@@ -118,7 +118,7 @@ MessageDisplay:
 ##################################################
 
 define loadModules
-	$(if $(MODULE_LOAD), module load $(1) $(CUDA_MODULE) $(if $(QUIET), > /dev/null 2> /dev/null,);,)
+	$(if $(MODULE_LOAD), module load $(1) $(CUDA_MODULE) $(if $(or $(QUIET), $(2)), > /dev/null 2> /dev/null,);,)
 endef
 
 ##################################################
@@ -136,7 +136,7 @@ endif
 # c files rule
 %.c.o: %.c $(BINDIR) $(LOGDIR)
 	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC)
-	$(call log_section_header,"COMPILE CC="${CCOMPILE},$(SYSTEM),$<,$(CC) $$($(C_VERSION)),$(notdir $(@:.o=.log)))
+	$(call log_section_header,"COMPILE CC="${CCOMPILE},$(SYSTEM),$<,$(CC) $(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(C_VERSION)),$(notdir $(@:.o=.log)))
 	-$(QUIET)$(call loadModules,$(C_COMPILER_MODULE)) $(CCOMPILE) $(VERBOSE_MODE) $< -o $(BINDIR)/$(notdir $@) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
 		|| echo "FAIL" > $(LOGTEMPFILE))
@@ -146,7 +146,7 @@ endif
 # c++ files rule
 %.cpp.o: %.cpp $(BINDIR) $(LOGDIR)
 	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC) 
-	$(call log_section_header,"COMPILE CPP="${CXXCOMPILE},$(SYSTEM),$<,$(CC) $$($(C_VERSION)),$(notdir $(@:.o=.log)))
+	$(call log_section_header,"COMPILE CPP="${CXXCOMPILE},$(SYSTEM),$<,$(CC) $(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(CXX_VERSION)),$(notdir $(@:.o=.log)))
 	-$(QUIET)$(call loadModules,$(CXX_COMPILER_MODULE)) $(CXXCOMPILE) $(VERBOSE_MODE) $< -o $(BINDIR)/$(notdir $@) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
 		|| echo "FAIL" > $(LOGTEMPFILE))

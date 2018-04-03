@@ -21,7 +21,7 @@ endif
 # IBM XL compiler
 ifeq ($(CC), xlc)
   C_COMPILER_MODULE = xl/20180125
-  C_VERSION = xlc -qversion | grep "Version: .*$" | sed "s/Version: //g"
+  C_VERSION = xlc -qversion | grep 'Version: .*$$' | sed 's/Version: //g' 
 endif
 
 # Clang compiler
@@ -44,7 +44,7 @@ endif
 # IBM XL compiler
 ifeq ($(CXX), xlc++)
   CXX_COMPILER_MODULE = xl/20180125
-  CXX_VERSION = xlc -qversion | grep "Version: .*$" | sed "s/Version: //g"
+  CXX_VERSION = xlc -qversion | grep 'Version: .*$$' | sed 's/Version: //g' 
 endif
 
 # Clang compiler
