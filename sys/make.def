@@ -73,7 +73,7 @@ CXXCOMPILERS?="clang++, g++, xlc++"
 CXX_VERSION?= echo "version unknown"
 
 # CRAY compiler
-ifeq ($(CC), CC)
+ifeq ($(CXX), CC)
   CFLAGS = -homp -O3
   CLINK = cc
   CLINKFLAGS = -homp -lm
