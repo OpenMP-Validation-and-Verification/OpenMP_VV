@@ -19,30 +19,27 @@
 #include "ompvv.h"
 #include <stdio.h>
 
-#define ATTEMPT_THRESHOLD 5
-#define NUM_ATTEMPTS 10
+#define ATTEMPT_THRESHOLD 70
+#define NUM_ATTEMPTS 100
 #define SIZE_N 1024
 
-int test_target_teams_distribute_if_no_modifier() {
-  OMPVV_INFOMSG("test_target_teams_distribute_if_no_modifier");
-  
-  int isOffloading = 0;
-  int a[SIZE_N], init_num_threads_dev[SIZE_N], init_num_threads_host[SIZE_N];
-  int attempt = 0;
-  int errors = 0;
-  int i;
+void checkPreconditions() {
+  // We test if offloading is enable, and if 
+  // the number of threads is not 1. Having 
+  // the number of threads equal to 1 is legal, but 
+  // we won't be able to test if the if is 
+  // affecting this or not
 
-  // We test for offloading
-#pragma omp target map(from: isOffloading)
-  {
-    isOffloading = !omp_is_initial_device();
-  }
-  
+  // Testing for offloading
+  int isOffloading = 0;
+  int i;
+  OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
   OMPVV_WARNING_IF(!isOffloading, "With offloading off, it is not possible to test if");
 
-  // a, init_num_threads_dev and init_num_threads_host arrays initialization
+  // Testing for number of threads
+  int init_num_threads_dev[SIZE_N], init_num_threads_host[SIZE_N];
+  // init_num_threads_dev and init_num_threads_host arrays initialization
   for (i = 0; i < SIZE_N; i++) {
-    a[i] = 1;
     init_num_threads_dev[i] = 0;
     init_num_threads_host[i] = 0;
   }
@@ -74,26 +71,53 @@ int test_target_teams_distribute_if_no_modifier() {
   OMPVV_WARNING_IF(raiseWarningDevice, "Initial number of threads in device was 1. It is not possible to test the if for parallel");
   OMPVV_WARNING_IF(raiseWarningHost, "Initial number of threads in host was 1. It is not possible to test the if for parallel");
 
+}
+
+int test_target_teams_distribute_if_no_modifier() {
+  OMPVV_INFOMSG("test_target_teams_distribute_if_no_modifier");
+ 
+  checkPreconditions();
+
+  int a[SIZE_N];
+  int warning[SIZE_N] ; // num_threads = 1 is not technically an error
+  int attempt = 0;
+  int errors = 0;
+  int i;
+
+  for (i = 0; i < SIZE_N; i++) {
+    a[i] = 1;
+    warning[i] = 0;
+  }
+
   // We tests multiple times. Each one we check if we are running on the initial device or not
-  // if we are not we increase the value by 1, and we check if the num_threads is different
-  // to the one meassured before. If we are running on the host, the if should also affect the 
-  // parallel clause and we should have the number of threads = 1
+  // if we are not we increase the value by 1, and we check if the num_threads is either one or
+  // manby. If the condition evaluates to false, we should execute in the host and with num_threads
+  // equal to 1
   for (attempt = 0; attempt < NUM_ATTEMPTS; ++attempt) {
 #pragma omp target teams distribute parallel for if(attempt >= ATTEMPT_THRESHOLD)\
-    map(tofrom: a) num_threads(10)
+    map(tofrom: a, warning) num_threads(10)
     for (i = 0; i < SIZE_N; i++) {
       if (omp_is_initial_device()) {
+        // if(false): We should execute in the host 
+        // and the number of threads is expected 
+        // to be 1
         a[i] += (omp_get_num_threads() > 1) ? 10 : 0; // This +10 should not happen
       } else {
-        a[i] += (omp_get_num_threads() > 1 ? 1 : 0); 
+        a[i] += 1;
+        warning[i] += (omp_get_num_threads() == 1 ? 1 : 0); // We cannot say that this is an error but we can raise a warning
       }
     }
   }
 
-  // a and b array initialization
+  int raiseWarning = 0;
+  
   for (i = 0; i < SIZE_N; i++) {
     OMPVV_TEST_AND_SET(errors, a[i] != 1 + (NUM_ATTEMPTS - ATTEMPT_THRESHOLD));
+    if (warning[i] != 0) {
+      raiseWarning = 1;
+    }
   }
+  OMPVV_WARNING_IF(raiseWarning != 0, "The number of threads was 1 even though we expected it to be more than 1. Not a compliance error in the specs");
 
   OMPVV_ERROR_IF(errors, "Unexpected value after if clause");
 
