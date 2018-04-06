@@ -36,7 +36,7 @@ C_VERSION?= echo "version unknown"
 ifeq ($(CC), cc)
   CFLAGS = -homp -O3
   CLINK = cc
-  CLINKFLAGS = -homp -lm
+  CLINKFLAGS = -homp -lm -lrt
 endif
 
 # GCC compiler
@@ -45,7 +45,7 @@ ifeq ($(CC), gcc)
   C_NO_OFFLOADING = -foffload=disable
   CFLAGS = -O3 -std=c99 -fopenmp $(COFFLOADING) 
   CLINK = gcc
-  CLINKFLAGS = -O3 -fopenmp $(COFFLOADING)
+  CLINKFLAGS = -O3 -fopenmp $(COFFLOADING) -lrt
 endif
 
 # IBM XL compiler
@@ -54,7 +54,7 @@ ifeq ($(CC), xlc)
   C_NO_OFFLOADING = 
   CFLAGS = -O3 -qsmp=omp $(COFFLOADING)
   CLINK = xlc
-  CLINKFLAGS = -O3 -qsmp=omp $(COFFLOADING)
+  CLINKFLAGS = -O3 -qsmp=omp $(COFFLOADING)  -lrt
 endif
 
 # Clang compiler
@@ -63,7 +63,7 @@ ifeq ($(CC), clang)
   C_NO_OFFLOADING = 
   CFLAGS = -O3 -std=c99 -fopenmp $(COFFLOADING)
   CLINK = clang
-  CLINKFLAGS = -O3 -fopenmp $(COFFLOADING)
+  CLINKFLAGS = -O3 -fopenmp $(COFFLOADING) -lrt
 endif
 
 #---------------------------------------------------------------------------
@@ -74,9 +74,9 @@ CXX_VERSION?= echo "version unknown"
 
 # CRAY compiler
 ifeq ($(CXX), CC)
-  CFLAGS = -homp -O3
-  CLINK = cc
-  CLINKFLAGS = -homp -lm
+  CXXFLAGS = -homp -O3
+  CXXLINK = cc
+  CXXLINKFLAGS = -homp -lm -lrt
 endif
 
 # GCC compiler
@@ -85,7 +85,7 @@ ifeq ($(CXX), g++)
   CXX_NO_OFFLOADING = -foffload=disable
   CXXFLAGS = -O3 -fopenmp $(CXXOFFLOADING)
   CXXLINK = g++
-  CXXLINKFLAGS = -O3 -fopenmp $(CXXOFFLOADING)
+  CXXLINKFLAGS = -O3 -fopenmp $(CXXOFFLOADING) -lrt
 endif
 
 # IBM XL compiler
@@ -94,7 +94,8 @@ ifeq ($(CXX), xlc++)
   CXX_NO_OFFLOADING = 
   CXXFLAGS = -O3 -qsmp=omp $(CXXOFFLOADING)
   CXXLINK = xlc++
-  CXXLINKFLAGS = -O3 -qsmp=omp $(CXXOFFLOADING)
+  CXXLINKFLAGS = -O3 -qsmp=omp $(CXXOFFLOADING) -lrt
+
 endif
 
 # Clang compiler
@@ -103,7 +104,7 @@ ifeq ($(CXX), clang++)
   CXX_NO_OFFLOADING = 
   CXXFLAGS = -O3 -fopenmp $(CXXOFFLOADING) 
   CXXLINK = clang++
-  CXXLINKFLAGS = -O3 -fopenmp $(CXXOFFLOADING)
+  CXXLINKFLAGS = -O3 -fopenmp $(CXXOFFLOADING) -lrt
 endif
 
 #---------------------------------------------------------------------------

@@ -13,7 +13,9 @@
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "ompvv.h"
+#include "ompvv_timing.h"
 
 int test_function() {
   int errors = 1;
@@ -56,6 +58,13 @@ int main() {
   
   errors = test_function();
   // CALL OTHER FUNCTIONS HERE
+  uint64_t startTimer, stopTimer;
+
+  OMPVV_GET_TIME(startTimer);
+  sleep(3);
+  OMPVV_GET_TIME(stopTimer);
+  OMPVV_PRINT_TIME_LAPSED(startTimer, stopTimer);
+
 
   // These two lines could be replaced with OMPVV_REPORT_AND_RETURN(errors)
   // OMPVV_REPORT requires OMPVV_TEST_OFFLOADING TO BE CALLED BEFOREHAND
