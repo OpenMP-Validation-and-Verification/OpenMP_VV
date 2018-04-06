@@ -3,6 +3,7 @@
 
 #include "ompvv.h"
 #include <sys/time.h>
+#include <stdint.h>
 
 #define OMPVV_GET_TIME(timer) \
 { \
