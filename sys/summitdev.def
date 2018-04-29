@@ -1,0 +1,55 @@
+# Definitions for the Summitdev system
+
+#---------------------------------------------------------------------------
+# BATCH Scheduler
+#---------------------------------------------------------------------------
+JSRUN_COMMAND = jsrun -n 1 -g 4 -a 1 
+BATCH_SCHEDULER = $(JSRUN_COMMAND)
+
+CUDA_MODULE = cuda/8.0.61-1
+#---------------------------------------------------------------------------
+# C compilers
+#---------------------------------------------------------------------------
+CCOMPILERS="clang, gcc, xlc"
+
+# GCC compiler
+ifeq ($(CC), gcc)
+  C_COMPILER_MODULE = gcc/7.1.1-20170802
+  C_VERSION = gcc -dumpversion
+endif
+
+# IBM XL compiler
+ifeq ($(CC), xlc)
+  C_COMPILER_MODULE = xl/20180125
+  C_VERSION = xlc -qversion | grep 'Version: .*$$' | sed 's/Version: //g' 
+endif
+
+# Clang compiler
+ifeq ($(CC), clang)
+  C_COMPILER_MODULE = clang/20170925
+  C_VERSION = clang -dumpversion
+endif
+
+#---------------------------------------------------------------------------
+# C++ compilers
+#---------------------------------------------------------------------------
+CXXCOMPILERS="clang++, g++, xlc++"
+
+# GCC compiler
+ifeq ($(CXX), g++)
+  CXX_COMPILER_MODULE = gcc/7.1.1-20170802
+  CXX_VERSION = g++ -dumpversion
+endif
+
+# IBM XL compiler
+ifeq ($(CXX), xlc++)
+  CXX_COMPILER_MODULE = xl/20180125
+  CXX_VERSION = xlc -qversion | grep 'Version: .*$$' | sed 's/Version: //g' 
+endif
+
+# Clang compiler
+ifeq ($(CXX), clang++)
+  CXX_COMPILER_MODULE = clang/20170925
+  CXX_VERSION = clang++ -dumpversion
+endif
+
