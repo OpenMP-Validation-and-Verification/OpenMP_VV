@@ -3,10 +3,10 @@ SHELL=/bin/bash -o pipefail
 .DEFAULT_GOAL:=help
 
 ifdef SYSTEM
-	-include sys/$(SYSTEM).def
+	-include sys/systems/$(SYSTEM).def
 endif
 
-include sys/make.def
+include sys/make/make.def
 
 LOG_NOTE?="none"
 
@@ -20,13 +20,14 @@ endif
 
 RECORD:=
 LOGDIR:= 
+LOGDIRNAME:= logs
 ifdef LOG
-  LOGDIR:= logs
+  LOGDIR:= $(LOGDIRNAME)
   RECORD:= | tee -a $(LOGDIR)/
 endif
 ifdef LOG_ALL
   LOG:=1 # LOG_ALL implies LOG
-  LOGDIR:= logs
+  LOGDIR:= $(LOGDIRNAME)
   RECORD:= 2>&1 | tee -a $(LOGDIR)/
 endif
 
@@ -39,8 +40,12 @@ ifdef ADD_BATCH_SCHED
   BSRUN:= $(BATCH_SCHEDULER)  
 endif
 
-RUN_TEST=$(CURDIR)/sys/run_test.sh
-
+# Test running and results analyzer
+RUN_TEST=$(CURDIR)/sys/scripts/run_test.sh
+RESULTS_ANALYZER=$(CURDIR)/sys/scripts/createSummary.py
+RESULTS_JSON_OUTPUT_FILE=results.json
+RESULTS_HTML_OUTPUT_FOLDER=results_report
+RESULTS_HTML_REPORT_TEMPLATE=$(CURDIR)/sys/results_template
 
 ##################################################
 # Source files
@@ -173,6 +178,33 @@ $(BINDIR):
 $(LOGDIR):
 	mkdir $@
 
+$(RESULTS_JSON_OUTPUT_FILE): 
+	@echo "Creating $(RESULTS_JSON_OUTPUT_FILE) file"
+	@echo "Currently we only support run logs that contain compilation and run outputs. Use the 'make all' rule to obtain these"
+	@$(RESULTS_ANALYZER) -f json -o $(RESULTS_JSON_OUTPUT_FILE) $(LOGDIRNAME)/*
+
+.PHONY: report_json
+report_json: $(RESULTS_JSON_OUTPUT_FILE)
+	@echo " === REPORT DONE === "
+
+.PHONY: report_html
+report_html: $(RESULTS_JSON_OUTPUT_FILE)
+	@if [ -d "./$(RESULTS_HTML_OUTPUT_FOLDER)" ]; then \
+    echo "A report exist already. Please move it before creating a new one"; \
+	 else \
+	  echo " === CREATING REPORT === "; \
+		mkdir $(RESULTS_HTML_OUTPUT_FOLDER); \
+		echo " folder $(RESULTS_HTML_OUTPUT_FOLDER) created"; \
+	  cp -r $(RESULTS_HTML_REPORT_TEMPLATE)/* $(RESULTS_HTML_OUTPUT_FOLDER); \
+		echo " template copied"; \
+		mv $(RESULTS_JSON_OUTPUT_FILE) $(RESULTS_HTML_OUTPUT_FOLDER); \
+		sed -i "1s/.*/var jsonResults = \[/g" $(RESULTS_HTML_OUTPUT_FOLDER)/$(RESULTS_JSON_OUTPUT_FILE); \
+		sed -i "$$ s/.*/];/g" $(RESULTS_HTML_OUTPUT_FOLDER)/$(RESULTS_JSON_OUTPUT_FILE); \
+		echo " json file processed"; \
+	fi;
+	
+	@echo " === REPORT DONE === "
+
 .PHONY: clean
 clean:
 	- rm -r $(BINDIR)
@@ -214,6 +246,13 @@ help:
 	@echo "    Remove all executables from bin/ directory"
 	@echo "  compilers"
 	@echo "    Shows available compiler configuration"
+	@echo "  report_json"
+	@echo "    create a json file containing the results existing in the logs files inside the $(LOGDIRNAME) folder"
+	@echo "    currently we only support runs that contain output for compile and run"
+	@echo "  report_html"
+	@echo "    create an html based results report. This rule takes the json file and a prebuild template and creates"
+	@echo "    the $(RESULTS_HTML_OUTPUT_FOLDER) folder containing the report. This report allows filtering the results"
+	@echo "    by system, compiler, and pass/fail result. It also allows to see the output of each tests"
 	@echo ""
 	@echo " === EXAMPLES ==="
 	@echo "  make CC=gcc CXX=g++ all                 ==> compile and run all test cases with GCC"
@@ -221,6 +260,7 @@ help:
 	@echo "  make CXX=g++ SOURCES_CPP=a.cpp all      ==> compile and run a.cpp with g++"
 	@echo "  make CC=xlc CXX=xlc++ compile           ==> compile all test cases with XL"
 	@echo "  make run                                ==> run all the cases that exist inside bin/"
+	@echo "  make report_html                        ==> Using the logs file created with the LOG option, create a report"
 	@echo "  make TESTS_TO_RUN=bin/myTest run        ==> run myTest "
 	@echo ""
 	
