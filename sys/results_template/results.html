@@ -60,10 +60,12 @@
 					<input type="text" class="form-control" ng-model="filters.searchFilter" placeholder="Search Results..">
 				</li>
 				<li class="list-group-item">
-					<select multiple class="form-control" ng-model="filters.compilerFilter" ng-options="compiler for compiler in filters.compilerOptions"></select>
+					<label for="filterCompilers">Compilers</label>
+					<select multiple id="filterCompilers" style="margin-bottom: 0px;" class="form-control" ng-model="filters.compilerFilter" ng-options="compiler for compiler in filters.compilerOptions"></select>
 				</li>
 				<li class="list-group-item">
-					<select multiple class="form-control" ng-model="filters.platformFilter" ng-options="platform for platform in filters.platformOptions"></select>
+					<label for="filterSystems">Systems</label>					
+					<select multiple id="filterSystems" style="margin-bottom: 0px;" class="form-control" ng-model="filters.platformFilter" ng-options="platform for platform in filters.platformOptions"></select>
 				</li>
 				<li class="list-group-item">
 					<span class="label label-primary">Compiler results</span>

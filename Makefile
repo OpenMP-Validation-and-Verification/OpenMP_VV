@@ -51,27 +51,56 @@ RESULTS_HTML_REPORT_TEMPLATE=$(CURDIR)/sys/results_template
 # Source files
 #################################################
 
-
-ifneq "$(SOURCES_C)" ""
-OBJS_C := $(SOURCES_C:.c=.c.o)
-RUN_DEP := $(addprefix $(BINDIR)/,$(notdir $(SOURCES_C:.c=.c.run)))
-ALL_DEP := $(RUN_DEP)
-COMP_DEP := $(OBJS_C)
-endif
-ifneq "$(SOURCES_CPP)" ""
-OBJS_CPP := $(SOURCES_CPP:.cpp=.cpp.o)
-RUN_DEP := $(addprefix $(BINDIR)/,$(notdir $(SOURCES_CPP:.cpp=.cpp.run)))
-ALL_DEP := $(RUN_DEP)
-COMP_DEP := $(OBJS_CPP)
+ifneq "$(or $(SOURCES_C),$(or $(SOURCES_CPP),$(SOURCES_F)))" ""
+$(error The SOURCES_C SOURCES_CPP and SOURCES_F flags where depreciated. Use SOURCES instead)
 endif
 
-ifeq "$(or $(SOURCES_C),$(SOURCES_CPP))" ""
-SOURCES_C := $(shell find $(CURDIR) -name *.c)
-SOURCES_CPP := $(shell find $(CURDIR) -name *.cpp)
+ifneq "$(SOURCES)" ""
+# Obtain all the possible source files
+SOURCES_C := $(shell find $(CURDIR) -path "*$(SOURCES)" | grep "c$$")
+SOURCES_CPP := $(shell find $(CURDIR) -path "*$(SOURCES)" | grep "cpp$$")
+SOURCES_F := $(shell find $(CURDIR) -path "*$(SOURCES)" | grep "\(F90\|F95\|F03\|F\|FOR\)$$")
+$(info SOURCES = $(notdir $(SOURCES_C) $(SOURCES_CPP) $(SOURCES_F)))
+
+# Obtain all the possible binary files formed from the source files
 OBJS_C := $(SOURCES_C:.c=.c.o)
 OBJS_CPP := $(SOURCES_CPP:.cpp=.cpp.o)
+OBJS_F := $(SOURCES_F:.F90=.F90.FOR.o)
+OBJS_F := $(OBJS_F:.F95=.F95.FOR.o)
+OBJS_F := $(OBJS_F:.F03=.F03.FOR.o)
+OBJS_F := $(OBJS_F:.F=.F.FOR.o)
+OBJS_F := $(OBJS_F:.FOR=.FOR.FOR.o)
+
+# Obtain the list of dependencies
 RUN_DEP := $(addprefix $(BINDIR)/,$(notdir $(SOURCES_C:.c=.c.run)))
 RUN_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_CPP:.cpp=.cpp.run)))
+RUN_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_F:.F90=.F90.FOR.run)))
+RUN_DEP += $(addprefix $(BINDIR)/,$(notdir $(RUN_DEP:.F95=.F95.FOR.run)))
+RUN_DEP += $(addprefix $(BINDIR)/,$(notdir $(RUN_DEP:.F03=.F03.FOR.run)))
+RUN_DEP += $(addprefix $(BINDIR)/,$(notdir $(RUN_DEP:.F=.F.FOR.run)))
+RUN_DEP += $(addprefix $(BINDIR)/,$(notdir $(RUN_DEP:.FOR=.FOR.FOR.run)))
+ALL_DEP := $(RUN_DEP)
+COMP_DEP := $(OBJS_C) $(OBJS_CPP) $(OBJS_F)
+endif
+
+ifeq "$(SOURCES)" ""
+SOURCES_C := $(shell find $(CURDIR) -name *.c)
+SOURCES_CPP := $(shell find $(CURDIR) -name *.cpp)
+SOURCES_F := $(shell find $(CURDIR) -name *.F90 -o -name *.F95 -o -name *.F03 -o -name *.F -o -name *.FOR)
+OBJS_C := $(SOURCES_C:.c=.c.o)
+OBJS_CPP := $(SOURCES_CPP:.cpp=.cpp.o)
+OBJS_F := $(SOURCES_F:.F90=.F90.FOR)
+OBJS_F += $(SOURCES_F:.F95=.F95.FOR)
+OBJS_F += $(SOURCES_F:.F03=.F03.FOR)
+OBJS_F += $(SOURCES_F:.F=.F.FOR)
+OBJS_F += $(SOURCES_F:.FOR=.FOR.FOR.o)
+RUN_DEP := $(addprefix $(BINDIR)/,$(notdir $(SOURCES_C:.c=.c.run)))
+RUN_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_CPP:.cpp=.cpp.run)))
+RUN_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_F:.F90=.F90.FOR.run)))
+RUN_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_F:.F95=.F95.FOR.run)))
+RUN_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_F:.F03=.F03.FOR.run)))
+RUN_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_F:.F=.F.FOR.run)))
+RUN_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_F:.FOR=.FOR.FOR.run)))
 ALL_DEP := $(RUN_DEP)
 COMP_DEP := $(OBJS_C) $(OBJS_CPP) 
 endif
@@ -99,7 +128,7 @@ compile: MessageDisplay $(COMP_DEP)
 # FOR RUNNING TESTS ONLY
 #################################################
 
-TESTS_TO_RUN ?= $(shell find $(BINDIR) -name *.o)
+TESTS_TO_RUN ?= $(shell test -d $(BINDIR) && find $(BINDIR) -name '*.o')
 RUN_TESTS = $(TESTS_TO_RUN:.o=.o.run)
 
 .PHONY: run
@@ -116,7 +145,8 @@ MessageDisplay:
 	@echo "Running make with the following compilers"
 	@echo "CC = "$(CC) $(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") ${C_VERSION})
 	@echo "CXX = "$(CXX) $(shell $(call loadModules,$(CXX_COMPILER_MODULE),"shut up") ${CXX_VERSION})
-	$(if $(MODULE_LOAD), @echo "C_MODULE = "$(C_COMPILER_MODULE); echo "CXX_MODULE = "$(CXX_COMPILER_MODULE);,)
+	@echo "FC = "$(FC) $(shell $(call loadModules,$(F_COMPILER_MODULE),"shut up") ${F_VERSION})
+	$(if $(MODULE_LOAD), @echo "C_MODULE = "$(C_COMPILER_MODULE); echo "CXX_MODULE = "$(CXX_COMPILER_MODULE); echo "F_MODULE = "$(F_COMPILER_MODULE),)
 
 ##################################################
 # Loading modules
@@ -133,6 +163,7 @@ endef
 ifdef NO_OFFLOADING
 	COFFLOADING = $(C_NO_OFFLOADING)
 	CXXOFFLOADING = $(CXX_NO_OFFLOADING)
+	FOFFLOADING = $(F_NO_OFFLOADING)
 endif
 
 ##################################################
@@ -158,17 +189,47 @@ endif
 	-$(call log_section_footer,"COMPILE",$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.o=.log)))
 	-@$(if $(LOG), rm $(LOGTEMPFILE))
 
+# fortran files rule
+%.FOR.o: % $(BINDIR) $(LOGDIR) clear_fortran_mod
+	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC)
+	$(call log_section_header,"COMPILE F="${FCOMPILE},$(SYSTEM),$<,$(FC) $(shell $(call loadModules,$(F_COMPILER_MODULE),"shut up") $(F_VERSION)),$(notdir $(@:.FOR.o=.log)))
+	-$(QUIET)$(call loadModules,$(F_COMPILER_MODULE)) $(FCOMPILE) $(VERBOSE_MODE) $< -o $(BINDIR)/$(notdir $(@:.FOR.o=.o)) $(if $(LOG),$(RECORD)$(notdir $(@:.FOR.o=.log))\
+		&& echo "PASS" > $(LOGTEMPFILE) \
+		|| echo "FAIL" > $(LOGTEMPFILE))
+	-$(call log_section_footer,"COMPILE",$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.FOR.o=.log)))
+	-@$(if $(LOG), rm $(LOGTEMPFILE))
+
+
 ##################################################
 # Running tests rules
 ##################################################
 # run c app rule
-%.run: $(OBJS_C) $(OBJS_CPP)
+%.c.run: $(OBJS_C)
 	$(call log_section_header,"RUN",$(SYSTEM),$(@:.run=),$(LOG_NOTE),$(notdir $(@:.run=.log)))
 	@echo -e $(TXTGRN)"\n\n" running: $@ $(TXTNOC) $(if $(LOG), ${RECORD}$(notdir $(@:.run=.log)))
 	-$(call loadModules,$(C_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.run=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.run=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
 		|| echo "FAIL" > $(LOGTEMPFILE))
 	-$(call log_section_footer,"RUN",$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.run=.log)))
+	-@$(if $(LOG), rm $(LOGTEMPFILE))
+
+# run c++ app rule
+%.cpp.run: $(OBJS_CPP)
+	$(call log_section_header,"RUN",$(SYSTEM),$(@:.run=),$(LOG_NOTE),$(notdir $(@:.run=.log)))
+	@echo -e $(TXTGRN)"\n\n" running: $@ $(TXTNOC) $(if $(LOG), ${RECORD}$(notdir $(@:.run=.log)))
+	-$(call loadModules,$(CXX_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.run=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.run=.log))\
+		&& echo "PASS" > $(LOGTEMPFILE) \
+		|| echo "FAIL" > $(LOGTEMPFILE))
+	-$(call log_section_footer,"RUN",$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.run=.log)))
+	-@$(if $(LOG), rm $(LOGTEMPFILE))
+# run c app rule
+%.FOR.run: $(OBJS_F)
+	$(call log_section_header,"RUN",$(SYSTEM),$(@:.FOR.run=),$(LOG_NOTE),$(notdir $(@:.FOR.run=.log)))
+	@echo -e $(TXTGRN)"\n\n" running: $@ $(TXTNOC) $(if $(LOG), ${RECORD}$(notdir $(@:.FOR.run=.log)))
+	-$(call loadModules,$(F_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.FOR.run=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.FOR.run=.log))\
+		&& echo "PASS" > $(LOGTEMPFILE) \
+		|| echo "FAIL" > $(LOGTEMPFILE))
+	-$(call log_section_footer,"RUN",$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.FOR.run=.log)))
 	-@$(if $(LOG), rm $(LOGTEMPFILE))
 
 # Creates the BINDIR folder
@@ -206,20 +267,25 @@ report_html: $(RESULTS_JSON_OUTPUT_FILE)
 	@echo " === REPORT DONE === "
 
 .PHONY: clean
-clean:
-	- rm -r $(BINDIR)
+clean: clear_fortran_mod
+	- rm -rf $(BINDIR)
+
+.PHONY: clear_fortran_mod
+clear_fortran_mod::
+	- rm -f ./ompvv/*.mod
 
 .PHONY: compilers
 compilers:
 	@echo "C compilers: "$(CCOMPILERS)
 	@echo "C++ compilers: "$(CXXCOMPILERS)
+	@echo "FORTRAN compilers: "$(FCOMPILERS)
 
 .PHONY: help
 help:
 	@echo "OpenMP Offloading Validation Suite"
 	@echo ""
 	@echo " === USE ==="
-	@echo "  make CC=ccompiler CXX=cppcompiler [OPTIONS] [RULE]"
+	@echo "  make CC=ccompiler CXX=cppcompiler FC=fortrancompiler [OPTIONS] [RULE]"
 	@echo ""
 	@echo " === OPTIONS === "
 	@echo "  VERBOSE=1                 Enables output of the commands that the make process executes"
@@ -231,17 +297,16 @@ help:
 	@echo "  MODULE_LOAD=1             Before compiling or running, module load is called"
 	@echo "  ADD_BATCH_SCHED=1         Add the jsrun command before the execution of the running script to send it to a compute node"
 	@echo "  NO_OFFLOADING=1           Turn off offloading"
-	@echo "  SOURCES_C=file.c          Specify the C file(s) that you want to apply the rule to. Cannot be combined with SOURCES_CPP"
-	@echo "  SOURCES_CPP=file.cxx      Specify the CPP file(s) that you want to apply the rule to. Cannot be combined with SOURCES_C"
+	@echo "  SOURCES=file or exp       Specify the source file(s) that you want to apply the rule to. You can use wildchars to select a subset of tests"
 	@echo "  TESTS_TO_RUN=bin/file.o   Specify the binaries to run"
 	@echo ""
 	@echo " === RULES ==="
 	@echo "  all"
-	@echo "    Build and run SOURCES_CPP or SOURCES_C. If none is specified build and run all the OpenMP test files"
+	@echo "    Build and run SOURCES. If none is specified build and run all the OpenMP test files"
 	@echo "  run"
 	@echo "    run either TESTS_TO_RUN list, or all the OpenMP tests that are available within bin/ directory"
 	@echo "  compile"
-	@echo "    Compile the specific SOURCES_CPP or SOURCES_C files. If none is specified compile all the OpenMP test files"
+	@echo "    Compile the specific SOURCES files. If none is specified compile all the OpenMP test files"
 	@echo "  clean"
 	@echo "    Remove all executables from bin/ directory"
 	@echo "  compilers"
@@ -255,13 +320,15 @@ help:
 	@echo "    by system, compiler, and pass/fail result. It also allows to see the output of each tests"
 	@echo ""
 	@echo " === EXAMPLES ==="
-	@echo "  make CC=gcc CXX=g++ all                 ==> compile and run all test cases with GCC"
-	@echo "  make CC=gcc SOURCES_C=a.c all           ==> compile and run a.c with gcc"
-	@echo "  make CXX=g++ SOURCES_CPP=a.cpp all      ==> compile and run a.cpp with g++"
-	@echo "  make CC=xlc CXX=xlc++ compile           ==> compile all test cases with XL"
-	@echo "  make run                                ==> run all the cases that exist inside bin/"
-	@echo "  make report_html                        ==> Using the logs file created with the LOG option, create a report"
-	@echo "  make TESTS_TO_RUN=bin/myTest run        ==> run myTest "
+	@echo "  make CC=gcc CXX=g++ FC=gfortran all         ==> compile and run all test cases with GCC"
+	@echo "  make CC=gcc SOURCES=a.c all                 ==> compile and run a.c with gcc"
+	@echo "  make CXX=g++ SOURCES=a.cpp all              ==> compile and run a.cpp with g++"
+	@echo "  make CXX=g++ SOURCES=tests/target/* all     ==> compile and run all tests/target tests"
+	@echo "  make CXX=g++ SOURCES=tests/target/*.F90 all ==> compile and run all fortran tests in tests/target"
+	@echo "  make FC=gfortran SOURCES=a.F90 all          ==> compile and run a.cpp with g++"
+	@echo "  make CC=xlc CXX=xlc++ FC=gfortran compile   ==> compile all test cases with XL"
+	@echo "  make run                                    ==> run all the cases that exist inside bin/"
+	@echo "  make report_html                            ==> Using the logs file created with the LOG option, create a report"
+	@echo "  make TESTS_TO_RUN=bin/myTest run            ==> run myTest "
 	@echo ""
 	
-.DEFAULT_GOAL := help

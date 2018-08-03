@@ -107,16 +107,43 @@ ifeq ($(CXX), clang++)
 endif
 
 #---------------------------------------------------------------------------
+# FORTRAN compilers
+#---------------------------------------------------------------------------
+FCOMPILERS?="gfortran, xlf"
+F_VERSION?= echo "version unknown"
+
+# GCC compiler
+ifeq ($(FC), gfortran)
+  FOFFLOADING = -foffload="-lm" -lm
+  F_NO_OFFLOADING = -foffload=disable
+  FFLAGS = -O3 -fopenmp $(FOFFLOADING) -ffree-line-length-none -J./ompvv
+  FLINK = gcc
+  FLINKFLAGS = -O3 -fopenmp $(FOFFLOADING)
+endif
+
+# IBM XLF compiler
+# Summitdev happens to have a wrapper that without it we cannot execute 
+# xlf with OMP 4.5 support. This wrapper is xlf_r
+ifeq ($(FC), $(filter $(FC), xlf xlf_r))
+  FOFFLOADING = -qoffload
+  F_NO_OFFLOADING = 
+  FFLAGS = -O3 -qsmp=omp $(FOFFLOADING) -qmoddir=./ompvv
+  FLINK = xlc
+  FLINKFLAGS = -O3 -qsmp=omp $(FOFFLOADING)
+endif
+#---------------------------------------------------------------------------
 # These macros are passed to the linker 
 #---------------------------------------------------------------------------
 C_LIB  = 
 CXX_LIB  = 
+F_LIB = 
 
 #---------------------------------------------------------------------------
 # These macros are passed to the compiler 
 #---------------------------------------------------------------------------
 C_INC = -I./ompvv
 CXX_INC = -I./ompvv
+F_INC = -I./ompvv
 
 #---------------------------------------------------------------------------
 # Destination of executables, relative to subdirs of the main directory. . 
@@ -128,6 +155,7 @@ BINDIR = bin
 #---------------------------------------------------------------------------
 CCOMPILE = $(CC) $(C_INC) $(CFLAGS)
 CXXCOMPILE = $(CXX) $(CXX_INC) $(CXXFLAGS)
+FCOMPILE = $(FC) $(F_INC) $(FFLAGS)
 
 #---------------------------------------------------------------------------
 # COLORS DEF
