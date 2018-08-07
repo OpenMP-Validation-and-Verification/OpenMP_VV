@@ -85,25 +85,38 @@ TESTS_TO_RUN := $(TESTS_TO_RUN:.F.o=.F.FOR.o)
 RUN_TESTS = $(TESTS_TO_RUN:.o=.runonly)
 
 # Obtain all the possible binary files formed from the source files
+ifneq "$(CC)" "none"
 OBJS_C := $(SOURCES_C:.c=.c.o)
+endif
+ifneq "$(CPP)" "none"
 OBJS_CPP := $(SOURCES_CPP:.cpp=.cpp.o)
+endif
+ifneq "$(FC)" "none"
 OBJS_F := $(SOURCES_F:.FOR=.FOR.FOR.o)
 OBJS_F := $(OBJS_F:.F90=.F90.FOR.o)
 OBJS_F := $(OBJS_F:.F95=.F95.FOR.o)
 OBJS_F := $(OBJS_F:.F03=.F03.FOR.o)
 OBJS_F := $(OBJS_F:.F=.F.FOR.o)
+endif
 
 # Build list of compilation dependencies
 COMP_DEP = $(OBJS_C) $(OBJS_CPP) $(OBJS_F)
 
 # Obtain the list of dependencies for the rule all
-ALL_DEP := $(addprefix $(BINDIR)/,$(notdir $(SOURCES_C:.c=.c.run)))
+ALL_DEP :=
+ifneq "$(CC)" "none"
+ALL_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_C:.c=.c.run)))
+endif
+ifneq "$(CPP)" "none"
 ALL_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_CPP:.cpp=.cpp.run)))
+endif
+ifneq "$(FC)" "none"
 ALL_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_F:.F90=.F90.FOR.run)))
 ALL_DEP := $(addprefix $(BINDIR)/,$(notdir $(ALL_DEP:.F95=.F95.FOR.run)))
 ALL_DEP := $(addprefix $(BINDIR)/,$(notdir $(ALL_DEP:.F03=.F03.FOR.run)))
 ALL_DEP := $(addprefix $(BINDIR)/,$(notdir $(ALL_DEP:.F=.F.FOR.run)))
 ALL_DEP := $(addprefix $(BINDIR)/,$(notdir $(ALL_DEP:.FOR=.FOR.FOR.run)))
+endif
 
 endif
 
@@ -125,23 +138,36 @@ TESTS_TO_RUN := $(shell test -d $(BINDIR) && \
 RUN_TESTS := $(TESTS_TO_RUN:.o=.o.runonly)
 
 # Creating compile dependencies
+ifneq "$(CC)" "none"
 OBJS_C := $(SOURCES_C:.c=.c.o)
+endif
+ifneq "$(CPP)" "none"
 OBJS_CPP := $(SOURCES_CPP:.cpp=.cpp.o)
+endif
+ifneq "$(FC)" "none"
 OBJS_F := $(SOURCES_F:.F90=.F90.FOR.o)
 OBJS_F := $(OBJS_F:.F95=.F95.FOR.o)
 OBJS_F := $(OBJS_F:.F03=.F03.FOR.o)
 OBJS_F := $(OBJS_F:.F=.F.FOR.o)
 OBJS_F := $(OBJS_F:.FOR=.FOR.FOR.o)
 COMP_DEP := $(OBJS_C) $(OBJS_CPP) $(OBJS_F)
+endif
 
 # Get all the dependencies for all rule
+ALL_DEP :=
+ifneq "$(CC)" "none"
 ALL_DEP := $(addprefix $(BINDIR)/,$(notdir $(SOURCES_C:.c=.c.run)))
+endif
+ifneq "$(CPP)" "none"
 ALL_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_CPP:.cpp=.cpp.run)))
+endif
+ifneq "$(FC)" "none"
 ALL_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_F:.F90=.F90.FOR.run)))
 ALL_DEP := $(addprefix $(BINDIR)/,$(notdir $(ALL_DEP:.F95=.F95.FOR.run)))
 ALL_DEP := $(addprefix $(BINDIR)/,$(notdir $(ALL_DEP:.F03=.F03.FOR.run)))
 ALL_DEP := $(addprefix $(BINDIR)/,$(notdir $(ALL_DEP:.F=.F.FOR.run)))
 ALL_DEP := $(addprefix $(BINDIR)/,$(notdir $(ALL_DEP:.FOR=.FOR.FOR.run)))
+endif
 
 endif
 
@@ -176,9 +202,15 @@ run: $(RUN_TESTS)
 MessageDisplay:
 	@echo "    ====    SOLLVE PROJECT MAKEFILE   ====   "
 	@echo "Running make with the following compilers"
+ifneq "$(CC)" "none"
 	@echo "CC = "$(CC) $(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") ${C_VERSION})
+endif
+ifneq "$(CPP)" "none"
 	@echo "CXX = "$(CXX) $(shell $(call loadModules,$(CXX_COMPILER_MODULE),"shut up") ${CXX_VERSION})
+endif
+ifneq "$(FC)" "none"
 	@echo "FC = "$(FC) $(shell $(call loadModules,$(F_COMPILER_MODULE),"shut up") ${F_VERSION})
+endif
 	$(if $(MODULE_LOAD), @echo "C_MODULE = "$(C_COMPILER_MODULE); echo "CXX_MODULE = "$(CXX_COMPILER_MODULE); echo "F_MODULE = "$(F_COMPILER_MODULE),)
 
 ##################################################
