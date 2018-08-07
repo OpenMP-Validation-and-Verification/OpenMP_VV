@@ -88,7 +88,7 @@ RUN_TESTS = $(TESTS_TO_RUN:.o=.runonly)
 ifneq "$(CC)" "none"
 OBJS_C := $(SOURCES_C:.c=.c.o)
 endif
-ifneq "$(CPP)" "none"
+ifneq "$(CXX)" "none"
 OBJS_CPP := $(SOURCES_CPP:.cpp=.cpp.o)
 endif
 ifneq "$(FC)" "none"
@@ -107,7 +107,7 @@ ALL_DEP :=
 ifneq "$(CC)" "none"
 ALL_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_C:.c=.c.run)))
 endif
-ifneq "$(CPP)" "none"
+ifneq "$(CXX)" "none"
 ALL_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_CPP:.cpp=.cpp.run)))
 endif
 ifneq "$(FC)" "none"
@@ -141,7 +141,7 @@ RUN_TESTS := $(TESTS_TO_RUN:.o=.o.runonly)
 ifneq "$(CC)" "none"
 OBJS_C := $(SOURCES_C:.c=.c.o)
 endif
-ifneq "$(CPP)" "none"
+ifneq "$(CXX)" "none"
 OBJS_CPP := $(SOURCES_CPP:.cpp=.cpp.o)
 endif
 ifneq "$(FC)" "none"
@@ -158,7 +158,7 @@ ALL_DEP :=
 ifneq "$(CC)" "none"
 ALL_DEP := $(addprefix $(BINDIR)/,$(notdir $(SOURCES_C:.c=.c.run)))
 endif
-ifneq "$(CPP)" "none"
+ifneq "$(CXX)" "none"
 ALL_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_CPP:.cpp=.cpp.run)))
 endif
 ifneq "$(FC)" "none"
@@ -205,7 +205,7 @@ MessageDisplay:
 ifneq "$(CC)" "none"
 	@echo "CC = "$(CC) $(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") ${C_VERSION})
 endif
-ifneq "$(CPP)" "none"
+ifneq "$(CXX)" "none"
 	@echo "CXX = "$(CXX) $(shell $(call loadModules,$(CXX_COMPILER_MODULE),"shut up") ${CXX_VERSION})
 endif
 ifneq "$(FC)" "none"
