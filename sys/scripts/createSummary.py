@@ -188,6 +188,7 @@ def parseFile(log_file):
               returned_value.append(current_test)
               # Runtime is the last thing that should happen
               current_test = testResult()
+              current_state = header_info["type"]
 
             # reset the values
             current_state = header_info["type"]
@@ -198,9 +199,9 @@ def parseFile(log_file):
             current_buffer = current_buffer + line
 
     else: 
-      raise ValueError(log_file + " is not a file")
+      raise ValueError(str(log_file) + " is not a file")
   else: 
-    raise ValueError(log_file + " is not a string")
+    raise ValueError(str(log_file) + " is not a string")
       
   return returned_value
 # end of parseFile function definition
@@ -233,6 +234,8 @@ def interpretHeader(header):
           returned_value["compilerCommand"] = compilation_info[3:]
         elif compilation_info[:3] == "CPP":
           returned_value["compilerCommand"] = compilation_info[4:]
+        elif compilation_info[:1] == "F":
+          returned_value["compilerCommand"] = compilation_info[2:]
         else:
           returned_value["compilerCommand"] = "undefined"
       elif header_split[1].startswith('RUN'):
@@ -277,7 +280,11 @@ def main():
     files = glob.iglob(logfile)
     for fileName in files: 
       results.extend(parseFile(fileName))
-  
+ 
+  if len(results) == 0:
+    print(" ==> No log files to process")
+    return
+
   if args.relativePath:
     for result in results:
       result.makePathRelative()

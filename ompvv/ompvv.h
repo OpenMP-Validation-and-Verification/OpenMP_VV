@@ -112,7 +112,7 @@ _Pragma("omp target map (from: _ompvv_isOffloadingOn) map(to: _ompvv_isSharedEnv
 #define OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(var2set) {\
   OMPVV_TEST_SHARED_ENVIRONMENT_PROBE \
   OMPVV_WARNING_IF((_ompvv_isOffloadingOn && _ompvv_isSharedEnv == 0),"This tests is running on a shared data environment between host and device. This may cause errors") \
-  var2Set = (_ompvv_isOffloadingOn && _ompvv_isSharedEnv == 0);\
+  var2set = (_ompvv_isOffloadingOn && _ompvv_isSharedEnv == 0);\
   }
 
 

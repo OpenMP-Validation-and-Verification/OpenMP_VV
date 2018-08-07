@@ -1,2 +1,4 @@
 bin
 logs
+results_report
+ompvv/*.mod
