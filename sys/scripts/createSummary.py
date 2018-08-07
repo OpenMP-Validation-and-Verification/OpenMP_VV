@@ -234,6 +234,8 @@ def interpretHeader(header):
           returned_value["compilerCommand"] = compilation_info[3:]
         elif compilation_info[:3] == "CPP":
           returned_value["compilerCommand"] = compilation_info[4:]
+        elif compilation_info[:1] == "F":
+          returned_value["compilerCommand"] = compilation_info[2:]
         else:
           returned_value["compilerCommand"] = "undefined"
       elif header_split[1].startswith('RUN'):
