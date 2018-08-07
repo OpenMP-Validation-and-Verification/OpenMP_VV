@@ -1,13 +1,23 @@
 SHELL=/bin/bash -o pipefail
 
+# When using make alone show the help message
 .DEFAULT_GOAL:=help
 
+##################################################
+# System specific varibles can be specified 
+# in the system files sys/system/###.def
+#################################################
 ifdef SYSTEM
 	-include sys/systems/$(SYSTEM).def
 endif
 
 include sys/make/make.def
 
+##################################################
+# It is possible to annotate a set of results with
+# a LOG_NOTE which will be added to the log header
+# files
+#################################################
 LOG_NOTE?="none"
 
 ##################################################
@@ -51,18 +61,70 @@ RESULTS_HTML_REPORT_TEMPLATE=$(CURDIR)/sys/results_template
 # Source files
 #################################################
 
-ifneq "$(or $(SOURCES_C),$(or $(SOURCES_CPP),$(SOURCES_F)))" ""
-$(error The SOURCES_C SOURCES_CPP and SOURCES_F flags where depreciated. Use SOURCES instead)
+ifneq "$(SOURCES_C)$(SOURCES_CPP)$(SOURCES_F)$(TESTS_TO_RUN)" ""
+$(error The SOURCES_C SOURCES_CPP SOURCES_F and TESTS_TO_RUN flags where depreciated. Use SOURCES instead)
 endif
 
 ifneq "$(SOURCES)" ""
-# Obtain all the possible source files
-SOURCES_C := $(shell find $(CURDIR) -path "*$(SOURCES)" | grep "c$$")
-SOURCES_CPP := $(shell find $(CURDIR) -path "*$(SOURCES)" | grep "cpp$$")
-SOURCES_F := $(shell find $(CURDIR) -path "*$(SOURCES)" | grep "\(F90\|F95\|F03\|F\|FOR\)$$")
+# Obtain all the possible source files for C, CPP and Fortran
+SOURCES_C := $(shell find $(CURDIR) -path "*$(SOURCES)" | grep "\.c$$")
+SOURCES_CPP := $(shell find $(CURDIR) -path "*$(SOURCES)" | grep "\.cpp$$")
+SOURCES_F := $(shell find $(CURDIR) -path "*$(SOURCES)" | grep "\(\.F90\|\.F95\|\.F03\|\.F\|\.FOR\)$$")
 $(info SOURCES = $(notdir $(SOURCES_C) $(SOURCES_CPP) $(SOURCES_F)))
 
+# Obtain the list of files that were previously 
+# compiled based on the subsection of tests
+TESTS_TO_RUN := $(foreach testName, \
+									$(notdir $(SURCES_C) $(SOURCES_CPP) $(SOURCES_F)), \
+									$(shell test -d $(BINDIR) && find $(BINDIR) -name "$(testName)*"))
+TESTS_TO_RUN := $(TESTS_TO_RUN:.FOR.o=.FOR.FOR.o) # Adding .FOR.o to fortran
+TESTS_TO_RUN := $(TESTS_TO_RUN:.F90.o=.F90.FOR.o)
+TESTS_TO_RUN := $(TESTS_TO_RUN:.F95.o=.F95.FOR.o)
+TESTS_TO_RUN := $(TESTS_TO_RUN:.F03.o=.F03.FOR.o)
+TESTS_TO_RUN := $(TESTS_TO_RUN:.F.o=.F.FOR.o)
+RUN_TESTS = $(TESTS_TO_RUN:.o=.runonly)
+
 # Obtain all the possible binary files formed from the source files
+OBJS_C := $(SOURCES_C:.c=.c.o)
+OBJS_CPP := $(SOURCES_CPP:.cpp=.cpp.o)
+OBJS_F := $(SOURCES_F:.FOR=.FOR.FOR.o)
+OBJS_F := $(OBJS_F:.F90=.F90.FOR.o)
+OBJS_F := $(OBJS_F:.F95=.F95.FOR.o)
+OBJS_F := $(OBJS_F:.F03=.F03.FOR.o)
+OBJS_F := $(OBJS_F:.F=.F.FOR.o)
+
+# Build list of compilation dependencies
+COMP_DEP = $(OBJS_C) $(OBJS_CPP) $(OBJS_F)
+
+# Obtain the list of dependencies for the rule all
+ALL_DEP := $(addprefix $(BINDIR)/,$(notdir $(SOURCES_C:.c=.c.run)))
+ALL_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_CPP:.cpp=.cpp.run)))
+ALL_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_F:.F90=.F90.FOR.run)))
+ALL_DEP := $(addprefix $(BINDIR)/,$(notdir $(ALL_DEP:.F95=.F95.FOR.run)))
+ALL_DEP := $(addprefix $(BINDIR)/,$(notdir $(ALL_DEP:.F03=.F03.FOR.run)))
+ALL_DEP := $(addprefix $(BINDIR)/,$(notdir $(ALL_DEP:.F=.F.FOR.run)))
+ALL_DEP := $(addprefix $(BINDIR)/,$(notdir $(ALL_DEP:.FOR=.FOR.FOR.run)))
+
+endif
+
+ifeq "$(SOURCES)" ""
+# Getting all the source files in the project
+SOURCES_C := $(shell find $(CURDIR) -name *.c)
+SOURCES_CPP := $(shell find $(CURDIR) -name *.cpp)
+SOURCES_F := $(shell find $(CURDIR) -name "*.F90" -o -name "*.F95" -o -name "*.F03" -o -name "*.F" -o -name "*.FOR" | grep -v "ompvv.F90")
+
+# Find all the binary files that have been previously compiled
+TESTS_TO_RUN := $(shell test -d $(BINDIR) && \
+												find $(BINDIR) -name "*.F90.o" \
+												-o -name "*.F95.o" \
+												-o -name "*.F03.o" \
+												-o -name "*.F.o" \
+												-o -name "*.FOR.o" \
+												-o -name "*.c.o" \
+												-o -name "*.cpp.o")
+RUN_TESTS := $(TESTS_TO_RUN:.o=.o.runonly)
+
+# Creating compile dependencies
 OBJS_C := $(SOURCES_C:.c=.c.o)
 OBJS_CPP := $(SOURCES_CPP:.cpp=.cpp.o)
 OBJS_F := $(SOURCES_F:.F90=.F90.FOR.o)
@@ -70,39 +132,17 @@ OBJS_F := $(OBJS_F:.F95=.F95.FOR.o)
 OBJS_F := $(OBJS_F:.F03=.F03.FOR.o)
 OBJS_F := $(OBJS_F:.F=.F.FOR.o)
 OBJS_F := $(OBJS_F:.FOR=.FOR.FOR.o)
-
-# Obtain the list of dependencies
-RUN_DEP := $(addprefix $(BINDIR)/,$(notdir $(SOURCES_C:.c=.c.run)))
-RUN_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_CPP:.cpp=.cpp.run)))
-RUN_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_F:.F90=.F90.FOR.run)))
-RUN_DEP += $(addprefix $(BINDIR)/,$(notdir $(RUN_DEP:.F95=.F95.FOR.run)))
-RUN_DEP += $(addprefix $(BINDIR)/,$(notdir $(RUN_DEP:.F03=.F03.FOR.run)))
-RUN_DEP += $(addprefix $(BINDIR)/,$(notdir $(RUN_DEP:.F=.F.FOR.run)))
-RUN_DEP += $(addprefix $(BINDIR)/,$(notdir $(RUN_DEP:.FOR=.FOR.FOR.run)))
-ALL_DEP := $(RUN_DEP)
 COMP_DEP := $(OBJS_C) $(OBJS_CPP) $(OBJS_F)
-endif
 
-ifeq "$(SOURCES)" ""
-SOURCES_C := $(shell find $(CURDIR) -name *.c)
-SOURCES_CPP := $(shell find $(CURDIR) -name *.cpp)
-SOURCES_F := $(shell find $(CURDIR) -name *.F90 -o -name *.F95 -o -name *.F03 -o -name *.F -o -name *.FOR)
-OBJS_C := $(SOURCES_C:.c=.c.o)
-OBJS_CPP := $(SOURCES_CPP:.cpp=.cpp.o)
-OBJS_F := $(SOURCES_F:.F90=.F90.FOR)
-OBJS_F += $(SOURCES_F:.F95=.F95.FOR)
-OBJS_F += $(SOURCES_F:.F03=.F03.FOR)
-OBJS_F += $(SOURCES_F:.F=.F.FOR)
-OBJS_F += $(SOURCES_F:.FOR=.FOR.FOR.o)
-RUN_DEP := $(addprefix $(BINDIR)/,$(notdir $(SOURCES_C:.c=.c.run)))
-RUN_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_CPP:.cpp=.cpp.run)))
-RUN_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_F:.F90=.F90.FOR.run)))
-RUN_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_F:.F95=.F95.FOR.run)))
-RUN_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_F:.F03=.F03.FOR.run)))
-RUN_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_F:.F=.F.FOR.run)))
-RUN_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_F:.FOR=.FOR.FOR.run)))
-ALL_DEP := $(RUN_DEP)
-COMP_DEP := $(OBJS_C) $(OBJS_CPP) 
+# Get all the dependencies for all rule
+ALL_DEP := $(addprefix $(BINDIR)/,$(notdir $(SOURCES_C:.c=.c.run)))
+ALL_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_CPP:.cpp=.cpp.run)))
+ALL_DEP += $(addprefix $(BINDIR)/,$(notdir $(SOURCES_F:.F90=.F90.FOR.run)))
+ALL_DEP := $(addprefix $(BINDIR)/,$(notdir $(ALL_DEP:.F95=.F95.FOR.run)))
+ALL_DEP := $(addprefix $(BINDIR)/,$(notdir $(ALL_DEP:.F03=.F03.FOR.run)))
+ALL_DEP := $(addprefix $(BINDIR)/,$(notdir $(ALL_DEP:.F=.F.FOR.run)))
+ALL_DEP := $(addprefix $(BINDIR)/,$(notdir $(ALL_DEP:.FOR=.FOR.FOR.run)))
+
 endif
 
 # parameters (1) Action (2) System (3) Filename (4) other Info (compiler) (5) Log File 
@@ -128,16 +168,9 @@ compile: MessageDisplay $(COMP_DEP)
 # FOR RUNNING TESTS ONLY
 #################################################
 
-TESTS_TO_RUN ?= $(shell test -d $(BINDIR) && find $(BINDIR) -name '*.o')
-RUN_TESTS = $(TESTS_TO_RUN:.o=.o.run)
-
 .PHONY: run
 run: $(RUN_TESTS)
 	@echo "====RUN DONE====="
-
-%.o.run: 
-	@echo -e $(TXTGRN)"\n\n running:" $(@:.run=) $(TXTNOC) ${RECORD}$(notdir $(@:.run=))
-	-@$(call loadModules,$(C_COMPILER_MODULE) $(CXX_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.run=) $(VERBOSE) $(RECORD)$(notdir $(@:.run=))
 
 .PHONY: MessageDisplay
 MessageDisplay:
@@ -232,6 +265,38 @@ endif
 	-$(call log_section_footer,"RUN",$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.FOR.run=.log)))
 	-@$(if $(LOG), rm $(LOGTEMPFILE))
 
+##################################################
+# Running only no compile rules
+##################################################
+# run c app rule
+%.c.runonly:
+	$(call log_section_header,"RUN",$(SYSTEM),$(@:.runonly=),$(LOG_NOTE),$(notdir $(@:.runonly=.log)))
+	@echo -e $(TXTGRN)"\n\n" running previously compiled: $@ $(TXTNOC) $(if $(LOG), ${RECORD}$(notdir $(@:.runonly=.log)))
+	-$(call loadModules,$(C_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.runonly=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.runonly=.log))\
+		&& echo "PASS" > $(LOGTEMPFILE) \
+		|| echo "FAIL" > $(LOGTEMPFILE))
+	-$(call log_section_footer,"RUN",$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.runonly=.log)))
+	-@$(if $(LOG), rm $(LOGTEMPFILE))
+
+# run c++ app rule
+%.cpp.runonly:
+	$(call log_section_header,"RUN",$(SYSTEM),$(@:.runonly=),$(LOG_NOTE),$(notdir $(@:.runonly=.log)))
+	@echo -e $(TXTGRN)"\n\n" running previously compiled: $@ $(TXTNOC) $(if $(LOG), ${RECORD}$(notdir $(@:.runonly=.log)))
+	-$(call loadModules,$(CXX_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.runonly=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.runonly=.log))\
+		&& echo "PASS" > $(LOGTEMPFILE) \
+		|| echo "FAIL" > $(LOGTEMPFILE))
+	-$(call log_section_footer,"RUN",$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.runonly=.log)))
+	-@$(if $(LOG), rm $(LOGTEMPFILE))
+# run c app rule
+%.FOR.runonly:
+	$(call log_section_header,"RUN",$(SYSTEM),$(@:.FOR.runonly=),$(LOG_NOTE),$(notdir $(@:.FOR.runonly=.log)))
+	@echo -e $(TXTGRN)"\n\n" running previously compiled: $@ $(TXTNOC) $(if $(LOG), ${RECORD}$(notdir $(@:.FOR.runonly=.log)))
+	-$(call loadModules,$(F_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.FOR.runonly=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.FOR.runonly=.log))\
+		&& echo "PASS" > $(LOGTEMPFILE) \
+		|| echo "FAIL" > $(LOGTEMPFILE))
+	-$(call log_section_footer,"RUN",$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.FOR.runonly=.log)))
+	-@$(if $(LOG), rm $(LOGTEMPFILE))
+
 # Creates the BINDIR folder
 $(BINDIR):
 	mkdir $@
@@ -271,7 +336,7 @@ clean: clear_fortran_mod
 	- rm -rf $(BINDIR)
 
 .PHONY: clear_fortran_mod
-clear_fortran_mod::
+clear_fortran_mod:
 	- rm -f ./ompvv/*.mod
 
 .PHONY: compilers
@@ -298,13 +363,12 @@ help:
 	@echo "  ADD_BATCH_SCHED=1         Add the jsrun command before the execution of the running script to send it to a compute node"
 	@echo "  NO_OFFLOADING=1           Turn off offloading"
 	@echo "  SOURCES=file or exp       Specify the source file(s) that you want to apply the rule to. You can use wildchars to select a subset of tests"
-	@echo "  TESTS_TO_RUN=bin/file.o   Specify the binaries to run"
 	@echo ""
 	@echo " === RULES ==="
 	@echo "  all"
 	@echo "    Build and run SOURCES. If none is specified build and run all the OpenMP test files"
 	@echo "  run"
-	@echo "    run either TESTS_TO_RUN list, or all the OpenMP tests that are available within bin/ directory"
+	@echo "    run tests previously build. Filter tests SOURCES list, or all the OpenMP tests that are available within bin/ directory"
 	@echo "  compile"
 	@echo "    Compile the specific SOURCES files. If none is specified compile all the OpenMP test files"
 	@echo "  clean"
@@ -329,6 +393,6 @@ help:
 	@echo "  make CC=xlc CXX=xlc++ FC=gfortran compile   ==> compile all test cases with XL"
 	@echo "  make run                                    ==> run all the cases that exist inside bin/"
 	@echo "  make report_html                            ==> Using the logs file created with the LOG option, create a report"
-	@echo "  make TESTS_TO_RUN=bin/myTest run            ==> run myTest "
+	@echo "  make SOURCES=myTestSource run               ==> run myTestSource if it was previously compiled "
 	@echo ""
 	
