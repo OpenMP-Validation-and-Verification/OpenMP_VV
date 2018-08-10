@@ -30,7 +30,7 @@ endif
 
 RECORD:=
 LOGDIR:= 
-LOGDIRNAME:= logs
+LOGDIRNAME ?= logs
 ifdef LOG
   LOGDIR:= $(LOGDIRNAME)
   RECORD:= | tee -a $(LOGDIR)/
@@ -135,7 +135,12 @@ TESTS_TO_RUN := $(shell test -d $(BINDIR) && \
 												-o -name "*.FOR.o" \
 												-o -name "*.c.o" \
 												-o -name "*.cpp.o")
-RUN_TESTS := $(TESTS_TO_RUN:.o=.o.runonly)
+TESTS_TO_RUN := $(TESTS_TO_RUN:.FOR.o=.FOR.FOR.o) # Adding .FOR.o to fortran
+TESTS_TO_RUN := $(TESTS_TO_RUN:.F90.o=.F90.FOR.o)
+TESTS_TO_RUN := $(TESTS_TO_RUN:.F95.o=.F95.FOR.o)
+TESTS_TO_RUN := $(TESTS_TO_RUN:.F03.o=.F03.FOR.o)
+TESTS_TO_RUN := $(TESTS_TO_RUN:.F.o=.F.FOR.o)
+RUN_TESTS := $(TESTS_TO_RUN:.o=.runonly)
 
 # Creating compile dependencies
 ifneq "$(CC)" "none"
