@@ -1,8 +1,3 @@
-// RUN: %libomptarget-compile-run-and-check-aarch64-unknown-linux-gnu
-// RUN: %libomptarget-compile-run-and-check-powerpc64-ibm-linux-gnu
-// RUN: %libomptarget-compile-run-and-check-powerpc64le-ibm-linux-gnu
-// RUN: %libomptarget-compile-run-and-check-x86_64-pc-linux-gnu
-
 //===--test_target_map_array_default.c - test default behavior of array map--===//
 // 
 // OpenMP API Version 4.5 Nov 2015
@@ -14,23 +9,23 @@
 
 #include <omp.h>
 #include <stdio.h>
+#include "ompvv.h"
 
 #define N 1000
 
 int main() {
   int compute_array[N];
-  int sum = 0, result = 0;
-  int i, isHost = -1;
+  int sum = 0, result = 0, errors;
+  int i;
   
- 
+  OMPVV_TEST_OFFLOADING;
+
+  // Array initialization
   for (i=0; i<N; i++) 
     compute_array[i] = 10;
 
-#pragma omp target map(compute_array) map(tofrom: isHost)
+#pragma omp target map(compute_array)
   {
-    /*Record where the computation was executed*/
-    isHost = omp_is_initial_device();
-
     for (i = 0; i < N; i++)
       compute_array[i] += i;
    
@@ -42,13 +37,7 @@ int main() {
   for (i = 0; i < N; i++)
     result += 10 + i;
 
-  if (result != sum) {
-    printf("Test failed on %s\n",isHost ? "host":"device");
-    return 1;
-  }
-  else {
-    printf("Test passed on %s\n", isHost ? "host":"device");
-    return 0;
-  }
+  OMPVV_TEST_AND_SET_VERBOSE(errors, result != sum);
 
+  OMPVV_REPORT_AND_RETURN(errors)
 }

@@ -1,101 +1,91 @@
-// RUN: %libomptarget-compile-run-and-check-aarch64-unknown-linux-gnu
-// RUN: %libomptarget-compile-run-and-check-powerpc64-ibm-linux-gnu
-// RUN: %libomptarget-compile-run-and-check-powerpc64le-ibm-linux-gnu
-// RUN: %libomptarget-compile-run-and-check-x86_64-pc-linux-gnu
-
-//===---- test_target_data_if.c - check the if clause of target data ------===//
+//===---- test_target_enter_data_if.c - check the if clause of target data ------===//
 // 
 // OpenMP API Version 4.5 Nov 2015
 // 
-// The if clause determines if the section should be executed in the host or 
-// the device. There are three things to test here: 
-// (a) with offloading when 'if' clause evaluates to true then code
-// be executed on the device 
-// (b) with offloading when 'if' clause evaluates to false then code should
-// be executed on the host
-// (c) without offloading all the code should be executed on the device
-// The if clause is evaluated on runtime which means that variables could
-// determine this behavior. We use a SIZE_THRESHOLD variable to check if we 
-// should execute on the device or the host. Before starting the test we 
-// sample offloading to see if it was enabled or not. If the code is executed
-// in the device, the result should be c[i] = a[i] + b[i] = i + 1. 
-// If the code is executed on the host the result should be c[i] = -1
+// This test verifies the conditional data movement of the target enter data
+// directive through the if clause. There are two options:
+// 1. The if condition evaluates to true, in which case the data a[i] = 1 and 
+// b[i] = i will be copied over to the device. Since there is alreay a and b
+// mapped in the target enter data, then the target region should not map the 
+// a and b arrays. 
+//
+// 2. The if condition evaluates to false. After the target enter data directive
+// we modify the values of the host to be 0. In which case the target region will
+// be in charge of the data movement and a[i] = 0 and b[i] = 0
+//
+// The target region will do c[i] = a[i] which will be either i + 1 or 0, 
+// depending on the result of if. 
+//
+// this test only gets executed if there is offloading and no shared memory
+// Shared memory devices would not work in this case
 //
 //===----------------------------------------------------------------------===//
 
 #include <omp.h>
+#include "ompvv.h"
 #include <stdio.h>
 
 #define SIZE_THRESHOLD 512
+#define ARRAY_SIZE 1024
 
 // Test for OpenMP 4.5 target enter data with if
 int main() {
-  int a[1024];
-  int b[1024];
-  int c[1024];
-  int size, i = 0, errors[2] = {0,0}, isHost = -1, isOffloading = 0;
+  int a[ARRAY_SIZE];
+  int b[ARRAY_SIZE];
+  int c[ARRAY_SIZE];
+  int size, i = 0, errors = 0, isOffloading = 0, isSharedMemory = 0;
 
-  // a and b array initialization
-  for (i = 0; i < 1024; i++) {
-    a[i] = 1;
-    b[i] = i;
-  }
+  OMPVV_TEST_AND_SET_OFFLOADING(isOffloading)
+  OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(isSharedMemory)
 
-  // We test for offloading
-#pragma omp target map(from: isOffloading)
-  {
-    isOffloading = !omp_is_initial_device();
+  if (!isOffloading || isSharedMemory) {
+    OMPVV_WARNING("It is not possible to test conditional data transfers "
+                  "if the environment is shared or offloading is off. Not testing "
+                  "anything")
+    OMPVV_REPORT_AND_RETURN(0);
   }
 
   // check multiple sizes. 
-  for (size = 256; size <= 1024; size += 256) {
-    // C initialization
+  for (size = 256; size <= ARRAY_SIZE; size += 256) {
+    // a,b and c arrays initialization
     for (i = 0; i < size; i++) {
+      a[i] = 1;
+      b[i] = i;
       c[i] = -1;
     }
-#pragma omp target enter data if(size > SIZE_THRESHOLD) map(to: size) 
+#pragma omp target enter data if(size > SIZE_THRESHOLD) map(to: size) \
+    map (to: a[0:size], b[0:size])
            
-#pragma omp target if(size > SIZE_THRESHOLD)  \
-        map(to: a[0:size], b[0:size])  map(tofrom: c[0:size], isHost)
+    // a, b arrays host side modification
+    for (i = 0; i < size; i++) {
+      a[i] = 0;
+      b[i] = 0;
+    }
+
+    // if a and b were mapped already by the target enter data then 
+    // the tofrom should be a noop
+#pragma omp target map(tofrom: a[0:size], b[0:size], c[0:size])
 {
-        isHost = omp_is_initial_device();
-        int alpha = (isHost ? 0 : 1);
         int j = 0;
         for (j = 0; j < size; j++) {
           // c[j] is zero if executed in the host
           // c[j] is 1+j if executed on the device
-          c[j] = alpha*(a[j] + b[j]);
+          c[j] = a[j] + b[j];
         }
 } // end target
 
     // checking results 
     for (i = 0; i < size; i++) {
-      if (isOffloading && size > SIZE_THRESHOLD) {
-        // Should have executed on the device
-        // if offloading was used
-        if (c[i] != i + 1) {
-          // c[i] is zero if it was executed in the host
-          errors[0] += 1;//error when executed on the device
-        }
+      if (size > SIZE_THRESHOLD) {
+        OMPVV_TEST_AND_SET_VERBOSE(errors, c[i] != i + 1)
       } else {
-        // Should have executed in the host
-        // with or without offloading
-        if (c[i] != 0) {
-          errors[1] += 1;
-        }
+        OMPVV_TEST_AND_SET_VERBOSE(errors, c[i] != 0)
       } //end-else 
     }
-    //puts("");
+    // This is not part of the test but it is necessary to avoid conflicts
+    #pragma omp target exit data map (delete: a[0:size], b[0:size])
   } // end-for size
 
-  if (!errors[0] && !errors[1])
-    printf("Test passed with offloading %s\n", (isOffloading ? "enabled" : "disabled"));
-  else if (errors[0]==0 && errors[1]!=0)
-         printf("Test failed on host with offloading %s.\n", (isOffloading ? "enabled" : "disabled"));
-       else if (errors[0]!=0 && errors[1]==0)
-              printf("Test failed on device with offloading %s.\n", (isOffloading ? "enabled" : "disabled"));
-            else if (errors[0]!=0 && errors[1]!=0)
-              printf("Test failed on host and device with offloading %s.\n", (isOffloading ? "enabled" : "disabled"));
+  OMPVV_REPORT_AND_RETURN(errors)
 
-  return (errors[0] && errors[1]);
 }

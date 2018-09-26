@@ -12,47 +12,49 @@
 
 #include <omp.h>
 #include <stdio.h>
+#include "ompvv.h"
 
 #define N 10
+#define NUM_THREADS 10
 
 int main() {
-  int compute_array[4][N];
+  int compute_array[NUM_THREADS][N];
   int errors = 0;
-  int i,j, isHost = -1;//, p_val=-1;
-  
+  int i,j;
+  int actualNumThreads;
+
+  OMPVV_TEST_OFFLOADING;
  
-  for (i=0; i<4; i++) 
+  for (i=0; i<NUM_THREADS; i++) 
     for (j=0; j<N; j++) 
       compute_array[i][j] = 0;
 
-  omp_set_num_threads(4);
+  omp_set_num_threads(NUM_THREADS);
 #pragma omp parallel
 {
   int p_val = omp_get_thread_num();
+  actualNumThreads = omp_get_num_threads();
 
-#pragma omp target map(tofrom:compute_array) map(tofrom: isHost) firstprivate(p_val)
+#pragma omp target map(tofrom:compute_array) firstprivate(p_val)
   {
-    /*Record where the computation was executed*/
-    isHost = omp_is_initial_device();
     for (i = 0; i < N; i++)
       compute_array[p_val][i] = 100;
+    // Checking if the value is not copied back
+    p_val++;
   } // End target
+  if (p_val == omp_get_thread_num()) {
+    for (i = 0; i < N; i++)
+      compute_array[p_val][i]++;
+  }
 }//end-parallel
 
-  for (i=0; i<4; i++){ 
+  OMPVV_WARNING_IF(actualNumThreads == 1, "The number of threads in the host is 1. This tests is inconclusive")
+  for (i=0; i<actualNumThreads; i++){ 
     for (j=0; j<N; j++){
-      if(compute_array[i][j] != 100){
-        errors += 1;
-        printf("compute_array[%d][%d] = %d\n",i,j,compute_array[i][j]);
-      }
+      OMPVV_TEST_AND_SET(errors, compute_array[i][j] != 101);
+      OMPVV_ERROR_IF(compute_array[i][j] == 100, "p_val changed after target region for thread %d",i)
     }
   }//end-for
-  if (errors) {
-    printf("Test failed on %s\n",isHost ? "host":"device");
-  }
-  else {
-    printf("Test passed on %s\n", isHost ? "host":"device");
-  }
-  return errors;
 
+  OMPVV_REPORT_AND_RETURN(errors);
 }
