@@ -82,6 +82,7 @@
             INTEGER :: helper_array_2d(N,N)
             INTEGER :: helper_array_3d(N,N,N)
             INTEGER :: err_before, err_after
+            CHARACTER(len=400) :: msgHelper
 
             OMPVV_GET_ERRORS(err_before)
             
@@ -106,11 +107,11 @@
 
             ! Checking that data is not copied to the device
             IF (.not. isSharedEnv) THEN
-              OMPVV_TEST_VERBOSE(ALL(helper_array_1d == 999))
-              OMPVV_TEST_VERBOSE(ALL(helper_array_2d == 999))
-              OMPVV_TEST_VERBOSE(ALL(helper_array_3d == 999))
-            ELSE
-              OMPVV_WARNING("Part of test ommited: shared data env")
+              WRITE(msgHelper, *) "Array seemed to have been copied to &
+                & the device when using the from modifier."
+              OMPVV_WARNING_IF(ALL(helper_array_1d == 999), msgHelper)
+              OMPVV_WARNING_IF(ALL(helper_array_2d == 999), msgHelper)
+              OMPVV_WARNING_IF(ALL(helper_array_3d == 999), msgHelper)
             END IF
 
             OMPVV_TEST_VERBOSE(ANY(array_1d /= 20))
