@@ -155,8 +155,8 @@ OBJS_F := $(OBJS_F:.F95=.F95.FOR.o)
 OBJS_F := $(OBJS_F:.F03=.F03.FOR.o)
 OBJS_F := $(OBJS_F:.F=.F.FOR.o)
 OBJS_F := $(OBJS_F:.FOR=.FOR.FOR.o)
-COMP_DEP := $(OBJS_C) $(OBJS_CPP) $(OBJS_F)
 endif
+COMP_DEP := $(OBJS_C) $(OBJS_CPP) $(OBJS_F)
 
 # Get all the dependencies for all rule
 ALL_DEP :=
