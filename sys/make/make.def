@@ -130,7 +130,7 @@ endif
 ifeq ($(FC), $(filter $(FC), xlf xlf_r))
   FOFFLOADING = -qoffload
   F_NO_OFFLOADING = 
-  FFLAGS += -O3 -qsmp=omp $(FOFFLOADING) -qmoddir=./ompvv
+  FFLAGS += -O3 -qsmp=omp $(FOFFLOADING) -qmoddir=./ompvv -DEXIT=EXIT_
   FLINK = xlc
   FLINKFLAGS += -O3 -qsmp=omp $(FOFFLOADING)
 endif
@@ -151,7 +151,7 @@ F_INC = -I./ompvv
 #---------------------------------------------------------------------------
 # Destination of executables, relative to subdirs of the main directory. . 
 #---------------------------------------------------------------------------
-BINDIR = bin
+BINDIR ?= bin
 
 #---------------------------------------------------------------------------
 # COMPILER DEF
@@ -176,4 +176,4 @@ TXTNOC := "\033[0m"
 #---------------------------------------------------------------------------
 # LOGS
 #---------------------------------------------------------------------------
-LOGTEMPFILE := _ompvv_temp_result_.exitstatus
+LOGTEMPFILE ?= _ompvv_temp_result_.exitstatus
