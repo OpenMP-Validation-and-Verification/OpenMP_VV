@@ -1,7 +1,19 @@
-// RUN: %libomptarget-compile-run-and-check-aarch64-unknown-linux-gnu
-// RUN: %libomptarget-compile-run-and-check-powerpc64-ibm-linux-gnu
-// RUN: %libomptarget-compile-run-and-check-powerpc64le-ibm-linux-gnu
-// RUN: %libomptarget-compile-run-and-check-x86_64-pc-linux-gnu
+//===--- test_target_teams_distribute_defaultmap.c---------------------------===//
+//
+// OpenMP API Version 4.5 Nov 2015
+//
+// This test uses the defaultmap clause on a target teams distribute directive.
+// This tests the following scalars: char, short, int, float, double, and enum.
+// Both using the clause defaultmap(tofrom:scalar) is used. When it is used,
+// the test tests the to nature by setting arrays to the value.  Then it is also
+// tested that, as opposed to the default action on scalars which is to first-
+// privatize them, they are shared and returned to the host.
+//
+// It also tests the default operation of treating scalars without the defaultmap
+// clause.  The test first tests the privatization of the firstprivatized
+// scalars and then separately tests the proper initialization of them separately
+//
+////===----------------------------------------------------------------------===//
 
 #include <assert.h>
 #include <omp.h>
@@ -32,6 +44,59 @@ int test_defaultmap_on() {
   enum enum_type scalar_enum = VAL1;
   enum enum_type enum_array[ARRAY_SIZE];
 
+  #pragma omp target teams distribute defaultmap(tofrom: scalar) map(from: char_array[0:ARRAY_SIZE], \
+    short_array[0:ARRAY_SIZE], int_array[0:ARRAY_SIZE], float_array[0:ARRAY_SIZE], double_array[0:ARRAY_SIZE], enum_array[0:ARRAY_SIZE])
+  for (int x = 0; x < ARRAY_SIZE; ++x){
+      char_array[x] = scalar_char;
+      short_array[x] = scalar_short;
+      int_array[x] = scalar_int;
+      float_array[x] = scalar_float;
+      double_array[x] = scalar_double;
+      enum_array[x] = scalar_enum;
+  }
+
+  for (int x = 0; x < ARRAY_SIZE; ++x){
+      OMPVV_TEST_AND_SET_VERBOSE(errors, char_array[x] != 'a');
+      if (char_array[x] != 1){
+          break;
+      }
+  }
+
+  for (int x = 0; x < ARRAY_SIZE; ++x){
+      OMPVV_TEST_AND_SET_VERBOSE(errors, short_array[x] != 10);
+      if (short_array[x] != 2){
+          break;
+      }
+  }
+
+  for (int x = 0; x < ARRAY_SIZE; ++x){
+      OMPVV_TEST_AND_SET_VERBOSE(errors, int_array[x] != 11);
+      if (int_array[x] != 3){
+          break;
+      }
+  }
+
+  for (int x = 0; x < ARRAY_SIZE; ++x){
+      OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(float_array[x] - 5.5f) > .0000001);
+      if (fabs(float_array[x] - .4) > .0000000001){
+          break;
+      }
+  }
+
+  for (int x = 0; x < ARRAY_SIZE; ++x){
+      OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(double_array[x] - 10.45) > .0000000001);
+      if (fabs(double_array[x] - .5) > .0000000001){
+          break;
+      }
+  }
+
+  for (int x = 0; x < ARRAY_SIZE; ++x){
+      OMPVV_TEST_AND_SET_VERBOSE(errors, enum_array[x] != VAL1);
+      if (enum_array[x] != VAL2){
+          break;
+      }
+  }
+
   for (int x = 0; x < ARRAY_SIZE; ++x){
       char_array[x] = 1;
       short_array[x] = 2;
@@ -41,29 +106,67 @@ int test_defaultmap_on() {
       enum_array[x] = VAL2;
   }
 
+  #pragma omp target teams distribute defaultmap(tofrom: scalar) map(tofrom: char_array[0:ARRAY_SIZE], \
+    short_array[0:ARRAY_SIZE], int_array[0:ARRAY_SIZE], float_array[0:ARRAY_SIZE], double_array[0:ARRAY_SIZE], enum_array[0:ARRAY_SIZE])
+  for (int x = 0; x < ARRAY_SIZE; ++x){
+      scalar_char = char_array[x];
+      scalar_short = short_array[x];
+      scalar_int = int_array[x];
+      scalar_float = float_array[x];
+      scalar_double = double_array[x];
+      scalar_enum = enum_array[x];
+  }
 
-  // Map the same array to multiple devices. initialize with device number
-  #pragma omp target data map(tofrom: char_array[0:ARRAY_SIZE], short_array[0:ARRAY_SIZE], int_array[0:ARRAY_SIZE], float_array[0:ARRAY_SIZE], double_array[0:ARRAY_SIZE], enum_array[0:ARRAY_SIZE])
-  {
-      #pragma omp target teams distribute defaultmap(tofrom: scalar)
-      for (int x = 0; x < ARRAY_SIZE; ++x){
-          scalar_char = char_array[x];
-          scalar_short = short_array[x];
-          scalar_int = int_array[x];
-          scalar_float = float_array[x];
-          scalar_double = double_array[x];
-          scalar_enum = enum_array[x];
+  OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_char != char_array[0]);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_short != short_array[0]);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_int != int_array[0]);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(scalar_float - float_array[0]) > .0000001);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(scalar_double - double_array[0]) > .0000000001);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_enum != enum_array[0]);
+
+  for (int x = 0; x < ARRAY_SIZE; ++x){
+      OMPVV_TEST_AND_SET_VERBOSE(errors, char_array[x] != 1);
+      if (char_array[x] != 1){
+          break;
       }
   }
 
   for (int x = 0; x < ARRAY_SIZE; ++x){
-      OMPVV_TEST_AND_SET_VERBOSE(errors, char_array[x] != 1);
       OMPVV_TEST_AND_SET_VERBOSE(errors, short_array[x] != 2);
-      OMPVV_TEST_AND_SET_VERBOSE(errors, int_array[x] != 3);
-      OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(float_array[x] - .4) > .0000001);
-      OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(double_array[x] - .5) > .0000000001);
-      OMPVV_TEST_AND_SET_VERBOSE(errors, enum_array[x] != VAL2);
+      if (short_array[x] != 2){
+          break;
+      }
   }
+
+  for (int x = 0; x < ARRAY_SIZE; ++x){
+      OMPVV_TEST_AND_SET_VERBOSE(errors, int_array[x] != 3);
+      if (int_array[x] != 3){
+          break;
+      }
+  }
+
+  for (int x = 0; x < ARRAY_SIZE; ++x){
+      OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(float_array[x] - .4) > .0000001);
+      if (fabs(float_array[x] - .4) > .0000000001){
+          break;
+      }
+  }
+
+  for (int x = 0; x < ARRAY_SIZE; ++x){
+      OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(double_array[x] - .5) > .0000000001);
+      if (fabs(double_array[x] - .5) > .0000000001){
+          break;
+      }
+  }
+
+  for (int x = 0; x < ARRAY_SIZE; ++x){
+      OMPVV_TEST_AND_SET_VERBOSE(errors, enum_array[x] != VAL2);
+      if (enum_array[x] != VAL2){
+          break;
+      }
+  }
+
+
 
   return errors;
 }
@@ -72,16 +175,17 @@ int test_defaultmap_off() {
     OMPVV_INFOMSG("test_defaultmap_off");
 
     int errors = 0;
-    int devtest = 1;
+    int* devtest = (int *)malloc(sizeof(int));
 
     // Checking for sharedmemory environment
-    #pragma omp target enter data map(to: devtest)
-    #pragma omp target
+    devtest[0] = 1;
+    #pragma omp target enter data map(to: devtest[0:1])
+    #pragma omp target map(alloc: devtest[0:1])
     {
-        devtest = 0;
+        devtest[0] = 0;
     }
 
-    OMPVV_WARNING_IF(devtest == 0, "Shared memory environment. Scalars are not copied over but modified. This part of the tests is inconclusive")
+    OMPVV_WARNING_IF(devtest[0] == 0, "Shared memory environment. Scalars are not copied over but modified. This part of the tests is inconclusive")
 
 
     // we try with all the scalars
@@ -110,9 +214,6 @@ int test_defaultmap_off() {
     enum enum_type enum_array_a[ARRAY_SIZE];
     enum enum_type enum_array_b[ARRAY_SIZE];
 
-    // To check if execution happened in the host
-    int isHost[ARRAY_SIZE];
-
     for (int x = 0; x < ARRAY_SIZE; ++x){
         char_array_a[x] = x%10;
         char_array_b[x] = 0;
@@ -126,59 +227,86 @@ int test_defaultmap_off() {
         double_array_b[x] = 0;
         enum_array_a[x] = x%4 + 1;
         enum_array_b[x] = VAL1;
-
-        // To check if execution happened in the host        
-        isHost[x] = 0;
     }
 
 
     //Testing the privatization nature of firstprivate default action
-    #pragma omp target data map(tofrom: char_array_a[0:ARRAY_SIZE], char_array_b[0:ARRAY_SIZE], short_array_a[0:ARRAY_SIZE], \
+    #pragma omp target teams distribute map(tofrom: char_array_a[0:ARRAY_SIZE], char_array_b[0:ARRAY_SIZE], short_array_a[0:ARRAY_SIZE], \
       short_array_b[0:ARRAY_SIZE], int_array_a[0:ARRAY_SIZE], int_array_b[0:ARRAY_SIZE], float_array_a[0:ARRAY_SIZE], float_array_b[0:ARRAY_SIZE], \
       double_array_a[0:ARRAY_SIZE], double_array_b[0:ARRAY_SIZE], enum_array_a[0:ARRAY_SIZE], enum_array_b[0:ARRAY_SIZE])
-    {
-        #pragma omp target teams distribute
-        for (int x = 0; x < ARRAY_SIZE; ++x){
-            scalar_char = 0;
-            for (int y = 0; y < char_array_a[x]; ++y){
-                scalar_char += 1;
-            }
-            char_array_b[x] = scalar_char;
-            scalar_short = 0;
-            for (int y = 0; y < short_array_a[x]; ++y){
-                scalar_short += 1;
-            }
-            short_array_b[x] = scalar_short;
-            scalar_int = 0;
-            for (int y = 0; y < int_array_a[x]; ++y){
-                scalar_int += 1;
-            }
-            int_array_b[x] = scalar_int;
-            scalar_float = 0;
-            for (int y = 0; y < ((int)float_array_a[x]); ++y){
-                scalar_float += .7f;
-            }
-            float_array_b[x] = scalar_float;
-            scalar_double = 0;
-            for (int y = 0; y < ((int)double_array_a[x]); ++y){
-                scalar_double += .9;
-            }
-            double_array_b[x] = scalar_double;
-            scalar_enum = VAL1;
-            for (int y = 1; y < enum_array_a[x]; ++y){
-                scalar_enum += 1;
-            }
-            enum_array_b[x] = scalar_enum;
+    for (int x = 0; x < ARRAY_SIZE; ++x){
+        scalar_char = 0;
+        for (int y = 0; y < char_array_a[x]; ++y){
+            scalar_char += 1;
         }
+        char_array_b[x] = scalar_char;
+        scalar_short = 0;
+        for (int y = 0; y < short_array_a[x]; ++y){
+            scalar_short += 1;
+        }
+        short_array_b[x] = scalar_short;
+        scalar_int = 0;
+        for (int y = 0; y < int_array_a[x]; ++y){
+            scalar_int += 1;
+        }
+        int_array_b[x] = scalar_int;
+        scalar_float = 0;
+        for (int y = 0; y < ((int)float_array_a[x]); ++y){
+            scalar_float += .7f;
+        }
+        float_array_b[x] = scalar_float;
+        scalar_double = 0;
+        for (int y = 0; y < ((int)double_array_a[x]); ++y){
+            scalar_double += .9;
+        }
+        double_array_b[x] = scalar_double;
+        scalar_enum = VAL1;
+        for (int y = 1; y < enum_array_a[x]; ++y){
+            scalar_enum += 1;
+        }
+        enum_array_b[x] = scalar_enum;
     }
 
     for (int x = 0; x < ARRAY_SIZE; ++x){
         OMPVV_TEST_AND_SET_VERBOSE(errors, char_array_b[x] != char_array_a[x]);
+        if (char_array_b[x] != char_array_a[x]){
+            break;
+        }
+    }
+
+    for (int x = 0; x < ARRAY_SIZE; ++x){
         OMPVV_TEST_AND_SET_VERBOSE(errors, short_array_b[x] != short_array_a[x]);
-        OMPVV_TEST_AND_SET_VERBOSE(errors, int_array_b[x] != int_array_b[x]);
+        if (short_array_b[x] != short_array_a[x]){
+            break;
+        }
+    }
+
+    for (int x = 0; x < ARRAY_SIZE; ++x){
+        OMPVV_TEST_AND_SET_VERBOSE(errors, int_array_b[x] != int_array_a[x]);
+        if (int_array_b[x] != int_array_a[x]){
+            break;
+        }
+    }
+
+    for (int x = 0; x < ARRAY_SIZE; ++x){
         OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(float_array_b[x] - (((int) float_array_a[x]) * .7)) > .00001);
-        OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(double_array_b[x] - (((int) double_array_a[x]) *.9)) > .000000001);
+        if (fabs(float_array_b[x] - (((int) float_array_a[x]) * .7)) > .00001){
+            break;
+        }
+    }
+
+    for (int x = 0; x < ARRAY_SIZE; ++x){
+        OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(double_array_b[x] - (((int) double_array_a[x]) * .9)) > .000000001);
+        if (fabs(double_array_b[x] - (((int) double_array_a[x]) * .9)) > .000000001){
+            break;
+        }
+    }
+
+    for (int x = 0; x < ARRAY_SIZE; ++x){
         OMPVV_TEST_AND_SET_VERBOSE(errors, enum_array_b[x] != enum_array_a[x]);
+        if (enum_array_b[x] != enum_array_a[x]){
+            break;
+        }
     }
 
     scalar_char = 26;
@@ -196,17 +324,15 @@ int test_defaultmap_off() {
     scalar_enum_copy = scalar_enum;
 
     // Testing the copy of scalar values to the device
-    #pragma omp target data map(tofrom: char_array_a[0:ARRAY_SIZE], short_array_a[0:ARRAY_SIZE], int_array_a[0:ARRAY_SIZE], float_array_a[0:ARRAY_SIZE], double_array_a[0:ARRAY_SIZE], enum_array_a[0:ARRAY_SIZE])
-    {
-        #pragma omp target teams distribute
-        for (int x = 0; x < ARRAY_SIZE; ++x){
-            char_array_a[x] = scalar_char;
-            short_array_a[x] = scalar_short;
-            int_array_a[x] = scalar_int;
-            float_array_a[x] = scalar_float;
-            double_array_a[x] = scalar_double;
-            enum_array_a[x] = scalar_enum;
-        }
+    #pragma omp target teams distribute map(tofrom: char_array_a[0:ARRAY_SIZE], short_array_a[0:ARRAY_SIZE], int_array_a[0:ARRAY_SIZE], \
+      float_array_a[0:ARRAY_SIZE], double_array_a[0:ARRAY_SIZE], enum_array_a[0:ARRAY_SIZE])
+    for (int x = 0; x < ARRAY_SIZE; ++x){
+        char_array_a[x] = scalar_char;
+        short_array_a[x] = scalar_short;
+        int_array_a[x] = scalar_int;
+        float_array_a[x] = scalar_float;
+        double_array_a[x] = scalar_double;
+        enum_array_a[x] = scalar_enum;
     }
 
     // Testing the fact that values should not be modified
@@ -219,29 +345,60 @@ int test_defaultmap_off() {
         scalar_float = 0;
         scalar_double = 0;
         scalar_enum = 0;
-
-        isHost[x] = omp_is_initial_device();
     }
 
     for (int x = 0; x < ARRAY_SIZE; ++x){
         OMPVV_TEST_AND_SET_VERBOSE(errors, char_array_a[x] != scalar_char_copy);
-        OMPVV_TEST_AND_SET_VERBOSE(errors, short_array_a[x] != scalar_short_copy);
-        OMPVV_TEST_AND_SET_VERBOSE(errors, int_array_a[x] != scalar_int_copy);
-        OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(float_array_a[x] - scalar_float_copy) > .00001);
-        OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(double_array_a[x] - scalar_double_copy) > .000000001);
-        OMPVV_TEST_AND_SET_VERBOSE(errors, enum_array_a[x] != scalar_enum_copy);
-
-        // If not shared memory, test if the scalars were not modified
-        if (devtest == 1 && !isHost[x]) {
-            OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_char != scalar_char_copy);
-            OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_short != scalar_short_copy);
-            OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_int != scalar_int_copy);
-            OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(scalar_float - scalar_float_copy) > .00001);
-            OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(scalar_double - scalar_double_copy) > .000000001);
-            OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_enum != scalar_enum_copy);
+        if (char_array_a[x] != scalar_char_copy){
+            break;
         }
     }
-    
+
+    for (int x = 0; x < ARRAY_SIZE; ++x){
+        OMPVV_TEST_AND_SET_VERBOSE(errors, short_array_a[x] != scalar_short_copy);
+        if (short_array_a[x] != scalar_short_copy){
+            break;
+        }
+    }
+
+    for (int x = 0; x < ARRAY_SIZE; ++x){
+        OMPVV_TEST_AND_SET_VERBOSE(errors, int_array_a[x] != scalar_int_copy);
+        if (int_array_a[x] != scalar_int_copy){
+            break;
+        }
+    }
+
+    for (int x = 0; x < ARRAY_SIZE; ++x){
+        OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(float_array_a[x] - scalar_float_copy) > .00001);
+        if (fabs(float_array_a[x] - scalar_float_copy) > .00001){
+            break;
+        }
+    }
+
+    for (int x = 0; x < ARRAY_SIZE; ++x){
+        OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(double_array_a[x] - scalar_double_copy) > .000000001);
+        if (fabs(double_array_a[x] - scalar_double_copy) > .000000001){
+            break;
+        }
+    }
+
+    for (int x = 0; x < ARRAY_SIZE; ++x){
+        OMPVV_TEST_AND_SET_VERBOSE(errors, enum_array_a[x] != scalar_enum_copy);
+        if (enum_array_a[x] != scalar_enum_copy){
+            break;
+        }
+    }
+
+    // If not shared memory, test if the scalars were not modified
+    if (devtest[0] == 1) {
+        OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_char != scalar_char_copy);
+        OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_short != scalar_short_copy);
+        OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_int != scalar_int_copy);
+        OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(scalar_float - scalar_float_copy) > .00001);
+        OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(scalar_double - scalar_double_copy) > .000000001);
+        OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_enum != scalar_enum_copy);
+    }
+
 
     return errors;
 }
