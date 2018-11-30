@@ -35,7 +35,7 @@ elif [ ! -f "$1" ]; then
 fi
 
 app=$1
-output=`timeout 60s $app 2>&1`
+output=`$app 2>&1`
 status=$?
 output=$(printf "$output" | uniq)
 
