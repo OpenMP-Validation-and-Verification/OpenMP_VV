@@ -67,7 +67,7 @@
     _ompvv_accum += pow(_ompvv_all_results[_ompvv_aux] - _ompvv_average, 2); \
   _ompvv_std_dev = sqrt(_ompvv_accum/(NUM_REP-2)); \
   _ompvv_median = ((NUM_REP-2) % 2 == 0) ? (_ompvv_all_results[(NUM_REP-2)/2] + _ompvv_all_results[(NUM_REP-2)/2 + 1])/2 : _ompvv_all_results[(NUM_REP-2)/2 + 1];\
-  OMPVV_INFOMSG("["clause"] AVG_TIME = %f us, STD_DEV = %f, MEDIAN = %f, MAX_TIME = %ju us, MIN_TIME = %ju us", _ompvv_average, _ompvv_std_dev, _ompvv_median, _ompvv_all_results[NUM_REP-1], _ompvv_all_results[1]);
+  OMPVV_INFOMSG("["clause"] AVG_TIME = %f us, STD_DEV = %f us, MEDIAN = %f us, MAX_TIME = %ju us, MIN_TIME = %ju us", _ompvv_average, _ompvv_std_dev, _ompvv_median, _ompvv_all_results[NUM_REP-1], _ompvv_all_results[1]);
 
 #define OMPVV_PRINT_VALUES \
   for (_ompvv_aux = 0; _ompvv_aux < NUM_REP; _ompvv_aux++) { OMPVV_INFOMSG("%ju", _ompvv_all_results[_ompvv_aux]); }
