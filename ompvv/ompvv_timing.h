@@ -2,6 +2,7 @@
 #define __OMPVV_TIMING__
 
 #include "ompvv.h"
+#include <math.h>
 #include <sys/time.h>
 #include <stdint.h>
 
@@ -20,8 +21,12 @@
 
 // For the experiments
 #define NUM_REP 1002
+
+
 #define OMPVV_INIT_TIMERS \
-  uint64_t _ompvv_start, _ompvv_stop, _ompvv_max, _ompvv_min, _ompvv_partial, _ompvv_accum, _ompvv_aux;
+  uint64_t _ompvv_aux, _ompvv_tmp, _ompvv_start, _ompvv_stop, _ompvv_partial, _ompvv_cur_result = 0, _ompvv_all_results[NUM_REP]; \
+  uint64_t _ompvv_accum; \
+  double _ompvv_average, _ompvv_std_dev, _ompvv_median;
 
 #define OMPVV_TIMING_LOAD \
 { \
@@ -34,25 +39,35 @@
 #define OMPVV_GET_TIME_LAPSED (_ompvv_stop - _ompvv_start)
 
 #define OMPVV_INIT_TEST \
-  _ompvv_accum = 0; \
-  _ompvv_max = 0; \
-  _ompvv_min = 0xFFFFFFFFFFFFFFFF;
+  for (_ompvv_aux = 0; _ompvv_aux < NUM_REP; _ompvv_aux++) { _ompvv_all_results[_ompvv_aux] = -1; } \
+  _ompvv_cur_result = 0; \
+  _ompvv_accum = 0; 
 
+// Implementing insertion sort 
 #define OMPVV_REGISTER_TEST \
-  _ompvv_partial = OMPVV_GET_TIME_LAPSED; \
-  _ompvv_aux = 0; \
-  if (_ompvv_partial > _ompvv_max) {\
-    _ompvv_accum += _ompvv_max; \
-    _ompvv_max = _ompvv_partial; \
-    _ompvv_aux = 1; \
+   _ompvv_partial = OMPVV_GET_TIME_LAPSED; \
+  for (_ompvv_aux = 0; _ompvv_aux < _ompvv_cur_result+1; _ompvv_aux++) { \
+    if (_ompvv_partial < _ompvv_all_results[_ompvv_aux]) { \
+      _ompvv_tmp = _ompvv_all_results[_ompvv_aux]; \
+      _ompvv_all_results[_ompvv_aux] = _ompvv_partial; \
+      _ompvv_partial = _ompvv_tmp; \
+    } \
   } \
-  if (_ompvv_partial < _ompvv_min) { \
-    _ompvv_accum += _ompvv_min; \
-    _ompvv_min = _ompvv_partial; \
-    _ompvv_aux = 1; \
-  } \
-  if (_ompvv_aux == 0) \
-    _ompvv_accum += _ompvv_partial;\
+  _ompvv_cur_result++;
+  
 
+
+// Find average, median and standard deviation ignore first and last (list of results is sorted)
 #define OMPVV_TIMER_RESULT(clause) \
-  OMPVV_INFOMSG("["clause"] AVG_TIME = %f us, MAX_TIME = %ju us, MIN_TIME = %ju us", ((double)_ompvv_accum) / NUM_REP, _ompvv_max, _ompvv_min);
+  for (_ompvv_aux = 1; _ompvv_aux < NUM_REP-1; _ompvv_aux++) \
+    _ompvv_accum += _ompvv_all_results[_ompvv_aux]; \
+  _ompvv_average = (double)_ompvv_accum / (NUM_REP-2); \
+  _ompvv_accum = 0; \
+  for (_ompvv_aux = 1; _ompvv_aux < NUM_REP-1; _ompvv_aux++) \
+    _ompvv_accum += pow(_ompvv_all_results[_ompvv_aux] - _ompvv_average, 2); \
+  _ompvv_std_dev = sqrt(_ompvv_accum/(NUM_REP-2)); \
+  _ompvv_median = ((NUM_REP-2) % 2 == 0) ? (_ompvv_all_results[(NUM_REP-2)/2] + _ompvv_all_results[(NUM_REP-2)/2 + 1])/2 : _ompvv_all_results[(NUM_REP-2)/2 + 1];\
+  OMPVV_INFOMSG("["clause"] AVG_TIME = %f us, STD_DEV = %f, MEDIAN = %f, MAX_TIME = %ju us, MIN_TIME = %ju us", _ompvv_average, _ompvv_std_dev, _ompvv_median, _ompvv_all_results[NUM_REP-1], _ompvv_all_results[1]);
+
+#define OMPVV_PRINT_VALUES \
+  for (_ompvv_aux = 0; _ompvv_aux < NUM_REP; _ompvv_aux++) { OMPVV_INFOMSG("%ju", _ompvv_all_results[_ompvv_aux]); }
