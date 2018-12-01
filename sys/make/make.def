@@ -55,9 +55,9 @@ endif
 ifeq ($(CC), xlc)
   COFFLOADING = -qoffload
   C_NO_OFFLOADING = 
-  CFLAGS +=  -O0 -g -qsmp=omp $(COFFLOADING)
+  CFLAGS +=  -O0 -g  -lm -qsmp=omp $(COFFLOADING)
   CLINK = xlc
-  CLINKFLAGS +=  -O0 -g -qsmp=omp $(COFFLOADING)
+  CLINKFLAGS +=  -O0 -g -lm -qsmp=omp $(COFFLOADING)
 endif
 
 # Clang compiler
@@ -95,18 +95,18 @@ endif
 ifeq ($(CXX), xlc++)
   CXXOFFLOADING = -qoffload
   CXX_NO_OFFLOADING = 
-  CXXFLAGS +=  -O0 -g -qsmp=omp $(CXXOFFLOADING)
+  CXXFLAGS +=  -O0 -g -lm -qsmp=omp $(CXXOFFLOADING)
   CXXLINK = xlc++
-  CXXLINKFLAGS +=  -O0 -g -qsmp=omp $(CXXOFFLOADING)
+  CXXLINKFLAGS +=  -O0 -g -lm -qsmp=omp $(CXXOFFLOADING)
 endif
 
 # Clang compiler
 ifeq ($(CXX), clang++)
   CXXOFFLOADING = -fopenmp-targets=nvptx64-nvida-cuda 
   CXX_NO_OFFLOADING = 
-  CXXFLAGS +=  -O0 -g -fopenmp $(CXXOFFLOADING) 
+  CXXFLAGS +=  -O0 -g -lm -fopenmp $(CXXOFFLOADING) 
   CXXLINK = clang++
-  CXXLINKFLAGS +=  -O0 -g -fopenmp $(CXXOFFLOADING)
+  CXXLINKFLAGS +=  -O0 -g -lm -fopenmp $(CXXOFFLOADING)
 endif
 
 #---------------------------------------------------------------------------
