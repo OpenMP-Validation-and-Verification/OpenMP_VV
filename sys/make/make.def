@@ -64,9 +64,9 @@ endif
 ifeq ($(CC), clang)
   COFFLOADING = -fopenmp-targets=nvptx64-nvida-cuda
   C_NO_OFFLOADING = 
-  CFLAGS +=  -O0 -g  -std=c99 -fopenmp $(COFFLOADING)
+  CFLAGS +=  -O0 -g -lm -std=c99 -fopenmp $(COFFLOADING)
   CLINK = clang
-  CLINKFLAGS +=  -O0  -g -fopenmp $(COFFLOADING)
+  CLINKFLAGS +=  -O0 -lm -g -fopenmp $(COFFLOADING)
 endif
 
 #---------------------------------------------------------------------------
