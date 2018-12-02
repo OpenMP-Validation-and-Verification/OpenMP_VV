@@ -61,11 +61,13 @@ def main():
                 print("ERROR Opening the file " + fileName)
 
     result = cleanUp(result)
+    header = "TestName\tAVG_TIME\tSTD_DEV\tMEDIAN\tMAX_TIME\tMIN_TIME\n"
     
     # writing the output file
     with open(outputFileName, "w") as f: 
         try:
             printLog("Writing output file " + outputFileName + " containing " + str(result.count("\n")) + " lines")
+            f.write(header)
             f.write(result)
         except Exception as e :
             print ("ERROR writing the file " + outputFileName + " " + str(e))
