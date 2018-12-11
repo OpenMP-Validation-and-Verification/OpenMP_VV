@@ -69,7 +69,7 @@ endif
 # Summitdev happens to have a wrapper that without it we cannot execute 
 # xlf with OMP 4.5 support. This wrapper is xlf_r
 ifeq ($(FC), $(filter $(FC), xlf xlf_r))
-  F_COMPILER_MODULE = xl/20180223-beta
+  F_COMPILER_MODULE =  xl/20180125
   CUDA_MODULE= cuda/9.0.69
   F_VERSION = xlf -qversion | grep 'Version: .*$$' | sed 's/Version: //g' 
 endif
