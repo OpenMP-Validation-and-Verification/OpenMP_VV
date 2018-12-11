@@ -344,7 +344,7 @@ $(LOGDIR):
 $(RESULTS_JSON_OUTPUT_FILE): 
 	@echo "Creating $(RESULTS_JSON_OUTPUT_FILE) file"
 	@echo "Currently we only support run logs that contain compilation and run outputs. Use the 'make all' rule to obtain these"
-	@$(RESULTS_ANALYZER) -f json -o $(RESULTS_JSON_OUTPUT_FILE) $(LOGDIRNAME)/*
+	@$(RESULTS_ANALYZER) -r -f json -o $(RESULTS_JSON_OUTPUT_FILE) $(LOGDIRNAME)/*
 
 .PHONY: report_json
 report_json: $(RESULTS_JSON_OUTPUT_FILE)
