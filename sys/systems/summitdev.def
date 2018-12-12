@@ -27,7 +27,7 @@ endif
 # Clang compiler
 ifeq ($(CC), clang)
   C_COMPILER_MODULE = clang/20170925
-  C_VERSION = clang -v 2>&1 | grep -oh 'clang version [0-9.]*'| sed 's/.*/& CORAL/'
+  C_VERSION = clang -v 2>&1 | grep -oh 'clang version [0-9.]*'| grep -oh 'version .*' | sed 's/.*/& CORAL/'
 endif
 
 #---------------------------------------------------------------------------
@@ -51,7 +51,7 @@ endif
 # Clang compiler
 ifeq ($(CXX), clang++)
   CXX_COMPILER_MODULE = clang/20170925
-  CXX_VERSION = clang++ -v 2>&1 | grep -oh 'clang version [0-9.]*' | sed 's/.*/& CORAL/'
+  CXX_VERSION = clang++ -v 2>&1 | grep -oh 'clang version [0-9.]*' | grep -oh 'version .*' | sed 's/.*/& CORAL/'
 endif
 
 #---------------------------------------------------------------------------
