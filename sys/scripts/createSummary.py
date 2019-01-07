@@ -183,12 +183,17 @@ def parseFile(log_file):
             # We are ending a section
             if current_state == "COMPILE":
               current_test.setCompilerResult(header_info["result"], current_buffer, header_info["date"], header_info["comments"])
+              if header_info["result"].find("FAIL") != -1:
+                returned_value.append(current_test)
+                # Runtime is the last thing that should happen
+                current_test = testResult()
+
             elif current_state == "RUN":
               current_test.setRuntimeResult(header_info["result"], current_buffer, header_info["date"], header_info["comments"])
-              returned_value.append(current_test)
-              # Runtime is the last thing that should happen
-              current_test = testResult()
-              current_state = header_info["type"]
+              if current_test.compilerPass.find("FAIL") == -1:
+                returned_value.append(current_test)
+                # Runtime is the last thing that should happen
+                current_test = testResult()
 
             # reset the values
             current_state = header_info["type"]
