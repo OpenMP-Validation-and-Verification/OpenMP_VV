@@ -2,6 +2,7 @@
 
 import argparse, glob, sys
 import os, json
+import traceback
 
 
 class testResult:
@@ -157,6 +158,7 @@ def parseFile(log_file):
   array of results
   '''
   returned_value = [];
+  ignore_run_information = [];
   #check if log_file is string
   if isinstance(log_file, str):
     #check if log_file is a file that exist
@@ -176,6 +178,10 @@ def parseFile(log_file):
           elif header_info["type"] == "RUN":
             # we are starting a runtime section
             if (current_test.testName == ""):
+              # This is needed to ignore tests that failed at compilation time. but sometimes we only have 
+              # RUN information, and in this case we want to add the info to the logs
+              if (header_info["testName"] in ignore_run_information):
+                  continue
               current_test.setTestParameters(header_info["testName"])
             current_test.setRuntimeInit(header_info["file"], header_info["date"], header_info["system"])
             current_state = header_info["type"]
@@ -185,6 +191,8 @@ def parseFile(log_file):
               current_test.setCompilerResult(header_info["result"], current_buffer, header_info["date"], header_info["comments"])
               if header_info["result"].find("FAIL") != -1:
                 returned_value.append(current_test)
+                # add test name to ignore run information. 
+                ignore_run_information.append(current_test.testName)
                 # Runtime is the last thing that should happen
                 current_test = testResult()
 
