@@ -13,7 +13,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute
+      #pragma omp target teams distribute num_teams(16)
       for (int x = 0; x < 1024; ++x){
           OMPVV_TIMING_LOAD;
       }
@@ -44,7 +44,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute collapse(1)
+      #pragma omp target teams distribute num_teams(16) collapse(1)
       for (int x = 0; x < 1024; ++x){
           OMPVV_TIMING_LOAD;
       }
@@ -75,7 +75,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute defaultmap(tofrom: scalar)
+      #pragma omp target teams distribute num_teams(16) defaultmap(tofrom: scalar)
       for (int x = 0; x < 1024; ++x){
           OMPVV_TIMING_LOAD;
       }
@@ -106,7 +106,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute default(none)
+      #pragma omp target teams distribute num_teams(16) default(none)
       for (int x = 0; x < 1024; ++x){
           OMPVV_TIMING_LOAD;
       }
@@ -137,7 +137,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute default(shared)
+      #pragma omp target teams distribute num_teams(16) default(shared)
       for (int x = 0; x < 1024; ++x){
           OMPVV_TIMING_LOAD;
       }
@@ -169,7 +169,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute depend(inout:a_map_var)
+      #pragma omp target teams distribute num_teams(16) depend(inout:a_map_var)
       for (int x = 0; x < 1024; ++x){
           OMPVV_TIMING_LOAD;
       }
@@ -201,7 +201,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute device(a_map_var)
+      #pragma omp target teams distribute num_teams(16) device(a_map_var)
       for (int x = 0; x < 1024; ++x){
           OMPVV_TIMING_LOAD;
       }
@@ -232,7 +232,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute firstprivate(a_map_var)
+      #pragma omp target teams distribute num_teams(16) firstprivate(a_map_var)
       for (int x = 0; x < 1024; ++x){
           a_map_var = 0;
           OMPVV_TIMING_LOAD;
@@ -265,7 +265,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute if(1)
+      #pragma omp target teams distribute num_teams(16) if(1)
       for (int x = 0; x < 1024; ++x){
           OMPVV_TIMING_LOAD;
       }
@@ -296,7 +296,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute if(0)
+      #pragma omp target teams distribute num_teams(16) if(0)
       for (int x = 0; x < 1024; ++x){
           OMPVV_TIMING_LOAD;
       }
@@ -327,7 +327,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute lastprivate(a_map_var)
+      #pragma omp target teams distribute num_teams(16) lastprivate(a_map_var)
       for (int x = 0; x < 1024; ++x){
           a_map_var = 0;
           OMPVV_TIMING_LOAD;
@@ -360,7 +360,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute map(to: a_map_var)
+      #pragma omp target teams distribute num_teams(16) map(to: a_map_var)
       for (int x = 0; x < 1024; ++x){
           a_map_var = 0;
           OMPVV_TIMING_LOAD;
@@ -393,7 +393,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute map(from: a_map_var)
+      #pragma omp target teams distribute num_teams(16) map(from: a_map_var)
       for (int x = 0; x < 1024; ++x){
           a_map_var = 0;
           OMPVV_TIMING_LOAD;
@@ -426,7 +426,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute map(tofrom: a_map_var)
+      #pragma omp target teams distribute num_teams(16) map(tofrom: a_map_var)
       for (int x = 0; x < 1024; ++x){
           a_map_var = 0;
           OMPVV_TIMING_LOAD;
@@ -460,7 +460,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute map(alloc: a_map_var)
+      #pragma omp target teams distribute num_teams(16) map(alloc: a_map_var)
       for (int x = 0; x < 1024; ++x){
           a_map_var = 0;
           OMPVV_TIMING_LOAD;
@@ -493,7 +493,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute private(a_map_var)
+      #pragma omp target teams distribute num_teams(16) private(a_map_var)
       for (int x = 0; x < 1024; ++x){
           a_map_var = 0;
           OMPVV_TIMING_LOAD;
@@ -526,7 +526,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute shared(a_map_var)
+      #pragma omp target teams distribute num_teams(16) shared(a_map_var)
       for (int x = 0; x < 1024; ++x){
           a_map_var = 0;
           OMPVV_TIMING_LOAD;

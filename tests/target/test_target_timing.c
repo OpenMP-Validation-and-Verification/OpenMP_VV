@@ -128,6 +128,7 @@ int main() {
     OMPVV_START_TIMER;
 #pragma omp target map(to: a_map_var)
     {
+      a_map_var = 1;
       OMPVV_TIMING_LOAD;
     }
     OMPVV_STOP_TIMER;
