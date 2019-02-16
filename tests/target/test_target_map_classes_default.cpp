@@ -1,8 +1,3 @@
-// RUN: %libomptarget-compile-run-and-check-aarch64-unknown-linux-gnu
-// RUN: %libomptarget-compile-run-and-check-powerpc64-ibm-linux-gnu
-// RUN: %libomptarget-compile-run-and-check-powerpc64le-ibm-linux-gnu
-// RUN: %libomptarget-compile-run-and-check-x86_64-pc-linux-gnu
-
 //===--test_target_map_classes_default.c - test a class default mapping -----===//
 // 
 // OpenMP API Version 4.5 Nov 2015
@@ -25,9 +20,8 @@
 ////===----------------------------------------------------------------------===//
 
 #include <omp.h>
-#include <iostream>
-
-using namespace std;
+#include "ompvv.h"
+#include <cmath>
 
 #define N 1000
 
@@ -38,24 +32,29 @@ private:
   int size;
 
 public:
-  A(const int s) : size(s) {}
+  A(const int s) : size(s) {
+    for (int i = 0; i < N; i++) {
+      h_array[i] = 0;
+    }
+  }
 
-  void modifyExplicit(int* isHost) {
-#pragma omp target map(this->h_array) map(this->size)           \
-        map(tofrom: isHost) // by defaul arrays are tofrom
+  void modifyExplicit() {
+    int * theArray = this->h_array;
+    int theSize = size;
+    // It is not possible to do this-> since it is an
+    // expression and it is not supported by 4.5
+#pragma omp target map(theArray[0:N]) map(theSize) 
     {
-      *isHost = omp_is_initial_device();
-      for (int i = 0; i < size; ++i)
-          h_array[i] = 1;
+      for (int i = 0; i < theSize; ++i)
+          theArray[i] += 1;
     } // end target
   }
 
-  void modifyImplicit(int* isHost) {
-#pragma omp target map(tofrom: isHost) // implicit map(tofrom: this->h_array) map(firstprivate: this->size)
+  void modifyImplicit() {
+#pragma omp target // implicit map(tofrom: this->h_array) map(firstprivate: this->size)
     {
-      *isHost = omp_is_initial_device();
       for (int i = 0; i < size; ++i)
-          h_array[i] = 1;
+          h_array[i] += 1;
     } // end target 
   }
 
@@ -69,35 +68,32 @@ public:
   static double VAR;
   B() {}
 
-  // TODO: Add virtual once supported
   ~B() {}
-  
-  virtual int vMethod() {
+
+#pragma omp declare target 
+  static int staticMethod() {
       return 1;
   }
+#pragma omp end declare target 
 };
+
 double B::VAR = 1.0;
 
 int test_explicit() {
 
-  cout << "test_explicit" << endl;
-
-  int sum = 0, isHost = 0, errors = 0;
+  OMPVV_INFOMSG("Explicit mapping test");
+  int sum = 0, errors = 0;
 
   A *obj = new A(N);
 
-  obj->modifyExplicit(&isHost);
+  obj->modifyExplicit();
 
   // checking results
   int* h_array = obj->getArray();
   for (int i = 0; i < N; ++i)
     sum += h_array[i];
 
-  errors = N != sum;
-  if (!errors)
-    cout << "Test passed on " << (isHost ? "host" : "device") << ": sum=" << sum << ", N=" << N << endl;
-  else
-    cout << "Test failed on " << (isHost ? "host" : "device") << ": sum=" << sum << ", N=" << N << endl;
+  OMPVV_TEST_AND_SET_VERBOSE(errors, N != sum);
 
   delete obj;
 
@@ -106,24 +102,20 @@ int test_explicit() {
 
 int test_implicit() {
 
-  cout << "test_implicit" << endl;
+  OMPVV_INFOMSG("Test implicit mapping");
 
-  int sum = 0, isHost = 0, errors = 0;
+  int sum = 0, errors = 0;
 
   A *obj = new A(N);
 
-  obj->modifyImplicit(&isHost);
+  obj->modifyImplicit();
 
   // checking results
   int* h_array = obj->getArray();
   for (int i = 0; i < N; ++i)
     sum += h_array[i];
 
-  errors = N != sum;
-  if (!errors)
-    cout << "Test passed on " << (isHost ? "host" : "device") << ": sum=" << sum << ", N=" << N << endl;
-  else
-    cout << "Test failed on " << (isHost ? "host" : "device") << ": sum=" << sum << ", N=" << N << endl;
+  OMPVV_TEST_AND_SET_VERBOSE(errors, N != sum);
 
   delete obj;
 
@@ -131,66 +123,48 @@ int test_implicit() {
 }
 
 int test_static () {
-  cout << "test_static" << endl;
 
-  int isHost = 0, errors = 0;
-  double exp = 1.0, res = 0.0;
+  OMPVV_INFOMSG("Testing accessing a static variable");
+
+  int errors = 0;
+  double res = 0.0;
   
-  B *obj = new B();
-
-#pragma omp target map(tofrom: obj[0:1]) map(tofrom: res) map(tofrom: isHost)
+#pragma omp target map(tofrom: res)
   {
-    isHost = omp_is_initial_device();
     res = B::VAR;
   } // end target
 
   // checking results
-  errors = res != exp;
-  if (!errors)
-    cout << "Test passed on " << (isHost ? "host" : "device") << ": exp=" << exp << ", res=" << res << endl;
-  else
-    cout << "Test failed on " << (isHost ? "host" : "device") << ": exp=" << exp << ", res=" << res << endl;
-
-  delete obj;
+  OMPVV_TEST_AND_SET_VERBOSE(errors, std::abs(res - 1.0) > 0.0001)
 
   return errors;
 }
 
-int test_virtual () {
-  cout << "test_virtual" << endl;
+int test_static_method () {
+  OMPVV_INFOMSG("Testing static methods on the device");
 
-  int isHost = 0, errors = 0;
-  int (B::*vMethodPointer) (); // function pointer
+  int errors = 0;
+  int value = 0;
 
-  B *obj = new B();
-
-#pragma omp target map(tofrom: obj[0:1]) map(tofrom: vMethodPointer) \
-        map(tofrom: isHost)
+#pragma omp target map(tofrom: value) 
   {
-      isHost = omp_is_initial_device();
-      vMethodPointer = &B::vMethod;
+    value = B::staticMethod();
   } // end target
 
-  // checking results
-  errors = &B::vMethod != vMethodPointer;
-  if (!errors)
-    cout << "Test passed on " << (isHost ? "host" : "device") << endl;
-  else
-    cout << "Test failed on " << (isHost ? "host" : "device") << endl;
-
-  delete obj;
+  OMPVV_TEST_AND_SET_VERBOSE(errors, std::abs(value - 1.0) > 0.0001);
 
   return errors;
 }
 
 int main() {
+  OMPVV_TEST_OFFLOADING;
 
   int errors = 0;
 
-  errors += test_virtual();
-  errors += test_static();
-  errors += test_explicit();
-  errors += test_implicit();
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_static_method() != 0);
+  OMPVV_TEST_AND_SET_VERBOSE(errors,  test_static() != 0);
+  OMPVV_TEST_AND_SET_VERBOSE(errors,  test_explicit() != 0);
+  OMPVV_TEST_AND_SET_VERBOSE(errors,  test_implicit() != 0);
 
-  return errors;
+  OMPVV_REPORT_AND_RETURN(errors);
 }
