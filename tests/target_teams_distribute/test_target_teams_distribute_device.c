@@ -1,3 +1,19 @@
+//===--- test_target_teams_distribute_device.c-------------------------------===//
+//
+// OpenMP API Version 4.5 Nov 2015
+//
+// This test uses the device clause to indicate which device should execute the
+// given target regions.  The test uses the separate device data environments to
+// ensure that operations are executed on the specified device.  If only one device
+// is available, the test issues a warning.
+//
+// By having a separate initialization of the same array on each device at the
+// same time, if all operations were occuring on the same device, we would expect
+// the same results from each device and it wouldn't be able to give proper answers
+// for each initialization.
+//
+////===----------------------------------------------------------------------===//
+
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -5,7 +21,6 @@
 
 #define ARRAY_SIZE 1024
 
-// Test for OpenMP 4.5 target data with if
 int main() {
   int isOffloading = 0;
   OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
@@ -19,7 +34,6 @@ int main() {
 
   OMPVV_INFOMSG("running tests on %d devices", num_devices);
 
-  // a and b array initialization
   for (int x = 0; x < ARRAY_SIZE; ++x) {
       a[x] = 1;
       b[x] = x;
@@ -44,7 +58,10 @@ int main() {
   for (int dev = 0; dev < num_devices; ++dev){
       #pragma omp target exit data map(from: a[0:ARRAY_SIZE], num_teams[dev]) map(delete: b[0:ARRAY_SIZE]) device(dev)
       for (int x = 0; x < ARRAY_SIZE; ++x){
-          OMPVV_TEST_AND_SET(errors[dev], a[x] != 1 + dev + b[x]);
+          OMPVV_TEST_AND_SET_VERBOSE(errors[dev], a[x] != 1 + dev + b[x]);
+          if (a[x] != 1 + dev + b[x]){
+              break;
+          }
       }
   }
 
