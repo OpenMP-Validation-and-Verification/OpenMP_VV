@@ -6,8 +6,7 @@
 #include <iostream>
 #include <omp.h>
 #include <cassert>
-
-using namespace std;
+#include "ompvv.h"
 
 #define N 1000
 
@@ -19,12 +18,14 @@ private:
 public:
   Mapper (T* p) : ptr(p) {
     not_mapped = !omp_target_is_present(ptr, omp_get_default_device());
+    T* solutionPtr = ptr;
     // maps if target is not present
-#pragma omp target enter data map(to:ptr[0:1]) if(not_mapped)
+#pragma omp target enter data map(to:solutionPtr[0:1]) if(not_mapped)
   }
   ~Mapper() {
+    T* solutionPtr = ptr;
     // unmaps iff this mapper mapped the target
-#pragma omp target exit data map(delete: ptr[0:1]) if(not_mapped)
+#pragma omp target exit data map(delete: solutionPtr[0:1]) if(not_mapped)
     ptr = NULL;
   }
 };
@@ -37,15 +38,14 @@ private:
 public:
   B(int n) : Mapper<B>(this), n(n) {
     x = new double[n];
+    double* solutionX = x;
 #pragma omp target update to(n)
-#pragma omp target enter data map(to:x[0:n])
+#pragma omp target enter data map(to:solutionX[0:n])
   }
 
-  void modifyB(int* isHost, double* obj_x_ptr) {
-#pragma omp target map(tofrom: isHost) map(from: obj_x_ptr)
+  void modifyB(double* obj_x_ptr) {
+#pragma omp target map(from: obj_x_ptr[0:1])
     {
-      *isHost = omp_is_initial_device();
-
       for (int i = 0; i < n; ++i)
         x[i] = 1.0;
       
@@ -68,11 +68,10 @@ public:
       y = new int[n];
   }
 
-  void modifyA(int* isHost, double* obj_x_ptr, int* obj_y_ptr) {
-#pragma omp target map(tofrom: isHost) map(from: obj_x_ptr) map(from: obj_y_ptr)
+  void modifyA(double* obj_x_ptr, int* obj_y_ptr) {
+#pragma omp target map(from: obj_x_ptr) map(from: obj_y_ptr)
     {
-      modifyB(isHost, obj_x_ptr);
-      *isHost = omp_is_initial_device();
+      modifyB(obj_x_ptr);
 
       for (int i = 0; i < n; ++i)
         y[i] = 1;
@@ -91,43 +90,53 @@ public:
 
 class Simple {
 private:
-  int *h_array;
+  int *d_array;
   int size;
   int sum;
 
 public:
   Simple(int s) : size(s) { 
       sum = 0;
-      h_array = new int[size];
-#pragma omp target enter data map(to:this[0:1])
-#pragma omp target enter data map(to:h_array[0:size])
+      d_array = new int[size];
+//#pragma omp target enter data map(to:this[0:1])
+      int* helper = d_array;
+      int &hs = size;
+#pragma omp target enter data map(to: helper[0:size]) map(to: hs)
   }
 
   // TODO: Add virtual once supported
   ~Simple() { 
-#pragma omp target exit data map(delete:h_array[0:size])
-#pragma omp target exit data map(delete:this[0:1])
-      delete[] h_array; 
+      int* helper = d_array;
+      int &hs = size;
+#pragma omp target exit data map(delete: helper[0:size]) map(delete: hs)
+//#pragma omp target exit data map(delete:this[0:1])
+      delete[] d_array; 
   }
   
-  void modify(int* isHost, int* obj_sum_ptr, int* obj_array_ptr) {
-#pragma omp target map(tofrom: isHost) map(from: obj_sum_ptr) map(from: obj_array_ptr)
+  void modify() {
+#pragma omp target defaultmap(tofrom: scalar) 
     {
-      *isHost = omp_is_initial_device();
-
       sum = 0;
       for (int i = 0; i < size; ++i) {
-        h_array[i] = 1;
-        sum += h_array[i];
+        d_array[i] = 1;
+        sum += d_array[i];
       }
-      
-      obj_sum_ptr = &sum; 
-      obj_array_ptr = h_array;
     }
   }
-  
+  void getValues(int &h_sum, int* h_array) {
+      int* helper = d_array;
+      int &hs = size;
+      int &hs2 = sum;
+#pragma omp target map(from: h_sum) 
+    {
+      h_sum = sum;
+      for (int i = 0; i < size; i++) {
+        h_array[i] = d_array[i];
+      }
+    }
+  }
   int* getArray() {
-    return h_array;
+    return d_array;
   }
   
   int* getSum() {
@@ -136,20 +145,18 @@ public:
 };
 
 int test_simple_class() {
-
-  cout << "test_simple_class" << endl;
-
-  int sum = 0, isHost = 0, errors = 0, h_sum = 0;
+  
+  OMPVV_INFOMSG("Testing enter exit data with a simple class");
+  int errors = 0, h_sum = 0, sum = 0;
   int* h_array = new int[N];
-  int* obj_array_ptr = NULL, *obj_sum_ptr = NULL;
 
   // allocation on the device
   Simple *obj = new Simple(N);
 
-  obj->modify(&isHost, obj_sum_ptr, obj_array_ptr);
-
-  assert(0 == omp_target_memcpy(h_array, obj_array_ptr, N*sizeof(int), 0, 0, omp_get_initial_device(), omp_get_default_device()));
-  assert(0 == omp_target_memcpy(&h_sum, obj_sum_ptr, sizeof(int), 0, 0, omp_get_initial_device(), omp_get_default_device()));
+  obj->modify();
+  obj->modify();
+  obj->modify();
+  obj->getValues(h_sum, h_array);
 
   // checking results
   for (int i = 0; i < N; ++i)
@@ -158,14 +165,9 @@ int test_simple_class() {
   delete obj;
   delete[] h_array;
   
-  int res_cpy_array = omp_target_memcpy(h_array, obj_array_ptr, N*sizeof(int), 0, 0, omp_get_initial_device(), omp_get_default_device());
-  int res_cpy_sum = omp_target_memcpy(&h_sum, obj_sum_ptr, sizeof(int), 0, 0, omp_get_initial_device(), omp_get_default_device());
-
-  errors = (N != sum) || (N != h_sum) || (0 == res_cpy_sum) || (0 == res_cpy_array) ;
-  if (!errors)
-    cout << "Test passed on " << (isHost ? "host" : "device") << ": sum=" << sum << ", N=" << N << endl;
-  else
-    cout << "Test failed on " << (isHost ? "host" : "device") << ": sum=" << sum << ", N=" << N << endl;
+  OMPVV_TEST_AND_SET_VERBOSE(errors, (N != sum));
+  OMPVV_TEST_AND_SET_VERBOSE(errors, (N != h_sum));
+  OMPVV_ERROR_IF(errors != 0, "N = %d, sum = %d, h_sum = %d", N, sum, h_sum);
 
   return errors;
 }
@@ -210,10 +212,21 @@ return 0;
 
 int main() {
 
+int myInt = 5;
+#pragma omp target enter data map(to: myInt)
+
+#pragma omp target defaultmap(tofrom:scalar)
+{
+        myInt += 5;
+}
+
+#pragma omp target exit data map(from: myInt)
+OMPVV_INFOMSG("The value of myInt is = %d", myInt);
   int errors = 0;
 
-  errors += test_simple_class();
-  errors += test_complex_class();
+//  errors += test_simple_class();
+//  errors += test_complex_class();
 
   return errors;
 }
+
