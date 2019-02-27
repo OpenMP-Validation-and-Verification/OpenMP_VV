@@ -1,8 +1,3 @@
-// RUN: %libomptarget-compile-run-and-check-aarch64-unknown-linux-gnu
-// RUN: %libomptarget-compile-run-and-check-powerpc64-ibm-linux-gnu
-// RUN: %libomptarget-compile-run-and-check-powerpc64le-ibm-linux-gnu
-// RUN: %libomptarget-compile-run-and-check-x86_64-pc-linux-gnu
-
 //===--- test_target_map_escalar_default.c - testing default map to scalar --===//
 // 
 // OpenMP API Version 4.5 Nov 2015
