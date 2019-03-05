@@ -16,7 +16,7 @@ CCOMPILERS="clang, gcc, xlc"
 
 # GCC compiler
 ifeq ($(CC), gcc)
-  C_COMPILER_MODULE = gcc/8.1.0
+  C_COMPILER_MODULE = gcc/8.1.1
   C_VERSION = gcc -dumpversion
 endif
 
@@ -39,7 +39,7 @@ CXXCOMPILERS="clang++, g++, xlc++"
 
 # GCC compiler
 ifeq ($(CXX), g++)
-  CXX_COMPILER_MODULE = gcc/8.1.0
+  CXX_COMPILER_MODULE = gcc/8.1.1
   CXX_VERSION = g++ -dumpversion
 endif
 
@@ -62,7 +62,7 @@ FCOMPILERS="gfortran, xlf"
 
 # GCC compiler
 ifeq ($(FC), gfortran)
-  F_COMPILER_MODULE = gcc/8.1.0
+  F_COMPILER_MODULE = gcc/8.1.1
   F_VERSION = gfortran -dumpversion
 endif
 
