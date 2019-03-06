@@ -115,18 +115,19 @@ module ompvv_lib
 
     ! test offloading prints if offloading is enabled or not
     subroutine test_offloading(fn ,ln)
-      CHARACTER(len=*) :: fn 
+      CHARACTER(len=*) :: fn
+      CHARACTER(len=500) :: clean
       INTEGER :: ln
 
       ! Avoid unused variables warning 
-      fn = TRIM(clean_fn(fn))
+      clean = TRIM(clean_fn(fn))
       ln = ln
 
       call test_offloading_probe()
       IF (ompvv_isHost) THEN
-        OMPVV_INFOMSG_HELPER("Test is running on host",fn , ln)
+        OMPVV_INFOMSG_HELPER("Test is running on host",clean ,ln)
       ELSE
-        OMPVV_INFOMSG_HELPER("Test is running on device",fn , ln)
+        OMPVV_INFOMSG_HELPER("Test is running on device",clean ,ln)
       END IF
     end subroutine test_offloading  
 
@@ -158,9 +159,10 @@ module ompvv_lib
       LOGICAL, INTENT(IN) :: condition
       CHARACTER(len=*) :: conditionStr
       CHARACTER(len=*) :: fn
+      CHARACTER(len=500) :: clean
       INTEGER :: ln, condition_clean_pos
 
-      fn = TRIM(clean_fn(fn))
+      clean = TRIM(clean_fn(fn))
       ! Avoid unused variables warning
       ln = ln
       ! cleaning condition % causes to fail. replace with '.'
@@ -173,7 +175,7 @@ module ompvv_lib
       
       IF (condition) then 
         ompvv_errors = ompvv_errors + 1
-        OMPVV_ERROR_HELPER(conditionStr, fn, ln)
+        OMPVV_ERROR_HELPER(conditionStr, clean, ln)
 !        OMPVV_ERROR_HELPER(" Condition failed ", fn, ln)
       END IF 
     end subroutine test_error_verbose
@@ -210,8 +212,9 @@ module ompvv_lib
     subroutine report_errors(fn)
       CHARACTER(len=*) :: fn
       CHARACTER(len=50) :: message2dis
+      CHARACTER(len=500) :: clean
 
-      fn = TRIM(clean_fn(fn))
+      clean = TRIM(clean_fn(fn))
 
       WRITE(message2dis, '(A,I0)') "The value of errors is ", ompvv_errors
       message2dis = TRIM(message2dis)
@@ -219,16 +222,16 @@ module ompvv_lib
       IF (ompvv_errors /= 0) then 
         OMPVV_INFOMSG(message2dis)
         IF (ompvv_isHost) THEN 
-          WRITE(*,OMPVV_HEADER_RESULT_FMT) TRIM(fn), "failed", "host"
+          WRITE(*,OMPVV_HEADER_RESULT_FMT) TRIM(clean), "failed", "host"
         ELSE
-          WRITE(*,OMPVV_HEADER_RESULT_FMT) TRIM(fn), "failed", "device"
+          WRITE(*,OMPVV_HEADER_RESULT_FMT) TRIM(clean), "failed", "device"
         END IF
       ELSE
         OMPVV_INFOMSG("Test ran with no errors")
         IF (ompvv_isHost) THEN 
-          WRITE(*,OMPVV_HEADER_RESULT_FMT) TRIM(fn), "passed", "host"
+          WRITE(*,OMPVV_HEADER_RESULT_FMT) TRIM(clean), "passed", "host"
         ELSE
-          WRITE(*,OMPVV_HEADER_RESULT_FMT) TRIM(fn), "passed", "device"
+          WRITE(*,OMPVV_HEADER_RESULT_FMT) TRIM(clean), "passed", "device"
         END IF
       END IF
 
@@ -274,16 +277,17 @@ module ompvv_lib
 
     subroutine test_shared_environment(fn, ln)
       CHARACTER(len=*) :: fn
+      CHARACTER(len=500) :: clean
       INTEGER :: ln
       CHARACTER(len=*), PARAMETER :: msg = "This tests is running on a shared &
         & data environment between host and device. This may cause errors"
 
-      fn = TRIM(clean_fn(fn))
+      clean = TRIM(clean_fn(fn))
       ! Avoid unused variables warning
       ln = ln
 
       call test_shared_environment_probe()
-      if (ompvv_sharedEnv) OMPVV_WARNING_HELPER(msg, fn, ln)
+      if (ompvv_sharedEnv) OMPVV_WARNING_HELPER(msg, clean, ln)
     end subroutine test_shared_environment
 
     function test_and_set_shared_environment(fn, ln)
