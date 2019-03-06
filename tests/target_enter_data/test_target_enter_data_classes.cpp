@@ -1,7 +1,11 @@
-// RUN: %libomptarget-compile-run-and-check-aarch64-unknown-linux-gnu
-// RUN: %libomptarget-compile-run-and-check-powerpc64-ibm-linux-gnu
-// RUN: %libomptarget-compile-run-and-check-powerpc64le-ibm-linux-gnu
-// RUN: %libomptarget-compile-run-and-check-x86_64-pc-linux-gnu
+//===---- test_target_enter_data_classes.c - combined consutrct -===//
+//
+// OpenMP API Version 4.5 Nov 2015
+//
+//
+//===----------------------------------------------------------------------------------===//
+//
+//
 
 #include <iostream>
 #include <omp.h>
@@ -44,10 +48,11 @@ public:
   }
 
   void modifyB(double* obj_x_ptr) {
+    double * cpy_x = x; 
 #pragma omp target map(from: obj_x_ptr[0:1])
     {
       for (int i = 0; i < n; ++i)
-        x[i] = 1.0;
+        cpy_x[i] = 1.0;
       
       obj_x_ptr = x;
     } 
@@ -69,12 +74,13 @@ public:
   }
 
   void modifyA(double* obj_x_ptr, int* obj_y_ptr) {
+    int * cpy_y = y;
 #pragma omp target map(from: obj_x_ptr) map(from: obj_y_ptr)
     {
       modifyB(obj_x_ptr);
 
       for (int i = 0; i < n; ++i)
-        y[i] = 1;
+        cpy_y[i] = 1;
       
       obj_y_ptr = y;
     }
@@ -98,40 +104,40 @@ public:
   Simple(int s) : size(s) { 
       sum = 0;
       d_array = new int[size];
-//#pragma omp target enter data map(to:this[0:1])
       int* helper = d_array;
       int &hs = size;
 #pragma omp target enter data map(to: helper[0:size]) map(to: hs)
   }
 
-  // TODO: Add virtual once supported
   ~Simple() { 
       int* helper = d_array;
       int &hs = size;
 #pragma omp target exit data map(delete: helper[0:size]) map(delete: hs)
-//#pragma omp target exit data map(delete:this[0:1])
       delete[] d_array; 
   }
   
   void modify() {
-#pragma omp target defaultmap(tofrom: scalar) 
+    int * helper = d_array;
+    int &hsize = size;
+    int &hsum = sum;
+#pragma omp target defaultmap(tofrom: scalar)
     {
-      sum = 0;
-      for (int i = 0; i < size; ++i) {
-        d_array[i] = 1;
-        sum += d_array[i];
+      hsum = 0;
+      for (int i = 0; i < hsize; ++i) {
+        helper[i] = 1;
+        hsum += helper[i];
       }
     }
   }
   void getValues(int &h_sum, int* h_array) {
       int* helper = d_array;
-      int &hs = size;
-      int &hs2 = sum;
-#pragma omp target map(from: h_sum) 
+      int &hsize = size;
+      int &hsum = sum;
+#pragma omp target map(from: h_sum) map(tofrom: h_array[0:size])
     {
-      h_sum = sum;
-      for (int i = 0; i < size; i++) {
-        h_array[i] = d_array[i];
+      h_sum = hsum;
+      for (int i = 0; i < hsize; i++) {
+        h_array[i] = helper[i];
       }
     }
   }
@@ -211,22 +217,12 @@ return 0;
 }
 
 int main() {
-
-int myInt = 5;
-#pragma omp target enter data map(to: myInt)
-
-#pragma omp target defaultmap(tofrom:scalar)
-{
-        myInt += 5;
-}
-
-#pragma omp target exit data map(from: myInt)
-OMPVV_INFOMSG("The value of myInt is = %d", myInt);
+  OMPVV_TEST_OFFLOADING;
   int errors = 0;
 
-//  errors += test_simple_class();
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_simple_class());
 //  errors += test_complex_class();
 
-  return errors;
+  OMPVV_REPORT_AND_RETURN(errors)
 }
 
