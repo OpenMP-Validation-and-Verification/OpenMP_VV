@@ -27,36 +27,38 @@ public:
       d_array = new int[size];
       int* helper = d_array;
       int &hs = size;
-#pragma omp target enter data map(to: helper[0:size]) map(to: hs)
+      int &hsum = sum;
+#pragma omp target enter data map(to: helper[0:size]) map(to: hs) map(to:hsum)
   }
 
   ~Simple() { 
       int* helper = d_array;
       int &hs = size;
-#pragma omp target exit data map(delete: helper[0:size]) map(delete: hs)
+      int &hsum = sum;
+#pragma omp target exit data map(delete: helper[0:size]) map(delete: hs) map(delete: hsum)
       delete[] d_array; 
   }
   
   void modify() {
     int * helper = d_array;
     int &hsize = size;
-    int &hsum = sum;
-#pragma omp target defaultmap(tofrom: scalar)
+    int *hsum = &sum;
+#pragma omp target defaultmap(tofrom: scalar) 
     {
-      hsum = 0;
+      *hsum = 0;
       for (int i = 0; i < hsize; ++i) {
         helper[i] = 1;
-        hsum += helper[i];
+        *hsum += helper[i];
       }
     }
   }
   void getValues(int &h_sum, int* h_array) {
       int* helper = d_array;
       int &hsize = size;
-      int &help_sum = sum;
+      int *help_sum = &sum;
 #pragma omp target map(from: h_sum) map(tofrom: h_array[0:size])
     {
-      h_sum = help_sum;
+      h_sum = *help_sum;
       for (int i = 0; i < hsize; i++) {
         h_array[i] = helper[i];
       }
