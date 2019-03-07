@@ -36,8 +36,9 @@ public:
 };
 
 class B : public Mapper<B> {
-private:
+protected:
   int n;
+private:
   double* x;
   double sumB; 
 
@@ -53,13 +54,12 @@ public:
   void modifyB() {
     double * cpy_x = x; 
     int &cpy_n = n;
-    double & cpy_sum = sumB;;
 #pragma omp target 
     {
-      cpy_sum = 0.0;
+      sumB = 0.0;
       for (int i = 0; i < cpy_n; ++i) {
         cpy_x[i] = 1.0;
-        cpy_sum += cpy_x[i];
+        sumB += cpy_x[i];
       }
     } 
   }
@@ -70,7 +70,7 @@ public:
       double &cpy_sum = sumB;
 #pragma omp target map(from: b_sum) map(tofrom: b_array[0:n])
     {
-      b_sum = cpy_sum;
+      b_sum = sumB;
       for (int i = 0; i < cpy_n; i++) {
         b_array[i] = cpy_x[i];
       }
@@ -87,20 +87,23 @@ private:
 public:
   A(int s) : Mapper<A>(this), B(s){ 
       y = new int[n];
+      int * solutionY = y;
+      int &cpy_n = n;
+      #pragma omp target update to(cpy_n)
+      #pragma omp target enter data map(to:solutionY[0:n])
   }
 
   void modifyA() {
+    modifyB();
     int * cpy_y = y;
     int &cpy_n = n;
-    int &cpy_sum = sumA;
 
-    modifyB();
-#pragma omp target 
+#pragma omp target
     {
-      cpy_sum = 0;
+      sumA = 0;
       for (int i = 0; i < cpy_n; ++i) {
         cpy_y[i] = 1;
-        cpy_sum += cpy_y[i];
+        sumA += cpy_y[i];
       }
     }
   }
@@ -109,10 +112,9 @@ public:
       getValuesB(b_sum, b_array);
       int* cpy_y = y;
       int &cpy_n = n;
-      int &cpy_sum = sumA;
 #pragma omp target map(from: a_sum) map(tofrom: a_array[0:n])
     {
-      a_sum = cpy_sum;
+      a_sum = sumA;
       for (int i = 0; i < cpy_n; i++) {
         a_array[i] = cpy_y[i];
       }
