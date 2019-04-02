@@ -37,7 +37,7 @@ FC?=none
 
 # CRAY compiler
 ifeq ($(CC), cc)
-  CFLAGS += -homp -O0
+  CFLAGS += -homp -O3
   CLINK = cc
   CLINKFLAGS += -homp -lm
 endif
@@ -46,27 +46,27 @@ endif
 ifeq ($(CC), gcc)
   COFFLOADING = -foffload="-lm" -lm
   C_NO_OFFLOADING = -foffload=disable
-  CFLAGS +=  -O0 -g  -std=c99 -fopenmp $(COFFLOADING) 
+  CFLAGS += -O3 -std=c99 -fopenmp $(COFFLOADING) 
   CLINK = gcc
-  CLINKFLAGS +=  -O0 -g  -fopenmp $(COFFLOADING)
+  CLINKFLAGS += -O3 -fopenmp $(COFFLOADING)
 endif
 
 # IBM XL compiler
 ifeq ($(CC), xlc)
   COFFLOADING = -qoffload
   C_NO_OFFLOADING = 
-  CFLAGS +=  -O0 -g  -lm -qsmp=omp $(COFFLOADING)
+  CFLAGS += -O3 -qsmp=omp $(COFFLOADING)
   CLINK = xlc
-  CLINKFLAGS +=  -O0 -g -lm -qsmp=omp $(COFFLOADING)
+  CLINKFLAGS += -O3 -qsmp=omp $(COFFLOADING)
 endif
 
 # Clang compiler
 ifeq ($(CC), clang)
   COFFLOADING = -fopenmp-targets=nvptx64-nvida-cuda
   C_NO_OFFLOADING = 
-  CFLAGS +=  -O0 -g -lm -std=c99 -fopenmp $(COFFLOADING)
+  CFLAGS += -O3 -std=c99 -fopenmp $(COFFLOADING)
   CLINK = clang
-  CLINKFLAGS +=  -O0 -lm -g -fopenmp $(COFFLOADING)
+  CLINKFLAGS += -O3 -fopenmp $(COFFLOADING)
 endif
 
 #---------------------------------------------------------------------------
@@ -77,7 +77,7 @@ CXX_VERSION?= echo "version unknown"
 
 # CRAY compiler
 ifeq ($(CXX), CC)
-  CXXFLAGS += -homp -O0
+  CXXFLAGS += -homp -O3
   CXXLINK = cc
   CXXLINKFLAGS += -homp -lm
 endif
@@ -86,27 +86,27 @@ endif
 ifeq ($(CXX), g++)
   CXXOFFLOADING = -foffload="-lm" -lm
   CXX_NO_OFFLOADING = -foffload=disable
-  CXXFLAGS +=  -O0 -g -fopenmp $(CXXOFFLOADING)
+  CXXFLAGS += -O3 -fopenmp $(CXXOFFLOADING)
   CXXLINK = g++
-  CXXLINKFLAGS +=  -O0 -g -fopenmp $(CXXOFFLOADING)
+  CXXLINKFLAGS += -O3 -fopenmp $(CXXOFFLOADING)
 endif
 
 # IBM XL compiler
 ifeq ($(CXX), xlc++)
   CXXOFFLOADING = -qoffload
   CXX_NO_OFFLOADING = 
-  CXXFLAGS +=  -O0 -g -lm -qsmp=omp $(CXXOFFLOADING)
+  CXXFLAGS += -O3 -qsmp=omp $(CXXOFFLOADING)
   CXXLINK = xlc++
-  CXXLINKFLAGS +=  -O0 -g -lm -qsmp=omp $(CXXOFFLOADING)
+  CXXLINKFLAGS += -O3 -qsmp=omp $(CXXOFFLOADING)
 endif
 
 # Clang compiler
 ifeq ($(CXX), clang++)
   CXXOFFLOADING = -fopenmp-targets=nvptx64-nvida-cuda 
   CXX_NO_OFFLOADING = 
-  CXXFLAGS +=  -O0 -g -lm -fopenmp $(CXXOFFLOADING) 
+  CXXFLAGS += -O3 -fopenmp $(CXXOFFLOADING) 
   CXXLINK = clang++
-  CXXLINKFLAGS +=  -O0 -g -lm -fopenmp $(CXXOFFLOADING)
+  CXXLINKFLAGS += -O3 -fopenmp $(CXXOFFLOADING)
 endif
 
 #---------------------------------------------------------------------------
@@ -119,9 +119,9 @@ F_VERSION?= echo "version unknown"
 ifeq ($(FC), gfortran)
   FOFFLOADING = -foffload="-lm" -lm
   F_NO_OFFLOADING = -foffload=disable
-  FFLAGS +=  -O0 -g -fopenmp $(FOFFLOADING) -ffree-line-length-none -J./ompvv
+  FFLAGS += -O3 -fopenmp $(FOFFLOADING) -ffree-line-length-none -J./ompvv
   FLINK = gcc
-  FLINKFLAGS +=  -O0 -g -fopenmp $(FOFFLOADING)
+  FLINKFLAGS += -O3 -fopenmp $(FOFFLOADING)
 endif
 
 # IBM XLF compiler
@@ -130,9 +130,9 @@ endif
 ifeq ($(FC), $(filter $(FC), xlf xlf_r))
   FOFFLOADING = -qoffload
   F_NO_OFFLOADING = 
-  FFLAGS +=  -O0 -g -qsmp=omp $(FOFFLOADING) -qmoddir=./ompvv
+  FFLAGS += -O3 -qsmp=omp $(FOFFLOADING) -qmoddir=./ompvv -DEXIT=EXIT_
   FLINK = xlc
-  FLINKFLAGS +=  -O0 -g -qsmp=omp $(FOFFLOADING)
+  FLINKFLAGS += -O3 -qsmp=omp $(FOFFLOADING)
 endif
 #---------------------------------------------------------------------------
 # These macros are passed to the linker 
@@ -151,7 +151,7 @@ F_INC = -I./ompvv
 #---------------------------------------------------------------------------
 # Destination of executables, relative to subdirs of the main directory. . 
 #---------------------------------------------------------------------------
-BINDIR = bin
+BINDIR ?= bin
 
 #---------------------------------------------------------------------------
 # COMPILER DEF
@@ -176,4 +176,4 @@ TXTNOC := "\033[0m"
 #---------------------------------------------------------------------------
 # LOGS
 #---------------------------------------------------------------------------
-LOGTEMPFILE := _ompvv_temp_result_.exitstatus
+LOGTEMPFILE ?= _ompvv_temp_result_.exitstatus

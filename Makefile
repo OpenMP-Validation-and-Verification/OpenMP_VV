@@ -30,7 +30,7 @@ endif
 
 RECORD:=
 LOGDIR:= 
-LOGDIRNAME:= logs
+LOGDIRNAME ?= logs
 ifdef LOG
   LOGDIR:= $(LOGDIRNAME)
   RECORD:= | tee -a $(LOGDIR)/
@@ -135,7 +135,12 @@ TESTS_TO_RUN := $(shell test -d $(BINDIR) && \
 												-o -name "*.FOR.o" \
 												-o -name "*.c.o" \
 												-o -name "*.cpp.o")
-RUN_TESTS := $(TESTS_TO_RUN:.o=.o.runonly)
+TESTS_TO_RUN := $(TESTS_TO_RUN:.FOR.o=.FOR.FOR.o) # Adding .FOR.o to fortran
+TESTS_TO_RUN := $(TESTS_TO_RUN:.F90.o=.F90.FOR.o)
+TESTS_TO_RUN := $(TESTS_TO_RUN:.F95.o=.F95.FOR.o)
+TESTS_TO_RUN := $(TESTS_TO_RUN:.F03.o=.F03.FOR.o)
+TESTS_TO_RUN := $(TESTS_TO_RUN:.F.o=.F.FOR.o)
+RUN_TESTS := $(TESTS_TO_RUN:.o=.runonly)
 
 # Creating compile dependencies
 ifneq "$(CC)" "none"
@@ -150,8 +155,8 @@ OBJS_F := $(OBJS_F:.F95=.F95.FOR.o)
 OBJS_F := $(OBJS_F:.F03=.F03.FOR.o)
 OBJS_F := $(OBJS_F:.F=.F.FOR.o)
 OBJS_F := $(OBJS_F:.FOR=.FOR.FOR.o)
-COMP_DEP := $(OBJS_C) $(OBJS_CPP) $(OBJS_F)
 endif
+COMP_DEP := $(OBJS_C) $(OBJS_CPP) $(OBJS_F)
 
 # Get all the dependencies for all rule
 ALL_DEP :=
@@ -339,7 +344,7 @@ $(LOGDIR):
 $(RESULTS_JSON_OUTPUT_FILE): 
 	@echo "Creating $(RESULTS_JSON_OUTPUT_FILE) file"
 	@echo "Currently we only support run logs that contain compilation and run outputs. Use the 'make all' rule to obtain these"
-	@$(RESULTS_ANALYZER) -f json -o $(RESULTS_JSON_OUTPUT_FILE) $(LOGDIRNAME)/*
+	@$(RESULTS_ANALYZER) -r -f json -o $(RESULTS_JSON_OUTPUT_FILE) $(LOGDIRNAME)/*
 
 .PHONY: report_json
 report_json: $(RESULTS_JSON_OUTPUT_FILE)

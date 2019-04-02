@@ -5,8 +5,8 @@
   var ompvv = angular.module('ompvvSollve', ['ngRoute','ngAnimate', 'ngSanitize', 'ui.bootstrap', 'ansiToHtml']);
 
   ompvv.controller('ompvvSollveController', 
-  ['$scope', '$http', '$log','$uibModal', '$timeout', 'ansi2html',
-    function($scope, $http, $log, $uibModal, $timeout, ansi2html) {
+  ['$scope', '$http', '$log','$uibModal', '$timeout', 'ansi2html', '$filter',
+    function($scope, $http, $log, $uibModal, $timeout, ansi2html, $filter) {
 
       // Info message regarding table
       $scope.displayMessage = true;
@@ -33,16 +33,101 @@
           return;
         }
         $scope.tableContent = jsonResults;
-        angular.forEach($scope.tableContent, function(value) {
-          if ($scope.filters.compilerOptions.indexOf(value["Compiler name"]) == -1) {
-            $scope.filters.compilerOptions.push(value["Compiler name"]);
+        angular.forEach($scope.tableContent, function(value, index) {
+          var compilerName = value["Compiler name"];
+          var testSystem = value["Test system"];
+          var testName = value["Test name"];
+          var compilerResult = value["Compiler result"];
+          var runtimeResult = value ["Runtime result"];
+          // Adding test to list of all tests
+          if ($scope.filters.testsOptions.indexOf(testName) == -1) {
+            $scope.filters.testsOptions.push(testName);
           }
-          if ($scope.filters.platformOptions.indexOf(value["Test system"]) == -1) {
-            $scope.filters.platformOptions.push(value["Test system"]);
+          // Adding compiler name to list of all compilers
+          if ($scope.filters.compilerOptions.indexOf(compilerName) == -1) {
+            $scope.filters.compilerOptions.push(compilerName);
           }
+          // Adding system name to list of all systems
+          if ($scope.filters.systemOptions.indexOf(testSystem) == -1) {
+            $scope.filters.systemOptions.push(testSystem);
+          }
+
+          // Placing all results indexed by testname
+          if ($scope.testsResults[testName] == undefined) {
+            $scope.testsResults[testName] = {};
+          }
+          if ($scope.testsResults[testName][testSystem] == undefined) {
+            $scope.testsResults[testName][testSystem] = {};
+          }
+          if ($scope.testFailed(compilerResult)) {
+            $scope.testsResults[testName][testSystem][compilerName] = ["FAIL CE", index];
+          } else if ($scope.testFailed(runtimeResult)) {
+            $scope.testsResults[testName][testSystem][compilerName] = ["FAIL RE", index];
+          } else {
+            $scope.testsResults[testName][testSystem][compilerName] = ["PASS", index];
+          }
+
+          // Placing all compilers by test
+          if ($scope.compilerByTest.get(testName) == undefined) {
+            $scope.compilerByTest.set(testName, []);
+          }
+          if ($scope.compilerByTest.get(testName).indexOf(compilerName) == -1) {
+            $scope.compilerByTest.get(testName).push(compilerName);
+          }          
+          // Placing all compilers by system
+          if ($scope.compilerBySystems.get(testSystem) == undefined) {
+            $scope.compilerBySystems.set(testSystem, []);
+          }
+          if ($scope.compilerBySystems.get(testSystem).indexOf(compilerName) == -1) {
+            $scope.compilerBySystems.get(testSystem).push(compilerName);
+          }
+
         });
         
         $scope.loadingResults = false;
+      }
+
+      $scope.testsResults = {};
+      $scope.compilerBySystems = new Map();
+      $scope.compilerByTest = new Map();
+
+      // For the stats display
+      $scope.getListOfSystems = function() {
+        var returnList = [];
+        $scope.compilerBySystems.forEach( function(value, key) {
+            returnList.push(key);
+        });
+        return $filter('filterSystems')(returnList, $scope.filters);
+      };
+      $scope.getListOfCompilersSystems = function() {
+        var returnList = [];
+        $scope.compilerBySystems.forEach( function(compiler, system) {
+          if ($filter('filterSystems')([system], $scope.filters).length != 0) {
+            returnList.push.apply(returnList, compiler); 
+          }
+        });
+        return $filter('filterCompilers')(returnList, $scope.filters);
+      };
+
+      $scope.getResultsSystemCompiler = function (test) {
+        var returnList = [];
+        $scope.compilerBySystems.forEach( function(systemCompilers, systemName) {
+          if ($filter('filterSystems')([systemName], $scope.filters).length != 0) {
+            var filteredSystemCompilers = $filter('filterCompilers')(systemCompilers, $scope.filters);
+            filteredSystemCompilers.forEach(function (compiler) {
+              var result=$scope.testsResults[test];
+              result = result != undefined ? result[systemName]:undefined;
+              result = result != undefined ? result[compiler]:undefined;
+            
+              returnList.push(result);
+            });
+          }
+        });
+        return returnList;
+      }
+
+      $scope.getListOfTests = function() {
+        return $filter('filterTests')($scope.filters.testsOptions, $scope.filters);
       }
 
       // To sort results by column
@@ -53,11 +138,12 @@
 
       // To filter results by column
       $scope.filters = {};
+      $scope.filters.testsOptions = [];
       $scope.filters.searchFilter = "";
-      $scope.filters.compilerOptions = [""];
+      $scope.filters.compilerOptions = [];
       $scope.filters.compilerFilter = [];
-      $scope.filters.platformOptions = [""];
-      $scope.filters.platformFilter = [];
+      $scope.filters.systemOptions = [];
+      $scope.filters.systemFilter = [];
       $scope.filters.compilerResultFilter = "Both";
       $scope.filters.runResultFilter = "Both";
       
@@ -204,11 +290,55 @@
   
     }
   });
+
+  ompvv.filter('filterCompilers', function(){
+    return function(items, filters) {
+      var filtered = [];
+      angular.forEach(items, function(item){
+        var containsCompiler = false;
+        angular.forEach(filters.compilerFilter, function(compiler) {
+          if (compiler == "" || item == compiler)
+            containsCompiler = true;
+        });
+        if (containsCompiler || filters.compilerFilter == "") {
+          filtered.push(item);
+        }
+      });
+      return filtered;
+    }
+  })
+  ompvv.filter('filterTests', function(){
+    return function(items, filters) {
+      var filtered = [];
+      angular.forEach(items, function(item){
+        if (filters.searchFilter == "" || item.includes(filters.searchFilter)) {
+          filtered.push(item);
+        }
+      });
+      return filtered;
+    }
+  })
+  ompvv.filter('filterSystems', function(){
+    return function(items, filters) {
+      var filtered = [];
+      angular.forEach(items, function(item){
+        var containsSystem = false;
+        angular.forEach(filters.systemFilter, function(system) {
+          if (system == "" || item == system)
+          containsSystem = true;
+        });
+        if (containsSystem || filters.systemFilter == "") {
+          filtered.push(item);
+        }
+      });
+      return filtered;
+    }
+  })
   
   ompvv.filter('applyResultsFilter', function() {
       return function (items, filters) {
         var filtered = [];
-        if (filters.searchFilter == "" && filters.compilerFilter == "" && filters.platformFilter == "" && filters.compilerResultFilter == "Both" && filters.runResultFilter == "Both") {
+        if (filters.searchFilter == "" && filters.compilerFilter == "" && filters.systemFilter == "" && filters.compilerResultFilter == "Both" && filters.runResultFilter == "Both") {
           return items;
         }
         angular.forEach(items, function(item) {
@@ -224,13 +354,13 @@
           });
           if (filters.compilerFilter != "" && !containsCompiler)
             removeItem = true;
-          // Filter by platform name
-          var containsPlatform = false;
-          angular.forEach(filters.platformFilter, function(platform) {
-            if (platform != "" && item['Test system'] == platform)
-              containsPlatform = true;
+          // Filter by system name
+          var containsSystem = false;
+          angular.forEach(filters.systemFilter, function(system) {
+            if (system != "" && item['Test system'] == system)
+              containsSystem = true;
           });
-          if (filters.platformFilter != "" && !containsPlatform)
+          if (filters.systemFilter != "" && !containsSystem)
             removeItem = true;
           // Filter by compiler result
           if (filters.compilerResultFilter != "Both" && !item['Compiler result'].includes(filters.compilerResultFilter))

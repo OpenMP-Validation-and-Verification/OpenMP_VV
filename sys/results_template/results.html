@@ -40,8 +40,8 @@
 </head>
 
 <body>
-<div class="container-fluid" ng-app="ompvvSollve" ng-controller="ompvvSollveController">
-	<div class"row content">
+<div class="container-fluid" ng-app="ompvvSollve" ng-controller="ompvvSollveController">	
+	<div class="row content">
 		<div class="col-sm-12 sidenav">
 			<h4>OpenMP V&V Results</h4>
 			<div ng-model="repoUuid"></div>
@@ -61,11 +61,15 @@
 				</li>
 				<li class="list-group-item">
 					<label for="filterCompilers">Compilers</label>
-					<select multiple id="filterCompilers" style="margin-bottom: 0px;" class="form-control" ng-model="filters.compilerFilter" ng-options="compiler for compiler in filters.compilerOptions"></select>
+					<select multiple id="filterCompilers" style="margin-bottom: 0px;" class="form-control" ng-model="filters.compilerFilter" ng-options="compiler for compiler in filters.compilerOptions">
+						<option value="" selected="selected"></option>
+					</select>
 				</li>
 				<li class="list-group-item">
 					<label for="filterSystems">Systems</label>					
-					<select multiple id="filterSystems" style="margin-bottom: 0px;" class="form-control" ng-model="filters.platformFilter" ng-options="platform for platform in filters.platformOptions"></select>
+					<select multiple id="filterSystems" style="margin-bottom: 0px;" class="form-control" ng-model="filters.systemFilter" ng-options="system for system in filters.systemOptions">
+						<option value="" selected="selected"></option>
+					</select>
 				</li>
 				<li class="list-group-item">
 					<span class="label label-primary">Compiler results</span>
@@ -100,32 +104,65 @@
 				<div class="col text-center">
 				</div>
 				<div class="col">
-					<!-- Results table -->
-					<table class="table table-striped" ng-cloak="true" ng-if="!errorMessage && !loadingResults">
-						<thead>
-							<tr>
-								<th> # </th> 
-								<th scope="col" ng-repeat="header in colsToDisplay">
-									<a href="#" ng-click="order.orderByField=header; order.reverseSort = !order.reverseSort;">
-										{{header}} <i class="glyphicon glyphicon-arrow-up" ng-show="order.reverseSort"></i><i class="glyphicon glyphicon-arrow-down" ng-show="!order.reverseSort"></i>
-									</a>
-								</th>
-							</tr>
-						</thead>
-						<tbody>
-						<tr ng-repeat="result in tableContent | applyResultsFilter:filters | orderBy:predicate:order.reverseSort" ng-click="openResultModal(result)">
-							<td> {{$index + 1}} </td>
-							<td scope="col" ng-repeat="header in colsToDisplay" ng-class="{'passTest': testPassed(result[header]), 'failTest': testFailed(result[header])}">
-								{{result[header]}} 
-							</td>
-						</tr>
-						</tbody>
-					</table>
+					<uib-tabset active="active">
+						<uib-tab index="0" heading="Results" disable="loadingResults">
+							<!-- Results table -->
+							<table class="table table-striped" ng-cloak="true" ng-if="!errorMessage && !loadingResults">
+								<thead>
+									<tr>
+										<th> # </th>
+										<th scope="col" ng-repeat="header in colsToDisplay">
+											<a href="#" ng-click="order.orderByField=header; order.reverseSort = !order.reverseSort;">
+												{{header}} <i class="glyphicon glyphicon-arrow-up" ng-show="order.reverseSort"></i><i class="glyphicon glyphicon-arrow-down" ng-show="!order.reverseSort"></i>
+											</a>
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+								<tr ng-repeat="result in tableContent | applyResultsFilter:filters | orderBy:predicate:order.reverseSort" ng-click="openResultModal(result)">
+									<td> {{$index + 1}} </td>
+									<td scope="col" ng-repeat="header in colsToDisplay" ng-class="{'passTest': testPassed(result[header]), 'failTest': testFailed(result[header])}">
+										{{result[header]}} 
+									</td>
+								</tr>
+								</tbody>
+							</table>
+						</uib-tab>
+						<uib-tab index="1" heading="Summary table" disable="loadingResults">
+							<!-- Summary table -->
+							<table class="table table-striped" ng-cloak="true" ng-if="!errorMessage && !loadingResults">
+								<thead>
+									<!-- System name row -->
+									<tr>
+										<th rowspan="2"> # </th> 
+										<th rowspan="2"> testName </th> 
+										<th style="text-align: center;" scope="col" ng-repeat="system in getListOfSystems()" colspan="{{compilerBySystems.get(system).length}}">
+												{{system}}
+										</th>
+									</tr>
+									<tr>
+											<th scope="col" ng-repeat="compiler in getListOfCompilersSystems() track by $index">
+												{{compiler}}
+											</th>
+										</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="testName in getListOfTests()">
+									<td> {{$index + 1}} </td>
+									<td> {{testName}} </td>
+									<td style="text-align: center;" nowrap scope="col" ng-repeat="value in getResultsSystemCompiler(testName) track by $index" ng-click="value[0] != undefined && openResultModal(tableContent[value[1]])"ng-class="{'passTest': testPassed(value[0]), 'failTest': testFailed(value[0])}">
+										{{ value[0] || "-"}} 
+									</td>
+								</tr>
+								</tbody>
+							</table>
+						</uib-tab>
+					</uib-tabset>
+						</div>
+					</div>
+
 				</div>
 			</div>
-
-		</div>
-	</div>
 </div>
 </div>
 </body>
