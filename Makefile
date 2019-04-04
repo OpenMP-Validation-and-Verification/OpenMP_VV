@@ -4,7 +4,7 @@ SHELL=/bin/bash -o pipefail
 .DEFAULT_GOAL:=help
 
 ##################################################
-# System specific varibles can be specified 
+# System specific varibles can be specified
 # in the system files sys/system/###.def
 #################################################
 ifdef SYSTEM
@@ -29,7 +29,7 @@ ifdef VERBOSE
 endif
 
 RECORD:=
-LOGDIR:= 
+LOGDIR:=
 LOGDIRNAME ?= logs
 ifdef LOG
   LOGDIR:= $(LOGDIRNAME)
@@ -47,7 +47,7 @@ endif
 
 BSRUN:=
 ifdef ADD_BATCH_SCHED
-  BSRUN:= $(BATCH_SCHEDULER)  
+  BSRUN:= $(BATCH_SCHEDULER)
 endif
 
 # Test running and results analyzer
@@ -72,10 +72,10 @@ SOURCES_CPP := $(shell find $(CURDIR) -path "*$(SOURCES)" | grep "\.cpp$$")
 SOURCES_F := $(shell find $(CURDIR) -path "*$(SOURCES)" | grep "\(\.F90\|\.F95\|\.F03\|\.F\|\.FOR\)$$")
 $(info SOURCES = $(notdir $(SOURCES_C) $(SOURCES_CPP) $(SOURCES_F)))
 
-# Obtain the list of files that were previously 
+# Obtain the list of files that were previously
 # compiled based on the subsection of tests
 TESTS_TO_RUN := $(foreach testName, \
-									$(notdir $(SURCES_C) $(SOURCES_CPP) $(SOURCES_F)), \
+									$(notdir $(SOURCES_C) $(SOURCES_CPP) $(SOURCES_F)), \
 									$(shell test -d $(BINDIR) && find $(BINDIR) -name "$(testName)*"))
 TESTS_TO_RUN := $(TESTS_TO_RUN:.FOR.o=.FOR.FOR.o) # Adding .FOR.o to fortran
 TESTS_TO_RUN := $(TESTS_TO_RUN:.F90.o=.F90.FOR.o)
@@ -176,12 +176,12 @@ endif
 
 endif
 
-# parameters (1) Action (2) System (3) Filename (4) other Info (compiler) (5) Log File 
+# parameters (1) Action (2) System (3) Filename (4) other Info (compiler) (5) Log File
 define log_section_header
   -$(if $(LOG), @echo -e "*-*-*BEGIN*-*-*"$(1)"*-*-*$$(date)*-*-*"$(2)"*-*-*"$(3)"*-*-*"$(4)"*-*-*" >> $(LOGDIR)/$(5);,)
 endef
 
-# parameters (1) Action (2) System (3) Output status  (4) other Info (compiler) (5) Log File 
+# parameters (1) Action (2) System (3) Output status  (4) other Info (compiler) (5) Log File
 define log_section_footer
   -$(if $(LOG), @echo -e "*-*-*END*-*-*"$(1)"*-*-*$$(date)*-*-*"$(2)"*-*-*"$(3)"*-*-*"$(4)"\n" >> $(LOGDIR)/$(5);,)
 endef
@@ -189,7 +189,7 @@ endef
 .PHONY: all
 all: MessageDisplay $(ALL_DEP)
 	@echo "====COMPILE AND RUN DONE===="
-	
+
 
 .PHONY: compile
 compile: MessageDisplay $(COMP_DEP)
@@ -248,10 +248,10 @@ endif
 		|| echo "FAIL" > $(LOGTEMPFILE))
 	-$(call log_section_footer,"COMPILE CC="${CCOMPILE},$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.o=.log)))
 	-@$(if $(LOG), rm $(LOGTEMPFILE))
-	
+
 # c++ files rule
 %.cpp.o: %.cpp $(BINDIR) $(LOGDIR)
-	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC) 
+	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC)
 	$(call log_section_header,"COMPILE CPP="${CXXCOMPILE},$(SYSTEM),$<,$(CXX) $(shell $(call loadModules,$(CXX_COMPILER_MODULE),"shut up") $(CXX_VERSION)),$(notdir $(@:.o=.log)))
 	-$(QUIET)$(call loadModules,$(CXX_COMPILER_MODULE)) $(CXXCOMPILE) $(VERBOSE_MODE) $< -o $(BINDIR)/$(notdir $@) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
@@ -341,7 +341,7 @@ $(BINDIR):
 $(LOGDIR):
 	mkdir $@
 
-$(RESULTS_JSON_OUTPUT_FILE): 
+$(RESULTS_JSON_OUTPUT_FILE):
 	@echo "Creating $(RESULTS_JSON_OUTPUT_FILE) file"
 	@echo "Currently we only support run logs that contain compilation and run outputs. Use the 'make all' rule to obtain these"
 	@$(RESULTS_ANALYZER) -r -f json -o $(RESULTS_JSON_OUTPUT_FILE) $(LOGDIRNAME)/*
@@ -365,7 +365,7 @@ report_html: $(RESULTS_JSON_OUTPUT_FILE)
 		sed -i "$$ s/.*/];/g" $(RESULTS_HTML_OUTPUT_FOLDER)/$(RESULTS_JSON_OUTPUT_FILE); \
 		echo " json file processed"; \
 	fi;
-	
+
 	@echo " === REPORT DONE === "
 
 .PHONY: clean
@@ -432,4 +432,3 @@ help:
 	@echo "  make report_html                            ==> Using the logs file created with the LOG option, create a report"
 	@echo "  make SOURCES=myTestSource run               ==> run myTestSource if it was previously compiled "
 	@echo ""
-	
