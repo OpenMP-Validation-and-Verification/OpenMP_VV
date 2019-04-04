@@ -172,6 +172,7 @@ int main() {
       #pragma omp target teams distribute num_teams(16) depend(inout:a_map_var)
       for (int x = 0; x < 1024; ++x){
           OMPVV_TIMING_LOAD;
+          a_map_var = 0;
       }
       OMPVV_STOP_TIMER;
       OMPVV_REGISTER_TEST;
@@ -188,6 +189,7 @@ int main() {
           #pragma omp distribute
           for (int x = 0; x < 1024; ++x){
               OMPVV_TIMING_LOAD;
+              a_map_var = 0;
           }
         }
       }
