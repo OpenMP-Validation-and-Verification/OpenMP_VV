@@ -35,6 +35,17 @@ CC?=none
 CPP?=none
 FC?=none
 
+
+ifdef CUDA_CUPTI
+  ifdef CUDA_HOME
+    C_INC+= -I${CUDA_HOME}/extras/CUPTI/include -L${CUDA_HOME}/extras/CUPTI/lib64
+    CFLAGS += -DCUDA_CUPTI=1 -lcupti
+    CLINKFLAGS += -lcupti
+  else
+    $(error CUDA_HOME needs to be defined)
+  endif
+endif
+  
 # CRAY compiler
 ifeq ($(CC), cc)
   CFLAGS += -homp -O3
@@ -144,9 +155,9 @@ F_LIB =
 #---------------------------------------------------------------------------
 # These macros are passed to the compiler
 #---------------------------------------------------------------------------
-C_INC = -I./ompvv
-CXX_INC = -I./ompvv
-F_INC = -I./ompvv
+C_INC += -I./ompvv
+CXX_INC += -I./ompvv
+F_INC += -I./ompvv
 
 #---------------------------------------------------------------------------
 # Destination of executables, relative to subdirs of the main directory. .

@@ -35,9 +35,12 @@ elif [ ! -f "$1" ]; then
 fi
 
 app=$1
-output=`timeout 60s $app 2>&1`
+for i in `seq 1 1`; do
+output="$output `timeout 6000s $app 2>&1`"
+done
+
 status=$?
-output=$(printf "$output" | uniq)
+#output=$(printf "$output" | uniq)
 
 if [ -z $2 ]; then
   report $(basename $app) $status
