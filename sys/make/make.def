@@ -35,7 +35,6 @@ CC?=none
 CPP?=none
 FC?=none
 
-
 ifdef CUDA_CUPTI
   ifdef CUDA_HOME
     C_INC+= -I${CUDA_HOME}/extras/CUPTI/include -L${CUDA_HOME}/extras/CUPTI/lib64
@@ -66,7 +65,7 @@ endif
 ifeq ($(CC), xlc)
   COFFLOADING = -qoffload
   C_NO_OFFLOADING =
-  CFLAGS += -O3 -qsmp=omp $(COFFLOADING)
+  CFLAGS += -O3 -qsmp=omp $(COFFLOADING) -qxlcompatmacros
   CLINK = xlc
   CLINKFLAGS += -O3 -qsmp=omp $(COFFLOADING)
 endif
