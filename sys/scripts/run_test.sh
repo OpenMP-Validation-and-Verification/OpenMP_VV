@@ -35,7 +35,7 @@ elif [ ! -f "$1" ]; then
 fi
 
 app=$1
-for i in `seq 1 1`; do
+for i in `seq 1 100`; do
 output="$output `timeout 6000s $app 2>&1`"
 done
 
