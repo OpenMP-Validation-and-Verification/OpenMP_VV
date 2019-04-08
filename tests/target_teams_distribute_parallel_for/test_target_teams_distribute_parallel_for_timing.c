@@ -72,7 +72,7 @@ int main() {
       OMPVV_REGISTER_TEST;
   }
   OMPVV_TIMER_RESULT("target teams distribute parallel for default(shared)");
-  /*
+  
   //target teams distribute depend
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
@@ -80,12 +80,13 @@ int main() {
       #pragma omp target teams distribute parallel for depend(inout:a_map_var)
       for (int x = 0; x < 1024; ++x){
           OMPVV_TIMING_LOAD;
+          a_map_var = 0;
       }
       OMPVV_STOP_TIMER;
       OMPVV_REGISTER_TEST;
   }
   OMPVV_TIMER_RESULT("target teams distribute parallel for depend");
-  */
+  
   //target teams distribute device
   a_map_var = omp_get_default_device();
   OMPVV_INIT_TEST;
