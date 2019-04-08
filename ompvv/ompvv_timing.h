@@ -118,6 +118,7 @@ initTrace();
     cudaDuration = _ompvv_accum_driver + _ompvv_accum_kernel + _ompvv_accum_runtime + _ompvv_accum_memory + _ompvv_accum_others; \
     printf("TEST_END \t %s \t %lu \t %lu \t %lu\n", clause, startTimestamp, stopTimestamp, testDuration); \
     printf("TEST_SUMMARY\t%s\t%s\t%s\t%lu\t%lu\n", OMPVV_COMPILER_NAME, OMPVV_COMPILER_VERSION, clause, testDuration, cudaDuration); \
+    fflus(stdout); \
   } while (0);
 
 #endif

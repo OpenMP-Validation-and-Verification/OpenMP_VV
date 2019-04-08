@@ -362,6 +362,7 @@ printActivity(CUpti_Activity *record)
     printf("  <unknown>\n");
     break;
   }
+  fflush(stdout);
 }
 
 void CUPTIAPI bufferRequested(uint8_t **buffer, size_t *size, size_t *maxNumRecords)
@@ -403,6 +404,7 @@ void CUPTIAPI bufferCompleted(CUcontext ctx, uint32_t streamId, uint8_t *buffer,
     }
   }
 
+  fflush(stdout);
   free(buffer);
 }
 

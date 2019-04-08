@@ -336,10 +336,10 @@ endif
 
 # Creates the BINDIR folder
 $(BINDIR):
-	mkdir $@
+	mkdir -p $@
 
 $(LOGDIR):
-	mkdir $@
+	mkdir -p $@
 
 $(RESULTS_JSON_OUTPUT_FILE):
 	@echo "Creating $(RESULTS_JSON_OUTPUT_FILE) file"

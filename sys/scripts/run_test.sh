@@ -36,7 +36,7 @@ fi
 
 app=$1
 for i in `seq 1 100`; do
-output="$output `timeout 6000s $app 2>&1`"
+output="$output `$app 2>&1`"
 done
 
 status=$?
