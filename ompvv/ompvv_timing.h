@@ -82,6 +82,7 @@
 #include <cuda.h>
 #include <cupti.h>
 #include "ompvv_cupti.h"
+
 #define OMPVV_INIT_TIMERS  \
 initTrace();
 
@@ -94,6 +95,8 @@ initTrace();
 }
 
 #define OMPVV_START_TIMER \
+  cuptiActivityFlushAll(0); \
+  ignoreEventsPrinting = 0; \
   _ompvv_accum_driver = 0; \
   _ompvv_accum_kernel = 0; \
   _ompvv_accum_runtime = 0; \
@@ -107,7 +110,8 @@ initTrace();
 #define OMPVV_INIT_TEST \
   OMPVV_INFOMSG("Starting test");
 
-#define OMPVV_REGISTER_TEST
+#define OMPVV_REGISTER_TEST \
+  ignoreEventsPrinting = 1;
 
 #define OMPVV_TIMER_RESULT(clause) \
   do { \

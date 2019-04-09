@@ -56,6 +56,7 @@
 // Timestamp at trace initialization time. Used to normalized other
 // timestamps
 static uint64_t startTimestamp;
+static int ignoreEventsPrinting;
 static uint64_t _ompvv_accum_driver, _ompvv_accum_kernel, _ompvv_accum_runtime, _ompvv_accum_memory,_ompvv_accum_others;
 
 static const char *
@@ -166,6 +167,7 @@ getComputeApiKindString(CUpti_ActivityComputeApiKind kind)
 static void
 printActivity(CUpti_Activity *record)
 {
+  if (ignoreEventsPrinting) return;
   switch (record->kind)
   {
   case CUPTI_ACTIVITY_KIND_DEVICE:
@@ -443,5 +445,6 @@ initTrace()
   attrValue *= 2;
   CUPTI_CALL(cuptiActivitySetAttribute(CUPTI_ACTIVITY_ATTR_DEVICE_BUFFER_POOL_LIMIT, &attrValueSize, &attrValue));
 
+  ignoreEventsPrinting = 1;
 }
 

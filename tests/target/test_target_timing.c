@@ -109,8 +109,8 @@ int main() {
   OMPVV_TIMER_RESULT("target_if")
 
   // target is_device_ptr
-  OMPVV_INIT_TEST
   int * device_ptr = omp_target_alloc(sizeof(int), omp_get_default_device());
+  OMPVV_INIT_TEST
   for (i = 0; i < NUM_REP; i ++) {
     OMPVV_START_TIMER;
 #pragma omp target is_device_ptr(device_ptr)
