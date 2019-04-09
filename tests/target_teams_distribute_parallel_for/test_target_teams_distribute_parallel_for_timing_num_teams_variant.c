@@ -239,6 +239,7 @@ int test(int teams, int threads) {
   }
   OMPVV_TIMER_RESULT("target teams distribute parallel for shared");
 
+  printf("END_OF_TEST\n");
   return 0;
 }
 

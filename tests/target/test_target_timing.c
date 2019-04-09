@@ -163,5 +163,6 @@ int main() {
     OMPVV_REGISTER_TEST
   }
   OMPVV_TIMER_RESULT("target_map_tofrom")
+  printf("END_OF_TEST\n");
   return 0;
 }

@@ -240,5 +240,6 @@ int main() {
   }
   OMPVV_TIMER_RESULT("target teams distribute shared");
 
+  printf("END_OF_TEST\n");
   return 0;
 }

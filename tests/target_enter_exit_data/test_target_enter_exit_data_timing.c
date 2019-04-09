@@ -145,5 +145,6 @@ int main() {
   }
   OMPVV_TIMER_RESULT("target_exit_data_map_depend")
   
+  printf("END_OF_TEST\n");
  return 0;
 }

@@ -93,5 +93,6 @@ int main() {
 //  }
 //  OMPVV_TIMER_RESULT("target_data_use_device_ptr")
 
+  printf("END_OF_TEST\n");
   return 0;
 }
