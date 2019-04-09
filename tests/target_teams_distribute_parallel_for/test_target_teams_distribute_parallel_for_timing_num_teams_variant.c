@@ -6,6 +6,7 @@
 
 // Test for OpenMP 4.5 target data with if
 int test(int teams, int threads) {
+  printf("TEST_VARIANT\t%d\t%d",teams, threads);
   OMPVV_INIT_TIMERS;
   int a_map_var = 0;
   OMPVV_INFOMSG("Running timing tests with %d teams and %d threads", teams, threads);
