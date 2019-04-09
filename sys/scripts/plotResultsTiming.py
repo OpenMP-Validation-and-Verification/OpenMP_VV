@@ -68,6 +68,91 @@ def countResultsStats():
         totalValues = totalValues + len(results[compiler][version][test]["values"])
       printLog("       There are %d iterations" % (totalValues), 1)
 
+def calculateStats():
+  printLog("Calculating stats" ,1)
+  for compiler in results:
+    printLog(" -> Compiler " + str(compiler), 2)
+    for version in results[compiler]:
+      printLog("    -> Version " + str(version), 2)
+      for test in results[compiler][version]:
+        values = results[compiler][version][test]["values"]
+        
+        mean_total = np.mean([row[0] for row in values])/1000
+        median_total = np.median([row[0] for row in values])/1000
+        stdev_total = np.std([row[0] for row in values])/1000
+        mean_cuda = np.mean([row[1] for row in values])/1000
+        median_cuda = np.median([row[1] for row in values])/1000
+        stdev_cuda = np.std([row[1] for row in values])/1000
+        results[compiler][version][test]["median"] = [median_total, median_cuda]
+        results[compiler][version][test]["mean"] = [mean_total, mean_cuda]
+        results[compiler][version][test]["stdev"] = [stdev_total, stdev_cuda]
+        printLog(" -> mean = " + str([mean_total, mean_cuda]), 3)
+        printLog(" -> median = " + str([median_total, median_cuda]), 3)
+        printLog(" -> stdev = " + str([stdev_total, stdev_cuda]), 3)
+
+def createPlot(tests, compilers=None, versions=None, labels=None):
+  printLog("Plotting ..." ,1)
+  if not isinstance(tests, list):
+    printLog("ERROR: tests is not a list")
+    return None
+  # Plot configuration
+  n_groups = len(tests)
+  opacity = 0.8
+  fig, ax = plt.subplots()
+  index = np.arange(n_groups)
+
+  # Filtering out the results by test in the tests list and by compilers and versions
+  values2plot = {}
+  for compiler in results:
+    if (compilers is None or compiler in compilers):
+      printLog(" -> Compiler " + str(compiler), 2)
+      for version in results[compiler]:
+        if (versions is None or version in versions):
+          printLog("    -> Version " + str(version), 2)
+          newVals = {
+            "total_means": [],
+            "total_medians" : [],
+            "total_stdev" : [],
+            "cuda_means" : [],
+            "cuda_medians" : [],
+            "cuda_stdev" : []
+          }
+          for test in tests:
+            if test in results[compiler][version]:
+              # Obtaining the values for this test
+              newVals["total_means"].append(results[compiler][version][test]["mean"][0])
+              newVals["total_medians"].append(results[compiler][version][test]["median"][0])
+              newVals["total_stdev"].append(results[compiler][version][test]["stdev"][0])
+              newVals["cuda_means"].append(results[compiler][version][test]["mean"][1])
+              newVals["cuda_medians"].append(results[compiler][version][test]["median"][1])
+              newVals["cuda_stdev"].append(results[compiler][version][test]["stdev"][1])
+            else:
+              # test result does not exist
+              newVals["total_means"].append(0)
+              newVals["total_medians"].append(0)
+              newVals["total_stdev"].append(0)
+              newVals["cuda_means"].append(0)
+              newVals["cuda_medians"].append(0)
+              newVals["cuda_stdev"].append(0)
+          values2plot[str(compiler)+" "+str(version)[:20]] = newVals
+  bar_width = 0.8/len(values2plot)
+  # Adding the plots
+  for indx, key in enumerate(values2plot):
+    plt.bar(index + 0.1 + bar_width*indx, values2plot[key]["total_means"], bar_width,
+    alpha=opacity,
+    label=key,
+    yerr=values2plot[key]["total_stdev"])
+    plt.bar(index + 0.1 + bar_width*indx, values2plot[key]["cuda_means"], bar_width,
+    alpha=opacity,
+    color="r",
+    label="CUDA" if indx == len(values2plot)-1 else None,
+    yerr=values2plot[key]["cuda_stdev"])
+  plt.xlabel('clause')
+  plt.ylabel('time (us)')
+  plt.xticks(index+0.5, tests,  rotation='vertical')
+  plt.legend(bbox_to_anchor=(1.05, 1), loc=4, borderaxespad=0.)
+  plt.tight_layout()
+  
 
 def main():
     ''' Arguments parsing'''
@@ -102,30 +187,14 @@ def main():
 
                 printLog("Len of File " + fileName + " = " + str(linesCounter), 1)
                 countResultsStats()
+                calculateStats()
                 
             except IOError as e: 
                 print("ERROR Opening the file " + fileName)
                 print(" Exception = " + str(e))
 
-    data = {'a': np.arange(50),
-                'c': np.random.randint(0, 50, 50),
-                        'd': np.random.randn(50)}
-    data['b'] = data['a'] + 10 * np.random.randn(50)
-    data['d'] = np.abs(data['d']) * 100
-    
-    plt.scatter('a', 'b', c='c', s='d', data=data)
-    plt.xlabel('entry a')
-    plt.ylabel('entry b')
+    createPlot(["target", "target_defaultmap", "target_dependvar", "target_device", "target_firstprivate", "target_private", "target_if","target_is_device_ptr", "target_map_to", "target_map_from", "target_map_tofrom"])
     plt.savefig(outputFileName)
-    
-#    # writing the output file
-#    with open(outputFileName, "w") as f: 
-#        try:
-#            printLog("Writing output file " + outputFileName + " containing " + str(result.count("\n")) + " lines")
-#            f.write(header)
-#            f.write(result)
-#        except Exception as e :
-#            print ("ERROR writing the file " + outputFileName + " " + str(e))
 
 if __name__ == "__main__":
     main()
