@@ -1,6 +1,8 @@
 import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
+import matplotlib.colors as colors
+import matplotlib.cm as cmx
 import numpy as np
 import re
 import os
@@ -8,6 +10,12 @@ import argparse, sys
 
 
 debugMode = 0
+includeCuda = False
+
+np.random.seed(1)
+linear_colors = [ 'Purples', 'Blues', 'Greens', 'Oranges', 'Reds']
+compiler_color_maps = {}
+
 def printLog (stringLog, level = 3):
     if (debugMode >= level):
         print ("[DEBUG " + str(level) + "] " + stringLog) 
@@ -28,6 +36,7 @@ def insertInResults(compiler, version, test, result_total, result_cuda):
   # Changing to integers
   result_total = int(result_total)
   result_cuda = int(result_cuda)
+  result_omp_runtime = result_total - result_cuda
 
   # Loging new value
   printLog("Adding new result \n -> compiler = %s \n -> version = %s \n -> test = %s \n -> result_total = %s \n -> result_cuda = %s" % (compiler, version, test, result_total, result_cuda))
@@ -53,7 +62,7 @@ def insertInResults(compiler, version, test, result_total, result_cuda):
     results[compiler][version][test]["values"] = []
 
   # Inserting the value
-  results[compiler][version][test]["values"].append([result_total, result_cuda])
+  results[compiler][version][test]["values"].append([result_total, result_cuda, result_omp_runtime])
 
 def countResultsStats():
   printLog("There are %d compilers" % (len(results)),1)
@@ -83,12 +92,15 @@ def calculateStats():
         mean_cuda = np.mean([row[1] for row in values])/1000
         median_cuda = np.median([row[1] for row in values])/1000
         stdev_cuda = np.std([row[1] for row in values])/1000
-        results[compiler][version][test]["median"] = [median_total, median_cuda]
-        results[compiler][version][test]["mean"] = [mean_total, mean_cuda]
-        results[compiler][version][test]["stdev"] = [stdev_total, stdev_cuda]
-        printLog(" -> mean = " + str([mean_total, mean_cuda]), 3)
-        printLog(" -> median = " + str([median_total, median_cuda]), 3)
-        printLog(" -> stdev = " + str([stdev_total, stdev_cuda]), 3)
+        mean_omp_runtime = np.mean([row[2] for row in values])/1000
+        median_omp_runtime = np.median([row[2] for row in values])/1000
+        stdev_omp_runtime = np.std([row[2] for row in values])/1000
+        results[compiler][version][test]["median"] = [median_total, median_cuda, median_omp_runtime]
+        results[compiler][version][test]["mean"] = [mean_total, mean_cuda, mean_omp_runtime]
+        results[compiler][version][test]["stdev"] = [stdev_total, stdev_cuda, stdev_omp_runtime]
+        printLog(" -> mean = " + str([mean_total, mean_cuda, mean_omp_runtime], ), 3)
+        printLog(" -> median = " + str([median_total, median_cuda, median_omp_runtime]), 3)
+        printLog(" -> stdev = " + str([stdev_total, stdev_cuda, stdev_omp_runtime]), 3)
 
 def createPlot(tests, compilers=None, versions=None, labels=None):
   printLog("Plotting ..." ,1)
@@ -105,32 +117,48 @@ def createPlot(tests, compilers=None, versions=None, labels=None):
   values2plot = {}
   for compiler in results:
     if (compilers is None or compiler in compilers):
+      # For choosing the color map
+      scalarMap = []
+      if (compiler not in compiler_color_maps.keys()):
+        selectColorMap = np.random.randint(0,len(linear_colors)-1)
+        cm = plt.get_cmap(linear_colors[selectColorMap])
+        cNorm  = colors.Normalize(vmin=-len(results[compiler]), vmax=len(results[compiler])*2)
+        scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=cm)
+        compiler_color_maps[compiler] = scalarMap
+      else :
+        scalarMap = compiler_color_maps[compiler]
+      nextColor = len(results[compiler])
+
       printLog(" -> Compiler " + str(compiler), 2)
       for version in results[compiler]:
         if (versions is None or version in versions):
+          colorVal = scalarMap.to_rgba(nextColor)
+          nextColor = nextColor - 1
           printLog("    -> Version " + str(version), 2)
           newVals = {
-            "total_means": [],
-            "total_medians" : [],
-            "total_stdev" : [],
+            "omp_runtime_means": [],
+            "omp_runtime_medians" : [],
+            "omp_runtime_stdev" : [],
             "cuda_means" : [],
             "cuda_medians" : [],
-            "cuda_stdev" : []
+            "cuda_stdev" : [],
+            "colorVal" : colorVal
           }
           for test in tests:
             if test in results[compiler][version]:
               # Obtaining the values for this test
-              newVals["total_means"].append(results[compiler][version][test]["mean"][0])
-              newVals["total_medians"].append(results[compiler][version][test]["median"][0])
-              newVals["total_stdev"].append(results[compiler][version][test]["stdev"][0])
+              newVals["omp_runtime_means"].append(results[compiler][version][test]["mean"][2])
+              newVals["omp_runtime_medians"].append(results[compiler][version][test]["median"][2])
+              newVals["omp_runtime_stdev"].append(results[compiler][version][test]["stdev"][2])
               newVals["cuda_means"].append(results[compiler][version][test]["mean"][1])
               newVals["cuda_medians"].append(results[compiler][version][test]["median"][1])
               newVals["cuda_stdev"].append(results[compiler][version][test]["stdev"][1])
+              
             else:
               # test result does not exist
-              newVals["total_means"].append(0)
-              newVals["total_medians"].append(0)
-              newVals["total_stdev"].append(0)
+              newVals["omp_runtime_means"].append(0)
+              newVals["omp_runtime_medians"].append(0)
+              newVals["omp_runtime_stdev"].append(0)
               newVals["cuda_means"].append(0)
               newVals["cuda_medians"].append(0)
               newVals["cuda_stdev"].append(0)
@@ -138,15 +166,20 @@ def createPlot(tests, compilers=None, versions=None, labels=None):
   bar_width = 0.8/len(values2plot)
   # Adding the plots
   for indx, key in enumerate(values2plot):
-    plt.bar(index + 0.1 + bar_width*indx, values2plot[key]["total_means"], bar_width,
-    alpha=opacity,
+    totals = []
+    if (includeCuda):
+      totals = [values2plot[key]["cuda_means"][i] + values2plot[key]["omp_runtime_means"][i] for i in range(len(values2plot[key]["cuda_means"]))] 
+    else:
+      totals = values2plot[key]["omp_runtime_means"]
+    plt.bar(index + 0.1 + bar_width*indx, totals , bar_width,
     label=key,
-    yerr=values2plot[key]["total_stdev"])
-    plt.bar(index + 0.1 + bar_width*indx, values2plot[key]["cuda_means"], bar_width,
-    alpha=opacity,
-    color="r",
-    label="CUDA" if indx == len(values2plot)-1 else None,
-    yerr=values2plot[key]["cuda_stdev"])
+    color= values2plot[key]["colorVal"],
+    yerr=values2plot[key]["omp_runtime_stdev"])
+    if (includeCuda):
+      plt.bar(index + 0.1 + bar_width*indx, values2plot[key]["cuda_means"], bar_width,
+      color="silver",
+      label="CUDA" if indx == len(values2plot)-1 else None,
+      yerr=values2plot[key]["cuda_stdev"])
   plt.xlabel('clause')
   plt.ylabel('time (us)')
   plt.xticks(index+0.5, tests,  rotation='vertical')
@@ -194,7 +227,15 @@ def main():
                 print(" Exception = " + str(e))
 
     createPlot(["target", "target_defaultmap", "target_dependvar", "target_device", "target_firstprivate", "target_private", "target_if","target_is_device_ptr", "target_map_to", "target_map_from", "target_map_tofrom"])
-    plt.savefig(outputFileName)
+    plt.savefig(outputFileName+"_target.png")
+    createPlot(["target_data_map_to", "target_data_map_from", "target_data_map_tofrom", "target_data_device", "target_data_if"])
+    plt.savefig(outputFileName+"_target_data.png")
+    createPlot(["target_enter_data_map_to", "target_enter_data_map_alloc", "target_enter_data_map_if_true", "target_enter_data_map_if_false", "target_enter_data_map_device", "target_enter_data_map_depend"])
+    plt.savefig(outputFileName+"_target_enter_data.png")
+    createPlot(["target_exit_data_map_from", "target_exit_data_map_delete", "target_exit_data_map_if_true", "target_exit_data_map_if_false", "target_exit_data_map_device", "target_exit_data_map_depend"])
+    plt.savefig(outputFileName+"_target_exit_data.png")
+    createPlot(["target_update_to", "target_update_to_if_true", "target_update_to_if_false", "target_update_to_device", "target_update_to_depend", "target_update_from", "target_update_from_if_true","target_update_from_if_false", "target_update_from_device", "target_update_from_depend"])
+    plt.savefig(outputFileName+"_target_update.png")
 
 if __name__ == "__main__":
     main()
