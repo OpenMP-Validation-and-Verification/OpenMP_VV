@@ -7,12 +7,14 @@
 // Test for OpenMP 4.5 target data with if
 int main() {
   OMPVV_INIT_TIMERS;
+  OMPVV_TEST_OFFLOADING;
+  printf("TEST_NESTED\n");
   int a_map_var = 0;
   //target teams distribute
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute parallel for
+      #pragma omp target teams distribute parallel for num_teams(16) num_threads(16)
       for (int x = 0; x < 1024; ++x){
           OMPVV_TIMING_LOAD;
       }
@@ -26,9 +28,9 @@ int main() {
       OMPVV_START_TIMER;
       #pragma omp target
       {
-        #pragma omp teams
+        #pragma omp teams num_teams(16) 
         {
-          #pragma omp distribute parallel for
+          #pragma omp distribute parallel for num_threads(16) 
           for (int x = 0; x < 1024; ++x){
               OMPVV_TIMING_LOAD;
           }
@@ -43,7 +45,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute parallel for collapse(1)
+      #pragma omp target teams distribute parallel for num_teams(16) num_threads(16) collapse(1)
       for (int x = 0; x < 1024; ++x){
           OMPVV_TIMING_LOAD;
       }
@@ -57,9 +59,9 @@ int main() {
       OMPVV_START_TIMER;
       #pragma omp target
       {
-        #pragma omp teams
+        #pragma omp teams num_teams(16) 
         {
-          #pragma omp distribute parallel for collapse(1)
+          #pragma omp distribute parallel for num_threads(16)  collapse(1)
           for (int x = 0; x < 1024; ++x){
               OMPVV_TIMING_LOAD;
           }
@@ -74,7 +76,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute parallel for defaultmap(tofrom: scalar)
+      #pragma omp target teams distribute parallel for num_teams(16) num_threads(16) defaultmap(tofrom: scalar)
       for (int x = 0; x < 1024; ++x){
           OMPVV_TIMING_LOAD;
       }
@@ -89,9 +91,9 @@ int main() {
       OMPVV_START_TIMER;
       #pragma omp target defaultmap(tofrom: scalar)
       {
-        #pragma omp teams
+        #pragma omp teams num_teams(16) 
         {
-          #pragma omp distribute parallel for
+          #pragma omp distribute parallel for num_threads(16) 
           for (int x = 0; x < 1024; ++x){
               OMPVV_TIMING_LOAD;
           }
@@ -106,7 +108,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute parallel for default(none)
+      #pragma omp target teams distribute parallel for num_teams(16) num_threads(16) default(none)
       for (int x = 0; x < 1024; ++x){
           OMPVV_TIMING_LOAD;
       }
@@ -120,9 +122,9 @@ int main() {
       OMPVV_START_TIMER;
       #pragma omp target
       {
-        #pragma omp teams default(none)
+        #pragma omp teams num_teams(16)  default(none)
         {
-          #pragma omp distribute parallel for default(none)
+          #pragma omp distribute parallel for num_threads(16)  default(none)
           for (int x = 0; x < 1024; ++x){
               OMPVV_TIMING_LOAD;
           }
@@ -137,7 +139,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute parallel for default(shared)
+      #pragma omp target teams distribute parallel for num_teams(16) num_threads(16) default(shared)
       for (int x = 0; x < 1024; ++x){
           OMPVV_TIMING_LOAD;
       }
@@ -151,9 +153,9 @@ int main() {
       OMPVV_START_TIMER;
       #pragma omp target
       {
-        #pragma omp teams default(shared)
+        #pragma omp teams num_teams(16)  default(shared)
         {
-          #pragma omp distribute parallel for default(shared)
+          #pragma omp distribute parallel for num_threads(16)  default(shared)
           for (int x = 0; x < 1024; ++x){
               OMPVV_TIMING_LOAD;
           }
@@ -168,7 +170,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute parallel for depend(inout:a_map_var)
+      #pragma omp target teams distribute parallel for num_teams(16) num_threads(16) depend(inout:a_map_var)
       for (int x = 0; x < 1024; ++x){
           OMPVV_TIMING_LOAD;
           a_map_var = 0;
@@ -185,7 +187,7 @@ int main() {
       {
         #pragma omp teams
         {
-          #pragma omp distribute parallel for
+          #pragma omp distribute parallel for num_threads(16) 
           for (int x = 0; x < 1024; ++x){
               OMPVV_TIMING_LOAD;
               a_map_var = 0;
@@ -202,7 +204,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute parallel for device(a_map_var)
+      #pragma omp target teams distribute parallel for num_teams(16) num_threads(16) device(a_map_var)
       for (int x = 0; x < 1024; ++x){
           OMPVV_TIMING_LOAD;
       }
@@ -216,9 +218,9 @@ int main() {
       OMPVV_START_TIMER;
       #pragma omp target device(a_map_var)
       {
-        #pragma omp teams
+        #pragma omp teams num_teams(16) 
         {
-          #pragma omp distribute parallel for
+          #pragma omp distribute parallel for num_threads(16) 
           for (int x = 0; x < 1024; ++x){
               OMPVV_TIMING_LOAD;
           }
@@ -233,7 +235,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute parallel for firstprivate(a_map_var)
+      #pragma omp target teams distribute parallel for num_teams(16) num_threads(16) firstprivate(a_map_var)
       for (int x = 0; x < 1024; ++x){
           a_map_var = 0;
           OMPVV_TIMING_LOAD;
@@ -248,9 +250,9 @@ int main() {
       OMPVV_START_TIMER;
       #pragma omp target
       {
-        #pragma omp teams
+        #pragma omp teams num_teams(16) 
         {
-          #pragma omp distribute parallel for firstprivate(a_map_var)
+          #pragma omp distribute parallel for num_threads(16)  firstprivate(a_map_var)
           for (int x = 0; x < 1024; ++x){
               a_map_var = 0;
               OMPVV_TIMING_LOAD;
@@ -266,7 +268,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute parallel for if(1)
+      #pragma omp target teams distribute parallel for num_teams(16) num_threads(16) if(1)
       for (int x = 0; x < 1024; ++x){
           OMPVV_TIMING_LOAD;
       }
@@ -280,9 +282,9 @@ int main() {
       OMPVV_START_TIMER;
       #pragma omp target if(1)
       {
-        #pragma omp teams
+        #pragma omp teams num_teams(16) 
         {
-          #pragma omp distribute parallel for if(1)
+          #pragma omp distribute parallel for num_threads(16)  if(1)
           for (int x = 0; x < 1024; ++x){
               OMPVV_TIMING_LOAD;
           }
@@ -297,7 +299,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute parallel for if(0)
+      #pragma omp target teams distribute parallel for num_teams(16) num_threads(16) if(0)
       for (int x = 0; x < 1024; ++x){
           OMPVV_TIMING_LOAD;
       }
@@ -311,9 +313,9 @@ int main() {
       OMPVV_START_TIMER;
       #pragma omp target if (0)
       {
-        #pragma omp teams
+        #pragma omp teams num_teams(16) 
         {
-          #pragma omp distribute parallel for if(0)
+          #pragma omp distribute parallel for num_threads(16)  if(0)
           for (int x = 0; x < 1024; ++x){
               OMPVV_TIMING_LOAD;
           }
@@ -328,7 +330,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute parallel for lastprivate(a_map_var)
+      #pragma omp target teams distribute parallel for num_teams(16) num_threads(16) lastprivate(a_map_var)
       for (int x = 0; x < 1024; ++x){
           a_map_var = 0;
           OMPVV_TIMING_LOAD;
@@ -343,9 +345,9 @@ int main() {
       OMPVV_START_TIMER;
       #pragma omp target
       {
-        #pragma omp teams
+        #pragma omp teams num_teams(16) 
         {
-          #pragma omp distribute parallel for lastprivate(a_map_var)
+          #pragma omp distribute parallel for num_threads(16)  lastprivate(a_map_var)
           for (int x = 0; x < 1024; ++x){
               a_map_var = 0;
               OMPVV_TIMING_LOAD;
@@ -361,7 +363,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute parallel for map(to: a_map_var)
+      #pragma omp target teams distribute parallel for num_teams(16) num_threads(16) map(to: a_map_var)
       for (int x = 0; x < 1024; ++x){
           a_map_var = 0;
           OMPVV_TIMING_LOAD;
@@ -376,9 +378,9 @@ int main() {
       OMPVV_START_TIMER;
       #pragma omp target map(to: a_map_var)
       {
-        #pragma omp teams
+        #pragma omp teams num_teams(16) 
         {
-          #pragma omp distribute parallel for
+          #pragma omp distribute parallel for num_threads(16) 
           for (int x = 0; x < 1024; ++x){
               a_map_var = 0;
               OMPVV_TIMING_LOAD;
@@ -394,7 +396,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute parallel for map(from: a_map_var)
+      #pragma omp target teams distribute parallel for num_teams(16) num_threads(16) map(from: a_map_var)
       for (int x = 0; x < 1024; ++x){
           a_map_var = 0;
           OMPVV_TIMING_LOAD;
@@ -409,9 +411,9 @@ int main() {
       OMPVV_START_TIMER;
       #pragma omp target map(from: a_map_var)
       {
-        #pragma omp teams
+        #pragma omp teams num_teams(16) 
         {
-          #pragma omp distribute parallel for
+          #pragma omp distribute parallel for num_threads(16) 
           for (int x = 0; x < 1024; ++x){
               a_map_var = 0;
               OMPVV_TIMING_LOAD;
@@ -427,7 +429,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute parallel for map(tofrom: a_map_var)
+      #pragma omp target teams distribute parallel for num_teams(16) num_threads(16) map(tofrom: a_map_var)
       for (int x = 0; x < 1024; ++x){
           a_map_var = 0;
           OMPVV_TIMING_LOAD;
@@ -442,9 +444,9 @@ int main() {
       OMPVV_START_TIMER;
       #pragma omp target map(tofrom: a_map_var)
       {
-        #pragma omp teams
+        #pragma omp teams num_teams(16) 
         {
-          #pragma omp distribute parallel for
+          #pragma omp distribute parallel for num_threads(16) 
           for (int x = 0; x < 1024; ++x){
               a_map_var = 0;
               OMPVV_TIMING_LOAD;
@@ -460,7 +462,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute parallel for map(alloc: a_map_var)
+      #pragma omp target teams distribute parallel for num_teams(16) num_threads(16) map(alloc: a_map_var)
       for (int x = 0; x < 1024; ++x){
           a_map_var = 0;
           OMPVV_TIMING_LOAD;
@@ -475,9 +477,9 @@ int main() {
       OMPVV_START_TIMER;
       #pragma omp target map(alloc: a_map_var)
       {
-        #pragma omp teams
+        #pragma omp teams num_teams(16) 
         {
-          #pragma omp distribute parallel for
+          #pragma omp distribute parallel for num_threads(16) 
           for (int x = 0; x < 1024; ++x){
               a_map_var = 0;
               OMPVV_TIMING_LOAD;
@@ -493,7 +495,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute parallel for private(a_map_var)
+      #pragma omp target teams distribute parallel for num_teams(16) num_threads(16) private(a_map_var)
       for (int x = 0; x < 1024; ++x){
           a_map_var = 0;
           OMPVV_TIMING_LOAD;
@@ -508,9 +510,9 @@ int main() {
       OMPVV_START_TIMER;
       #pragma omp target
       {
-        #pragma omp teams
+        #pragma omp teams num_teams(16) 
         {
-          #pragma omp distribute parallel for private(a_map_var)
+          #pragma omp distribute parallel for num_threads(16)  private(a_map_var)
           for (int x = 0; x < 1024; ++x){
               a_map_var = 0;
               OMPVV_TIMING_LOAD;
@@ -526,7 +528,7 @@ int main() {
   OMPVV_INIT_TEST;
   for (int i = 0; i < NUM_REP; ++i){
       OMPVV_START_TIMER;
-      #pragma omp target teams distribute parallel for shared(a_map_var)
+      #pragma omp target teams distribute parallel for num_teams(16) num_threads(16) shared(a_map_var)
       for (int x = 0; x < 1024; ++x){
           a_map_var = 0;
           OMPVV_TIMING_LOAD;
@@ -541,9 +543,9 @@ int main() {
       OMPVV_START_TIMER;
       #pragma omp target
       {
-        #pragma omp teams shared(a_map_var)
+        #pragma omp teams num_teams(16)  shared(a_map_var)
         {
-          #pragma omp distribute parallel for shared(a_map_var)
+          #pragma omp distribute parallel for num_threads(16) shared(a_map_var)
           for (int x = 0; x < 1024; ++x){
               a_map_var = 0;
               OMPVV_TIMING_LOAD;
@@ -554,6 +556,7 @@ int main() {
       OMPVV_REGISTER_TEST;
   }
   OMPVV_TIMER_RESULT("target teams distribute parallel for shared nested");
+  printf("END_OF_TEST\n");
 
   return 0;
 }

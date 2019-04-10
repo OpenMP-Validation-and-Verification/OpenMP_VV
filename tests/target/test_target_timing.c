@@ -6,8 +6,9 @@
 #include "ompvv_timing.h"
 
 int main() {
-  OMPVV_TEST_OFFLOADING;
   OMPVV_INIT_TIMERS;
+  OMPVV_TEST_OFFLOADING;
+  printf("TEST_TIMING_CLAUSES\n");
   int i = 0;
   int a_map_var = 0;
 
@@ -163,5 +164,6 @@ int main() {
     OMPVV_REGISTER_TEST
   }
   OMPVV_TIMER_RESULT("target_map_tofrom")
+  printf("END_OF_TEST\n");
   return 0;
 }

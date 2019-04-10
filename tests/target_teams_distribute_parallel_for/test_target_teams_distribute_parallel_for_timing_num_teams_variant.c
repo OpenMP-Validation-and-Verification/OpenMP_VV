@@ -7,6 +7,8 @@
 // Test for OpenMP 4.5 target data with if
 int test(int teams, int threads) {
   OMPVV_INIT_TIMERS;
+  OMPVV_TEST_OFFLOADING;
+  printf("TEST_VARIANT\t%d\t%d\n",teams, threads);
   int a_map_var = 0;
   OMPVV_INFOMSG("Running timing tests with %d teams and %d threads", teams, threads);
   //target teams distribute
@@ -239,6 +241,7 @@ int test(int teams, int threads) {
   }
   OMPVV_TIMER_RESULT("target teams distribute parallel for shared");
 
+  printf("END_OF_TEST\n");
   return 0;
 }
 
