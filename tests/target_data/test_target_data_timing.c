@@ -6,8 +6,9 @@
 #include "ompvv_timing.h"
 
 int main() {
-  OMPVV_TEST_OFFLOADING;
   OMPVV_INIT_TIMERS;
+  OMPVV_TEST_OFFLOADING;
+  printf("TEST_TIMING_CLAUSES\n");
   int i = 0;
   int a_map_var = 0;
 
@@ -17,6 +18,7 @@ int main() {
     OMPVV_START_TIMER;
 #pragma omp target data map(to: a_map_var)
     {
+      a_map_var = 1;
       OMPVV_TIMING_LOAD;
     }
     OMPVV_STOP_TIMER;

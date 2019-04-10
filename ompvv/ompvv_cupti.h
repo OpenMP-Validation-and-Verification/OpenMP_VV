@@ -1,3 +1,5 @@
+#include "ompvv_cupti_string_cbid.h"
+
 #define CUPTI_CALL(call)                                                \
   do {                                                                  \
     CUptiResult _status = call;                                         \
@@ -57,6 +59,7 @@
 // timestamps
 static uint64_t startTimestamp;
 static int ignoreEventsPrinting;
+static int initOnlyOnlce = 0;
 static uint64_t _ompvv_accum_driver, _ompvv_accum_kernel, _ompvv_accum_runtime, _ompvv_accum_memory,_ompvv_accum_others;
 
 static const char *
@@ -264,8 +267,8 @@ printActivity(CUpti_Activity *record)
   case CUPTI_ACTIVITY_KIND_DRIVER:
     {
       CUpti_ActivityAPI *api = (CUpti_ActivityAPI *) record;
-      printf("DRIVER \t %u \t %llu \t %llu \t %lu\n",
-             api->cbid,
+      printf("DRIVER \t %s \t %llu \t %llu \t %lu\n",
+             getDriverApiKindString(api->cbid),
              (unsigned long long) (api->start - startTimestamp),
              (unsigned long long) (api->end - startTimestamp),
              (unsigned long) (api->end - api->start));
@@ -287,8 +290,8 @@ printActivity(CUpti_Activity *record)
 //             (unsigned long long) (api->end - startTimestamp),
 //             api->processId, api->threadId, api->correlationId,
 //             (unsigned long) (api->end - api->start));
-      printf("RUNTIME \t %u \t %llu \t %llu \t %lu\n",
-             api->cbid,
+      printf("RUNTIME \t %s \t %llu \t %llu \t %lu\n",
+             getRuntimeApiKindString(api->cbid),
              (unsigned long long) (api->start - startTimestamp),
              (unsigned long long) (api->end - startTimestamp),
              (unsigned long) (api->end - api->start));
@@ -413,6 +416,8 @@ void CUPTIAPI bufferCompleted(CUcontext ctx, uint32_t streamId, uint8_t *buffer,
 void
 initTrace()
 {
+  if (initOnlyOnlce) return;
+  initOnlyOnlce = 1;
   size_t attrValue = 0, attrValueSize = sizeof(size_t);
   // Device activity record is created when CUDA initializes, so we
   // want to enable it before cuInit() or any CUDA runtime call.

@@ -7,6 +7,8 @@
 // Test for OpenMP 4.5 target data with if
 int main() {
   OMPVV_INIT_TIMERS;
+  OMPVV_TEST_OFFLOADING;
+  printf("TEST_TIMING_CLAUSES\n");
   int a_map_var = 0;
   //target teams distribute
   OMPVV_INIT_TEST;
