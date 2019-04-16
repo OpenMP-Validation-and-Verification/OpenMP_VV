@@ -16,7 +16,7 @@ import math
 
 
 debugMode = 0
-includeCuda = False
+includeCuda = True
 histogram_resolution = 500 # in ns
 create_histogram = False
 currentSystem = "summit"
@@ -483,7 +483,7 @@ def createPlotTimelineClause(test, test_type, compilers=None, versions=None, lab
                 
 
   printLog ("Plotting %d compilers with a total of %d subgraphs" % (num_compilers, np.sum(num_cuda_functions_per_compiler) + 1),2)
-  num_subplots = num_compilers*2 - 1 + np.sum(num_cuda_functions_per_compiler)
+  num_subplots = int(num_compilers*2 - 1 + np.sum(num_cuda_functions_per_compiler))
   fig, axes = plt.subplots(nrows=num_subplots+1, sharex='col', figsize=(9, 10)) # The +1 is necessary to plot the last imshow. I don't know why
   fig.subplots_adjust(left=0.25, hspace=0)
   cur_ax = 0
@@ -746,6 +746,112 @@ def createPlotNumTeams(tests, compilers=None, versions=None, labels=None):
       cur_ax += 1
 
 
+def createPlotNumTeamsNumThreads(test, compilers=None, versions=None):
+  printLog("Plotting TEST_VARIANT_TTDPF..." ,1)
+  if not isinstance(test, str):
+    printLog("ERROR: tests is not a string", 0)
+    return None
+  if (versions is not None) and not isinstance(versions, list):
+    printLog("ERROR: versions need to be a string", 0)
+    return None
+
+  # Plot configuration
+  num_of_compilers = len(compilers) if compilers is not None else len(results)
+  fig, axes = plt.subplots(ncols=num_of_compilers, sharex='row', figsize=(10*num_of_compilers, 9))
+  if type(axes) is not np.ndarray:
+    axes = [axes]
+  cur_ax = 0
+
+  # Filtering out the results by test in the tests list and by compilers and versions
+  for compiler in results:
+    if (compilers is None or compiler in compilers):
+      printLog(" -> Compiler " + str(compiler), 2)
+      num_of_versions = len(versions) if versions is not None else len(results[compiler])
+      values2plot = {}
+      current_version_index = 0
+      for version in results[compiler]:
+        if (versions is None or version in versions):
+          printLog("    -> Version " + version, 2)
+          for num_team in results[compiler][version]["TEST_VARIANT_TTDPF"]:
+            if num_team not in values2plot.keys():
+              values2plot[num_team] = {}
+            for num_threads in results[compiler][version]["TEST_VARIANT_TTDPF"][num_team]:
+              if num_threads not in values2plot[num_team].keys():
+                values2plot[num_team][num_threads] =  {
+                                                        "omp_runtime_means": [0 for i in range(num_of_versions)],
+                                                        "omp_runtime_medians" : [0 for i in range(num_of_versions)],
+                                                        "omp_runtime_stdev" : [0 for i in range(num_of_versions)],
+                                                        "cuda_means" : [0 for i in range(num_of_versions)],
+                                                        "cuda_medians" : [0 for i in range(num_of_versions)],
+                                                        "cuda_stdev" : [0 for i in range(num_of_versions)]
+                                                        }
+
+              test_results = results[compiler][version]["TEST_VARIANT_TTDPF"][num_team][num_threads]
+              if test in test_results:
+                # Obtaining the values for this test
+                values2plot[num_team][num_threads]["omp_runtime_means"][current_version_index] = test_results[test]["mean"][2]
+                values2plot[num_team][num_threads]["omp_runtime_medians"][current_version_index] = test_results[test]["median"][2]
+                values2plot[num_team][num_threads]["omp_runtime_stdev"][current_version_index] = test_results[test]["stdev"][2]
+                values2plot[num_team][num_threads]["cuda_means"][current_version_index] = test_results[test]["mean"][1]
+                values2plot[num_team][num_threads]["cuda_medians"][current_version_index] = test_results[test]["median"][1]
+                values2plot[num_team][num_threads]["cuda_stdev"][current_version_index] = test_results[test]["stdev"][1]
+                
+              else:
+                # test result does not exist
+                values2plot[num_team][num_threads]["omp_runtime_means"][current_version_index] = 0
+                values2plot[num_team][num_threads]["omp_runtime_medians"][current_version_index] = 0
+                values2plot[num_team][num_threads]["omp_runtime_stdev"][current_version_index] = 0
+                values2plot[num_team][num_threads]["cuda_means"][current_version_index] = 0
+                values2plot[num_team][num_threads]["cuda_medians"][current_version_index] = 0
+                values2plot[num_team][num_threads]["cuda_stdev"][current_version_index] = 0
+      bar_width = 0.8/num_of_versions
+      # Adding the plots
+      current_plot_group = 0
+      labels = []
+      ticks = []
+      for indx_teams, num_team in enumerate(values2plot):
+        totals = []
+        totals_cuda = []
+        indexes = []
+        for indx_threads, num_threads in enumerate(values2plot[num_team]):
+          if (includeCuda):
+            totals += [values2plot[num_team][num_threads]["cuda_medians"][i] + values2plot[num_team][num_threads]["omp_runtime_medians"][i] for i in range(num_of_versions)]
+            totals_cuda += values2plot[num_team][num_threads]["cuda_medians"]
+          else:
+            totals += [values2plot[num_team][num_threads]["omp_runtime_medians"][i] for i in range(num_of_versions)]
+          indexes += [current_plot_group + 0.1 + bar_width*i for i in range(num_of_versions)]
+          labels.append(num_threads)
+          ticks += [current_plot_group+.1]
+          current_plot_group += 1
+        # if (cur_ax == 0):
+        # if (cur_ax == num_subplots - 1):
+        #   axes[cur_ax].set(xlabel = 'clause')
+        totals= [i/1000 for i in totals]
+        totals_cuda= [i/1000 for i in totals_cuda]
+        axes[cur_ax].bar(indexes , totals , bar_width, label= num_team + " teams", edgecolor= "black")
+        if (includeCuda):
+          axes[cur_ax].bar(indexes, totals_cuda, bar_width,
+          color = "silver",
+          alpha =0.91,
+          label="CUDA" if indx_teams == len(values2plot)-1 else None)
+        current_plot_group += 1
+      #Adding plot info
+      axes[cur_ax].legend()
+      axes[cur_ax].set_xticks(ticks)
+      axes[cur_ax].set_xticklabels(labels)
+      axes[cur_ax].set(ylabel ='NumTeams Num Threads')
+      cur_ax += 1
+  plt.tight_layout()
+  cur_ax = 0
+  for compiler in results:
+    if (compilers is None or compiler in compilers):
+      pos = list(axes[cur_ax].get_position().bounds)
+      x_text = pos[0] + 0.01
+      y_text = pos[1] + pos[3] - 0.01
+      fig.text(x_text, y_text, compiler+ " " + version_labels[currentSystem][compiler],  va='center', fontsize=10)
+      cur_ax += 1
+
+
 def main():
     global results
     ''' Arguments parsing'''
@@ -810,6 +916,10 @@ def main():
     tests_to_plot = ["target_update_to", "target_update_to_if_true", "target_update_to_if_false", "target_update_to_device", "target_update_to_depend", "target_update_from", "target_update_from_if_true","target_update_from_if_false", "target_update_from_device", "target_update_from_depend"]
     createPlotTimingClauses(tests_to_plot, labels = labels)
     plt.savefig(outputFileName+"_target_update.png")
+    # for i in tests_to_plot:
+    #   createPlotTimelineClause(i,"TEST_TIMING_CLAUSES", ["GCC","XLC","clang"])
+    #   plt.savefig(outputFileName+i+"_timeline.png")
+
 
     labels = ["(NO CLAUSE)",
               "collapse",
@@ -921,6 +1031,9 @@ def main():
     # createPlotTimelineClause("target teams distribute parallel for","TEST_TIMING_CLAUSES", ["GCC","XLC","clang"])
     # plt.savefig(outputFileName+"target_Teams_distribute_parallel_for_timeline.png")
 
+
+    createPlotNumTeamsNumThreads("target teams distribute parallel for", ["GCC", "XLC", "clang"])
+    plt.savefig(outputFileName+"_target_teams_distribute_parallel_for_num_teams_num_threads.png")
 
 
 if __name__ == "__main__":
