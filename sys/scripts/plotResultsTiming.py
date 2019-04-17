@@ -18,14 +18,19 @@ import math
 debugMode = 0
 includeCuda = True
 histogram_resolution = 500 # in ns
-create_histogram = False
-currentSystem = "summit"
+create_histogram = True
+currentSystem = "fatnode"
 
 version_labels={
   "summit": {
     "GCC": "8.1.1",
     "clang": "CORAL 3.8.0",
     "XLC": "16.1.1.0"
+  },
+  "fatnode": {
+    "GCC": None,
+    "clang": None, 
+    "XLC": None
   }
 }
 
@@ -607,7 +612,8 @@ def createPlotTimingClauses(tests, compilers=None, versions=None, labels=None):
               newVals["cuda_means"].append(0)
               newVals["cuda_medians"].append(0)
               newVals["cuda_stdev"].append(0)
-          plot_label = str(compiler)+" "+version_labels[currentSystem][compiler]
+          version_text = str(version) if version_labels[currentSystem][compiler] is None else version_labels[currentSystem][compiler]
+          plot_label = str(compiler)+" "+version_text
           values2plot[plot_label] = newVals
   bar_width = 0.8/len(values2plot)
   # Adding the plots
@@ -742,7 +748,8 @@ def createPlotNumTeams(tests, compilers=None, versions=None, labels=None):
       pos = list(axes[cur_ax].get_position().bounds)
       x_text = pos[0] + 0.01
       y_text = pos[1] + pos[3] - 0.01
-      fig.text(x_text, y_text, compiler+ " " + version_labels[currentSystem][compiler],  va='center', fontsize=10)
+      version_text = str(versions[compiler]) if version_labels[currentSystem][compiler] is None else version_labels[currentSystem][compiler]
+      fig.text(x_text, y_text, compiler+ " " + version_text,  va='center', fontsize=10)
       cur_ax += 1
 
 
@@ -846,10 +853,15 @@ def createPlotNumTeamsNumThreads(test, compilers=None, versions=None):
   for compiler in results:
     if (compilers is None or compiler in compilers):
       pos = list(axes[cur_ax].get_position().bounds)
-      x_text = pos[0] + 0.01
-      y_text = pos[1] + pos[3] - 0.01
-      fig.text(x_text, y_text, compiler+ " " + version_labels[currentSystem][compiler],  va='center', fontsize=10)
+      index = 0
+      for version in (versions if versions is not None else results[compiler]):
+        x_text = pos[0] + 0.01
+        y_text = pos[1] + pos[3] - 0.01 + index
+        index += 1
+        version_text = str(version) if version_labels[currentSystem][compiler] is None else version_labels[currentSystem][compiler]
+        fig.text(x_text, y_text, compiler+ " " +version_text,  va='center', fontsize=10)
       cur_ax += 1
+
 
 
 def main():
@@ -891,150 +903,296 @@ def main():
     countResultsStats()
     calculateStats()
 
-    # Target
-    labels = ["target", "defaultmap", "dependvar", "device", "firstprivate", "private", "if","is_device_ptr", "map_to", "map_from", "map_tofrom"]
-    tests_to_plot = ["target", "target_defaultmap", "target_dependvar", "target_device", "target_firstprivate", "target_private", "target_if","target_is_device_ptr", "target_map_to", "target_map_from", "target_map_tofrom"]
-    createPlotTimingClauses(tests_to_plot, labels = labels)
-    plt.savefig(outputFileName+"_target.png")
-    # Target Data
-    labels = ["map_to", "map_from", "map_tofrom", "device", "if"]
-    tests_to_plot = ["target_data_map_to", "target_data_map_from", "target_data_map_tofrom", "target_data_device", "target_data_if"]
-    createPlotTimingClauses(tests_to_plot, labels = labels)
-    plt.savefig(outputFileName+"_target_data.png")
-    # Target enter data
-    labels = ["map_to", "map_alloc", "map_if_true", "map_if_false", "map_device", "map_depend"]
-    tests_to_plot = ["target_enter_data_map_to", "target_enter_data_map_alloc", "target_enter_data_map_if_true", "target_enter_data_map_if_false", "target_enter_data_map_device", "target_enter_data_map_depend"]
-    createPlotTimingClauses(tests_to_plot, labels = labels)
-    plt.savefig(outputFileName+"_target_enter_data.png")
-    # Target exit data
-    labels = ["map_from", "map_delete", "map_if_true", "map_if_false", "map_device", "map_depend"]
-    tests_to_plot = ["target_exit_data_map_from", "target_exit_data_map_delete", "target_exit_data_map_if_true", "target_exit_data_map_if_false", "target_exit_data_map_device", "target_exit_data_map_depend"]
-    createPlotTimingClauses(tests_to_plot, labels = labels)
-    plt.savefig(outputFileName+"_target_exit_data.png")
-    # Target update
-    labels = ["to", "to_if_true", "to_if_false", "to_device", "to_depend", "from", "from_if_true", "from_if_false", "from_device", "from_depend"]
-    tests_to_plot = ["target_update_to", "target_update_to_if_true", "target_update_to_if_false", "target_update_to_device", "target_update_to_depend", "target_update_from", "target_update_from_if_true","target_update_from_if_false", "target_update_from_device", "target_update_from_depend"]
-    createPlotTimingClauses(tests_to_plot, labels = labels)
-    plt.savefig(outputFileName+"_target_update.png")
-    # for i in tests_to_plot:
-    #   createPlotTimelineClause(i,"TEST_TIMING_CLAUSES", ["GCC","XLC","clang"])
-    #   plt.savefig(outputFileName+i+"_timeline.png")
+    if currentSystem == "summit":
+      # Target
+      labels = ["target", "defaultmap", "dependvar", "device", "firstprivate", "private", "if","is_device_ptr", "map_to", "map_from", "map_tofrom"]
+      tests_to_plot = ["target", "target_defaultmap", "target_dependvar", "target_device", "target_firstprivate", "target_private", "target_if","target_is_device_ptr", "target_map_to", "target_map_from", "target_map_tofrom"]
+      createPlotTimingClauses(tests_to_plot, labels = labels)
+      plt.savefig(outputFileName+"_target.png")
+      # Target Data
+      labels = ["map_to", "map_from", "map_tofrom", "device", "if"]
+      tests_to_plot = ["target_data_map_to", "target_data_map_from", "target_data_map_tofrom", "target_data_device", "target_data_if"]
+      createPlotTimingClauses(tests_to_plot, labels = labels)
+      plt.savefig(outputFileName+"_target_data.png")
+      # Target enter data
+      labels = ["map_to", "map_alloc", "map_if_true", "map_if_false", "map_device", "map_depend"]
+      tests_to_plot = ["target_enter_data_map_to", "target_enter_data_map_alloc", "target_enter_data_map_if_true", "target_enter_data_map_if_false", "target_enter_data_map_device", "target_enter_data_map_depend"]
+      createPlotTimingClauses(tests_to_plot, labels = labels)
+      plt.savefig(outputFileName+"_target_enter_data.png")
+      # Target exit data
+      labels = ["map_from", "map_delete", "map_if_true", "map_if_false", "map_device", "map_depend"]
+      tests_to_plot = ["target_exit_data_map_from", "target_exit_data_map_delete", "target_exit_data_map_if_true", "target_exit_data_map_if_false", "target_exit_data_map_device", "target_exit_data_map_depend"]
+      createPlotTimingClauses(tests_to_plot, labels = labels)
+      plt.savefig(outputFileName+"_target_exit_data.png")
+      # Target update
+      labels = ["to", "to_if_true", "to_if_false", "to_device", "to_depend", "from", "from_if_true", "from_if_false", "from_device", "from_depend"]
+      tests_to_plot = ["target_update_to", "target_update_to_if_true", "target_update_to_if_false", "target_update_to_device", "target_update_to_depend", "target_update_from", "target_update_from_if_true","target_update_from_if_false", "target_update_from_device", "target_update_from_depend"]
+      createPlotTimingClauses(tests_to_plot, labels = labels)
+      plt.savefig(outputFileName+"_target_update.png")
+      # for i in tests_to_plot:
+      #   createPlotTimelineClause(i,"TEST_TIMING_CLAUSES", ["GCC","XLC","clang"])
+      #   plt.savefig(outputFileName+i+"_timeline.png")
 
 
-    labels = ["(NO CLAUSE)",
-              "collapse",
-              "defaultmap",
-              "default(none)",
-              "default(shared)",
-              "depend",
-              "device",
-              "firstprivate",
-              "if(true)",
-              "if(false)",
-              "lastprivate",
-              "map(to)",
-              "map(from)",
-              "map(tofrom)",
-              "map(alloc)",
-              "private",
-              "shared"]
-            
-    tests_to_plot = ["target teams distribute parallel for",
-                    "target teams distribute parallel for collapse",
-                    "target teams distribute parallel for defaultmap",
-                    "target teams distribute parallel for default(none)",
-                    "target teams distribute parallel for default(shared)",
-                    "target teams distribute parallel for depend",
-                    "target teams distribute parallel for device",
-                    "target teams distribute parallel for firstprivate",
-                    "target teams distribute parallel for if(true)",
-                    "target teams distribute parallel for if(false)",
-                    "target teams distribute parallel for lastprivate",
-                    "target teams distribute parallel for map(to)",
-                    "target teams distribute parallel for map(from)",
-                    "target teams distribute parallel for map(tofrom)",
-                    "target teams distribute parallel for map(alloc)",
-                    "target teams distribute parallel for private",
-                    "target teams distribute parallel for shared"]
+      labels = ["(NO CLAUSE)",
+                "collapse",
+                "defaultmap",
+                "default(none)",
+                "default(shared)",
+                "depend",
+                "device",
+                "firstprivate",
+                "if(true)",
+                "if(false)",
+                "lastprivate",
+                "map(to)",
+                "map(from)",
+                "map(tofrom)",
+                "map(alloc)",
+                "private",
+                "shared"]
+              
+      tests_to_plot = ["target teams distribute parallel for",
+                      "target teams distribute parallel for collapse",
+                      "target teams distribute parallel for defaultmap",
+                      "target teams distribute parallel for default(none)",
+                      "target teams distribute parallel for default(shared)",
+                      "target teams distribute parallel for depend",
+                      "target teams distribute parallel for device",
+                      "target teams distribute parallel for firstprivate",
+                      "target teams distribute parallel for if(true)",
+                      "target teams distribute parallel for if(false)",
+                      "target teams distribute parallel for lastprivate",
+                      "target teams distribute parallel for map(to)",
+                      "target teams distribute parallel for map(from)",
+                      "target teams distribute parallel for map(tofrom)",
+                      "target teams distribute parallel for map(alloc)",
+                      "target teams distribute parallel for private",
+                      "target teams distribute parallel for shared"]
 
-    createPlotTimingClauses(tests_to_plot, labels=labels)
-    plt.savefig(outputFileName+"_target_teams_distribute_parallel_for.png")
-    tests_to_plot = ["target teams distribute",
-                    "target teams distribute collapse",
-                    "target teams distribute defaultmap",
-                    "target teams distribute default(none)",
-                    "target teams distribute default(shared)",
-                    "target teams distribute depend",
-                    "target teams distribute device",
-                    "target teams distribute firstprivate",
-                    "target teams distribute if(true)",
-                    "target teams distribute if(false)",
-                    "target teams distribute lastprivate",
-                    "target teams distribute map(to)",
-                    "target teams distribute map(from)",
-                    "target teams distribute map(tofrom)",
-                    "target teams distribute map(alloc)",
-                    "target teams distribute private",
-                    "target teams distribute shared"]
-    createPlotTimingClauses(tests_to_plot, labels=labels)
-    plt.savefig(outputFileName+"_target_teams_distribute.png")
-
-
-    labels = ["(NO CLAUSE)",
-              "collapse",
-              "defaultmap",
-              "default(none)",
-              "default(shared)",
-              "depend",
-              "device",
-              "firstprivate",
-              "if(true)",
-              "lastprivate",
-              "map(to)",
-              "map(from)",
-              "map(tofrom)",
-              "map(alloc)",
-              "private",
-              "shared"]
-    tests_to_plot = ["target teams distribute",
-                    "target teams distribute collapse",
-                    "target teams distribute defaultmap",
-                    "target teams distribute default(none)",
-                    "target teams distribute default(shared)",
-                    "target teams distribute depend",
-                    "target teams distribute device",
-                    "target teams distribute firstprivate",
-                    "target teams distribute if(true)",
-                    "target teams distribute lastprivate",
-                    "target teams distribute map(to)",
-                    "target teams distribute map(from)",
-                    "target teams distribute map(tofrom)",
-                    "target teams distribute map(alloc)",
-                    "target teams distribute private",
-                    "target teams distribute shared"]
-    createPlotNumTeams(tests_to_plot, ["clang", "XLC", "GCC"], labels=labels)
-    plt.savefig(outputFileName+"_target_teams_distribute_num_teams.png")
-
-    #Timelines! 
-
-    # Target
-    # createPlotTimelineClause("target","TEST_TIMING_CLAUSES", ["GCC","XLC","clang"])
-    # plt.savefig(outputFileName+"target_timeline.png")
-    # createPlotTimelineClause("target_data_map_to","TEST_TIMING_CLAUSES", ["GCC","XLC","clang"])
-    # plt.savefig(outputFileName+"target_data_map_to_timeline.png")
-    # createPlotTimelineClause("target_enter_data_map_to","TEST_TIMING_CLAUSES", ["GCC","XLC","clang"])
-    # plt.savefig(outputFileName+"target_enter_data_map_to_timeline.png")
-    # createPlotTimelineClause("target_exit_data_map_from","TEST_TIMING_CLAUSES", ["GCC","XLC","clang"])
-    # plt.savefig(outputFileName+"target_exit_data_map_from_timeline.png")
-    # createPlotTimelineClause("target teams distribute","TEST_TIMING_CLAUSES", ["GCC","XLC","clang"])
-    # plt.savefig(outputFileName+"target_teams_distribute.png")
-    # createPlotTimelineClause("target teams distribute parallel for","TEST_TIMING_CLAUSES", ["GCC","XLC","clang"])
-    # plt.savefig(outputFileName+"target_Teams_distribute_parallel_for_timeline.png")
+      createPlotTimingClauses(tests_to_plot, labels=labels)
+      plt.savefig(outputFileName+"_target_teams_distribute_parallel_for.png")
+      tests_to_plot = ["target teams distribute",
+                      "target teams distribute collapse",
+                      "target teams distribute defaultmap",
+                      "target teams distribute default(none)",
+                      "target teams distribute default(shared)",
+                      "target teams distribute depend",
+                      "target teams distribute device",
+                      "target teams distribute firstprivate",
+                      "target teams distribute if(true)",
+                      "target teams distribute if(false)",
+                      "target teams distribute lastprivate",
+                      "target teams distribute map(to)",
+                      "target teams distribute map(from)",
+                      "target teams distribute map(tofrom)",
+                      "target teams distribute map(alloc)",
+                      "target teams distribute private",
+                      "target teams distribute shared"]
+      createPlotTimingClauses(tests_to_plot, labels=labels)
+      plt.savefig(outputFileName+"_target_teams_distribute.png")
 
 
-    createPlotNumTeamsNumThreads("target teams distribute parallel for", ["GCC", "XLC", "clang"])
-    plt.savefig(outputFileName+"_target_teams_distribute_parallel_for_num_teams_num_threads.png")
+      labels = ["(NO CLAUSE)",
+                "collapse",
+                "defaultmap",
+                "default(none)",
+                "default(shared)",
+                "depend",
+                "device",
+                "firstprivate",
+                "if(true)",
+                "lastprivate",
+                "map(to)",
+                "map(from)",
+                "map(tofrom)",
+                "map(alloc)",
+                "private",
+                "shared"]
+      tests_to_plot = ["target teams distribute",
+                      "target teams distribute collapse",
+                      "target teams distribute defaultmap",
+                      "target teams distribute default(none)",
+                      "target teams distribute default(shared)",
+                      "target teams distribute depend",
+                      "target teams distribute device",
+                      "target teams distribute firstprivate",
+                      "target teams distribute if(true)",
+                      "target teams distribute lastprivate",
+                      "target teams distribute map(to)",
+                      "target teams distribute map(from)",
+                      "target teams distribute map(tofrom)",
+                      "target teams distribute map(alloc)",
+                      "target teams distribute private",
+                      "target teams distribute shared"]
+      createPlotNumTeams(tests_to_plot, ["clang", "XLC", "GCC"], labels=labels)
+      plt.savefig(outputFileName+"_target_teams_distribute_num_teams.png")
 
+      #Timelines! 
+
+      # Target
+      # createPlotTimelineClause("target","TEST_TIMING_CLAUSES", ["GCC","XLC","clang"])
+      # plt.savefig(outputFileName+"target_timeline.png")
+      # createPlotTimelineClause("target_data_map_to","TEST_TIMING_CLAUSES", ["GCC","XLC","clang"])
+      # plt.savefig(outputFileName+"target_data_map_to_timeline.png")
+      # createPlotTimelineClause("target_enter_data_map_to","TEST_TIMING_CLAUSES", ["GCC","XLC","clang"])
+      # plt.savefig(outputFileName+"target_enter_data_map_to_timeline.png")
+      # createPlotTimelineClause("target_exit_data_map_from","TEST_TIMING_CLAUSES", ["GCC","XLC","clang"])
+      # plt.savefig(outputFileName+"target_exit_data_map_from_timeline.png")
+      # createPlotTimelineClause("target teams distribute","TEST_TIMING_CLAUSES", ["GCC","XLC","clang"])
+      # plt.savefig(outputFileName+"target_teams_distribute.png")
+      # createPlotTimelineClause("target teams distribute parallel for","TEST_TIMING_CLAUSES", ["GCC","XLC","clang"])
+      # plt.savefig(outputFileName+"target_Teams_distribute_parallel_for_timeline.png")
+
+
+      createPlotNumTeamsNumThreads("target teams distribute parallel for", ["GCC", "XLC", "clang"])
+      plt.savefig(outputFileName+"_target_teams_distribute_parallel_for_num_teams_num_threads.png")
+    
+    if currentSystem =="fatnode":
+      # Target
+      labels = ["target", "defaultmap", "dependvar", "device", "firstprivate", "private", "if","is_device_ptr", "map_to", "map_from", "map_tofrom"]
+      tests_to_plot = ["target", "target_defaultmap", "target_dependvar", "target_device", "target_firstprivate", "target_private", "target_if","target_is_device_ptr", "target_map_to", "target_map_from", "target_map_tofrom"]
+      createPlotTimingClauses(tests_to_plot, labels = labels)
+      plt.savefig(outputFileName+"_target.png")
+      # Target Data
+      labels = ["map_to", "map_from", "map_tofrom", "device", "if"]
+      tests_to_plot = ["target_data_map_to", "target_data_map_from", "target_data_map_tofrom", "target_data_device", "target_data_if"]
+      createPlotTimingClauses(tests_to_plot, labels = labels)
+      plt.savefig(outputFileName+"_target_data.png")
+      # Target enter data
+      labels = ["map_to", "map_alloc", "map_if_true", "map_if_false", "map_device", "map_depend"]
+      tests_to_plot = ["target_enter_data_map_to", "target_enter_data_map_alloc", "target_enter_data_map_if_true", "target_enter_data_map_if_false", "target_enter_data_map_device", "target_enter_data_map_depend"]
+      createPlotTimingClauses(tests_to_plot, labels = labels)
+      plt.savefig(outputFileName+"_target_enter_data.png")
+      # Target exit data
+      labels = ["map_from", "map_delete", "map_if_true", "map_if_false", "map_device", "map_depend"]
+      tests_to_plot = ["target_exit_data_map_from", "target_exit_data_map_delete", "target_exit_data_map_if_true", "target_exit_data_map_if_false", "target_exit_data_map_device", "target_exit_data_map_depend"]
+      createPlotTimingClauses(tests_to_plot, labels = labels)
+      plt.savefig(outputFileName+"_target_exit_data.png")
+      # Target update
+      labels = ["to", "to_if_true", "to_if_false", "to_device", "to_depend", "from", "from_if_true", "from_if_false", "from_device", "from_depend"]
+      tests_to_plot = ["target_update_to", "target_update_to_if_true", "target_update_to_if_false", "target_update_to_device", "target_update_to_depend", "target_update_from", "target_update_from_if_true","target_update_from_if_false", "target_update_from_device", "target_update_from_depend"]
+      createPlotTimingClauses(tests_to_plot, labels = labels)
+      plt.savefig(outputFileName+"_target_update.png")
+      for i in tests_to_plot:
+        createPlotTimelineClause(i,"TEST_TIMING_CLAUSES", ["GCC","clang"])
+        plt.savefig(outputFileName+i+"_timeline.png")
+
+
+      labels = ["(NO CLAUSE)",
+                "collapse",
+                "defaultmap",
+                "default(none)",
+                "default(shared)",
+                "depend",
+                "device",
+                "firstprivate",
+                "if(true)",
+                "if(false)",
+                "lastprivate",
+                "map(to)",
+                "map(from)",
+                "map(tofrom)",
+                "map(alloc)",
+                "private",
+                "shared"]
+              
+      tests_to_plot = ["target teams distribute parallel for",
+                      "target teams distribute parallel for collapse",
+                      "target teams distribute parallel for defaultmap",
+                      "target teams distribute parallel for default(none)",
+                      "target teams distribute parallel for default(shared)",
+                      "target teams distribute parallel for depend",
+                      "target teams distribute parallel for device",
+                      "target teams distribute parallel for firstprivate",
+                      "target teams distribute parallel for if(true)",
+                      "target teams distribute parallel for if(false)",
+                      "target teams distribute parallel for lastprivate",
+                      "target teams distribute parallel for map(to)",
+                      "target teams distribute parallel for map(from)",
+                      "target teams distribute parallel for map(tofrom)",
+                      "target teams distribute parallel for map(alloc)",
+                      "target teams distribute parallel for private",
+                      "target teams distribute parallel for shared"]
+
+      createPlotTimingClauses(tests_to_plot, labels=labels)
+      plt.savefig(outputFileName+"_target_teams_distribute_parallel_for.png")
+      tests_to_plot = ["target teams distribute",
+                      "target teams distribute collapse",
+                      "target teams distribute defaultmap",
+                      "target teams distribute default(none)",
+                      "target teams distribute default(shared)",
+                      "target teams distribute depend",
+                      "target teams distribute device",
+                      "target teams distribute firstprivate",
+                      "target teams distribute if(true)",
+                      "target teams distribute if(false)",
+                      "target teams distribute lastprivate",
+                      "target teams distribute map(to)",
+                      "target teams distribute map(from)",
+                      "target teams distribute map(tofrom)",
+                      "target teams distribute map(alloc)",
+                      "target teams distribute private",
+                      "target teams distribute shared"]
+      createPlotTimingClauses(tests_to_plot, labels=labels)
+      plt.savefig(outputFileName+"_target_teams_distribute.png")
+
+
+      labels = ["(NO CLAUSE)",
+                "collapse",
+                "defaultmap",
+                "default(none)",
+                "default(shared)",
+                "depend",
+                "device",
+                "firstprivate",
+                "if(true)",
+                "lastprivate",
+                "map(to)",
+                "map(from)",
+                "map(tofrom)",
+                "map(alloc)",
+                "private",
+                "shared"]
+      tests_to_plot = ["target teams distribute",
+                      "target teams distribute collapse",
+                      "target teams distribute defaultmap",
+                      "target teams distribute default(none)",
+                      "target teams distribute default(shared)",
+                      "target teams distribute depend",
+                      "target teams distribute device",
+                      "target teams distribute firstprivate",
+                      "target teams distribute if(true)",
+                      "target teams distribute lastprivate",
+                      "target teams distribute map(to)",
+                      "target teams distribute map(from)",
+                      "target teams distribute map(tofrom)",
+                      "target teams distribute map(alloc)",
+                      "target teams distribute private",
+                      "target teams distribute shared"]
+
+      createPlotNumTeams(tests_to_plot, ["clang", "GCC"], labels=labels)
+      plt.savefig(outputFileName+"_target_teams_distribute_num_teams.png")
+
+
+      # Target
+      createPlotTimelineClause("target","TEST_TIMING_CLAUSES", ["GCC","clang"])
+      plt.savefig(outputFileName+"target_timeline.png")
+      createPlotTimelineClause("target_data_map_to","TEST_TIMING_CLAUSES", ["GCC","clang"])
+      plt.savefig(outputFileName+"target_data_map_to_timeline.png")
+      createPlotTimelineClause("target_enter_data_map_to","TEST_TIMING_CLAUSES", ["GCC","clang"])
+      plt.savefig(outputFileName+"target_enter_data_map_to_timeline.png")
+      createPlotTimelineClause("target_exit_data_map_from","TEST_TIMING_CLAUSES", ["GCC","clang"])
+      plt.savefig(outputFileName+"target_exit_data_map_from_timeline.png")
+      createPlotTimelineClause("target teams distribute","TEST_TIMING_CLAUSES", ["GCC","clang"])
+      plt.savefig(outputFileName+"target_teams_distribute.png")
+      createPlotTimelineClause("target teams distribute parallel for","TEST_TIMING_CLAUSES", ["GCC","clang"])
+      plt.savefig(outputFileName+"target_Teams_distribute_parallel_for_timeline.png")
+
+
+      createPlotNumTeamsNumThreads("target teams distribute parallel for", ["GCC", "XLC", "clang"])
+      plt.savefig(outputFileName+"_target_teams_distribute_parallel_for_num_teams_num_threads.png")
+    
 
 if __name__ == "__main__":
     main()
