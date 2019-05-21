@@ -1,3 +1,23 @@
+//===--- test_target_update_devices.c--------------------------------------===//
+//
+// OpenMP API Version 4.5 Nov 2015
+//
+// This test checks if the target update directive works on different devices.
+// We check two different variants.
+// 1. setting up the default device with the API call omp_set_default_device()
+// 2. using the device clause of the target update directive.
+//
+// Testing metodology uses an array that gets mapped into the device at first
+// through target enter data. Then on each iteration we update the array in one
+// device, create a compute region in that device, and then update it back
+// We also record that the compute region is not executed in the host
+// with the omp_is_initial_device() API call. Unfortunately 4.5 has no device
+// number API call.
+//
+////===----------------------------------------------------------------------===//
+
+
+
 #include <assert.h>
 #include <omp.h>
 #include <stdio.h>
@@ -7,9 +27,9 @@
 #define N 1000
 
 /*
- * This test check if update device works well 
- * when the omp_set_default_device API call is used 
- * to change the default device 
+ * This test check if update device works well
+ * when the omp_set_default_device API call is used
+ * to change the default device
  */
 int test_set_default_dev() {
   OMPVV_INFOMSG("test_set_default_dev");
@@ -40,8 +60,8 @@ int test_set_default_dev() {
     h_matrix[i] = 0;
   }
 
-  // Each device gets updated with the current array version, 
-  // one gets added to each element in the array, and then 
+  // Each device gets updated with the current array version,
+  // one gets added to each element in the array, and then
   // the host gets the updated version
   for (int dev = 0; dev < num_dev; ++dev) {
     omp_set_default_device(dev);
@@ -66,7 +86,7 @@ int test_set_default_dev() {
 #pragma omp target exit data map(delete: h_matrix[0:N])
     printf("");
   }
-  
+
   // checking results
   for (int dev = 0; dev < num_dev; ++dev) {
     OMPVV_INFOMSG("device %d ran on the %s", dev, (isHost[dev])? "host" : "device");
@@ -82,7 +102,7 @@ int test_set_default_dev() {
 }
 
 /*
- * This test checks if using the device clause in 
+ * This test checks if using the device clause in
  * data update works fine
  */
 int test_device() {
@@ -96,7 +116,9 @@ int test_device() {
   OMPVV_INFOMSG("initial device: %d", omp_get_initial_device());
   OMPVV_INFOMSG("default device: %d", def_dev);
 
-  int sum, errors = 0, isHost[num_dev];
+  int sum = 0;
+  int errors = 0;
+  int isHost[num_dev];
   int h_matrix[N];
 
   // Mapping the array to all the devices
@@ -113,8 +135,8 @@ int test_device() {
     h_matrix[i] = 0;
   }
 
-  // Each device gets updated with the current array version, 
-  // one gets added to each element in the array, and then 
+  // Each device gets updated with the current array version,
+  // one gets added to each element in the array, and then
   // the host gets the updated version
   for (int dev = 0; dev < num_dev; ++dev) {
 #pragma omp target update to(h_matrix[0:N]) device(dev)
@@ -138,7 +160,7 @@ int test_device() {
 #pragma omp target exit data map(delete: h_matrix[0:N]) device(dev)
     printf("");
   }
-  
+
   // checking results
   for (int dev = 0; dev < num_dev; ++dev) {
     OMPVV_INFOMSG("device %d ran on the %s", dev, (isHost[dev])? "host" : "device");
