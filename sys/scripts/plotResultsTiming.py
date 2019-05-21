@@ -551,7 +551,169 @@ def createPlotTimelineClause(test, test_type, compilers=None, versions=None, lab
 
 
             
-def createPlotTimingClauses(tests, compilers=None, versions=None, labels=None):
+def createPlotNestedVsCombined(tests, compilers=None, versions=None, labels=None):
+  printLog("Plotting TEST_NESTED..." ,1)
+  if not isinstance(tests, list):
+    printLog("ERROR: tests is not a list")
+    return None
+
+
+  #so I don't have to type it all 
+  tests_comb_nest = []
+  for test in tests:
+    tests_comb_nest.append(test+" combined")
+    tests_comb_nest.append(test+" nested")
+
+
+  # Plot configuration
+  n_groups = len(tests)
+  index = np.arange(n_groups)
+
+  # Getting the number of compilers. Each compiler is a subgraph
+  num_compilers = len(compilers) if compilers is not None else len(results)
+  fig, axes = plt.subplots(ncols=num_compilers, sharey="row", figsize=(10*num_compilers, 9))
+  fig.subplots_adjust(left=0.25, hspace=0)
+  if type(axes) is not np.ndarray:
+    axes = [axes]
+  cur_ax = 0
+
+  color_combined = "Reds"
+  color_nested = "Greens"
+
+  # Filtering out the results by test in the tests list and by compilers and versions
+  for compiler in results:
+    if (compilers is None or compiler in compilers):
+      values2plot = {}
+      # For choosing the color map
+      scalarMapNested = []
+      scalarMapCombined = []
+      cm_nested = plt.get_cmap(color_nested)
+      cm_combined = plt.get_cmap(color_combined)
+      cNorm  = colors.Normalize(vmin=-len(results[compiler]), vmax=len(results[compiler])*2)
+      scalarMapNested = cmx.ScalarMappable(norm=cNorm, cmap=cm_nested)
+      cNorm  = colors.Normalize(vmin=-len(results[compiler]), vmax=len(results[compiler])*2)
+      scalarMapCombined = cmx.ScalarMappable(norm=cNorm, cmap=cm_combined)
+
+      nextColor = len(results[compiler]) if versions is None else len(versions)
+      printLog(" -> Compiler " + str(compiler), 2)
+      for version in results[compiler]:
+        if (versions is None or version in versions):
+          colorValNested = scalarMapNested.to_rgba(nextColor)
+          colorValCombined = scalarMapCombined.to_rgba(nextColor)
+          nextColor = nextColor - 1
+          printLog("    -> Version " + str(version), 2)
+          newVals = {
+            "combined": {
+              "omp_runtime_means": [],
+              "omp_runtime_medians" : [],
+              "omp_runtime_stdev" : [],
+              "cuda_means" : [],
+              "cuda_medians" : [],
+              "cuda_stdev" : [],
+              "colorVal" : colorValCombined
+            }, 
+            "nested": {
+              "omp_runtime_means": [],
+              "omp_runtime_medians" : [],
+              "omp_runtime_stdev" : [],
+              "cuda_means" : [],
+              "cuda_medians" : [],
+              "cuda_stdev" : [],
+              "colorVal" : colorValNested
+            }
+          }
+          for test in tests_comb_nest:
+            test_results = results[compiler][version]["TEST_NESTED"]['0']['0']
+            if test in test_results:
+              if test.find(" combined") != -1:
+                # Obtaining the values for combined tests
+                newVals["combined"]["omp_runtime_means"].append(test_results[test]["mean"][2])
+                newVals["combined"]["omp_runtime_medians"].append(test_results[test]["median"][2])
+                newVals["combined"]["omp_runtime_stdev"].append(test_results[test]["stdev"][2])
+                newVals["combined"]["cuda_means"].append(test_results[test]["mean"][1])
+                newVals["combined"]["cuda_medians"].append(test_results[test]["median"][1])
+                newVals["combined"]["cuda_stdev"].append(test_results[test]["stdev"][1])
+              else: 
+                newVals["nested"]["omp_runtime_means"].append(test_results[test]["mean"][2])
+                newVals["nested"]["omp_runtime_medians"].append(test_results[test]["median"][2])
+                newVals["nested"]["omp_runtime_stdev"].append(test_results[test]["stdev"][2])
+                newVals["nested"]["cuda_means"].append(test_results[test]["mean"][1])
+                newVals["nested"]["cuda_medians"].append(test_results[test]["median"][1])
+                newVals["nested"]["cuda_stdev"].append(test_results[test]["stdev"][1])
+            else:
+              # test result does not exist
+              newVals["combined"]["omp_runtime_means"].append(0)
+              newVals["combined"]["omp_runtime_medians"].append(0)
+              newVals["combined"]["omp_runtime_stdev"].append(0)
+              newVals["combined"]["cuda_means"].append(0)
+              newVals["combined"]["cuda_medians"].append(0)
+              newVals["combined"]["cuda_stdev"].append(0)
+
+              newVals["nested"]["omp_runtime_means"].append(0)
+              newVals["nested"]["omp_runtime_medians"].append(0)
+              newVals["nested"]["omp_runtime_stdev"].append(0)
+              newVals["nested"]["cuda_means"].append(0)
+              newVals["nested"]["cuda_medians"].append(0)
+              newVals["nested"]["cuda_stdev"].append(0)
+
+          version_text = str(version) if version_labels[currentSystem][compiler] is None else version_labels[currentSystem][compiler]
+          groupName = str(compiler)+" "+version_text
+          values2plot[groupName] = newVals
+    bar_width = 0.8/(len(values2plot)*2) # One for combined and one for nested
+    # Adding the plots
+    for indx, key in enumerate(values2plot):
+      totals_combined = []
+      totals_nested = []
+      if (includeCuda):
+        totals_combined = [values2plot[key]["combined"]["cuda_medians"][i] + values2plot[key]["combined"]["omp_runtime_medians"][i] for i in range(len(values2plot[key]["combined"]["cuda_medians"]))] 
+        totals_nested = [values2plot[key]["nested"]["cuda_medians"][i] + values2plot[key]["nested"]["omp_runtime_medians"][i] for i in range(len(values2plot[key]["nested"]["cuda_medians"]))] 
+      else:
+        totals_combined = values2plot[key]["combined"]["omp_runtime_medians"]
+        totals_nested = values2plot[key]["nested"]["omp_runtime_medians"]
+
+      #changing ns to us
+      totals_combined = [i/1000 for i in totals_combined]
+      totals_nested = [i/1000 for i in totals_nested]
+      
+      #for Combined
+      axes[cur_ax].bar(index + 0.1 + bar_width*2*indx, totals_combined, bar_width,
+      label="combined",
+      color= values2plot[key]["combined"]["colorVal"])
+      if (includeCuda):
+        cuda_values_combined = [i/1000 for i in values2plot[key]["combined"]["cuda_medians"]]
+        axes[cur_ax].bar(index + 0.1 + bar_width*2*indx,cuda_values_combined, bar_width,
+        color="silver",
+        label=None)
+      
+      #for Nested
+      axes[cur_ax].bar(index + 0.1 + bar_width*(2*indx+1), totals_nested, bar_width,
+      label="nested",
+      color= values2plot[key]["nested"]["colorVal"])
+      if (includeCuda):
+        cuda_values_nested = [i/1000 for i in values2plot[key]["nested"]["cuda_medians"]]
+        axes[cur_ax].bar(index + 0.1 + bar_width*(2*indx+1),cuda_values_nested, bar_width,
+        color="silver",
+        label="CUDA" if indx == len(values2plot)-1 else None)
+      axes[cur_ax].set_xlabel('clause', fontsize = 18)
+      if (cur_ax == 0):
+        axes[cur_ax].set_ylabel('time (us)', fontsize = 18)
+      axes[cur_ax].set_xticks(index + 0.35)
+      axes[cur_ax].set_xticklabels((tests if labels is None else labels),  rotation="vertical", fontsize=12)
+      if(cur_ax == num_compilers -1):
+        axes[cur_ax].legend(loc=0, fontsize=18)
+    cur_ax += 1
+  plt.tight_layout()
+  cur_ax = 0
+  for compiler in results:
+    if (compilers is None or compiler in compilers):
+      pos = list(axes[cur_ax].get_position().bounds)
+      x_text = pos[0] + 0.01
+      y_text = pos[1] + pos[3] - 0.01
+      version_text = str(results[compiler].keys()) if version_labels[currentSystem][compiler] is None else version_labels[currentSystem][compiler]
+      fig.text(x_text, y_text, compiler + " " + version_text,  va='center', fontsize=10)
+      cur_ax += 1
+  
+def createPlotTimingClauses (tests, compilers=None, versions=None, labels=None):
   printLog("Plotting TEST_TIMING_CLAUSES..." ,1)
   if not isinstance(tests, list):
     printLog("ERROR: tests is not a list")
@@ -645,7 +807,8 @@ def createPlotTimingClauses(tests, compilers=None, versions=None, labels=None):
   plt.xticks(index + 0.35, (tests if labels is None else labels),  rotation="vertical", fontsize=12)
   plt.legend(loc=0, fontsize=18)
   plt.tight_layout()
-  
+ 
+
 def createPlotNumTeams(tests, compilers=None, versions=None, labels=None):
   printLog("Plotting TEST_VARIANT_TTD..." ,1)
   if not isinstance(tests, list):
@@ -972,6 +1135,7 @@ def main():
 
       createPlotTimingClauses(tests_to_plot, labels=labels)
       plt.savefig(outputFileName+"_target_teams_distribute_parallel_for.png")
+
       tests_to_plot = ["target teams distribute",
                       "target teams distribute collapse",
                       "target teams distribute defaultmap",
@@ -993,6 +1157,62 @@ def main():
       plt.savefig(outputFileName+"_target_teams_distribute.png")
 
 
+      # PLOTTING NESTED VS COMBINED
+      labels = ["(NO CLAUSE)",
+                "collapse",
+                "defaultmap",
+                "default(none)",
+                "default(shared)",
+                "depend",
+                "device",
+                "firstprivate",
+                "lastprivate",
+                "map(to)",
+                "map(from)",
+                "map(tofrom)",
+                "map(alloc)",
+                "private",
+                "shared"]
+      tests_to_plot = ["target teams distribute parallel for",
+                      "target teams distribute parallel for collapse",
+                      "target teams distribute parallel for defaultmap",
+                      "target teams distribute parallel for default(none)",
+                      "target teams distribute parallel for default(shared)",
+                      "target teams distribute parallel for depend",
+                      "target teams distribute parallel for device",
+                      "target teams distribute parallel for firstprivate",
+                      "target teams distribute parallel for lastprivate",
+                      "target teams distribute parallel for map(to)",
+                      "target teams distribute parallel for map(from)",
+                      "target teams distribute parallel for map(tofrom)",
+                      "target teams distribute parallel for map(alloc)",
+                      "target teams distribute parallel for private",
+                      "target teams distribute parallel for shared"]
+          
+      createPlotNestedVsCombined(tests_to_plot, labels=labels)
+      plt.savefig(outputFileName+"_target_teams_distribute_parallel_for_combined_vs_nested.png")
+
+      tests_to_plot = ["target teams distribute",
+                      "target teams distribute collapse",
+                      "target teams distribute defaultmap",
+                      "target teams distribute default(none)",
+                      "target teams distribute default(shared)",
+                      "target teams distribute depend",
+                      "target teams distribute device",
+                      "target teams distribute firstprivate",
+                      "target teams distribute lastprivate",
+                      "target teams distribute map(to)",
+                      "target teams distribute map(from)",
+                      "target teams distribute map(tofrom)",
+                      "target teams distribute map(alloc)",
+                      "target teams distribute private",
+                      "target teams distribute shared"]
+
+      createPlotNestedVsCombined(tests_to_plot, labels=labels)
+      plt.savefig(outputFileName+"_target_teams_distribute_combined_Vs_nested.png")
+
+
+      # PLOTTING THE DIFFERENT NUM TEAMS
       labels = ["(NO CLAUSE)",
                 "collapse",
                 "defaultmap",
@@ -1190,9 +1410,63 @@ def main():
       plt.savefig(outputFileName+"target_Teams_distribute_parallel_for_timeline.png")
 
 
-      createPlotNumTeamsNumThreads("target teams distribute parallel for", ["GCC", "XLC", "clang"])
+      createPlotNumTeamsNumThreads("target teams distribute parallel for", ["GCC", "clang"])
       plt.savefig(outputFileName+"_target_teams_distribute_parallel_for_num_teams_num_threads.png")
     
+
+      # PLOTTING NESTED VS COMBINED
+      labels = ["(NO CLAUSE)",
+                "collapse",
+                "defaultmap",
+                "default(none)",
+                "default(shared)",
+                "depend",
+                "device",
+                "firstprivate",
+                "lastprivate",
+                "map(to)",
+                "map(from)",
+                "map(tofrom)",
+                "map(alloc)",
+                "private",
+                "shared"]
+      tests_to_plot = ["target teams distribute parallel for",
+                      "target teams distribute parallel for collapse",
+                      "target teams distribute parallel for defaultmap",
+                      "target teams distribute parallel for default(none)",
+                      "target teams distribute parallel for default(shared)",
+                      "target teams distribute parallel for depend",
+                      "target teams distribute parallel for device",
+                      "target teams distribute parallel for firstprivate",
+                      "target teams distribute parallel for lastprivate",
+                      "target teams distribute parallel for map(to)",
+                      "target teams distribute parallel for map(from)",
+                      "target teams distribute parallel for map(tofrom)",
+                      "target teams distribute parallel for map(alloc)",
+                      "target teams distribute parallel for private",
+                      "target teams distribute parallel for shared"]
+          
+      createPlotNestedVsCombined(tests_to_plot, labels=labels)
+      plt.savefig(outputFileName+"_target_teams_distribute_parallel_for_combined_vs_nested.png")
+
+      tests_to_plot = ["target teams distribute",
+                      "target teams distribute collapse",
+                      "target teams distribute defaultmap",
+                      "target teams distribute default(none)",
+                      "target teams distribute default(shared)",
+                      "target teams distribute depend",
+                      "target teams distribute device",
+                      "target teams distribute firstprivate",
+                      "target teams distribute lastprivate",
+                      "target teams distribute map(to)",
+                      "target teams distribute map(from)",
+                      "target teams distribute map(tofrom)",
+                      "target teams distribute map(alloc)",
+                      "target teams distribute private",
+                      "target teams distribute shared"]
+
+      createPlotNestedVsCombined(tests_to_plot, labels=labels)
+      plt.savefig(outputFileName+"_target_teams_distribute_combined_Vs_nested.png")
 
 if __name__ == "__main__":
     main()
