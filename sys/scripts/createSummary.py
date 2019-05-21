@@ -317,6 +317,20 @@ def main():
            "endingRuntimeDate, runtimePass, runtimeOutput \n"
     for result in results:
       formatedOutput = formatedOutput + result.convert2CSV() + '\n'
+  elif args.format and args.format[0].lower() == 'bitbucket':
+    num_tests = len(results)
+    failures = []
+    for result in results: 
+      if result.compilerPass != "PASS":
+        failures.append("  " + result.testName + " on " + result.compilerName + " (compiler) ")
+      elif result.runtimePass != "PASS":
+        failures.append("  " + result.testName + " on " + result.compilerName + " (runtime) ")
+    if len(failures) == 0:
+      formatedOutput = "PASS\nChecked " + str(num_tests) + " runs"
+    else:
+      formatedOutput = "FAILED\nReported errors:\n"
+      for failure in failures:
+        formatedOutput += failure+"\n"
 
   # Checking if output file was specified
   if args.output and args.output[0]!="":
