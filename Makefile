@@ -350,6 +350,10 @@ $(RESULTS_JSON_OUTPUT_FILE):
 report_json: $(RESULTS_JSON_OUTPUT_FILE)
 	@echo " === REPORT DONE === "
 
+.PHONY: report_summary
+report_summary: 
+	@$(RESULTS_ANALYZER) -r -f summary $(LOGDIRNAME)/*
+
 .PHONY: report_html
 report_html: $(RESULTS_JSON_OUTPUT_FILE)
 	@if [ -d "./$(RESULTS_HTML_OUTPUT_FOLDER)" ]; then \
@@ -415,6 +419,8 @@ help:
 	@echo "  report_json"
 	@echo "    create a json file containing the results existing in the logs files inside the $(LOGDIRNAME) folder"
 	@echo "    currently we only support runs that contain output for compile and run"
+	@echo "  report_summary"
+	@echo "    Create a summarized report of the tests that failed, and how many runs in total the given log folder '$(LOGDIRNAME)' has."
 	@echo "  report_html"
 	@echo "    create an html based results report. This rule takes the json file and a prebuild template and creates"
 	@echo "    the $(RESULTS_HTML_OUTPUT_FOLDER) folder containing the report. This report allows filtering the results"
