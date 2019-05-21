@@ -1,6 +1,6 @@
 #---------------------------------------------------------------------------
 #
-#                SITE- AND/OR PLATFORM-SPECIFIC DEFINITIONS. 
+#                SITE- AND/OR PLATFORM-SPECIFIC DEFINITIONS.
 #
 #---------------------------------------------------------------------------
 
@@ -10,12 +10,12 @@
 
 #---------------------------------------------------------------------------
 #
-# CC/CXX         - C/C++ compiler 
+# CC/CXX         - C/C++ compiler
 # CFLAGS/CXXFLAG     - C/C++ compilation arguments
 # C_INC/CXX_INC      - any -I arguments required for compiling C/C++
 # CLINK/CXXLINK     - C/C++ linker
 # CLINKFLAGS/CXXLINKFLAGS - C/C++ linker flags
-# C_LIB/CXX_LIB      - any -L and -l arguments required for linking C/C++ 
+# C_LIB/CXX_LIB      - any -L and -l arguments required for linking C/C++
 #
 # For C compilations are done with $(CC) $(C_INC) $(CFLAGS) or
 #                            $(CC) $(CFLAGS)
@@ -46,7 +46,7 @@ endif
 ifeq ($(CC), gcc)
   COFFLOADING = -foffload="-lm" -lm
   C_NO_OFFLOADING = -foffload=disable
-  CFLAGS += -O3 -std=c99 -fopenmp $(COFFLOADING) 
+  CFLAGS += -O3 -std=c99 -fopenmp $(COFFLOADING)
   CLINK = gcc
   CLINKFLAGS += -O3 -fopenmp $(COFFLOADING)
 endif
@@ -54,7 +54,7 @@ endif
 # IBM XL compiler
 ifeq ($(CC), xlc)
   COFFLOADING = -qoffload
-  C_NO_OFFLOADING = 
+  C_NO_OFFLOADING =
   CFLAGS += -O3 -qsmp=omp $(COFFLOADING)
   CLINK = xlc
   CLINKFLAGS += -O3 -qsmp=omp $(COFFLOADING)
@@ -63,10 +63,10 @@ endif
 # Clang compiler
 ifeq ($(CC), clang)
   COFFLOADING = -fopenmp-targets=nvptx64-nvida-cuda
-  C_NO_OFFLOADING = 
-  CFLAGS += -O3 -std=c99 -fopenmp $(COFFLOADING)
+  C_NO_OFFLOADING =
+  CFLAGS += -lm -O3 -std=c99 -fopenmp $(COFFLOADING)
   CLINK = clang
-  CLINKFLAGS += -O3 -fopenmp $(COFFLOADING)
+  CLINKFLAGS += -lm -O3 -fopenmp $(COFFLOADING)
 endif
 
 #---------------------------------------------------------------------------
@@ -94,7 +94,7 @@ endif
 # IBM XL compiler
 ifeq ($(CXX), xlc++)
   CXXOFFLOADING = -qoffload
-  CXX_NO_OFFLOADING = 
+  CXX_NO_OFFLOADING =
   CXXFLAGS += -O3 -qsmp=omp $(CXXOFFLOADING)
   CXXLINK = xlc++
   CXXLINKFLAGS += -O3 -qsmp=omp $(CXXOFFLOADING)
@@ -102,11 +102,11 @@ endif
 
 # Clang compiler
 ifeq ($(CXX), clang++)
-  CXXOFFLOADING = -fopenmp-targets=nvptx64-nvida-cuda 
-  CXX_NO_OFFLOADING = 
-  CXXFLAGS += -O3 -fopenmp $(CXXOFFLOADING) 
+  CXXOFFLOADING = -fopenmp-targets=nvptx64-nvida-cuda
+  CXX_NO_OFFLOADING =
+  CXXFLAGS += -lm -O3 -fopenmp $(CXXOFFLOADING)
   CXXLINK = clang++
-  CXXLINKFLAGS += -O3 -fopenmp $(CXXOFFLOADING)
+  CXXLINKFLAGS += -lm -O3 -fopenmp $(CXXOFFLOADING)
 endif
 
 #---------------------------------------------------------------------------
@@ -125,31 +125,31 @@ ifeq ($(FC), gfortran)
 endif
 
 # IBM XLF compiler
-# Summitdev happens to have a wrapper that without it we cannot execute 
+# Summitdev happens to have a wrapper that without it we cannot execute
 # xlf with OMP 4.5 support. This wrapper is xlf_r
 ifeq ($(FC), $(filter $(FC), xlf xlf_r))
   FOFFLOADING = -qoffload
-  F_NO_OFFLOADING = 
+  F_NO_OFFLOADING =
   FFLAGS += -O3 -qsmp=omp $(FOFFLOADING) -qmoddir=./ompvv -DEXIT=EXIT_
   FLINK = xlc
   FLINKFLAGS += -O3 -qsmp=omp $(FOFFLOADING)
 endif
 #---------------------------------------------------------------------------
-# These macros are passed to the linker 
+# These macros are passed to the linker
 #---------------------------------------------------------------------------
-C_LIB  = 
-CXX_LIB  = 
-F_LIB = 
+C_LIB  =
+CXX_LIB  =
+F_LIB =
 
 #---------------------------------------------------------------------------
-# These macros are passed to the compiler 
+# These macros are passed to the compiler
 #---------------------------------------------------------------------------
 C_INC = -I./ompvv
 CXX_INC = -I./ompvv
 F_INC = -I./ompvv
 
 #---------------------------------------------------------------------------
-# Destination of executables, relative to subdirs of the main directory. . 
+# Destination of executables, relative to subdirs of the main directory. .
 #---------------------------------------------------------------------------
 BINDIR ?= bin
 
