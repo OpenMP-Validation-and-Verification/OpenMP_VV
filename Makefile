@@ -3,6 +3,17 @@ SHELL=/bin/bash -o pipefail
 # When using make alone show the help message
 .DEFAULT_GOAL:=help
 
+#################################################
+# OpenMP Versions. This is to support multiple
+# versions of the standard in the same testsuite
+#################################################
+OMP_VERSION?=4.5
+TEST_FOLDER_EXISTS=$(shell if [ -d tests/$(OMP_VERSION) ]; then echo "exist";fi)
+ifeq "$(TEST_FOLDER_EXISTS)" ""
+  $(error The OMP_VERSION=$(OMP_VERSION) does not exist in this testsuite)
+endif
+
+
 ##################################################
 # System specific varibles can be specified
 # in the system files sys/system/###.def
@@ -67,9 +78,9 @@ endif
 
 ifneq "$(SOURCES)" ""
 # Obtain all the possible source files for C, CPP and Fortran
-SOURCES_C := $(shell find $(CURDIR) -path "*$(SOURCES)" | grep "\.c$$")
-SOURCES_CPP := $(shell find $(CURDIR) -path "*$(SOURCES)" | grep "\.cpp$$")
-SOURCES_F := $(shell find $(CURDIR) -path "*$(SOURCES)" | grep "\(\.F90\|\.F95\|\.F03\|\.F\|\.FOR\)$$")
+SOURCES_C := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -path "*$(SOURCES)" | grep "\.c$$")
+SOURCES_CPP := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -path "*$(SOURCES)" | grep "\.cpp$$")
+SOURCES_F := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -path "*$(SOURCES)" | grep "\(\.F90\|\.F95\|\.F03\|\.F\|\.FOR\)$$")
 $(info SOURCES = $(notdir $(SOURCES_C) $(SOURCES_CPP) $(SOURCES_F)))
 
 # Obtain the list of files that were previously
@@ -122,9 +133,9 @@ endif
 
 ifeq "$(SOURCES)" ""
 # Getting all the source files in the project
-SOURCES_C := $(shell find $(CURDIR) -name *.c)
-SOURCES_CPP := $(shell find $(CURDIR) -name *.cpp)
-SOURCES_F := $(shell find $(CURDIR) -name "*.F90" -o -name "*.F95" -o -name "*.F03" -o -name "*.F" -o -name "*.FOR" | grep -v "ompvv.F90")
+SOURCES_C := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -name *.c)
+SOURCES_CPP := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -name *.cpp)
+SOURCES_F := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -name "*.F90" -o -name "*.F95" -o -name "*.F03" -o -name "*.F" -o -name "*.FOR" | grep -v "ompvv.F90")
 
 # Find all the binary files that have been previously compiled
 TESTS_TO_RUN := $(shell test -d $(BINDIR) && \
@@ -404,6 +415,9 @@ help:
 	@echo "  ADD_BATCH_SCHED=1         Add the jsrun command before the execution of the running script to send it to a compute node"
 	@echo "  NO_OFFLOADING=1           Turn off offloading"
 	@echo "  SOURCES=file or exp       Specify the source file(s) that you want to apply the rule to. You can use wildchars to select a subset of tests"
+	@echo "  OMP_VERSION=[e.g. 4.5]    This specifies which version of the specs we are targeting. This version should have its folder in tests/[version]"
+	@echo "                            default value is 4.5"
+	@echo "                            WARNING: WHEN CHANGING VERSIONS START FROM A CLEAN BUILD. OTHERWISE BINARIES and LOG folders may collide."
 	@echo ""
 	@echo " === RULES ==="
 	@echo "  all"
