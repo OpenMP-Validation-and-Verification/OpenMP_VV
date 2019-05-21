@@ -317,7 +317,7 @@ def main():
            "endingRuntimeDate, runtimePass, runtimeOutput \n"
     for result in results:
       formatedOutput = formatedOutput + result.convert2CSV() + '\n'
-  elif args.format and args.format[0].lower() == 'bitbucket':
+  elif args.format and args.format[0].lower() == 'summary':
     num_tests = len(results)
     failures = []
     for result in results: 
@@ -328,7 +328,7 @@ def main():
     if len(failures) == 0:
       formatedOutput = "PASS\nChecked " + str(num_tests) + " runs"
     else:
-      formatedOutput = "FAILED\nReported errors:\n"
+      formatedOutput = "FAILED\nChecked " + str(num_tests) + " runs\nReported errors(" + str(len(failures)) + "):\n"
       for failure in failures:
         formatedOutput += failure+"\n"
 
