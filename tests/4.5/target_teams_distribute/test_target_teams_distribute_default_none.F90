@@ -69,7 +69,7 @@
 
             !$omp target data map(to: a(1:N)) map(tofrom: share)
               !$omp target teams distribute default(none) private(x) &
-              !$omp& shared(share, a)
+              !$omp& shared(share, a) defaultmap(tofrom:scalar)
               DO x = 1, N
                 !$omp atomic
                 share = share + a(x)
