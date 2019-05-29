@@ -62,6 +62,7 @@
             INTEGER :: a(N)
             INTEGER :: share, x, errors
             errors = 0
+            share = 0
 
             DO x = 1, N
               a(x) = x
