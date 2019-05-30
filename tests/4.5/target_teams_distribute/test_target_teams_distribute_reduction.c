@@ -14,36 +14,37 @@
 #include "ompvv.h"
 #include <math.h>
 
+#DEFINE N 1024
 
 int test_add(){
-    int a[1024];
-    int b[1024];
+    int a[N];
+    int b[N];
     int total = 0;
     int host_total = 0;
     int errors = 0;
-    int num_teams[1024];
+    int num_teams[N];
     int warned = 0;
 
-    for (int x = 0; x < 1024; ++x){
+    for (int x = 0; x < N; ++x){
         a[x] = 1;
         b[x] = x;
         num_teams[x] = -x;
     }
 
-    #pragma omp target data map(tofrom: num_teams[0:1024]) map(to: a[0:1024], b[0:1024])
+    #pragma omp target data map(tofrom: num_teams[0:N]) map(to: a[0:N], b[0:N])
     {
-        #pragma omp target teams distribute reduction(+:total) map(alloc: a[0:1024], b[0:1024], num_teams[0:1024])
-        for (int x = 0; x < 1024; ++x){
+        #pragma omp target teams distribute reduction(+:total) map(alloc: a[0:N], b[0:N], num_teams[0:N])
+        for (int x = 0; x < N; ++x){
             num_teams[x] = omp_get_num_teams();
             total += a[x] + b[x];
         }
     }
 
-    for (int x = 0; x < 1024; ++x){
+    for (int x = 0; x < N; ++x){
         host_total += a[x] + b[x];
     }
 
-    for (int x = 1; x < 1024; ++x){
+    for (int x = 1; x < N; ++x){
         if (num_teams[x-1] != num_teams[x]){
           OMPVV_WARNING("Kernel reported multiple numbers of teams.  Validity of testing of reduction clause cannot be guarunteed.");
           warned += 1;
@@ -61,16 +62,17 @@ int test_add(){
 }
 
 int test_and(){
-    char a[1024];
+    char a[N];
     char result;
     char host_result;
-    double false_margin = pow(exp(1), log(.5)/1024);
+    double false_margin = pow(exp(1), log(.5)/N);
     int errors = 0;
-    int num_teams[1024];
+    int num_teams[N];
     int warned = 0;
+    srand(1);
 
     for (int itr_count = 0; itr_count < 16; ++itr_count){
-        for (int x = 0; x < 1024; ++x){
+        for (int x = 0; x < N; ++x){
             if (rand() / (double)(RAND_MAX) < false_margin){
                 a[x] = 1;
             }
@@ -83,21 +85,21 @@ int test_and(){
         result = 1;
         host_result = 1;
 
-        #pragma omp target data map(to: a[0:1024]) map(tofrom: num_teams[0:1024])
+        #pragma omp target data map(to: a[0:N]) map(tofrom: num_teams[0:N])
         {
-            #pragma omp target teams distribute reduction(&&:result) map(alloc: a[0:1024], num_teams[0:1024])
-            for (int x = 0; x < 1024; ++x){
+            #pragma omp target teams distribute reduction(&&:result) map(alloc: a[0:N], num_teams[0:N])
+            for (int x = 0; x < N; ++x){
                 num_teams[x] = omp_get_num_teams();
                 result = result && a[x];
             }
         }
 
-        for (int x = 0; x < 1024; ++x){
+        for (int x = 0; x < N; ++x){
             host_result = host_result && a[x];
         }
 
         if (itr_count == 0){
-          for (int x = 1; x < 1024; ++x){
+          for (int x = 1; x < N; ++x){
             if (num_teams[x-1] != num_teams[x]){
               OMPVV_WARNING("Kernel reported multiple numbers of teams.  Validity of testing of reduction clause cannot be guarunteed.");
               warned += 1;
@@ -119,13 +121,14 @@ int test_and(){
 }
 
 int test_bitand(){
-    unsigned int a[1024];
-    double false_margin = pow(exp(1), log(.5)/1024);
+    unsigned int a[N];
+    double false_margin = pow(exp(1), log(.5)/N);
     int errors = 0;
-    int num_teams[1024];
+    int num_teams[N];
     int warned = 0;
+    srand(1);
 
-    for (int x = 0; x < 1024; ++x){
+    for (int x = 0; x < N; ++x){
         for (int y = 0; y < 16; ++y){
             if (rand() / (double) RAND_MAX < false_margin){
                 a[x] += 1 << y;
@@ -139,21 +142,21 @@ int test_bitand(){
         b = b + (1 << x);
     }
 
-    #pragma omp target data map(tofrom: num_teams[0:1024]) map(to: a[0:1024])
+    #pragma omp target data map(tofrom: num_teams[0:N]) map(to: a[0:N])
     {
-        #pragma omp target teams distribute reduction(&:b) map(alloc: a[0:1024], num_teams[0:1024])
-        for (int x = 0; x < 1024; ++x){
+        #pragma omp target teams distribute reduction(&:b) map(alloc: a[0:N], num_teams[0:N])
+        for (int x = 0; x < N; ++x){
             num_teams[x] = omp_get_num_teams();
             b = b & a[x];
         }
     }
     unsigned int host_b = a[0];
 
-    for (int x = 0; x < 1024; ++x){
+    for (int x = 0; x < N; ++x){
         host_b = host_b & a[x];
     }
 
-    for (int x = 1; x < 1024; ++x){
+    for (int x = 1; x < N; ++x){
         if (num_teams[x-1] != num_teams[x]){
           OMPVV_WARNING("Kernel reported multiple numbers of teams.  Validity of testing of reduction clause cannot be guarunteed.");
           warned += 1;
@@ -171,13 +174,14 @@ int test_bitand(){
 }
 
 int test_bitor(){
-    int a[1024];
-    double false_margin = pow(exp(1), log(.5)/1024);
+    int a[N];
+    double false_margin = pow(exp(1), log(.5)/N);
     int errors = 0;
-    int num_teams[1024];
+    int num_teams[N];
     int warned = 0;
+    srand(1);
 
-    for (int x = 0; x < 1024; ++x){
+    for (int x = 0; x < N; ++x){
         for (int y = 0; y < 16; ++y){
             if (rand() / (double) RAND_MAX > false_margin){
                 a[x] += (1 << y);
@@ -188,10 +192,10 @@ int test_bitor(){
 
     unsigned int b = 0;
 
-    #pragma omp target data map(tofrom: num_teams[0:1024]) map(to: a[0:1024])
+    #pragma omp target data map(tofrom: num_teams[0:N]) map(to: a[0:N])
     {
-        #pragma omp target teams distribute reduction(|:b) map(alloc: a[0:1024], num_teams[0:1024])
-        for (int x = 0; x < 1024; ++x){
+        #pragma omp target teams distribute reduction(|:b) map(alloc: a[0:N], num_teams[0:N])
+        for (int x = 0; x < N; ++x){
             num_teams[x] = omp_get_num_teams();
             b = b | a[x];
         }
@@ -199,11 +203,11 @@ int test_bitor(){
 
     unsigned int host_b = 0;
 
-    for (int x = 0; x < 1024; ++x){
+    for (int x = 0; x < N; ++x){
         host_b = host_b | a[x];
     }
 
-    for (int x = 1; x < 1024; ++x){
+    for (int x = 1; x < N; ++x){
         if (num_teams[x-1] != num_teams[x]){
           OMPVV_WARNING("Kernel reported multiple numbers of teams.  Validity of testing of reduction clause cannot be guarunteed.");
           warned += 1;
@@ -221,22 +225,23 @@ int test_bitor(){
 }
 
 int test_bitxor(){
-    unsigned int a[1024];
+    unsigned int a[N];
     int errors = 0;
-    int num_teams[1024];
+    int num_teams[N];
     int warned = 0;
+    srand(1);
 
-    for (int x = 0; x < 1024; ++x){
+    for (int x = 0; x < N; ++x){
         a[x] = (unsigned int) rand() / (double) (RAND_MAX / 2);
         num_teams[x] = -x;
     }
 
     unsigned int b = 0;
 
-    #pragma omp target data map(tofrom: num_teams[0:1024]) map(to: a[0:1024])
+    #pragma omp target data map(tofrom: num_teams[0:N]) map(to: a[0:N])
     {
-        #pragma omp target teams distribute reduction(^:b) map(alloc: a[0:1024], num_teams[0:1024])
-        for (int x = 0; x < 1024; ++x){
+        #pragma omp target teams distribute reduction(^:b) map(alloc: a[0:N], num_teams[0:N])
+        for (int x = 0; x < N; ++x){
             num_teams[x] = omp_get_num_teams();
             b = (b ^ a[x]);
         }
@@ -244,11 +249,11 @@ int test_bitxor(){
 
     unsigned int host_b = 0;
 
-    for (int x = 0; x < 1024; ++x){
+    for (int x = 0; x < N; ++x){
         host_b = (host_b ^ a[x]);
     }
 
-    for (int x = 1; x < 1024; ++x){
+    for (int x = 1; x < N; ++x){
         if (num_teams[x-1] != num_teams[x]){
           OMPVV_WARNING("Kernel reported multiple numbers of teams.  Validity of testing of reduction clause cannot be guarunteed.");
           warned += 1;
@@ -266,13 +271,14 @@ int test_bitxor(){
 }
 
 int test_max(){
-    int a[1024];
-    int b[1024];
+    int a[N];
+    int b[N];
     int errors = 0;
-    int num_teams[1024];
+    int num_teams[N];
     int warned = 0;
+    srand(1);
 
-    for (int x = 0; x < 1024; ++x){
+    for (int x = 0; x < N; ++x){
         a[x] = (int) rand() / (double)(RAND_MAX / 100);
         b[x] = (int) rand() / (double)(RAND_MAX / 100);
         num_teams[x] = -x;
@@ -280,10 +286,10 @@ int test_max(){
 
     int result = 0;
 
-    #pragma omp target data map(tofrom: num_teams[0:1024]) map(to: a[0:1024], b[0:1024])
+    #pragma omp target data map(tofrom: num_teams[0:N]) map(to: a[0:N], b[0:N])
     {
-        #pragma omp target teams distribute reduction(max:result) map(alloc: a[0:1024], b[0:1024], num_teams[0:1024])
-        for (int x = 0; x < 1024; ++x){
+        #pragma omp target teams distribute reduction(max:result) map(alloc: a[0:N], b[0:N], num_teams[0:N])
+        for (int x = 0; x < N; ++x){
             result = fmax(a[x] + b[x], result);
             num_teams[x] = omp_get_num_teams();
         }
@@ -291,11 +297,11 @@ int test_max(){
 
     int host_max = 0;
 
-    for (int x = 0; x < 1024; ++x){
+    for (int x = 0; x < N; ++x){
         host_max = fmax(host_max, a[x] + b[x]);
     }
 
-    for (int x = 1; x < 1024; ++x){
+    for (int x = 1; x < N; ++x){
         if (num_teams[x-1] != num_teams[x]){
           OMPVV_WARNING("Kernel reported multiple numbers of teams.  Validity of testing of reduction clause cannot be guarunteed.");
           warned += 1;
@@ -313,13 +319,14 @@ int test_max(){
 }
 
 int test_min(){
-    int a[1024];
-    int b[1024];
+    int a[N];
+    int b[N];
     int errors = 0;
-    int num_teams[1024];
+    int num_teams[N];
     int warned = 0;
+    srand(1);
 
-    for (int x = 0; x < 1024; ++x){
+    for (int x = 0; x < N; ++x){
         a[x] = (int) rand() / (double) (RAND_MAX / 100);
         b[x] = (int) rand() / (double) (RAND_MAX / 100);
         num_teams[x] = -x;
@@ -327,10 +334,10 @@ int test_min(){
 
     int result = a[0] + b[0];
 
-    #pragma omp target data map(tofrom: num_teams[0:1024]) map(to: a[0:1024], b[0:1024])
+    #pragma omp target data map(tofrom: num_teams[0:N]) map(to: a[0:N], b[0:N])
     {
-        #pragma omp target teams distribute reduction(min:result) map(alloc: a[0:1024], b[0:1024], num_teams[0:1024])
-        for (int x = 0; x < 1024; ++x){
+        #pragma omp target teams distribute reduction(min:result) map(alloc: a[0:N], b[0:N], num_teams[0:N])
+        for (int x = 0; x < N; ++x){
             num_teams[x] = omp_get_num_teams();
             result = fmin(result, a[x] + b[x]);
         }
@@ -338,11 +345,11 @@ int test_min(){
 
     int host_min = a[0] + b[0];
 
-    for (int x = 0; x < 1024; ++x){
+    for (int x = 0; x < N; ++x){
         host_min = fmin(host_min, a[x] + b[x]);
     }
 
-    for (int x = 1; x < 1024; ++x){
+    for (int x = 1; x < N; ++x){
         if (num_teams[x-1] != num_teams[x]){
           OMPVV_WARNING("Kernel reported multiple numbers of teams.  Validity of testing of reduction clause cannot be guarunteed.");
           warned += 1;
@@ -360,12 +367,13 @@ int test_min(){
 }
 
 int test_multiply(){
-    int a[1024];
+    int a[N];
     int errors = 0;
-    int num_teams[1024];
+    int num_teams[N];
     int warned = 0;
+    srand(1);
 
-    for (int x = 0; x < 1024; ++x){
+    for (int x = 0; x < N; ++x){
         a[x] = 1 + (int) rand() / (double) RAND_MAX;
         num_teams[x] = -x;
     }
@@ -373,11 +381,11 @@ int test_multiply(){
     int result = 1;
     int host_result;
 
-    #pragma omp target data map(tofrom: num_teams[0:1024]) map(to: a[0:1024])
+    #pragma omp target data map(tofrom: num_teams[0:N]) map(to: a[0:N])
     {
-        for (int x = 0; x < 1024; x = x + 16){
+        for (int x = 0; x < N; x = x + 16){
             result = 1;
-            #pragma omp target teams distribute reduction(*:result) map(alloc: a[0:1024], num_teams[0:1024])
+            #pragma omp target teams distribute reduction(*:result) map(alloc: a[0:N], num_teams[0:N])
             for (int y = 0; y < 16; ++y){
                 result *= a[x + y];
                 num_teams[x + y] = omp_get_num_teams();
@@ -393,7 +401,7 @@ int test_multiply(){
         }
     }
 
-    for (int x = 1; x < 1024; ++x){
+    for (int x = 1; x < N; ++x){
         if (num_teams[x-1] != num_teams[x]){
           OMPVV_WARNING("Kernel reported multiple numbers of teams.  Validity of testing of reduction clause cannot be guarunteed.");
           warned += 1;
@@ -410,13 +418,14 @@ int test_multiply(){
 }
 
 int test_or(){
-    char a[1024];
-    double false_margin = pow(exp(1), log(.5)/1024);
+    char a[N];
+    double false_margin = pow(exp(1), log(.5)/N);
     int errors = 0;
-    int num_teams[1024];
+    int num_teams[N];
     int warned = 0;
+    srand(1);
 
-    for (int x = 0; x < 1024; ++x){
+    for (int x = 0; x < N; ++x){
         if (rand() / (double)(RAND_MAX) > false_margin){
             a[x] = 1;
         }
@@ -428,21 +437,21 @@ int test_or(){
 
     char result = 0;
 
-    #pragma omp target data map(tofrom: num_teams[0:1024]) map(to: a[0:1024])
+    #pragma omp target data map(tofrom: num_teams[0:N]) map(to: a[0:N])
     {
-        #pragma omp target teams distribute reduction(||:result) map(alloc: a[0:1024], num_teams[0:1024])
-        for (int x = 0; x < 1024; ++x){
+        #pragma omp target teams distribute reduction(||:result) map(alloc: a[0:N], num_teams[0:N])
+        for (int x = 0; x < N; ++x){
             num_teams[x] = omp_get_num_teams();
             result = result || a[x];
         }
     }
 
     char host_result = 0;
-    for (int x = 0; x < 1024; ++x){
+    for (int x = 0; x < N; ++x){
         host_result = host_result || a[x];
     }
 
-    for (int x = 1; x < 1024; ++x){
+    for (int x = 1; x < N; ++x){
         if (num_teams[x-1] != num_teams[x]){
           OMPVV_WARNING("Kernel reported multiple numbers of teams.  Validity of testing of reduction clause cannot be guarunteed.");
           warned += 1;
@@ -461,34 +470,34 @@ int test_or(){
 }
 
 int test_subtraction(){
-  int a[1024];
-  int b[1024];
+  int a[N];
+  int b[N];
   int total = 0;
   int host_total = 0;
   int errors = 0;
-  int num_teams[1024];
+  int num_teams[N];
   int warned = 0;
 
-  for (int x = 0; x < 1024; ++x){
+  for (int x = 0; x < N; ++x){
       a[x] = 1;
       b[x] = x;
       num_teams[x] = -x;
   }
 
-  #pragma omp target data map(tofrom: num_teams[0:1024]) map(to: a[0:1024], b[0:1024])
+  #pragma omp target data map(tofrom: num_teams[0:N]) map(to: a[0:N], b[0:N])
   {
-      #pragma omp target teams distribute reduction(-:total) map(alloc: a[0:1024], b[0:1024], num_teams[0:1024])
-      for (int x = 0; x < 1024; ++x){
+      #pragma omp target teams distribute reduction(-:total) map(alloc: a[0:N], b[0:N], num_teams[0:N])
+      for (int x = 0; x < N; ++x){
           num_teams[x] = omp_get_num_teams();
           total -= a[x] + b[x];
       }
   }
 
-  for (int x = 0; x < 1024; ++x){
+  for (int x = 0; x < N; ++x){
       host_total -= a[x] + b[x];
   }
 
-  for (int x = 1; x < 1024; ++x){
+  for (int x = 1; x < N; ++x){
       if (num_teams[x-1] != num_teams[x]){
         OMPVV_WARNING("Kernel reported multiple numbers of teams.  Validity of testing of reduction clause cannot be guarunteed.");
         warned += 1;
