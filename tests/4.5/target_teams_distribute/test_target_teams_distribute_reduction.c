@@ -14,7 +14,7 @@
 #include "ompvv.h"
 #include <math.h>
 
-#DEFINE N 1024
+#define N 1024
 
 int test_add(){
     int a[N];
