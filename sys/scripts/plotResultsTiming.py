@@ -19,7 +19,7 @@ debugMode = 0
 includeCuda = True
 histogram_resolution = 500 # in ns
 create_histogram = True
-currentSystem = "fatnode"
+currentSystem = "summit"
 
 version_labels={
   "summit": {
@@ -551,7 +551,7 @@ def createPlotTimelineClause(test, test_type, compilers=None, versions=None, lab
 
 
             
-def createPlotNestedVsCombined(tests, compilers=None, versions=None, labels=None):
+def createPlotNestedVsCombined(tests, compilers=None, versions=None, labels=None, addLegend=True):
   printLog("Plotting TEST_NESTED..." ,1)
   if not isinstance(tests, list):
     printLog("ERROR: tests is not a list")
@@ -698,8 +698,9 @@ def createPlotNestedVsCombined(tests, compilers=None, versions=None, labels=None
       if (cur_ax == 0):
         axes[cur_ax].set_ylabel('time (us)', fontsize = 18)
       axes[cur_ax].set_xticks(index + 0.35)
-      axes[cur_ax].set_xticklabels((tests if labels is None else labels),  rotation="vertical", fontsize=12)
-      if(cur_ax == num_compilers -1):
+      axes[cur_ax].set_xticklabels((tests if labels is None else labels),  rotation="vertical", fontsize=15)
+      axes[cur_ax].tick_params(labelsize=15)
+      if(cur_ax == num_compilers -1 and addLegend):
         axes[cur_ax].legend(loc=0, fontsize=18)
     cur_ax += 1
   plt.tight_layout()
@@ -708,12 +709,12 @@ def createPlotNestedVsCombined(tests, compilers=None, versions=None, labels=None
     if (compilers is None or compiler in compilers):
       pos = list(axes[cur_ax].get_position().bounds)
       x_text = pos[0] + 0.01
-      y_text = pos[1] + pos[3] - 0.01
-      version_text = str(results[compiler].keys()) if version_labels[currentSystem][compiler] is None else version_labels[currentSystem][compiler]
-      fig.text(x_text, y_text, compiler + " " + version_text,  va='center', fontsize=10)
+      y_text = pos[1] + pos[3] - 0.015
+      version_text = str(list(results[compiler].keys())[0]) if version_labels[currentSystem][compiler] is None else version_labels[currentSystem][compiler]
+      fig.text(x_text, y_text, compiler + " " + version_text,  va='center', fontsize=15)
       cur_ax += 1
   
-def createPlotTimingClauses (tests, compilers=None, versions=None, labels=None):
+def createPlotTimingClauses (tests, compilers=None, versions=None, labels=None, addLegend=True):
   printLog("Plotting TEST_TIMING_CLAUSES..." ,1)
   if not isinstance(tests, list):
     printLog("ERROR: tests is not a list")
@@ -804,12 +805,16 @@ def createPlotTimingClauses (tests, compilers=None, versions=None, labels=None):
       label="CUDA" if indx == len(values2plot)-1 else None)
   plt.xlabel('clause', fontsize = 18)
   plt.ylabel('time (us)', fontsize = 18)
-  plt.xticks(index + 0.35, (tests if labels is None else labels),  rotation="vertical", fontsize=12)
-  plt.legend(loc=0, fontsize=18)
+  plt.xticks(index + 0.35, (tests if labels is None else labels),  rotation="vertical", fontsize=15)
+  plt.yticks(fontsize=15)
+  if (addLegend):
+    printLog("Adding Legend", 2)
+    plt.legend(loc=0, fontsize=18)
+
   plt.tight_layout()
  
 
-def createPlotNumTeams(tests, compilers=None, versions=None, labels=None):
+def createPlotNumTeams(tests, compilers=None, versions=None, labels=None, addLegend=True, legendPosition=0):
   printLog("Plotting TEST_VARIANT_TTD..." ,1)
   if not isinstance(tests, list):
     printLog("ERROR: tests is not a list", 0)
@@ -887,22 +892,26 @@ def createPlotNumTeams(tests, compilers=None, versions=None, labels=None):
           totals = [values2plot[key]["cuda_medians"][i] + values2plot[key]["omp_runtime_medians"][i] for i in range(len(values2plot[key]["cuda_medians"]))] 
         else:
           totals = values2plot[key]["omp_runtime_medians"]
+        totals= [i/1000 for i in totals]
+        totals_cuda = values2plot[key]["cuda_medians"]
+        totals_cuda = [i/1000 for i in totals_cuda]
         axes[cur_ax].bar(index + 0.1 + bar_width*indx, totals , bar_width,
         label=key + " teams",
         color = values2plot[key]["cm"])
         if (includeCuda):
-          axes[cur_ax].bar(index + 0.1 + bar_width*indx, values2plot[key]["cuda_medians"], bar_width,
+          axes[cur_ax].bar(index + 0.1 + bar_width*indx, totals_cuda, bar_width,
           color = "silver",
           alpha =0.91,
           label="CUDA" if indx == len(values2plot)-1 else None)
-      if (cur_ax == 0):
-        axes[cur_ax].legend()
+      if (cur_ax == legendPosition):
+        if (addLegend):
+          axes[cur_ax].legend(loc=9, fontsize=12)
       if (cur_ax == num_subplots - 1):
-        axes[cur_ax].set(xlabel = 'clause')
-        
+        axes[cur_ax].set_xlabel('clause', fontsize=18)
         axes[cur_ax].set_xticks(index+0.5)
         axes[cur_ax].set_xticklabels(tests if labels is None else labels, rotation='vertical')
-      axes[cur_ax].set(ylabel =' time (us)')
+      axes[cur_ax].set_ylabel('time (us)', fontsize=18)
+      axes[cur_ax].tick_params(labelsize=15)
       cur_ax += 1
   plt.tight_layout()
   cur_ax = 0
@@ -910,13 +919,13 @@ def createPlotNumTeams(tests, compilers=None, versions=None, labels=None):
     if (compilers is None or compiler in compilers):
       pos = list(axes[cur_ax].get_position().bounds)
       x_text = pos[0] + 0.01
-      y_text = pos[1] + pos[3] - 0.01
+      y_text = pos[1] + pos[3] - 0.015
       version_text = str(versions[compiler]) if version_labels[currentSystem][compiler] is None else version_labels[currentSystem][compiler]
-      fig.text(x_text, y_text, compiler+ " " + version_text,  va='center', fontsize=10)
+      fig.text(x_text, y_text, compiler+ " " + version_text,  va='center', fontsize=15)
       cur_ax += 1
 
 
-def createPlotNumTeamsNumThreads(test, compilers=None, versions=None):
+def createPlotNumTeamsNumThreads(test, compilers=None, versions=None, addLegend=True, legendPosition=0):
   printLog("Plotting TEST_VARIANT_TTDPF..." ,1)
   if not isinstance(test, str):
     printLog("ERROR: tests is not a string", 0)
@@ -1006,10 +1015,13 @@ def createPlotNumTeamsNumThreads(test, compilers=None, versions=None):
           label="CUDA" if indx_teams == len(values2plot)-1 else None)
         current_plot_group += 1
       #Adding plot info
-      axes[cur_ax].legend()
+      if(cur_ax == legendPosition and addLegend):
+        axes[cur_ax].legend(loc=9,fontsize=18)
       axes[cur_ax].set_xticks(ticks)
       axes[cur_ax].set_xticklabels(labels)
-      axes[cur_ax].set(ylabel ='NumTeams Num Threads')
+      axes[cur_ax].tick_params(labelsize=15)
+      axes[cur_ax].set_ylabel('NumTeams Num Threads', fontsize=18)
+      
       cur_ax += 1
   plt.tight_layout()
   cur_ax = 0
@@ -1019,10 +1031,10 @@ def createPlotNumTeamsNumThreads(test, compilers=None, versions=None):
       index = 0
       for version in (versions if versions is not None else results[compiler]):
         x_text = pos[0] + 0.01
-        y_text = pos[1] + pos[3] - 0.01 + index
+        y_text = pos[1] + pos[3] - 0.015 + index
         index += 1
         version_text = str(version) if version_labels[currentSystem][compiler] is None else version_labels[currentSystem][compiler]
-        fig.text(x_text, y_text, compiler+ " " +version_text,  va='center', fontsize=10)
+        fig.text(x_text, y_text, compiler+ " " +version_text,  va='center', fontsize=15)
       cur_ax += 1
 
 
@@ -1070,12 +1082,12 @@ def main():
       # Target
       labels = ["target", "defaultmap", "dependvar", "device", "firstprivate", "private", "if","is_device_ptr", "map_to", "map_from", "map_tofrom"]
       tests_to_plot = ["target", "target_defaultmap", "target_dependvar", "target_device", "target_firstprivate", "target_private", "target_if","target_is_device_ptr", "target_map_to", "target_map_from", "target_map_tofrom"]
-      createPlotTimingClauses(tests_to_plot, labels = labels)
+      createPlotTimingClauses(tests_to_plot, labels = labels, addLegend=False)
       plt.savefig(outputFileName+"_target.png")
       # Target Data
       labels = ["map_to", "map_from", "map_tofrom", "device", "if"]
       tests_to_plot = ["target_data_map_to", "target_data_map_from", "target_data_map_tofrom", "target_data_device", "target_data_if"]
-      createPlotTimingClauses(tests_to_plot, labels = labels)
+      createPlotTimingClauses(tests_to_plot, labels = labels, addLegend=False)
       plt.savefig(outputFileName+"_target_data.png")
       # Target enter data
       labels = ["map_to", "map_alloc", "map_if_true", "map_if_false", "map_device", "map_depend"]
@@ -1085,12 +1097,12 @@ def main():
       # Target exit data
       labels = ["map_from", "map_delete", "map_if_true", "map_if_false", "map_device", "map_depend"]
       tests_to_plot = ["target_exit_data_map_from", "target_exit_data_map_delete", "target_exit_data_map_if_true", "target_exit_data_map_if_false", "target_exit_data_map_device", "target_exit_data_map_depend"]
-      createPlotTimingClauses(tests_to_plot, labels = labels)
+      createPlotTimingClauses(tests_to_plot, labels = labels, addLegend=False)
       plt.savefig(outputFileName+"_target_exit_data.png")
       # Target update
       labels = ["to", "to_if_true", "to_if_false", "to_device", "to_depend", "from", "from_if_true", "from_if_false", "from_device", "from_depend"]
       tests_to_plot = ["target_update_to", "target_update_to_if_true", "target_update_to_if_false", "target_update_to_device", "target_update_to_depend", "target_update_from", "target_update_from_if_true","target_update_from_if_false", "target_update_from_device", "target_update_from_depend"]
-      createPlotTimingClauses(tests_to_plot, labels = labels)
+      createPlotTimingClauses(tests_to_plot, labels = labels, addLegend=False)
       plt.savefig(outputFileName+"_target_update.png")
       # for i in tests_to_plot:
       #   createPlotTimelineClause(i,"TEST_TIMING_CLAUSES", ["GCC","XLC","clang"])
@@ -1133,7 +1145,7 @@ def main():
                       "target teams distribute parallel for private",
                       "target teams distribute parallel for shared"]
 
-      createPlotTimingClauses(tests_to_plot, labels=labels)
+      createPlotTimingClauses(tests_to_plot, labels=labels, addLegend=False)
       plt.savefig(outputFileName+"_target_teams_distribute_parallel_for.png")
 
       tests_to_plot = ["target teams distribute",
@@ -1153,7 +1165,7 @@ def main():
                       "target teams distribute map(alloc)",
                       "target teams distribute private",
                       "target teams distribute shared"]
-      createPlotTimingClauses(tests_to_plot, labels=labels)
+      createPlotTimingClauses(tests_to_plot, labels=labels, addLegend=False)
       plt.savefig(outputFileName+"_target_teams_distribute.png")
 
 
@@ -1245,7 +1257,7 @@ def main():
                       "target teams distribute map(alloc)",
                       "target teams distribute private",
                       "target teams distribute shared"]
-      createPlotNumTeams(tests_to_plot, ["clang", "XLC", "GCC"], labels=labels)
+      createPlotNumTeams(tests_to_plot, ["clang", "XLC", "GCC"], labels=labels, legendPosition=2)
       plt.savefig(outputFileName+"_target_teams_distribute_num_teams.png")
 
       #Timelines! 
@@ -1265,7 +1277,7 @@ def main():
       # plt.savefig(outputFileName+"target_Teams_distribute_parallel_for_timeline.png")
 
 
-      createPlotNumTeamsNumThreads("target teams distribute parallel for", ["GCC", "XLC", "clang"])
+      createPlotNumTeamsNumThreads("target teams distribute parallel for", ["GCC", "XLC", "clang"], legendPosition=2)
       plt.savefig(outputFileName+"_target_teams_distribute_parallel_for_num_teams_num_threads.png")
     
     if currentSystem =="fatnode":
@@ -1277,26 +1289,26 @@ def main():
       # Target Data
       labels = ["map_to", "map_from", "map_tofrom", "device", "if"]
       tests_to_plot = ["target_data_map_to", "target_data_map_from", "target_data_map_tofrom", "target_data_device", "target_data_if"]
-      createPlotTimingClauses(tests_to_plot, labels = labels)
+      createPlotTimingClauses(tests_to_plot, labels = labels, addLegend=False)
       plt.savefig(outputFileName+"_target_data.png")
       # Target enter data
       labels = ["map_to", "map_alloc", "map_if_true", "map_if_false", "map_device", "map_depend"]
       tests_to_plot = ["target_enter_data_map_to", "target_enter_data_map_alloc", "target_enter_data_map_if_true", "target_enter_data_map_if_false", "target_enter_data_map_device", "target_enter_data_map_depend"]
-      createPlotTimingClauses(tests_to_plot, labels = labels)
+      createPlotTimingClauses(tests_to_plot, labels = labels, addLegend=False)
       plt.savefig(outputFileName+"_target_enter_data.png")
       # Target exit data
       labels = ["map_from", "map_delete", "map_if_true", "map_if_false", "map_device", "map_depend"]
       tests_to_plot = ["target_exit_data_map_from", "target_exit_data_map_delete", "target_exit_data_map_if_true", "target_exit_data_map_if_false", "target_exit_data_map_device", "target_exit_data_map_depend"]
-      createPlotTimingClauses(tests_to_plot, labels = labels)
+      createPlotTimingClauses(tests_to_plot, labels = labels, addLegend=False)
       plt.savefig(outputFileName+"_target_exit_data.png")
       # Target update
       labels = ["to", "to_if_true", "to_if_false", "to_device", "to_depend", "from", "from_if_true", "from_if_false", "from_device", "from_depend"]
       tests_to_plot = ["target_update_to", "target_update_to_if_true", "target_update_to_if_false", "target_update_to_device", "target_update_to_depend", "target_update_from", "target_update_from_if_true","target_update_from_if_false", "target_update_from_device", "target_update_from_depend"]
-      createPlotTimingClauses(tests_to_plot, labels = labels)
+      createPlotTimingClauses(tests_to_plot, labels = labels, addLegend=False)
       plt.savefig(outputFileName+"_target_update.png")
-      for i in tests_to_plot:
-        createPlotTimelineClause(i,"TEST_TIMING_CLAUSES", ["GCC","clang"])
-        plt.savefig(outputFileName+i+"_timeline.png")
+      # for i in tests_to_plot:
+      #   createPlotTimelineClause(i,"TEST_TIMING_CLAUSES", ["GCC","clang"])
+      #   plt.savefig(outputFileName+i+"_timeline.png")
 
 
       labels = ["(NO CLAUSE)",
@@ -1335,7 +1347,7 @@ def main():
                       "target teams distribute parallel for private",
                       "target teams distribute parallel for shared"]
 
-      createPlotTimingClauses(tests_to_plot, labels=labels)
+      createPlotTimingClauses(tests_to_plot, labels=labels, addLegend=False)
       plt.savefig(outputFileName+"_target_teams_distribute_parallel_for.png")
       tests_to_plot = ["target teams distribute",
                       "target teams distribute collapse",
@@ -1354,7 +1366,7 @@ def main():
                       "target teams distribute map(alloc)",
                       "target teams distribute private",
                       "target teams distribute shared"]
-      createPlotTimingClauses(tests_to_plot, labels=labels)
+      createPlotTimingClauses(tests_to_plot, labels=labels, addLegend=False)
       plt.savefig(outputFileName+"_target_teams_distribute.png")
 
 
@@ -1391,26 +1403,26 @@ def main():
                       "target teams distribute private",
                       "target teams distribute shared"]
 
-      createPlotNumTeams(tests_to_plot, ["clang", "GCC"], labels=labels)
+      createPlotNumTeams(tests_to_plot, ["clang", "GCC"], labels=labels,legendPosition=1)
       plt.savefig(outputFileName+"_target_teams_distribute_num_teams.png")
 
 
       # Target
-      createPlotTimelineClause("target","TEST_TIMING_CLAUSES", ["GCC","clang"])
-      plt.savefig(outputFileName+"target_timeline.png")
-      createPlotTimelineClause("target_data_map_to","TEST_TIMING_CLAUSES", ["GCC","clang"])
-      plt.savefig(outputFileName+"target_data_map_to_timeline.png")
-      createPlotTimelineClause("target_enter_data_map_to","TEST_TIMING_CLAUSES", ["GCC","clang"])
-      plt.savefig(outputFileName+"target_enter_data_map_to_timeline.png")
-      createPlotTimelineClause("target_exit_data_map_from","TEST_TIMING_CLAUSES", ["GCC","clang"])
-      plt.savefig(outputFileName+"target_exit_data_map_from_timeline.png")
-      createPlotTimelineClause("target teams distribute","TEST_TIMING_CLAUSES", ["GCC","clang"])
-      plt.savefig(outputFileName+"target_teams_distribute.png")
-      createPlotTimelineClause("target teams distribute parallel for","TEST_TIMING_CLAUSES", ["GCC","clang"])
-      plt.savefig(outputFileName+"target_Teams_distribute_parallel_for_timeline.png")
+      # createPlotTimelineClause("target","TEST_TIMING_CLAUSES", ["GCC","clang"])
+      # plt.savefig(outputFileName+"target_timeline.png")
+      # createPlotTimelineClause("target_data_map_to","TEST_TIMING_CLAUSES", ["GCC","clang"])
+      # plt.savefig(outputFileName+"target_data_map_to_timeline.png")
+      # createPlotTimelineClause("target_enter_data_map_to","TEST_TIMING_CLAUSES", ["GCC","clang"])
+      # plt.savefig(outputFileName+"target_enter_data_map_to_timeline.png")
+      # createPlotTimelineClause("target_exit_data_map_from","TEST_TIMING_CLAUSES", ["GCC","clang"])
+      # plt.savefig(outputFileName+"target_exit_data_map_from_timeline.png")
+      # createPlotTimelineClause("target teams distribute","TEST_TIMING_CLAUSES", ["GCC","clang"])
+      # plt.savefig(outputFileName+"target_teams_distribute.png")
+      # createPlotTimelineClause("target teams distribute parallel for","TEST_TIMING_CLAUSES", ["GCC","clang"])
+      # plt.savefig(outputFileName+"target_Teams_distribute_parallel_for_timeline.png")
 
-
-      createPlotNumTeamsNumThreads("target teams distribute parallel for", ["GCC", "clang"])
+      # PLOTTING NUM TEAMS NUM THREADS
+      createPlotNumTeamsNumThreads("target teams distribute parallel for", ["GCC", "clang"], legendPosition=1)
       plt.savefig(outputFileName+"_target_teams_distribute_parallel_for_num_teams_num_threads.png")
     
 
