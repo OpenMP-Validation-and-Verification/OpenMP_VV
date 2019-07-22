@@ -51,7 +51,7 @@ int test_add(){
         }
     }
     if ((num_teams[0] == 1) && (warned == 0)){
-        OMPVV_WARNING("Test operated with one team.  Testing of reduction clause cannot be done.");
+        OMPVV_WARNING("Test operated with one team.  Reduction clause cannot be tested.");
     }
     else if ((num_teams[0] <= 0) && (warned == 0)){
         OMPVV_WARNING("Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guarunteed.")
@@ -106,7 +106,7 @@ int test_and(){
             }
           }
           if ((num_teams[0] == 1) && (warned == 0)){
-            OMPVV_WARNING("Test operated with one team.  Testing of reduction clause cannot be done.");
+            OMPVV_WARNING("Test operated with one team.  Reduction clause cannot be tested.");
           }
           else if ((num_teams[0] <= 0) && (warned == 0)){
             OMPVV_WARNING("Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guarunteed.")
@@ -163,7 +163,7 @@ int test_bitand(){
         }
     }
     if ((num_teams[0] == 1) && (warned == 0)){
-        OMPVV_WARNING("Test operated with one team.  Testing of reduction clause cannot be done.");
+        OMPVV_WARNING("Test operated with one team.  Reduction clause cannot be tested.");
     }
     else if ((num_teams[0] <= 0) && (warned == 0)){
         OMPVV_WARNING("Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guarunteed.")
@@ -214,7 +214,7 @@ int test_bitor(){
         }
     }
     if ((num_teams[0] == 1) && (warned == 0)){
-        OMPVV_WARNING("Test operated with one team.  Testing of reduction clause cannot be done.");
+        OMPVV_WARNING("Test operated with one team.  Reduction clause cannot be tested.");
     }
     else if ((num_teams[0] <= 0) && (warned == 0)){
         OMPVV_WARNING("Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guarunteed.")
@@ -260,7 +260,7 @@ int test_bitxor(){
         }
     }
     if ((num_teams[0] == 1) && (warned == 0)){
-        OMPVV_WARNING("Test operated with one team.  Testing of reduction clause cannot be done.");
+        OMPVV_WARNING("Test operated with one team.  Reduction clause cannot be tested.");
     }
     else if ((num_teams[0] <= 0) && (warned == 0)){
         OMPVV_WARNING("Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guarunteed.")
@@ -308,7 +308,7 @@ int test_max(){
         }
     }
     if ((num_teams[0] == 1) && (warned == 0)){
-        OMPVV_WARNING("Test operated with one team.  Testing of reduction clause cannot be done.");
+        OMPVV_WARNING("Test operated with one team.  Reduction clause cannot be tested.");
     }
     else if ((num_teams[0] <= 0) && (warned == 0)){
         OMPVV_WARNING("Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guarunteed.")
@@ -356,7 +356,7 @@ int test_min(){
         }
     }
     if ((num_teams[0] == 1) && (warned == 0)){
-        OMPVV_WARNING("Test operated with one team.  Testing of reduction clause cannot be done.");
+        OMPVV_WARNING("Test operated with one team.  Reduction clause cannot be tested.");
     }
     else if ((num_teams[0] <= 0) && (warned == 0)){
         OMPVV_WARNING("Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guarunteed.")
@@ -408,7 +408,7 @@ int test_multiply(){
         }
     }
     if ((num_teams[0] == 1) && (warned == 0)){
-        OMPVV_WARNING("Test operated with one team.  Testing of reduction clause cannot be done.");
+        OMPVV_WARNING("Test operated with one team.  Reduction clause cannot be tested.");
     }
     else if ((num_teams[0] <= 0) && (warned == 0)){
         OMPVV_WARNING("Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guarunteed.")
@@ -458,7 +458,7 @@ int test_or(){
         }
     }
     if ((num_teams[0] == 1) && (warned == 0)){
-        OMPVV_WARNING("Test operated with one team.  Testing of reduction clause cannot be done.");
+        OMPVV_WARNING("Test operated with one team.  Reduction clause cannot be tested.");
     }
     else if ((num_teams[0] <= 0) && (warned == 0)){
         OMPVV_WARNING("Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guarunteed.")
@@ -504,7 +504,7 @@ int test_subtraction(){
       }
   }
   if ((num_teams[0] == 1) && (warned == 0)){
-      OMPVV_WARNING("Test operated with one team.  Testing of reduction clause cannot be done.");
+      OMPVV_WARNING("Test operated with one team.  Reduction clause cannot be tested.");
   }
   else if ((num_teams[0] <= 0) && (warned == 0)){
       OMPVV_WARNING("Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guarunteed.")
