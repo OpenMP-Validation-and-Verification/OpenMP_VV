@@ -121,7 +121,10 @@ module ompvv_lib
 
       ! Avoid unused variables warning 
       clean = TRIM(clean_fn(fn))
-      ln = ln
+      
+      IF (.FALSE.) THEN
+        ln = ln
+      END IF
 
       call test_offloading_probe()
       IF (ompvv_isHost) THEN
@@ -148,8 +151,10 @@ module ompvv_lib
       INTEGER :: ln
 
       ! Avoid unused variables warning
-      fn = fn 
-      ln = ln
+      IF (.FALSE.) THEN
+        fn = fn 
+        ln = ln
+      END IF 
       
       IF (condition) ompvv_errors = ompvv_errors + 1
     end subroutine test_error
@@ -164,7 +169,9 @@ module ompvv_lib
 
       clean = TRIM(clean_fn(fn))
       ! Avoid unused variables warning
-      ln = ln
+      IF (.FALSE.) THEN
+        ln = ln
+      END IF 
       ! cleaning condition % causes to fail. replace with '.'
       condition_clean_pos = SCAN(conditionStr, "%")
       DO WHILE (condition_clean_pos /= 0)
@@ -285,7 +292,9 @@ module ompvv_lib
 
       clean = TRIM(clean_fn(fn))
       ! Avoid unused variables warning
-      ln = ln
+      IF (.FALSE.) THEN
+        ln = ln
+      END IF
 
       call test_shared_environment_probe()
       if (ompvv_sharedEnv) OMPVV_WARNING_HELPER(msg, clean, ln)
