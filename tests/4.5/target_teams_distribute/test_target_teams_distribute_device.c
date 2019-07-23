@@ -71,7 +71,7 @@ int main() {
 
   for (int dev = 0; dev < num_devices; ++dev){
       if (!errors[dev] && num_teams[dev] == 1){
-          OMPVV_WARNING("Test operated with one team. Parallelism of teams distribute can't be guarnunteed.");
+          OMPVV_WARNING("Test operated with one team. Parallelism of teams distribute can't be guaranteed.");
       }
       else if (errors[dev]){
           OMPVV_ERROR("Test failed with device %d", dev);
