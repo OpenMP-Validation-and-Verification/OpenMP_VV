@@ -1,10 +1,10 @@
-//===--- test_target_teams_distribute_reduction.c----------------------------===//
+//===--- test_target_teams_distribute_reduction_add.c-------------------------===//
 //
 // OpenMP API Version 4.5 Nov 2015
 //
 // This test uses the reduction clause on a target teams distribute directive,
-// testing, for each operator, that the variable in the reduction clause is
-// properly reduced.
+// testing that the variable in the reduction clause is properly reduced using
+// the add operator.
 //
 ////===----------------------------------------------------------------------===//
 
