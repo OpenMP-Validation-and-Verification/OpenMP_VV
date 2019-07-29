@@ -16,49 +16,49 @@
 
 #define N 1024
 
-int test_add(){
-    int a[N];
-    int b[N];
-    int total = 0;
-    int host_total = 0;
-    int errors = 0;
-    int num_teams[N];
-    int warned = 0;
+int test_add() {
+  int a[N];
+  int b[N];
+  int total = 0;
+  int host_total = 0;
+  int errors = 0;
+  int num_teams[N];
+  int warned = 0;
 
-    for (int x = 0; x < N; ++x){
-        a[x] = 1;
-        b[x] = x;
-        num_teams[x] = -x;
-    }
+  for (int x = 0; x < N; ++x) {
+    a[x] = 1;
+    b[x] = x;
+    num_teams[x] = -1;
+  }
 
-    #pragma omp target data map(tofrom: num_teams[0:N]) map(to: a[0:N], b[0:N])
-    {
-        #pragma omp target teams distribute reduction(+:total) map(alloc: a[0:N], b[0:N], num_teams[0:N])
-        for (int x = 0; x < N; ++x){
-            num_teams[x] = omp_get_num_teams();
-            total += a[x] + b[x];
-        }
+#pragma omp target data map(tofrom: num_teams[0:N], total) map(to: a[0:N], b[0:N])
+  {
+#pragma omp target teams distribute reduction(+:total) map(alloc: a[0:N], b[0:N], num_teams[0:N])
+    for (int x = 0; x < N; ++x) {
+      num_teams[x] = omp_get_num_teams();
+      total += a[x] + b[x];
     }
+  }
 
-    for (int x = 0; x < N; ++x){
-        host_total += a[x] + b[x];
-    }
+  for (int x = 0; x < N; ++x) {
+    host_total += a[x] + b[x];
+  }
 
-    for (int x = 1; x < N; ++x){
-        if (num_teams[x-1] != num_teams[x]){
-          OMPVV_WARNING("Kernel reported multiple numbers of teams.  Validity of testing of reduction clause cannot be guarunteed.");
-          warned += 1;
-        }
+  for (int x = 1; x < N; ++x) {
+    if (num_teams[x-1] != num_teams[x]) {
+      OMPVV_WARNING("Kernel reported multiple numbers of teams.  Validity of testing of reduction clause cannot be guaranteed.");
+      warned += 1;
     }
-    if ((num_teams[0] == 1) && (warned == 0)){
-        OMPVV_WARNING("Test operated with one team.  Reduction clause cannot be tested.");
-    }
-    else if ((num_teams[0] <= 0) && (warned == 0)){
-        OMPVV_WARNING("Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guarunteed.")
-    }
+  }
 
-    OMPVV_TEST_AND_SET_VERBOSE(errors, host_total != total);
-    return errors;
+  if ((num_teams[0] == 1) && (warned == 0)) {
+    OMPVV_WARNING("Test operated with one team.  Reduction clause cannot be tested.");
+  } else if ((num_teams[0] <= 0) && (warned == 0)) {
+    OMPVV_WARNING("Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guaranteed.");
+  }
+
+  OMPVV_TEST_AND_SET_VERBOSE(errors, host_total != total);
+  return errors;
 }
 
 int main() {
