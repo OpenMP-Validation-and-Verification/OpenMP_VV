@@ -58,10 +58,11 @@ int test_or() {
   if ((num_teams[0] == 1) && (warned == 0)) {
     OMPVV_WARNING("Test operated with one team.  Reduction clause cannot be tested.");
   } else if ((num_teams[0] <= 0) && (warned == 0)) {
-    OMPVV_WARNING("Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guarunteed.")
-      }
+    OMPVV_WARNING("Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guarunteed.");
+  }
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, host_result != result);
+  OMPVV_ERROR_IF(host_result != result, "Result on device is %d but expected result from host is %d.", result, host_result);
 
   return errors;
 }

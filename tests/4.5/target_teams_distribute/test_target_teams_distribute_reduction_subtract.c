@@ -31,7 +31,7 @@ int test_subtraction() {
     num_teams[x] = -x;
   }
 
-#pragma omp target data map(tofrom: num_teams[0:N]) map(to: a[0:N], b[0:N])
+#pragma omp target data map(tofrom: num_teams[0:N], total) map(to: a[0:N], b[0:N])
   {
 #pragma omp target teams distribute reduction(-:total) map(alloc: a[0:N], b[0:N], num_teams[0:N])
     for (int x = 0; x < N; ++x) {
@@ -46,7 +46,7 @@ int test_subtraction() {
 
   for (int x = 1; x < N; ++x) {
     if (num_teams[x-1] != num_teams[x]) {
-      OMPVV_WARNING("Kernel reported multiple numbers of teams.  Validity of testing of reduction clause cannot be guarunteed.");
+      OMPVV_WARNING("Kernel reported multiple numbers of teams.  Validity of testing of reduction clause cannot be guaranteed.");
       warned += 1;
     }
   }
@@ -54,10 +54,11 @@ int test_subtraction() {
   if ((num_teams[0] == 1) && (warned == 0)) {
     OMPVV_WARNING("Test operated with one team.  Reduction clause cannot be tested.");
   } else if ((num_teams[0] <= 0) && (warned == 0)) {
-    OMPVV_WARNING("Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guarunteed.")
-      }
+    OMPVV_WARNING("Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guaranteed.");
+  }
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, host_total != total);
+  OMPVV_ERROR_IF(host_total != total, "Total on device is %d but expected total from host is %d.", total, host_total);
 
   return errors;
 }

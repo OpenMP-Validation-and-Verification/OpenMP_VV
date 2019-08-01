@@ -47,17 +47,19 @@ int test_bitxor() {
 
   for (int x = 1; x < N; ++x) {
     if (num_teams[x-1] != num_teams[x]) {
-      OMPVV_WARNING("Kernel reported multiple numbers of teams.  Validity of testing of reduction clause cannot be guarunteed.");
+      OMPVV_WARNING("Kernel reported multiple numbers of teams.  Validity of testing of reduction clause cannot be guaranteed.");
       warned += 1;
     }
   }
   if ((num_teams[0] == 1) && (warned == 0)) {
     OMPVV_WARNING("Test operated with one team.  Reduction clause cannot be tested.");
   } else if ((num_teams[0] <= 0) && (warned == 0)) {
-    OMPVV_WARNING("Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guarunteed.")
-      }
+    OMPVV_WARNING("Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guaranteed.");
+  }
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, b != host_b);
+  OMPVV_ERROR_IF(host_b != b, "Bit on device is %d but expected bit from host is %d.", b, host_b);
+
   return errors;
 }
 

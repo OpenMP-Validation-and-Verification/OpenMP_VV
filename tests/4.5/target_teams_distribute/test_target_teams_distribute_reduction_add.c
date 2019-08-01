@@ -58,6 +58,8 @@ int test_add() {
   }
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, host_total != total);
+  OMPVV_ERROR_IF(host_total != total, "Total on device is %d but expected total from host is %d.", total, host_total);
+
   return errors;
 }
 
