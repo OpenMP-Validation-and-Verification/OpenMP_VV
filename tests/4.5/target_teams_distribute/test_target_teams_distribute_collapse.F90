@@ -19,6 +19,7 @@
         implicit none
         INTEGER :: errors
         errors = 0
+        OMPVV_TEST_OFFLOADING
 
         OMPVV_WARNING("Testing of collasping cannot be tested.")
         OMPVV_WARNING("Test only verifies that the collapse doesn't ")
