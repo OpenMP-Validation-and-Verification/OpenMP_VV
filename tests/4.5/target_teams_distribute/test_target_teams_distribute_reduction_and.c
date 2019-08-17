@@ -77,7 +77,11 @@ int test_and(){
 }
 
 int main() {
+  OMPVV_TEST_OFFLOADING;
+
   int total_errors = 0;
+
   OMPVV_TEST_AND_SET_VERBOSE(total_errors, test_and() !=0);
+
   OMPVV_REPORT_AND_RETURN(total_errors);
 }
