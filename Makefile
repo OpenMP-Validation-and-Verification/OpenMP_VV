@@ -188,12 +188,12 @@ endif
 
 # parameters (1) Action (2) System (3) Filename (4) other Info (compiler) (5) Log File
 define log_section_header
-  -$(if $(LOG), @echo -e "*-*-*BEGIN*-*-*"$(1)"*-*-*$$(date)*-*-*"$(2)"*-*-*"$(3)"*-*-*"$(4)"*-*-*" >> $(LOGDIR)/$(5);,)
+  -$(if $(LOG), @echo -e "*-*-*BEGIN*-*-*$(1)*-*-*$$(date)*-*-*$(2)*-*-*$(3)*-*-*$(4)*-*-*" >> $(LOGDIR)/$(5);,)
 endef
 
 # parameters (1) Action (2) System (3) Output status  (4) other Info (compiler) (5) Log File
 define log_section_footer
-  -$(if $(LOG), @echo -e "*-*-*END*-*-*"$(1)"*-*-*$$(date)*-*-*"$(2)"*-*-*"$(3)"*-*-*"$(4)"\n" >> $(LOGDIR)/$(5);,)
+  -$(if $(LOG), @echo -e "*-*-*END*-*-*$(1)*-*-*$$(date)*-*-*$(2)*-*-*$(3)*-*-*$(4)\n" >> $(LOGDIR)/$(5);,)
 endef
 
 .PHONY: all
