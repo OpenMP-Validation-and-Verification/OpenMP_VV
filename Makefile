@@ -18,9 +18,8 @@ endif
 # System specific varibles can be specified
 # in the system files sys/system/###.def
 #################################################
-ifdef SYSTEM
-	-include sys/systems/$(SYSTEM).def
-endif
+SYSTEM ?= generic
+-include sys/systems/$(SYSTEM).def
 
 include sys/make/make.def
 
