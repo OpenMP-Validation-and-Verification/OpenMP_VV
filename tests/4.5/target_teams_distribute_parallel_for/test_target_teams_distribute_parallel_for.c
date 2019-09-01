@@ -53,7 +53,7 @@ int test_target_teams_distribute_parallel_for() {
 
   // Rise lack of parallelism alerts
   if (num_teams == 1) {
-      OMPVV_WARNING("Test operated with one team.  Parallelism of teams distribute can't be guarunteed.");
+      OMPVV_WARNING("Test operated with one team.  Parallelism of teams distribute can't be guaranteed.");
   }
   if (alert_num_threads == ARRAY_SIZE) {
       OMPVV_WARNING("Test operated with one thread in all the teams. Parallel clause had no effect");

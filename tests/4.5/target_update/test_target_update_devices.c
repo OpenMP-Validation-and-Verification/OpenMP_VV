@@ -42,7 +42,9 @@ int test_set_default_dev() {
   OMPVV_INFOMSG("initial device: %d", omp_get_initial_device());
   OMPVV_INFOMSG("default device: %d", def_dev);
 
-  int sum, errors = 0, isHost[num_dev];
+  int sum = 0;
+  int errors = 0;
+  int isHost[num_dev];
   int h_matrix[N];
 
   // Mapping the array to all the devices
