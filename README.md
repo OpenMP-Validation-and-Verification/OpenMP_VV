@@ -2,4 +2,5 @@
 
 Welcome to our SOLLVE project!
 
-For more information go to our [wiki](https://bitbucket.org/crpl_cisc/sollve_vv/wiki)
+For more information see the
+[documentation](https://crpl.cis.udel.edu/ompvvsollve/documentation)

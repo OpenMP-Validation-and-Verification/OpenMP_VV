@@ -9,9 +9,9 @@
 #include <stdlib.h>
 #include <sys/time.h>
 
-#define rowA 500        
-#define colA 500        
-#define colB 500        
+#define rowA 100        
+#define colA 100        
+#define colB 100        
 
 struct Time{
 

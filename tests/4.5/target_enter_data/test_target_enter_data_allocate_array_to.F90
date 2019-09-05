@@ -70,7 +70,7 @@
 
             ! Make sure it is not copied back
             IF (.NOT. isSharedEnv) THEN
-              OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my1DPtr) /= 10)
+              OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my1DPtr /= 10))
             END IF
             OMPVV_TEST_AND_SET_VERBOSE(errors, SUM(my1DArr) /= ((N*(N+1)/2)))
             ! having memory leaks
@@ -105,7 +105,7 @@
 
             ! Make sure it is not copied back
             IF (.NOT. isSharedEnv) THEN
-              OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my2DPtr) /= 10)
+              OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my2DPtr /= 10))
             END IF
             OMPVV_TEST_AND_SET_VERBOSE(errors, SUM(my2DArr) /= ((N**2*(N**2+1)/2)))
 
@@ -141,7 +141,7 @@
 
             ! Make sure it is not copied back
             IF (.NOT. isSharedEnv) THEN
-              OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my2DPtr) /= 10)
+              OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my2DPtr /= 10))
             END IF
             OMPVV_TEST_AND_SET_VERBOSE(errors, SUM(my3DArr) /= (N**6+N**3)/2)
 

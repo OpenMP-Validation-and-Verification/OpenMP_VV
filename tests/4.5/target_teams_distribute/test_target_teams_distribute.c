@@ -45,7 +45,7 @@ int main() {
   }
 
   if (num_teams == 1){
-      OMPVV_WARNING("Test operated with one team.  Parallelism of teams distribute can't be guarunteed.");
+      OMPVV_WARNING("Test operated with one team.  Parallelism of teams distribute can't be guaranteed.");
   }
   if (!is_offloading){
       OMPVV_WARNING("Test operated on host.  Target region was ignored.")
