@@ -390,6 +390,11 @@ clean: clear_fortran_mod
 clear_fortran_mod:
 	- rm -f ./ompvv/*.mod
 
+.PHONY: tidy
+tidy: clean
+	- rm -rf $(LOGDIR)
+	- rm -rf $(RESULTS_HTML_OUTPUT_FOLDER)
+
 .PHONY: compilers
 compilers:
 	@echo "C compilers: "$(CCOMPILERS)
@@ -427,6 +432,8 @@ help:
 	@echo "    Compile the specific SOURCES files. If none is specified compile all the OpenMP test files"
 	@echo "  clean"
 	@echo "    Remove all executables from bin/ directory"
+	@echo "  tidy"
+	@echo "    Remove all log files, reports, and executable code (implies clean)"
 	@echo "  compilers"
 	@echo "    Shows available compiler configuration"
 	@echo "  report_json"
