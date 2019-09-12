@@ -392,7 +392,7 @@ clear_fortran_mod:
 
 .PHONY: tidy
 tidy: clean
-	- rm -rf $(LOGDIR)
+	- rm -rf $(LOGDIRNAME)
 	- rm -rf $(RESULTS_HTML_OUTPUT_FOLDER)
 
 .PHONY: compilers
