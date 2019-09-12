@@ -16,7 +16,7 @@
 
 #define N 1024
 
-int test_and(){
+int test_and() {
   char a[N];
   char result;
   char host_result;
@@ -41,7 +41,7 @@ int test_and(){
 
 #pragma omp target data map(to: a[0:N]) map(tofrom: num_teams[0:N])
     {
-#pragma omp target teams distribute reduction(&&:result) map(alloc: a[0:N], num_teams[0:N])
+#pragma omp target teams distribute reduction(&&:result) map(alloc: a[0:N], num_teams[0:N]) map(from: result)
       for (int x = 0; x < N; ++x) {
 	num_teams[x] = omp_get_num_teams();
 	result = result && a[x];

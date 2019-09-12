@@ -35,7 +35,7 @@ int test_multiply() {
   {
     for (int x = 0; x < N; x = x + 16) {
       result = 1;
-#pragma omp target teams distribute reduction(*:result) map(alloc: a[0:N], num_teams[0:N])
+#pragma omp target teams distribute reduction(*:result) map(alloc: a[0:N], num_teams[0:N]) map(from: result)
       for (int y = 0; y < 16; ++y) {
 	result *= a[x + y];
 	num_teams[x + y] = omp_get_num_teams();

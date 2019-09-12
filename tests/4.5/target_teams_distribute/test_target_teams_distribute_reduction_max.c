@@ -34,7 +34,7 @@ int test_max() {
 
 #pragma omp target data map(tofrom: num_teams[0:N]) map(to: a[0:N], b[0:N])
   {
-#pragma omp target teams distribute reduction(max:result) map(alloc: a[0:N], b[0:N], num_teams[0:N])
+#pragma omp target teams distribute reduction(max:result) map(alloc: a[0:N], b[0:N], num_teams[0:N]) map(from: result)
     for (int x = 0; x < N; ++x) {
       result = fmax(a[x] + b[x], result);
       num_teams[x] = omp_get_num_teams();
