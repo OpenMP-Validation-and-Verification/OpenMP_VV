@@ -62,7 +62,7 @@ endif
 
 # Clang compiler
 ifeq ($(CC), clang)
-  COFFLOADING = -fopenmp-targets=nvptx64-nvida-cuda
+  COFFLOADING = -fopenmp-targets=nvptx64-nvidia-cuda
   C_NO_OFFLOADING =
   CFLAGS += -lm -O3 -std=c99 -fopenmp $(COFFLOADING)
   #Adding this to fix problem with math.h
@@ -104,7 +104,7 @@ endif
 
 # Clang compiler
 ifeq ($(CXX), clang++)
-  CXXOFFLOADING = -fopenmp-targets=nvptx64-nvida-cuda
+  CXXOFFLOADING = -fopenmp-targets=nvptx64-nvidia-cuda
   CXX_NO_OFFLOADING =
   CXXFLAGS += -lm -O3 -fopenmp $(CXXOFFLOADING)
   #Adding this to fix problem with math.h
