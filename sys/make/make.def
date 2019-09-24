@@ -64,7 +64,7 @@ endif
 ifeq ($(CC), clang)
   COFFLOADING = -fopenmp-targets=nvptx64-nvidia-cuda
   C_NO_OFFLOADING =
-  CFLAGS += -lm -O3 -std=c99 -fopenmp $(COFFLOADING)
+  CFLAGS += -lm -O3 -fopenmp $(COFFLOADING)
   #Adding this to fix problem with math.h
   CFLAGS +=  -D__NO_MATH_INLINES -U__SSE2_MATH__ -U__SSE_MATH__
   CLINK = clang
