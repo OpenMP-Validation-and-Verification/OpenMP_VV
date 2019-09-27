@@ -14,48 +14,48 @@
 #include <stdlib.h>
 #include "ompvv.h"
 
-#define ARRAY_SIZE 1024
+#define N 1024
 #define ITERATIONS 1024
 
 int main() {
   OMPVV_WARNING("This test cannot fail at runtime. It can only throw errors indicating nowait couldn't be tested.");
   int isOffloading = 0;
   OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
-  int a[ARRAY_SIZE];
-  int b[ARRAY_SIZE];
-  int c[ARRAY_SIZE];
-  int d[ARRAY_SIZE];
-  int e[ARRAY_SIZE];
-  int f[ARRAY_SIZE];
+  int a[N];
+  int b[N];
+  int c[N];
+  int d[N];
+  int e[N];
+  int f[N];
   int errors = 0;
   int race_condition_found = 0;
 
   for (int y = 0; y < ITERATIONS; ++y) {
-    for (int x = 0; x < ARRAY_SIZE; ++x) {
+    for (int x = 0; x < N; ++x) {
       a[x] = x + y;
-      b[x] = 2 * x + y;
+      b[x] = 2*x + y;
       c[x] = 0;
-      d[x] = 3 * x + y;
-      e[x] = 4 * x + y;
+      d[x] = 3*x + y;
+      e[x] = 4*x + y;
       f[x] = 0;
     }
 
-#pragma omp target data map(to: a[0:ARRAY_SIZE], b[0:ARRAY_SIZE], d[0:ARRAY_SIZE], e[0:ARRAY_SIZE]) map(from: c[0:ARRAY_SIZE], f[0:ARRAY_SIZE])
+#pragma omp target data map(to: a[0:N], b[0:N], d[0:N], e[0:N]) map(from: c[0:N], f[0:N])
     {
-#pragma omp target teams distribute nowait map(alloc: a[0:ARRAY_SIZE], b[0:ARRAY_SIZE], c[0:ARRAY_SIZE])
-      for (int x = 0; x < ARRAY_SIZE; ++x) {
+#pragma omp target teams distribute nowait map(alloc: a[0:N], b[0:N], c[0:N])
+      for (int x = 0; x < N; ++x) {
 	c[x] = a[x] + b[x];
       }
-#pragma omp target teams distribute map(alloc: c[0:ARRAY_SIZE], d[0:ARRAY_SIZE], e[0:ARRAY_SIZE], f[0:ARRAY_SIZE])
-      for (int x = 0; x < ARRAY_SIZE; ++x) {
+#pragma omp target teams distribute map(alloc: c[0:N], d[0:N], e[0:N], f[0:N])
+      for (int x = 0; x < N; ++x) {
 	f[x] = c[x] + d[x] + e[x];
       }
 #pragma omp taskwait
     }
 
-    for (int x = 0; x < ARRAY_SIZE; ++x) {
-      OMPVV_TEST_AND_SET_VERBOSE(errors, c[x] != 3 * x + 2 * y);
-      if (f[x] != 10 * x + 4 * y) {
+    for (int x = 0; x < N; ++x) {
+      OMPVV_TEST_AND_SET_VERBOSE(errors, c[x] != 3*x + 2*y);
+      if (f[x] != 10*x + 4*y) {
 	race_condition_found = 1;
       }
     }

@@ -12,6 +12,7 @@
 #include "ompvv.F90"
 
 #define N 1024
+#define ITERATIONS 1024
 
 PROGRAM test_target_teams_distribute_nowait
   USE iso_fortran_env
@@ -22,66 +23,56 @@ PROGRAM test_target_teams_distribute_nowait
   OMPVV_TEST_OFFLOADING
   errors = 0
 
+  OMPVV_WARNING("This test cannot fail at runtime. It can only issue warnings when nowait couldn't be tested.")
+
   OMPVV_TEST_VERBOSE(test_nowait() .ne. 0)
 
   OMPVV_REPORT_AND_RETURN()
 CONTAINS
   INTEGER FUNCTION test_nowait()
-    INTEGER:: errors, x
-    LOGICAL:: is_host
-    INTEGER,DIMENSION(N):: a, b, c, d, e, f, g
+    INTEGER:: errors, x, y, race_condition_found
+    INTEGER,DIMENSION(N):: a, b, c, d, e, f
 
-    DO x = 1, N
-       a(x) = x
-       b(x) = 2 * x
-       c(x) = 0
-       d(x) = 3 * x
-       e(x) = 4 * x
-       f(x) = 0
-       g(x) = 0
+    DO y = 1, ITERATIONS
+       DO x = 1, N
+          a(x) = x + y
+          b(x) = 2*x + y
+          c(x) = 0
+          d(x) = 3*x + y
+          e(x) = 4*x + y
+          f(x) = 0
+       END DO
+
+
+       !$omp target data map(to: a(1:N), b(1:N), d(1:N), e(1:N)) map(from: &
+       !$omp& c(1:N), f(1:N))
+       !$omp target teams distribute nowait map(alloc: a(1:N), b(1:N), &
+       !$omp& c(1:N))
+       DO x = 1, N
+          c(x) = a(x) + b(x)
+       END DO
+       !$omp end target teams distribute
+       !$omp target teams distribute map(alloc: c(1:N), d(1:N), e(1:N), &
+       !$omp& f(1:N))
+       DO x = 1, N
+          f(x) = c(x) + d(x) + e(x)
+       END DO
+       !$omp end target teams distribute
+       !$omp taskwait
+       !$omp end target data
+
+       DO x = 1, N
+          IF (c(x) .ne. 3*x + 2*y) THEN
+             errors = errors + 1
+          END IF
+          IF (f(x) .ne. 10*x + 4*y) THEN
+             race_condition_found = 1
+          END IF
+       END DO
     END DO
 
-    !$omp target data map(to: a(1:N), b(1:N), d(1:N), e(1:N)) map(from: &
-    !$omp& c(1:N), f(1:N), g(1:N)) map(tofrom: is_host)
-    !$omp parallel
-    !$omp target teams distribute nowait map(alloc: a(1:N), b(1:N), &
-    !$omp& c(1:N))
-    DO x = 1, N
-       c(x) = a(x) + b(x)
-    END DO
-    !$omp end target teams distribute
-    !$omp target teams distribute nowait map(alloc: d(1:N), e(1:N), &
-    !$omp& f(1:N))
-    DO x = 1, N
-       f(x) = d(x) + e(x)
-    END DO
-    !$omp end target teams distribute
-    !$omp barrier
-    !$omp target teams distribute map(alloc: is_host, c(1:N), f(1:N), &
-    !$omp& g(1:N))
-    DO x = 1, N
-       is_host = omp_is_initial_device()
-       g(x) = c(x) + f(x)
-    END DO
-    !$omp end target teams distribute
-    !$omp end parallel
-    !$omp end target data
-
-    IF (is_host) THEN
-       OMPVV_WARNING("Test ran on host, nowait cannot be tested")
-    END IF
-
-    DO x = 1, N
-       IF (c(x) .ne. 3 * x) THEN
-          errors = errors + 1
-       END IF
-       IF (f(x) .ne. 7 * x) THEN
-          errors = errors + 1
-       END IF
-       IF (g(x) .ne. 10 * x) THEN
-          errors = errors + 1
-       END IF
-    END DO
+    OMPVV_WARNING_IF(race_condition_found == 0, "Could not show that nowait was operating on target teams distribute construct.")
+    OMPVV_INFOMSG_IF(race_condition_found == 1, "At least one race condition was introduced, nowait was operating.")
 
     test_nowait = errors
   END FUNCTION test_nowait
