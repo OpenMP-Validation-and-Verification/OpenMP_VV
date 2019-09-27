@@ -18,6 +18,7 @@
 #define ITERATIONS 1024
 
 int main() {
+  OMPVV_WARNING("This test cannot fail at runtime. It can only throw errors indicating nowait couldn't be tested.");
   int isOffloading = 0;
   OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
   int a[ARRAY_SIZE];
@@ -45,14 +46,11 @@ int main() {
       for (int x = 0; x < ARRAY_SIZE; ++x) {
 	c[x] = a[x] + b[x];
       }
-#pragma omp target teams distribute nowait map(alloc: c[0:ARRAY_SIZE], d[0:ARRAY_SIZE], e[0:ARRAY_SIZE], f[0:ARRAY_SIZE])
+#pragma omp target teams distribute map(alloc: c[0:ARRAY_SIZE], d[0:ARRAY_SIZE], e[0:ARRAY_SIZE], f[0:ARRAY_SIZE])
       for (int x = 0; x < ARRAY_SIZE; ++x) {
 	f[x] = c[x] + d[x] + e[x];
       }
-#pragma omp target
-      {
-	race_condition_found = race_condition_found;
-      } // this target clause includes an implicit barrier
+#pragma omp taskwait
     }
 
     for (int x = 0; x < ARRAY_SIZE; ++x) {
