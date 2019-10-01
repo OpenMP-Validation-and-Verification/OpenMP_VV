@@ -19,61 +19,61 @@
 
 #define N 1024
 
-      PROGRAM test_target_teams_distribute_num_teams
-        USE iso_fortran_env
-        USE ompvv_lib
-        USE omp_lib
-        implicit none
-        INTEGER :: errors
-        errors = 0
+PROGRAM test_target_teams_distribute_num_teams
+  USE iso_fortran_env
+  USE ompvv_lib
+  USE omp_lib
+  implicit none
+  INTEGER :: errors
+  errors = 0
 
-        OMPVV_TEST_VERBOSE(num_teams() .ne. 0)
+  OMPVV_TEST_VERBOSE(num_teams() .ne. 0)
 
-        OMPVV_REPORT_AND_RETURN()
-      CONTAINS
-        INTEGER FUNCTION num_teams()
-          INTEGER:: errors, default_num_teams, num_team, x
-          INTEGER,DIMENSION(N):: a, b, c
+  OMPVV_REPORT_AND_RETURN()
+CONTAINS
+  INTEGER FUNCTION num_teams()
+    INTEGER:: errors, default_num_teams, num_team, x
+    INTEGER,DIMENSION(N):: a, b, c
 
-          DO x = 1, N
-            a(x) = 1
-            b(x) = x
-            c(x) = 0
-          END DO
+    DO x = 1, N
+       a(x) = 1
+       b(x) = x
+       c(x) = 0
+    END DO
 
-          errors = 0
-          default_num_teams = -1
+    errors = 0
+    default_num_teams = -1
 
-          !$omp target teams distribute map(tofrom: default_num_teams, c(1:N)) &
-          !$omp& map(to: a(1:N), b(1:N))
-          DO x = 1, N
-            default_num_teams = omp_get_num_teams()
-            c(x) = a(x) + b(x)
-          END DO
+    !$omp target teams distribute map(tofrom: default_num_teams, c(1:N)) &
+    !$omp& map(to: a(1:N), b(1:N))
+    DO x = 1, N
+       default_num_teams = omp_get_num_teams()
+       c(x) = a(x) + b(x)
+    END DO
 
-          IF (default_num_teams .eq. 1) THEN
-            OMPVV_WARNING("Test operated with one team. Testing num_teams")
-            OMPVV_WARNING("cannot be done.")
-          ELSEIF (default_num_teams .le. 0) THEN
-            OMPVV_ERROR("omp_get_num_teams() returned result less than or")
-            OMPVV_ERROR("equal to 0.  Maybe omp_get_num_teams is not returning")
-            OMPVV_ERROR("correct number of teams.")
-          ELSE
-            !$omp target teams distribute num_teams(default_num_teams - 1) &
-            !$omp& map(to: a(1:N), b(1:N)) map(from: c(1:N), num_teams)
-            DO x = 1, N
-              c(x) = a(x) + b(x)
-              num_team = omp_get_num_teams()
-            END DO
+    IF (default_num_teams .eq. 1) THEN
+       OMPVV_WARNING("Test operated with one team. Testing num_teams")
+       OMPVV_WARNING("cannot be done.")
+    ELSEIF (default_num_teams .le. 0) THEN
+       OMPVV_ERROR("omp_get_num_teams() returned result less than or")
+       OMPVV_ERROR("equal to 0.  Maybe omp_get_num_teams is not returning")
+       OMPVV_ERROR("correct number of teams.")
+    ELSE
+       !$omp target teams distribute num_teams(default_num_teams - 1) &
+       !$omp& map(to: a(1:N), b(1:N)) map(from: c(1:N), num_teams)
+       DO x = 1, N
+          c(x) = a(x) + b(x)
+          num_team = omp_get_num_teams()
+       END DO
 
-            IF (num_team .gt. default_num_teams - 1) THEN
-              errors = errors + 1
-              OMPVV_ERROR("Test ran on more teams than requested")
-            ELSEIF (num_team .lt. default_num_teams - 1) THEN
-              OMPVV_WARNING("Test ran on less teams than requested. This ")
-              OMPVV_WARNING("is still spec-conformant.")
-            END IF
-          END IF
-          num_team = errors
-        END FUNCTION num_teams
-      END PROGRAM test_target_teams_distribute_num_teams
+       IF (num_team .gt. default_num_teams - 1) THEN
+          errors = errors + 1
+          OMPVV_ERROR("Test ran on more teams than requested")
+       ELSEIF (num_team .lt. default_num_teams - 1) THEN
+          OMPVV_WARNING("Test ran on less teams than requested. This ")
+          OMPVV_WARNING("is still spec-conformant.")
+       END IF
+    END IF
+    num_team = errors
+  END FUNCTION num_teams
+END PROGRAM test_target_teams_distribute_num_teams
