@@ -25,6 +25,7 @@ int test_and() {
   int num_teams[N];
   int warned = 0;
   srand(1);
+  printf("%lf\n", false_margin);
 
   for (int itr_count = 0; itr_count < 16; ++itr_count) {
     for (int x = 0; x < N; ++x) {
@@ -39,7 +40,7 @@ int test_and() {
     result = 1;
     host_result = 1;
 
-#pragma omp target data map(to: a[0:N]) map(tofrom: num_teams[0:N])
+#pragma omp target data map(to: a[0:N]) map(tofrom: num_teams[0:N], result)
     {
 #pragma omp target teams distribute reduction(&&:result) map(alloc: a[0:N], num_teams[0:N]) map(from: result)
       for (int x = 0; x < N; ++x) {

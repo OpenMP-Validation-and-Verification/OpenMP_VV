@@ -31,7 +31,7 @@ int test_multiply() {
   int result = 1;
   int host_result;
 
-#pragma omp target data map(tofrom: num_teams[0:N]) map(to: a[0:N])
+#pragma omp target data map(tofrom: num_teams[0:N], result) map(to: a[0:N])
   {
     for (int x = 0; x < N; x = x + 16) {
       result = 1;
