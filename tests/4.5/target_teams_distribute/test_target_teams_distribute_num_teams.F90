@@ -32,7 +32,7 @@
         OMPVV_REPORT_AND_RETURN()
       CONTAINS
         INTEGER FUNCTION num_teams()
-          INTEGER:: errors, default_num_teams, num_teams
+          INTEGER:: errors, default_num_teams, num_team, x
           INTEGER,DIMENSION(N):: a, b, c
 
           DO x = 1, N
@@ -42,6 +42,8 @@
           END DO
 
           errors = 0
+          default_num_teams = -1
+
           !$omp target teams distribute map(tofrom: default_num_teams, c(1:N)) &
           !$omp& map(to: a(1:N), b(1:N))
           DO x = 1, N
@@ -61,17 +63,17 @@
             !$omp& map(to: a(1:N), b(1:N)) map(from: c(1:N), num_teams)
             DO x = 1, N
               c(x) = a(x) + b(x)
-              num_teams = omp_get_num_teams()
+              num_team = omp_get_num_teams()
             END DO
 
-            IF (num_teams .gt. default_num_teams - 1) THEN
+            IF (num_team .gt. default_num_teams - 1) THEN
               errors = errors + 1
               OMPVV_ERROR("Test ran on more teams than requested")
-            ELSEIF (num_teams .lt. default_num_teams - 1) THEN
+            ELSEIF (num_team .lt. default_num_teams - 1) THEN
               OMPVV_WARNING("Test ran on less teams than requested. This ")
               OMPVV_WARNING("is still spec-conformant.")
             END IF
           END IF
-          num_teams = errors
+          num_team = errors
         END FUNCTION num_teams
       END PROGRAM test_target_teams_distribute_num_teams
