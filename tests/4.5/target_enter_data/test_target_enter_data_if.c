@@ -83,7 +83,7 @@ int main() {
       } //end-else 
     }
     // This is not part of the test but it is necessary to avoid conflicts
-    #pragma omp target exit data map (delete: a[0:size], b[0:size])
+    #pragma omp target exit data if(size > SIZE_THRESHOLD) map(delete: a[0:size], b[0:size])
   } // end-for size
 
   OMPVV_REPORT_AND_RETURN(errors)

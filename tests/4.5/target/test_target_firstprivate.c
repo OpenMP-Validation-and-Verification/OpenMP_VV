@@ -30,24 +30,26 @@ int main() {
   int p_val = omp_get_thread_num();
   actualNumThreads = omp_get_num_threads();
 
-#pragma omp target map(tofrom:compute_array) firstprivate(p_val)
+#pragma omp target map(tofrom:compute_array[p_val:1][0:N]) firstprivate(p_val)
   {
     for (i = 0; i < N; i++)
       compute_array[p_val][i] = 100;
     // Checking if the value is not copied back
     p_val++;
   } // End target
+
+  // Checking the results 
   if (p_val == omp_get_thread_num()) {
     for (i = 0; i < N; i++)
       compute_array[p_val][i]++;
   }
-}//end-parallel
+} //end-parallel
 
-  OMPVV_WARNING_IF(actualNumThreads == 1, "The number of threads in the host is 1. This tests is inconclusive")
+  OMPVV_WARNING_IF(actualNumThreads == 1, "The number of threads in the host is 1. This tests is inconclusive");
   for (i=0; i<actualNumThreads; i++){ 
     for (j=0; j<N; j++){
       OMPVV_TEST_AND_SET(errors, compute_array[i][j] != 101);
-      OMPVV_ERROR_IF(compute_array[i][j] == 100, "p_val changed after target region for thread %d",i)
+      OMPVV_ERROR_IF(compute_array[i][j] == 100, "p_val changed after target region for thread %d",i);
     }
   }//end-for
 
