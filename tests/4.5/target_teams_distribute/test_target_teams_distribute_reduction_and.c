@@ -40,13 +40,10 @@ int test_and() {
     result = 1;
     host_result = 1;
 
-#pragma omp target data map(to: a[0:N]) map(tofrom: num_teams[0:N], result)
-    {
-#pragma omp target teams distribute reduction(&&:result) map(alloc: a[0:N], num_teams[0:N]) map(from: result)
-      for (int x = 0; x < N; ++x) {
-	num_teams[x] = omp_get_num_teams();
-	result = result && a[x];
-      }
+#pragma omp target teams distribute reduction(&&:result) map(to: a[0:N]) map(tofrom: result, num_teams[0:N])
+    for (int x = 0; x < N; ++x) {
+      num_teams[x] = omp_get_num_teams();
+      result = result && a[x];
     }
 
     for (int x = 0; x < N; ++x) {

@@ -38,14 +38,12 @@ int test_bitand() {
     b = b + (1 << x);
   }
 
-#pragma omp target data map(tofrom: num_teams[0:N]) map(to: a[0:N])
-  {
-#pragma omp target teams distribute reduction(&:b) map(alloc: a[0:N], num_teams[0:N]) map(from: b)
-    for (int x = 0; x < N; ++x) {
-      num_teams[x] = omp_get_num_teams();
-      b = b & a[x];
-    }
+#pragma omp target teams distribute reduction(&:b) map(to: a[0:N]) map(tofrom: b, num_teams[0:N])
+  for (int x = 0; x < N; ++x) {
+    num_teams[x] = omp_get_num_teams();
+    b = b & a[x];
   }
+
   unsigned int host_b = a[0];
 
   for (int x = 0; x < N; ++x) {

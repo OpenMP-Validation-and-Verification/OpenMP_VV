@@ -31,13 +31,10 @@ int test_add() {
     num_teams[x] = -1;
   }
 
-#pragma omp target data map(tofrom: num_teams[0:N], total) map(to: a[0:N], b[0:N])
-  {
-#pragma omp target teams distribute reduction(+:total) map(alloc: a[0:N], b[0:N], num_teams[0:N]) map(from: total)
-    for (int x = 0; x < N; ++x) {
-      num_teams[x] = omp_get_num_teams();
-      total += a[x] + b[x];
-    }
+#pragma omp target teams distribute reduction(+:total) map(to: a[0:N], b[0:N]) map(tofrom: total, num_teams[0:N])
+  for (int x = 0; x < N; ++x) {
+    num_teams[x] = omp_get_num_teams();
+    total += a[x] + b[x];
   }
 
   for (int x = 0; x < N; ++x) {

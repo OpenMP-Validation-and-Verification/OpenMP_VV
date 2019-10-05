@@ -35,13 +35,10 @@ int test_or() {
 
   char result = 0;
 
-#pragma omp target data map(tofrom: num_teams[0:N]) map(to: a[0:N])
-  {
-#pragma omp target teams distribute reduction(||:result) map(alloc: a[0:N], num_teams[0:N]) map(from: result)
-    for (int x = 0; x < N; ++x) {
-      num_teams[x] = omp_get_num_teams();
-      result = result || a[x];
-    }
+#pragma omp target teams distribute reduction(||:result) map(to: a[0:N]) map(tofrom: result, num_teams[0:N])
+  for (int x = 0; x < N; ++x) {
+    num_teams[x] = omp_get_num_teams();
+    result = result || a[x];
   }
 
   char host_result = 0;
