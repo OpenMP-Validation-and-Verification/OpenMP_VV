@@ -18,7 +18,7 @@
 #define ITERATIONS 1024
 
 int main() {
-  OMPVV_WARNING("This test cannot fail at runtime. It can only throw errors indicating nowait couldn't be tested.");
+  OMPVV_WARNING("This test does not throw an error if tasks fail to execute asynchronously, as this is still correct behavior. If execution is not asynchronous, we will throw a warning.");
   int isOffloading = 0;
   OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
   int a[N];
@@ -61,8 +61,8 @@ int main() {
     }
   }
 
-  OMPVV_WARNING_IF(race_condition_found == 0, "Could not show that nowait was operating on target teams distribute construct.");
-  OMPVV_INFOMSG_IF(race_condition_found == 1, "At least one race condition was introduced, nowait was operating.");
+  OMPVV_WARNING_IF(race_condition_found == 0, "Could not show that nowait had any effect on target teams distribute construct.");
+  OMPVV_INFOMSG_IF(race_condition_found == 1, "At least one race condition was introduced, nowait had an effect.");
 
   OMPVV_REPORT_AND_RETURN(errors);
 }

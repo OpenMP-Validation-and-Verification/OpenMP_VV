@@ -23,7 +23,7 @@ PROGRAM test_target_teams_distribute_nowait
   OMPVV_TEST_OFFLOADING
   errors = 0
 
-  OMPVV_WARNING("This test cannot fail at runtime. It can only issue warnings when nowait couldn't be tested.")
+  OMPVV_WARNING("This test does not throw an error if tasks fail to execute asynchronously, as this is still correct behavior. If execution is not asynchronous, we will throw a warning.")
 
   OMPVV_TEST_VERBOSE(test_nowait() .ne. 0)
 
@@ -71,8 +71,8 @@ CONTAINS
        END DO
     END DO
 
-    OMPVV_WARNING_IF(race_condition_found == 0, "Could not show that nowait was operating on target teams distribute construct.")
-    OMPVV_INFOMSG_IF(race_condition_found == 1, "At least one race condition was introduced, nowait was operating.")
+    OMPVV_WARNING_IF(race_condition_found == 0, "Could not show that nowait had an effect on target teams distribute construct.")
+    OMPVV_INFOMSG_IF(race_condition_found == 1, "At least one race condition was introduced, nowait had an effect.")
 
     test_nowait = errors
   END FUNCTION test_nowait
