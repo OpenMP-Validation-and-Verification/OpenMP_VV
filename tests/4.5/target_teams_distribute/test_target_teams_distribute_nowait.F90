@@ -12,6 +12,7 @@
 #include "ompvv.F90"
 
 #define N 1024
+#define N_TASKS 16
 #define ITERATIONS 1024
 
 PROGRAM test_target_teams_distribute_nowait
@@ -30,8 +31,10 @@ PROGRAM test_target_teams_distribute_nowait
   OMPVV_REPORT_AND_RETURN()
 CONTAINS
   INTEGER FUNCTION test_nowait()
-    INTEGER:: errors, x, y, race_condition_found
+    INTEGER:: errors, x, y, race_condition_found, task
     INTEGER,DIMENSION(N):: a, b, c, d, e, f
+
+    OMPVV_ERROR_IF(MOD(N, N_TASKS) .ne. 0, "Selected value of N not divisible by number of tasks")
 
     DO y = 1, ITERATIONS
        DO x = 1, N
@@ -46,12 +49,14 @@ CONTAINS
 
        !$omp target data map(to: a(1:N), b(1:N), d(1:N), e(1:N)) map(from: &
        !$omp& c(1:N), f(1:N))
-       !$omp target teams distribute nowait map(alloc: a(1:N), b(1:N), &
-       !$omp& c(1:N))
-       DO x = 1, N
-          c(x) = a(x) + b(x)
+       DO task = 1, N_TASKS
+          !$omp target teams distribute nowait map(alloc: a(1:N), b(1:N), &
+          !$omp& c(1:N))
+          DO x = 1 + (N / N_TASKS)*(task - 1), (N / N_TASKS)*task
+             c(x) = a(x) + b(x)
+          END DO
+          !$omp end target teams distribute
        END DO
-       !$omp end target teams distribute
        !$omp target teams distribute map(alloc: c(1:N), d(1:N), e(1:N), &
        !$omp& f(1:N))
        DO x = 1, N

@@ -15,6 +15,7 @@
 #include "ompvv.h"
 
 #define N 1024
+#define N_TASKS 16
 #define ITERATIONS 1024
 
 int main() {
@@ -30,6 +31,8 @@ int main() {
   int errors = 0;
   int race_condition_found = 0;
 
+  OMPVV_ERROR_IF(N % N_TASKS != 0, "Selected value of N not divisible by number of tasks.");
+
   for (int y = 0; y < ITERATIONS; ++y) {
     for (int x = 0; x < N; ++x) {
       a[x] = x + y;
@@ -40,11 +43,15 @@ int main() {
       f[x] = 0;
     }
 
+    
+
 #pragma omp target data map(to: a[0:N], b[0:N], d[0:N], e[0:N]) map(from: c[0:N], f[0:N])
     {
+      for (int task = 0; task < N_TASKS; ++task) {
 #pragma omp target teams distribute nowait map(alloc: a[0:N], b[0:N], c[0:N])
-      for (int x = 0; x < N; ++x) {
-	c[x] = a[x] + b[x];
+	for (int x = (N / N_TASKS)*task; x < (N / N_TASKS)*(task + 1); ++x) {
+	  c[x] = a[x] + b[x];
+	}
       }
 #pragma omp target teams distribute map(alloc: c[0:N], d[0:N], e[0:N], f[0:N])
       for (int x = 0; x < N; ++x) {
