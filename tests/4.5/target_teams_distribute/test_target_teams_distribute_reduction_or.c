@@ -18,6 +18,7 @@
 
 int test_or() {
   char a[N];
+  // See the 'and' operator test for an explanation of this math.
   double false_margin = pow(exp(1), log(.5)/N);
   int errors = 0;
   int num_teams[N];

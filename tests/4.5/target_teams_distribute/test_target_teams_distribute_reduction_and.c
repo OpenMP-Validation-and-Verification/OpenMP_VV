@@ -20,6 +20,10 @@ int test_and() {
   char a[N];
   char result;
   char host_result;
+  // The below calculation is meant to ensure about half the test arrays will
+  // come out to true under the 'and' operator, and the rest false. For the and
+  // operator, a test array that comes out true requires every entry to be true, 
+  // which is why this margin is so close to 100%.
   double false_margin = pow(exp(1), log(.5)/N);
   int errors = 0;
   int num_teams[N];
