@@ -49,7 +49,7 @@ int test_or() {
 
   for (int x = 1; x < N; ++x) {
     if (num_teams[x-1] != num_teams[x]) {
-      OMPVV_WARNING("Kernel reported multiple numbers of teams.  Validity of testing of reduction clause cannot be guarunteed.");
+      OMPVV_WARNING("Kernel reported differing numbers of teams.  Validity of testing of reduction clause cannot be guarunteed.");
       warned += 1;
     }
   }

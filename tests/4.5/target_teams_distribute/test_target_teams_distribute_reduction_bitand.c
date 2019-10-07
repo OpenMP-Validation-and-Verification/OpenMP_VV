@@ -53,7 +53,7 @@ int test_bitand() {
 
   for (int x = 1; x < N; ++x) {
     if (num_teams[x-1] != num_teams[x]) {
-      OMPVV_WARNING("Kernel reported multiple numbers of teams.  Validity of testing of reduction clause cannot be guaranteed.");
+      OMPVV_WARNING("Kernel reported differing numbers of teams.  Validity of testing of reduction clause cannot be guaranteed.");
       warned += 1;
     }
   }
