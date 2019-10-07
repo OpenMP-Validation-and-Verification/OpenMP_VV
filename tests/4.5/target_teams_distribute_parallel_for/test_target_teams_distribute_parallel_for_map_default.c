@@ -42,8 +42,10 @@ int test_target_teams_distribute_parallel_for_map_default(int isShared) {
     // could cause a data race.
     // See page 182, line 1.
     d[j] += c[j] * (a[j] + b[j] + scalar);
+#pragma omp atomic write
     scalar2 = j;
-  }
+  } // atomic prevents indeterminacy from simultaneous writes
+    // since scalar2 is shared implicitly.
 
   if (!isShared)
     OMPVV_TEST_AND_SET(errors, scalar2 != -1);

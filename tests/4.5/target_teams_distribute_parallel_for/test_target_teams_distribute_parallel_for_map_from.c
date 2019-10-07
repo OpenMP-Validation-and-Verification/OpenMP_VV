@@ -30,6 +30,7 @@ int test_target_teams_distribute_parallel_for_map_from() {
 
 #pragma omp target teams distribute parallel for map(from: a, scalar)
   for (j = 0; j < SIZE_N; ++j) {
+#pragma omp atomic write
     scalar = 20;
     a[j] = 10;
   }
