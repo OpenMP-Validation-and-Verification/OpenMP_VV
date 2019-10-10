@@ -52,7 +52,7 @@ int main() {
 	c[x] = a[x] + b[x];
       }
     }
-#pragma omp target teams distribute map(to: a[0:N], b[0:N], d[0:N], e[0:N]) \
+#pragma omp target teams distribute nowait map(to: a[0:N], b[0:N], d[0:N], e[0:N]) \
   map(from: c[0:N], f[0:N])
     for (int x = 0; x < N; ++x) {
       f[x] = c[x] + d[x] + e[x];

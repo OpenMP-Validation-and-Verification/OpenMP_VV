@@ -55,7 +55,7 @@ CONTAINS
           END DO
           !$omp end target teams distribute
        END DO
-       !$omp target teams distribute map(to: a(1:N), b(1:N), d(1:N), e(1:N)) &
+       !$omp target teams distribute nowait map(to: a(1:N), b(1:N), d(1:N), e(1:N)) &
        !$omp& map(from: c(1:N), f(1:N))
        DO x = 1, N
           f(x) = c(x) + d(x) + e(x)
