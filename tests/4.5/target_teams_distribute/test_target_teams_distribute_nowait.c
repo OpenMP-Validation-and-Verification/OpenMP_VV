@@ -58,12 +58,12 @@ int main() {
       f[x] = c[x] + d[x] + e[x];
     }
 #pragma omp taskwait
-  }
 
-  for (int x = 0; x < N; ++x) {
-    OMPVV_TEST_AND_SET_VERBOSE(errors, c[x] != 3*x + 2*y);
-    if (f[x] != 10*x + 4*y) {
-      race_condition_found = 1;
+    for (int x = 0; x < N; ++x) {
+      OMPVV_TEST_AND_SET_VERBOSE(errors, c[x] != 3*x + 2*y);
+      if (f[x] != 10*x + 4*y) {
+	race_condition_found = 1;
+      }
     }
   }
 
