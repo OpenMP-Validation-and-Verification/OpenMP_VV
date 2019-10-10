@@ -45,26 +45,25 @@ int main() {
 
     
 
-#pragma omp target data map(to: a[0:N], b[0:N], d[0:N], e[0:N]) map(from: c[0:N], f[0:N])
-    {
-      for (int task = 0; task < N_TASKS; ++task) {
-#pragma omp target teams distribute nowait map(alloc: a[0:N], b[0:N], c[0:N])
-	for (int x = (N / N_TASKS)*task; x < (N / N_TASKS)*(task + 1); ++x) {
-	  c[x] = a[x] + b[x];
-	}
+    for (int task = 0; task < N_TASKS; ++task) {
+#pragma omp target teams distribute nowait map(to: a[0:N], b[0:N], d[0:N], e[0:N]) \
+  map(from: c[0:N], f[0:N])
+      for (int x = (N / N_TASKS)*task; x < (N / N_TASKS)*(task + 1); ++x) {
+	c[x] = a[x] + b[x];
       }
-#pragma omp target teams distribute map(alloc: c[0:N], d[0:N], e[0:N], f[0:N])
-      for (int x = 0; x < N; ++x) {
-	f[x] = c[x] + d[x] + e[x];
-      }
-#pragma omp taskwait
     }
-
+#pragma omp target teams distribute map(to: a[0:N], b[0:N], d[0:N], e[0:N]) \
+  map(from: c[0:N], f[0:N])
     for (int x = 0; x < N; ++x) {
-      OMPVV_TEST_AND_SET_VERBOSE(errors, c[x] != 3*x + 2*y);
-      if (f[x] != 10*x + 4*y) {
-	race_condition_found = 1;
-      }
+      f[x] = c[x] + d[x] + e[x];
+    }
+#pragma omp taskwait
+  }
+
+  for (int x = 0; x < N; ++x) {
+    OMPVV_TEST_AND_SET_VERBOSE(errors, c[x] != 3*x + 2*y);
+    if (f[x] != 10*x + 4*y) {
+      race_condition_found = 1;
     }
   }
 

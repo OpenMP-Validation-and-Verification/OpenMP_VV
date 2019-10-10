@@ -47,24 +47,21 @@ CONTAINS
        END DO
 
 
-       !$omp target data map(to: a(1:N), b(1:N), d(1:N), e(1:N)) map(from: &
-       !$omp& c(1:N), f(1:N))
        DO task = 1, N_TASKS
-          !$omp target teams distribute nowait map(alloc: a(1:N), b(1:N), &
-          !$omp& c(1:N))
+          !$omp target teams distribute nowait map(to: a(1:N), b(1:N), d(1:N), e(1:N)) &
+          !$omp& map(from: c(1:N), f(1:N))
           DO x = 1 + (N / N_TASKS)*(task - 1), (N / N_TASKS)*task
              c(x) = a(x) + b(x)
           END DO
           !$omp end target teams distribute
        END DO
-       !$omp target teams distribute map(alloc: c(1:N), d(1:N), e(1:N), &
-       !$omp& f(1:N))
+       !$omp target teams distribute map(to: a(1:N), b(1:N), d(1:N), e(1:N)) &
+       !$omp& map(from: c(1:N), f(1:N))
        DO x = 1, N
           f(x) = c(x) + d(x) + e(x)
        END DO
        !$omp end target teams distribute
        !$omp taskwait
-       !$omp end target data
 
        DO x = 1, N
           IF (c(x) .ne. 3*x + 2*y) THEN
