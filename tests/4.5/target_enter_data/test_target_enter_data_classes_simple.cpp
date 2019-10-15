@@ -3,6 +3,16 @@
 // OpenMP API Version 4.5 Nov 2015
 //
 //
+// This test checks for mapping of classes into  the device through the use of 
+// target enter and exit data clauses. IT considers that 4.5 does not support
+// mapping of attributes directly, as the implicit use of the this-> pointer when 
+// using attributes inside the target region is restrictive.
+//
+// This test creates a class that, during construction maps an attribute through helper 
+// variables that remove the direct use to the attributes. And during destruction of the 
+// object it maps the data back to the devices. Additionally, there is a modifier 
+// method that uses values from the class indirectly through the use of helper references
+// finally there is a synchronization  clause that will obtain the values on demand
 //===----------------------------------------------------------------------------------===//
 //
 //
@@ -22,41 +32,52 @@ private:
   int sum;
 
 public:
+  // Constructor. Maps the data into the de3vice
   Simple(int s) : size(s) { 
-      sum = 0;
-      d_array = new int[size];
-      int* helper = d_array;
-      int &hs = size;
-      int &hsum = sum;
+    sum = 0;
+    d_array = new int[size];
+    // Removing the  direct use  of attributes to avoid problems
+    // with 4.5 specifications 
+    int* helper = d_array;
+    int &hs = size;
+    int &hsum = sum;
 #pragma omp target enter data map(to: helper[0:size]) map(to: hs) map(to:hsum)
   }
 
+  // Destructor, removes the data from the device
   ~Simple() { 
-      int* helper = d_array;
-      int &hs = size;
-      int &hsum = sum;
+    // Removing the  direct use  of attributes to avoid problems
+    // with 4.5 specifications 
+    int* helper = d_array;
+    int &hs = size;
+    int &hsum = sum;
 #pragma omp target exit data map(delete: helper[0:size]) map(delete: hs) map(delete: hsum)
-      delete[] d_array; 
+    delete[] d_array; 
   }
   
+  // Modify the device data directly
   void modify() {
+    // Removing the  direct use  of attributes to avoid problems
+    // with 4.5 specifications 
     int * helper = d_array;
     int &hsize = size;
-    int *hsum = &sum;
+    int &hsum = sum;
 #pragma omp target defaultmap(tofrom: scalar) 
     {
-      *hsum = 0;
+      hsum = 0;
       for (int i = 0; i < hsize; ++i) {
         helper[i] = 1;
-        *hsum += helper[i];
+        hsum += helper[i];
       }
     }
   }
+
+  // Get the values from the device through a second array
   void getValues(int &h_sum, int* h_array) {
-      int* helper = d_array;
-      int &hsize = size;
-      int *help_sum = &sum;
-#pragma omp target map(from: h_sum) map(tofrom: h_array[0:size])
+    int* helper = d_array;
+    int &hsize = size;
+    int *help_sum = &sum;
+#pragma omp target map(from: h_sum, h_array[0:size])
     {
       h_sum = *help_sum;
       for (int i = 0; i < hsize; i++) {
