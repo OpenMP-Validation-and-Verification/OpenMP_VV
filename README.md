@@ -8,4 +8,5 @@ Welcome to our SOLLVE project!
 
 For more information, publications, presentations and results, please check out our 
 [website](https://crpl.cis.udel.edu/ompvvsollve/) 
-[documentation](https://crpl.cis.udel.edu/ompvvsollve/documentation)
+
+For [documentation] please check out (https://crpl.cis.udel.edu/ompvvsollve/documentation)
