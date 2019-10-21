@@ -1,4 +1,4 @@
-//===---- test_target_enter_data_classes_simple.c - combined consutrct -===//
+//===---- test_target_enter_data_classes_simple.c -- target enter data with classes===//
 //
 // OpenMP API Version 4.5 Nov 2015
 //
