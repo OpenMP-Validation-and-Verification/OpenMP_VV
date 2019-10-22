@@ -23,7 +23,11 @@ int test_target_teams_distribute_parallel_for_firstprivate() {
   int b[SIZE_N];
   int c[SIZE_N];
   int d[SIZE_N];
-  int privatized = 10;
+  int firstized = 10;
+  int privatized;
+  int reported_num_teams[SIZE_N];
+  int reported_team_num[SIZE_N];
+  int reported_num_threads[SIZE_N];
   int errors = 0;
   int i, j, dev;
 
@@ -36,17 +40,37 @@ int test_target_teams_distribute_parallel_for_firstprivate() {
   }
 
   // check multiple sizes. 
-#pragma omp target data map(to: a[0:SIZE_N], b[0:SIZE_N], c[0:SIZE_N]) map(from: d[0:SIZE_N])
+#pragma omp target data map(to: a[0:SIZE_N], b[0:SIZE_N], c[0:SIZE_N])
   {
-#pragma omp target teams distribute parallel for firstprivate(privatized)
+#pragma omp target teams distribute parallel for firstprivate(privatized, firstized) num_teams(10) num_threads(256)
       for (j = 0; j < SIZE_N; ++j) {
+        reported_num_teams[j] = omp_get_num_teams();
+        reported_num_threads[j] = omp_get_num_threads();
+        reported_team_num[j] = omp_get_team_num();
+        privatized = 0;
         for (i = 0; i < a[j] + b[j]; ++i) {
           privatized++;
         }
+        privatized += firstized;
         d[j] = c[j] * privatized;
       }
   }
 
+  // Checking for reported teams and number of threads
+  OMPVV_WARNING_IF(reported_num_teams[0] == 1, "Number of teams reported was 1, test cannot assert privatization across teams");
+  // To have a single warning for threds. diff teams could have different number of threads, we warn if all are 1
+  int warning_threads = 0;
+  for (i = 0; i < SIZE_N; i++) {
+    if (reported_num_threads[i] == 1)
+      warning_threads++;
+    if (i > 0) {
+      OMPVV_ERROR_IF(reported_num_teams[i] != reported_num_teams[i-1], "Discrepancy in the reported number of teams across teams");
+      if (reported_team_num[i] == reported_team_num[i-1] && reported_num_threads[i] != reported_num_threads[i-1])
+        OMPVV_ERROR("Discrepancy in the reported number of threads inside a single team");
+    }
+  }
+  OMPVV_WARNING_IF(warning_threads == SIZE_N, "Number of threads was 1 for all teams. test cannot assert privatization across teams");
+  // Checking for the expected values 
   for (i = 0; i < SIZE_N; i++) {
     // 10 = initial value of privatized + 1 initial value of a[i] 
     // + i initial value of b[i]
