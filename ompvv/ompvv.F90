@@ -164,26 +164,26 @@ module ompvv_lib
       LOGICAL, INTENT(IN) :: condition
       CHARACTER(len=*) :: conditionStr
       CHARACTER(len=*) :: fn
-      CHARACTER(len=500) :: clean, clean_condition
+      CHARACTER(len=500) :: clean, clean_conditionStr
       INTEGER :: ln, condition_clean_pos
 
       clean = TRIM(clean_fn(fn))
+      clean_conditionStr = conditionStr
       ! Avoid unused variables warning
       IF (.FALSE.) THEN
         ln = ln
       END IF 
       ! cleaning condition % causes to fail. replace with '.'
-      condition_clean_pos = SCAN(conditionStr, "%")
+      condition_clean_pos = SCAN(clean_conditionStr, "%")
       DO WHILE (condition_clean_pos /= 0)
-        conditionStr(condition_clean_pos : condition_clean_pos + 1) = "."
-        condition_clean_pos = SCAN(conditionStr, "%")
+        clean_conditionStr (condition_clean_pos : condition_clean_pos + 1) = "."
+        condition_clean_pos = SCAN(clean_conditionStr , "%")
       END DO
-      clean_condition = conditionStr
-      clean_condition = " Condition "//TRIM(clean_condition)//" failed "
+      clean_conditionStr = " Condition "//TRIM(clean_conditionStr)//" failed "
       
       IF (condition) then 
         ompvv_errors = ompvv_errors + 1
-        OMPVV_ERROR_HELPER(clean_condition, clean, ln)
+        OMPVV_ERROR_HELPER(clean_conditionStr, clean, ln)
 !        OMPVV_ERROR_HELPER(" Condition failed ", fn, ln)
       END IF 
     end subroutine test_error_verbose
