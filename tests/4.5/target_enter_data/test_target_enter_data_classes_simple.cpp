@@ -44,12 +44,14 @@ private:
   int sum;
 
 public:
-  // Constructor. Maps the data into the de3vice
+  // Constructor. Maps the data into the device
   Simple(int s) : size(s) { 
     this->sum = 0;
     this->d_array = new int[size];
+    // Initialize array 
     std::fill(d_array, d_array+size, 0);
-    // Removing the  direct use  of attributes to avoid problems
+
+    // Removing the direct use of attributes to avoid problems
     // with 4.5 specifications 
     int* helper = d_array;
     int &hs = size;
@@ -59,7 +61,7 @@ public:
 
   // Destructor, removes the data from the device
   ~Simple() { 
-    // Removing the  direct use  of attributes to avoid problems
+    // Removing the direct use of attributes to avoid problems
     // with 4.5 specifications 
     int* helper = d_array;
     int &hs = size;
@@ -70,12 +72,12 @@ public:
   
   // Modify the device data directly
   void modify() {
-    // Removing the  direct use  of attributes to avoid problems
+    // Removing the direct use of attributes to avoid problems
     // with 4.5 specifications 
     int *helper = d_array;
     int &hsize = size;
     int &hsum = sum;
-#pragma omp target defaultmap(tofrom: scalar) 
+#pragma omp target map(alloc:hsum, hsize) 
     {
       hsum = 0;
       for (int i = 0; i < hsize; ++i) {
@@ -90,19 +92,12 @@ public:
     int* helper = d_array;
     int &hsize = size;
     int &help_sum = sum;
-#pragma omp target map(from: h_array[0:hsize]) defaultmap(tofrom: scalar)
+#pragma omp target map(from: h_array[0:hsize]) map(alloc: help_sum, hsize) map(from:h_sum)
     {
       h_sum = help_sum;
       for (int i = 0; i < hsize; i++)
         h_array[i] = helper[i];
     }
-  }
-  int* getArray() {
-    return d_array;
-  }
-  
-  int* getSum() {
-    return &sum;
   }
 };
 
