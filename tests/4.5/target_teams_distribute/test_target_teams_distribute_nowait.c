@@ -24,13 +24,14 @@ int main() {
   OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
   int work_storage[N_TASKS][N];
   int order[N_TASKS];  // Each position marks the order in which that task executed
-  int ticket[1] = {0};
   int errors = 0;
+  int ticket[1] = {0};
+
 
 #pragma omp target enter data map(to: ticket[0:1], order[0:N_TASKS])
 
   for (int i = 0; i < N_TASKS; ++i) {
-#pragma omp target teams distribute map(alloc:work_storage[i][0:N], ticket[0:1]) nowait
+#pragma omp target teams distribute map(alloc: work_storage[i][0:N], ticket[0:1]) nowait
     for (int j = 0; j < N; ++j) {
       for (int k = 0; k < N*(N_TASKS - i); ++k) { // Creates skewed work distribution
 	work_storage[i][j] += k*i*j;              // This value will not be verified
@@ -51,64 +52,15 @@ int main() {
   }
 
   int was_async = 0;
-  for (int i = 0; i < N_TASKS; ++i) {
-    if (order[i] != (i*N)) {
+  for (int i = 1; i < N_TASKS; ++i) {
+    if (order[i] <= order[i - 1]) {
       was_async = 1;
       break;
     }
   }
 
   OMPVV_WARNING_IF(!was_async, "We could not detect asynchronous behavior between target regions");
-  OMPVV_INFOMSG_IF(was_async, "Asynchronous behavior detected, this suggests nowait was effective");
+  OMPVV_INFOMSG_IF(was_async, "Asynchronous behavior detected, this suggests nowait had an effect");
   
-  /*
-  int a[N];
-  int b[N];
-  int c[N];
-  int d[N];
-  int e[N];
-  int f[N];
-  int errors = 0;
-  int race_condition_found = 0;
-
-  OMPVV_ERROR_IF(N % N_TASKS != 0, "Selected value of N not divisible by number of tasks.");
-
-  for (int y = 0; y < ITERATIONS; ++y) {
-    for (int x = 0; x < N; ++x) {
-      a[x] = x + y;
-      b[x] = 2*x + y;
-      c[x] = 0;
-      d[x] = 3*x + y;
-      e[x] = 4*x + y;
-      f[x] = 0;
-    }
-
-    
-
-    for (int task = 0; task < N_TASKS; ++task) {
-#pragma omp target teams distribute nowait map(to: a[0:N], b[0:N], d[0:N], e[0:N]) \
-  map(from: c[0:N], f[0:N])
-      for (int x = (N / N_TASKS)*task; x < (N / N_TASKS)*(task + 1); ++x) {
-	c[x] = a[x] + b[x];
-      }
-    }
-#pragma omp target teams distribute nowait map(to: a[0:N], b[0:N], d[0:N], e[0:N]) \
-  map(from: c[0:N], f[0:N])
-    for (int x = 0; x < N; ++x) {
-      f[x] = c[x] + d[x] + e[x];
-    }
-#pragma omp taskwait
-
-    for (int x = 0; x < N; ++x) {
-      OMPVV_TEST_AND_SET_VERBOSE(errors, c[x] != 3*x + 2*y);
-      if (f[x] != 10*x + 4*y) {
-	race_condition_found = 1;
-      }
-    }
-  }
-
-  OMPVV_WARNING_IF(race_condition_found == 0, "Could not show that nowait had any effect on target teams distribute construct.");
-  OMPVV_INFOMSG_IF(race_condition_found == 1, "At least one race condition was introduced, nowait had an effect.");
-  */
   OMPVV_REPORT_AND_RETURN(errors);
 }
