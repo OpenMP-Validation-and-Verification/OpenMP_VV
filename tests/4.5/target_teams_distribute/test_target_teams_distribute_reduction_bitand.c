@@ -18,8 +18,8 @@
 
 int test_bitand() {
   unsigned int a[N];
-  double false_margin = pow(exp(1), log(.5)/N); // See the 'and' operator test for an exaplantion of this math.
-  int errors = 0;
+  double false_margin = pow(exp(1), log(.5)/N); // See the 'and' operator test for
+  int errors = 0;                               // an exaplantion of this math.
   int num_teams[N];
   int warned = 0;
   srand(1);
