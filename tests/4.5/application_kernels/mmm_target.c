@@ -81,7 +81,7 @@ int main (int argc, char *argv[])
     for (j=0; j<colB; j++)
       if( 500 != c[i*rowA+j]){
         printf("Error: [%d][%d] should be 500 is %d\n",i,j,c[i*rowA+j]);
-        error += error;
+        error++;
      }
    
   }
