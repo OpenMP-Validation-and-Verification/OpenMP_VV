@@ -32,7 +32,7 @@ CONTAINS
   INTEGER FUNCTION test_nowait()
     INTEGER:: errors, x, y, z, was_async, my_ticket
     INTEGER,DIMENSION(N_TASKS):: order
-    INTEGER,DIMENSION(N_TASKS, N):: work_storage
+    INTEGER,DIMENSION(N, N_TASKS):: work_storage
     INTEGER,DIMENSION(1):: ticket
 
     ticket(1) = 0
@@ -42,10 +42,10 @@ CONTAINS
     !$omp target enter data map(to: ticket(1:1), order(1:N_TASKS), my_ticket)
 
     DO x = 1, N_TASKS
-       !$omp target teams distribute map(alloc: work_storage(x, 1:N), ticket(1:1)) private(my_ticket) nowait
+       !$omp target teams distribute map(alloc: work_storage(1:N, x), ticket(1:1)) private(my_ticket) nowait
        DO y = 1, N
           DO z = 1, N*(N_TASKS - x)
-             work_storage(x, y) = work_storage(x, y) + x*y*z
+             work_storage(y, x) = work_storage(y, x) + x*y*z
           END DO
           my_ticket = 0
           !$omp atomic capture
