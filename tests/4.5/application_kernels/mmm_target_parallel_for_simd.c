@@ -66,7 +66,7 @@ int main (int argc, char *argv[])
   
 #pragma omp target map(to: a[0:DimA],b[0:DimB]) map(from: c[0:DimC])
 {
-#pragma omp teams distribute parallel for simd collapse(2) 
+#pragma omp teams distribute parallel for simd collapse(2) private(k)
     for (i=0; i<rowA; i++)
       for(j=0; j<colB; j++)
         for(k=0; k<colA; k++)
@@ -82,7 +82,7 @@ int main (int argc, char *argv[])
     for (j=0; j<colB; j++)
       if( 500 != c[i*rowA+j]){
         printf("Error: [%d][%d] should be 500 is %d\n",i,j,c[i*rowA+j]);
-        error += error;
+        error++;
      }
    
   }
