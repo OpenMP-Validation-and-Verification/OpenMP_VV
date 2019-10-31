@@ -1,8 +1,21 @@
+//===-- test_target_data_use_device_ptr.c - test of use_device_ptr on target data ----===//
+// 
+// OpenMP API Version 4.5 Nov 2015
+// 
+// This file is a test for the use_device_ptr when used with the map
+// clause. This test uses arrays of size len which values are modified on the 
+// device and tested in the host. Once the array has been mapped to the device,
+// the use_device_ptr should be able to be used with the ptr to the array and 
+// subsequent modify values on the device. 
+//
+//===----------------------------------------------------------------------===//
+
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <ompvv.h>
 
-// Test for OpenMP 4.5 target data with use_device_ptr
+
 int main() {
   int errors = 0, len = 10000, isHost = 0, map_dummy;
   int *array_device = NULL;
@@ -13,6 +26,8 @@ int main() {
 
   for (int i = 0; i < len; ++i)
     array_host[i] = i;
+  
+  OMPVV_TEST_OFFLOADING;
 
 #pragma omp target data map(tofrom: array_device[0:len])
   {
@@ -31,17 +46,12 @@ int main() {
 
   // checking results
   for (int i = 0; i < len; ++i) {
-    if (array_host[i] != 2*i)
-      errors = 1;
+    OMPVV_TEST_AND_SET(errors, array_host[i] != 2*i);
   }
 
   free(array_device);
   free(array_host);
+  
+  OMPVV_REPORT_AND_RETURN(errors);
 
-  if (!errors)
-    printf("Test passed on %s\n", (isHost ? "host" : "device"));
-  else
-    printf("Test failed on %s\n", (isHost ? "host" : "device"));
-
-  return errors;
 }
