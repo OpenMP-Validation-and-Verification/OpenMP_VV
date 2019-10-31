@@ -25,7 +25,7 @@ int main() {
   array_device = (int *)malloc(N*sizeof(int));
   array_host = (int *)malloc(N*sizeof(int));
 
-  for (int i = 0; i < len; ++i)
+  for (int i = 0; i < N; ++i)
     array_host[i] = i;
   
   OMPVV_TEST_OFFLOADING;
