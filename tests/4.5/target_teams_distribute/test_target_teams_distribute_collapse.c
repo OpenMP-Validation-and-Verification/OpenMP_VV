@@ -16,11 +16,15 @@
 #define ARRAY_SIZE 128 //Array Size of 512 uses over 1 GB target memory and
                        //scales n^3 in test_collapse2()
 
-int test_collapse1(){
-  int a[ARRAY_SIZE][ARRAY_SIZE];
-  int b[ARRAY_SIZE][ARRAY_SIZE + 1];
+int test_collapse1() {
+
+  // Malloc needed to avoid stack overflow 
+  // see issue #14 on github
+  int * a_mem = malloc(ARRAY_SIZE*ARRAY_SIZE*sizeof(int));
+  int * b_mem = malloc(ARRAY_SIZE*(ARRAY_SIZE+1)*sizeof(int));
+  int (*a)[ARRAY_SIZE] = (int (*)[ARRAY_SIZE])a_mem;
+  int (*b)[ARRAY_SIZE + 1] = (int (*)[ARRAY_SIZE+1])b_mem;
   int errors = 0;
-  int is_host;
 
   // a and b array initialization
   for (int x = 0; x < ARRAY_SIZE; ++x) {
@@ -52,10 +56,11 @@ int test_collapse1(){
 }
 
 int test_collapse2() {
-  int a[ARRAY_SIZE][ARRAY_SIZE][ARRAY_SIZE];
-  int b[ARRAY_SIZE][ARRAY_SIZE][ARRAY_SIZE+1];
+  int * a_mem = malloc(ARRAY_SIZE*ARRAY_SIZE*ARRAY_SIZE*sizeof(int));
+  int * b_mem = malloc(ARRAY_SIZE*ARRAY_SIZE*(ARRAY_SIZE+1)*sizeof(int));
+  int (*a)[ARRAY_SIZE][ARRAY_SIZE] = (int (*)[ARRAY_SIZE][ARRAY_SIZE])a_mem;
+  int (*b)[ARRAY_SIZE][ARRAY_SIZE + 1] = (int (*)[ARRAY_SIZE][ARRAY_SIZE+1])b_mem;
   int errors = 0;
-  int is_host;
   int num_teams = 0;
 
   // a and b array initialization
