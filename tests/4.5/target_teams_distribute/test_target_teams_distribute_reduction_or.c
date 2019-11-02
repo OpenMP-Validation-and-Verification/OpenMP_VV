@@ -18,9 +18,8 @@
 
 int test_or() {
   char a[N];
-  // See the 'and' operator test for an explanation of this math.
-  double false_margin = pow(exp(1), log(.5)/N);
-  int errors = 0;
+  double false_margin = pow(exp(1), log(.5)/N);   // See the 'and' operator test for
+  int errors = 0;                                 // an explanation of this math.
   int num_teams[N];
   int warned = 0;
   srand(1);
@@ -36,7 +35,8 @@ int test_or() {
 
   char result = 0;
 
-#pragma omp target teams distribute reduction(||:result) map(to: a[0:N]) map(tofrom: result, num_teams[0:N])
+
+#pragma omp target teams distribute reduction(||:result) defaultmap(tofrom:scalar)
   for (int x = 0; x < N; ++x) {
     num_teams[x] = omp_get_num_teams();
     result = result || a[x];

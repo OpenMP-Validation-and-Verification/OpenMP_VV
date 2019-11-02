@@ -31,7 +31,7 @@ int test_add() {
     num_teams[x] = -1;
   }
 
-#pragma omp target teams distribute reduction(+:total) map(to: a[0:N], b[0:N]) map(tofrom: total, num_teams[0:N])
+#pragma omp target teams distribute reduction(+:total) defaultmap(tofrom:scalar)
   for (int x = 0; x < N; ++x) {
     num_teams[x] = omp_get_num_teams();
     total += a[x] + b[x];

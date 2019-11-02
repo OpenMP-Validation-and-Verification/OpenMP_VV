@@ -18,9 +18,8 @@
 
 int test_bitand() {
   unsigned int a[N];
-  // See the 'and' operator test for an exaplantion of this math.
-  double false_margin = pow(exp(1), log(.5)/N);
-  int errors = 0;
+  double false_margin = pow(exp(1), log(.5)/N); // See the 'and' operator test for
+  int errors = 0;                               // an exaplantion of this math.
   int num_teams[N];
   int warned = 0;
   srand(1);
@@ -39,7 +38,7 @@ int test_bitand() {
     b = b + (1 << x);
   }
 
-#pragma omp target teams distribute reduction(&:b) map(to: a[0:N]) map(tofrom: b, num_teams[0:N])
+#pragma omp target teams distribute reduction(&:b) defaultmap(tofrom:scalar)
   for (int x = 0; x < N; ++x) {
     num_teams[x] = omp_get_num_teams();
     b = b & a[x];
