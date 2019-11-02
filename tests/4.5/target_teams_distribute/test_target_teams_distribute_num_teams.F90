@@ -32,13 +32,14 @@ PROGRAM test_target_teams_distribute_num_teams
   OMPVV_REPORT_AND_RETURN()
 CONTAINS
   INTEGER FUNCTION num_teams()
-    INTEGER:: errors, default_num_teams, num_team, x
-    INTEGER,DIMENSION(N):: a, b, c
+    INTEGER:: errors, default_num_teams, x
+    INTEGER,DIMENSION(N):: a, b, c, num_team
 
     DO x = 1, N
        a(x) = 1
        b(x) = x
        c(x) = 0
+       num_team(x) = -1
     END DO
 
     errors = 0
@@ -47,7 +48,9 @@ CONTAINS
     !$omp target teams distribute map(tofrom: default_num_teams, c(1:N)) &
     !$omp& map(to: a(1:N), b(1:N))
     DO x = 1, N
-       default_num_teams = omp_get_num_teams()
+       IF (omp_get_team_num() .eq. 0) THEN
+          default_num_teams = omp_get_num_teams()
+       END IF
        c(x) = a(x) + b(x)
     END DO
 
@@ -60,20 +63,29 @@ CONTAINS
        OMPVV_ERROR("correct number of teams.")
     ELSE
        !$omp target teams distribute num_teams(default_num_teams - 1) &
-       !$omp& map(to: a(1:N), b(1:N)) map(from: c(1:N), num_teams)
+       !$omp& map(to: a(1:N), b(1:N)) map(from: c(1:N), num_team(1:N))
        DO x = 1, N
           c(x) = a(x) + b(x)
-          num_team = omp_get_num_teams()
+          num_team(x) = omp_get_num_teams()
        END DO
 
-       IF (num_team .gt. default_num_teams - 1) THEN
+       DO x = 2, N
+          IF (num_team(x) .ne. num_team(x - 1)) THEN
+             errors = errors + 1
+             OMPVV_ERROR("omp_get_num_teams returned an inconsistent number of")
+             OMPVV_ERROR("teams between iterations.")
+             exit
+          END IF
+       END DO
+
+       IF (num_team(1) .gt. default_num_teams - 1) THEN
           errors = errors + 1
           OMPVV_ERROR("Test ran on more teams than requested")
-       ELSEIF (num_team .lt. default_num_teams - 1) THEN
+       ELSEIF (num_team(1) .lt. default_num_teams - 1) THEN
           OMPVV_WARNING("Test ran on less teams than requested. This ")
           OMPVV_WARNING("is still spec-conformant.")
        END IF
     END IF
-    num_team = errors
+    num_teams = errors
   END FUNCTION num_teams
 END PROGRAM test_target_teams_distribute_num_teams
