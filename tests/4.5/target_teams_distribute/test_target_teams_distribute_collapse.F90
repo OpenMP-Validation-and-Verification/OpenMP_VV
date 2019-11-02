@@ -51,7 +51,9 @@
             DO x = 1, N
               DO y = 1, N
                 b(x, y + 1) = b(x, y) + a(x, y)
-                num_teams = omp_get_num_teams()
+                IF (omp_get_team_num() .eq. 0) THEN
+                   num_teams = omp_get_num_teams()
+                END IF
               END DO
             END DO
             !$omp end target teams distribute

@@ -73,8 +73,7 @@ int test_collapse2() {
   for (int x = 0; x < ARRAY_SIZE; ++x) {
     for (int y = 0; y < ARRAY_SIZE; ++y) {
       for (int z = 0; z < ARRAY_SIZE; ++z) {
-#pragma omp master
-	{
+	if (omp_get_team_num() == 0) {
 	  num_teams = omp_get_num_teams();
 	}
 	b[x][y][z + 1] = b[x][y][z] + a[x][y][z];
