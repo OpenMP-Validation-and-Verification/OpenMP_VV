@@ -18,7 +18,11 @@ endif
 # System specific varibles can be specified
 # in the system files sys/system/###.def
 #################################################
-SYSTEM ?= generic
+ifdef OMPVV_SYSTEM
+	SYSTEM = ${OMPVV_SYSTEM}
+else
+	SYSTEM ?= generic
+endif
 -include sys/systems/$(SYSTEM).def
 
 include sys/make/make.def
