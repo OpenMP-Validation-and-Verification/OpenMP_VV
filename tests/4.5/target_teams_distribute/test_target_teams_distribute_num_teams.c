@@ -50,7 +50,7 @@ int main() {
   if (default_num_teams == 1) {
     OMPVV_WARNING("Test operated with one team.  Testing num_teams clause cannot be done.");
   } else if(default_num_teams <= 0) {
-    OMPVV_ERROR("Test returned num_teams <= 0.  Maybe omp_get_num_teams() is not returning correct number of teams.");
+    OMPVV_ERROR("Test returned num_teams <= 0.");
     errors = 1;
   } else {
 #pragma omp target teams distribute num_teams(default_num_teams - 1) map(to: a[0:N], b[0:N]) \
