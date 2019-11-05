@@ -35,47 +35,49 @@ int main() {
   OMPVV_INFOMSG("running tests on %d devices", num_devices);
 
   for (int x = 0; x < ARRAY_SIZE; ++x) {
-      a[x] = 1;
-      b[x] = x;
-  }
-  for (int x = 0; x < num_devices; ++x){
-      num_teams[x] = 0;
-      errors[x] = 0;
+    a[x] = 1;
+    b[x] = x;
   }
 
-  for (int dev = 0; dev < num_devices; ++dev){
-      #pragma omp target enter data map(to: a[0:ARRAY_SIZE], b[0:ARRAY_SIZE], num_teams[dev]) device(dev)
+  for (int x = 0; x < num_devices; ++x) {
+    num_teams[x] = 0;
+    errors[x] = 0;
   }
 
-  for (int dev = 0; dev < num_devices; ++dev){
-      #pragma omp target teams distribute map(alloc: a[0:ARRAY_SIZE], b[0:ARRAY_SIZE], num_teams[dev]) device(dev)
-      for (int x = 0; x < ARRAY_SIZE; ++x){
-          num_teams[dev] = omp_get_num_teams();
-          a[x] += b[x] + dev;
+  for (int dev = 0; dev < num_devices; ++dev) {
+#pragma omp target enter data map(to: a[0:ARRAY_SIZE], b[0:ARRAY_SIZE], num_teams[dev]) device(dev)
+  }
+
+  for (int dev = 0; dev < num_devices; ++dev) {
+#pragma omp target teams distribute map(alloc: a[0:ARRAY_SIZE], b[0:ARRAY_SIZE], num_teams[dev]) device(dev)
+    for (int x = 0; x < ARRAY_SIZE; ++x) {
+      num_teams[dev] = omp_get_num_teams();
+      a[x] += b[x] + dev;
+    }
+  }
+
+  for (int dev = 0; dev < num_devices; ++dev) {
+#pragma omp target exit data map(from: a[0:ARRAY_SIZE], num_teams[dev]) map(delete: b[0:ARRAY_SIZE]) device(dev)
+    for (int x = 0; x < ARRAY_SIZE; ++x) {
+      OMPVV_TEST_AND_SET_VERBOSE(errors[dev], a[x] != 1 + dev + b[x]);
+      if (a[x] != 1 + dev + b[x]) {
+	break;
       }
+    }
   }
 
-  for (int dev = 0; dev < num_devices; ++dev){
-      #pragma omp target exit data map(from: a[0:ARRAY_SIZE], num_teams[dev]) map(delete: b[0:ARRAY_SIZE]) device(dev)
-      for (int x = 0; x < ARRAY_SIZE; ++x){
-          OMPVV_TEST_AND_SET_VERBOSE(errors[dev], a[x] != 1 + dev + b[x]);
-          if (a[x] != 1 + dev + b[x]){
-              break;
-          }
-      }
+  for (int x = 0; x < num_devices; ++x) {
+    sum_errors += errors[x];
   }
 
-  for (int x = 0; x < num_devices; ++x){
-      sum_errors += errors[x];
+  for (int dev = 0; dev < num_devices; ++dev) {
+    if (!errors[dev] && num_teams[dev] == 1) {
+      OMPVV_WARNING("Test operated with one team. Parallelism of teams distribute can't be guarnunteed.");
+    }
+    else if (errors[dev]) {
+      OMPVV_ERROR("Test failed with device %d", dev);
+    }
   }
 
-  for (int dev = 0; dev < num_devices; ++dev){
-      if (!errors[dev] && num_teams[dev] == 1){
-          OMPVV_WARNING("Test operated with one team. Parallelism of teams distribute can't be guarnunteed.");
-      }
-      else if (errors[dev]){
-          OMPVV_ERROR("Test failed with device %d", dev);
-      }
-  }
   OMPVV_REPORT_AND_RETURN(sum_errors);
 }

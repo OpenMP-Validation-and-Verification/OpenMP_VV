@@ -121,7 +121,10 @@ module ompvv_lib
 
       ! Avoid unused variables warning 
       clean = TRIM(clean_fn(fn))
-      ln = ln
+      
+      IF (.FALSE.) THEN
+        ln = ln
+      END IF
 
       call test_offloading_probe()
       IF (ompvv_isHost) THEN
@@ -148,8 +151,10 @@ module ompvv_lib
       INTEGER :: ln
 
       ! Avoid unused variables warning
-      fn = fn 
-      ln = ln
+      IF (.FALSE.) THEN
+        fn = fn 
+        ln = ln
+      END IF 
       
       IF (condition) ompvv_errors = ompvv_errors + 1
     end subroutine test_error
@@ -159,24 +164,26 @@ module ompvv_lib
       LOGICAL, INTENT(IN) :: condition
       CHARACTER(len=*) :: conditionStr
       CHARACTER(len=*) :: fn
-      CHARACTER(len=500) :: clean, clean_condition
+      CHARACTER(len=500) :: clean, clean_conditionStr
       INTEGER :: ln, condition_clean_pos
 
       clean = TRIM(clean_fn(fn))
+      clean_conditionStr = conditionStr
       ! Avoid unused variables warning
-      ln = ln
+      IF (.FALSE.) THEN
+        ln = ln
+      END IF 
       ! cleaning condition % causes to fail. replace with '.'
-      condition_clean_pos = SCAN(conditionStr, "%")
+      condition_clean_pos = SCAN(clean_conditionStr, "%")
       DO WHILE (condition_clean_pos /= 0)
-        conditionStr(condition_clean_pos : condition_clean_pos + 1) = "."
-        condition_clean_pos = SCAN(conditionStr, "%")
+        clean_conditionStr (condition_clean_pos : condition_clean_pos + 1) = "."
+        condition_clean_pos = SCAN(clean_conditionStr , "%")
       END DO
-      clean_condition = conditionStr
-      clean_condition = " Condition "//TRIM(clean_condition)//" failed "
+      clean_conditionStr = " Condition "//TRIM(clean_conditionStr)//" failed "
       
       IF (condition) then 
         ompvv_errors = ompvv_errors + 1
-        OMPVV_ERROR_HELPER(clean_condition, clean, ln)
+        OMPVV_ERROR_HELPER(clean_conditionStr, clean, ln)
 !        OMPVV_ERROR_HELPER(" Condition failed ", fn, ln)
       END IF 
     end subroutine test_error_verbose
@@ -285,7 +292,9 @@ module ompvv_lib
 
       clean = TRIM(clean_fn(fn))
       ! Avoid unused variables warning
-      ln = ln
+      IF (.FALSE.) THEN
+        ln = ln
+      END IF
 
       call test_shared_environment_probe()
       if (ompvv_sharedEnv) OMPVV_WARNING_HELPER(msg, clean, ln)

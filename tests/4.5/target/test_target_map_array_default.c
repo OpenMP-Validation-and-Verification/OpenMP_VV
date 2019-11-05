@@ -15,7 +15,7 @@
 
 int main() {
   int compute_array[N];
-  int sum = 0, result = 0, errors;
+  int sum = 0, result = 0, errors = 0;
   int i;
   
   OMPVV_TEST_OFFLOADING;

@@ -18,9 +18,12 @@ endif
 # System specific varibles can be specified
 # in the system files sys/system/###.def
 #################################################
-ifdef SYSTEM
-	-include sys/systems/$(SYSTEM).def
+ifdef OMPVV_SYSTEM
+	SYSTEM = ${OMPVV_SYSTEM}
+else
+	SYSTEM ?= generic
 endif
+-include sys/systems/$(SYSTEM).def
 
 include sys/make/make.def
 
@@ -189,12 +192,12 @@ endif
 
 # parameters (1) Action (2) System (3) Filename (4) other Info (compiler) (5) Log File
 define log_section_header
-  -$(if $(LOG), @echo -e "*-*-*BEGIN*-*-*"$(1)"*-*-*$$(date)*-*-*"$(2)"*-*-*"$(3)"*-*-*"$(4)"*-*-*" >> $(LOGDIR)/$(5);,)
+  -$(if $(LOG), @echo -e "*-*-*BEGIN*-*-*$(1)*-*-*$$(date)*-*-*$(2)*-*-*$(3)*-*-*$(4)*-*-*" >> $(LOGDIR)/$(5);,)
 endef
 
 # parameters (1) Action (2) System (3) Output status  (4) other Info (compiler) (5) Log File
 define log_section_footer
-  -$(if $(LOG), @echo -e "*-*-*END*-*-*"$(1)"*-*-*$$(date)*-*-*"$(2)"*-*-*"$(3)"*-*-*"$(4)"\n" >> $(LOGDIR)/$(5);,)
+  -$(if $(LOG), @echo -e "*-*-*END*-*-*$(1)*-*-*$$(date)*-*-*$(2)*-*-*$(3)*-*-*$(4)\n" >> $(LOGDIR)/$(5);,)
 endef
 
 .PHONY: all
@@ -219,13 +222,13 @@ MessageDisplay:
 	@echo "    ====    SOLLVE PROJECT MAKEFILE   ====   "
 	@echo "Running make with the following compilers"
 ifneq "$(CC)" "none"
-	@echo "CC = "$(CC) $(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") ${C_VERSION})
+	@echo "CC = $(CC) $(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") ${C_VERSION})"
 endif
 ifneq "$(CXX)" "none"
-	@echo "CXX = "$(CXX) $(shell $(call loadModules,$(CXX_COMPILER_MODULE),"shut up") ${CXX_VERSION})
+	@echo "CXX = $(CXX) $(shell $(call loadModules,$(CXX_COMPILER_MODULE),"shut up") ${CXX_VERSION})"
 endif
 ifneq "$(FC)" "none"
-	@echo "FC = "$(FC) $(shell $(call loadModules,$(F_COMPILER_MODULE),"shut up") ${F_VERSION})
+	@echo "FC = $(FC) $(shell $(call loadModules,$(F_COMPILER_MODULE),"shut up") ${F_VERSION})"
 endif
 	$(if $(MODULE_LOAD), @echo "C_MODULE = "$(C_COMPILER_MODULE); echo "CXX_MODULE = "$(CXX_COMPILER_MODULE); echo "F_MODULE = "$(F_COMPILER_MODULE),)
 
@@ -391,6 +394,11 @@ clean: clear_fortran_mod
 clear_fortran_mod:
 	- rm -f ./ompvv/*.mod
 
+.PHONY: tidy
+tidy: clean
+	- rm -rf $(LOGDIRNAME)
+	- rm -rf $(RESULTS_HTML_OUTPUT_FOLDER)
+
 .PHONY: compilers
 compilers:
 	@echo "C compilers: "$(CCOMPILERS)
@@ -428,6 +436,8 @@ help:
 	@echo "    Compile the specific SOURCES files. If none is specified compile all the OpenMP test files"
 	@echo "  clean"
 	@echo "    Remove all executables from bin/ directory"
+	@echo "  tidy"
+	@echo "    Remove all log files, reports, and executable code (implies clean)"
 	@echo "  compilers"
 	@echo "    Shows available compiler configuration"
 	@echo "  report_json"
