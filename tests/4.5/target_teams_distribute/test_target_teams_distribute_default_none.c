@@ -43,8 +43,9 @@ int main() {
 	privatized++;
       }
       d[x] = c[x] * privatized;
-#pragma omp master
-      num_teams = omp_get_num_teams();
+      if (omp_get_team_num() == 0) {
+	num_teams = omp_get_num_teams();
+      }
     }
   }
 
@@ -61,10 +62,11 @@ int main() {
   {
 #pragma omp target teams distribute default(none) private(x) shared(share, b, num_teams) defaultmap(tofrom:scalar)
     for (x = 0; x < 1024; ++x) {
-#pragma omp atomic
+#pragma omp atomic update
       share = share + b[x];
-#pragma omp master
-      num_teams = omp_get_num_teams();
+      if (omp_get_team_num() == 0) {
+	num_teams = omp_get_num_teams();
+      }
     }
   }
 
