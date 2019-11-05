@@ -59,8 +59,7 @@ CONTAINS
        OMPVV_WARNING("cannot be done.")
     ELSEIF (default_num_teams .le. 0) THEN
        OMPVV_ERROR("omp_get_num_teams() returned result less than or")
-       OMPVV_ERROR("equal to 0.  Maybe omp_get_num_teams is not returning")
-       OMPVV_ERROR("correct number of teams.")
+       OMPVV_ERROR("equal to 0.")
     ELSE
        !$omp target teams distribute num_teams(default_num_teams - 1) &
        !$omp& map(to: a(1:N), b(1:N)) map(from: c(1:N), num_team(1:N))
