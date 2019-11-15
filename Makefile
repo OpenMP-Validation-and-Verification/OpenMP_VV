@@ -68,6 +68,7 @@ endif
 RUN_TEST=$(CURDIR)/sys/scripts/run_test.sh
 RESULTS_ANALYZER=$(CURDIR)/sys/scripts/createSummary.py
 RESULTS_JSON_OUTPUT_FILE=results.json
+RESULTS_CSV_OUTPUT_FILE=results.csv
 RESULTS_HTML_OUTPUT_FOLDER=results_report
 RESULTS_HTML_REPORT_TEMPLATE=$(CURDIR)/sys/results_template
 
@@ -337,10 +338,19 @@ $(BINDIR):
 $(LOGDIR):
 	mkdir $@
 
+$(RESULTS_CSV_OUTPUT_FILE):
+	@echo "Creating $(RESULTS_CSV_OUTPUT_FILE) file"
+	@echo "Currently we only support run logs that contain compilation and run outputs. Use the 'make all' rule to obtain these"
+	@$(RESULTS_ANALYZER) -r -f csv -o $(RESULTS_CSV_OUTPUT_FILE) $(LOGDIRNAME)/*
+
 $(RESULTS_JSON_OUTPUT_FILE):
 	@echo "Creating $(RESULTS_JSON_OUTPUT_FILE) file"
 	@echo "Currently we only support run logs that contain compilation and run outputs. Use the 'make all' rule to obtain these"
 	@$(RESULTS_ANALYZER) -r -f json -o $(RESULTS_JSON_OUTPUT_FILE) $(LOGDIRNAME)/*
+
+.PHONY: report_csv
+report_csv: $(RESULTS_CSV_OUTPUT_FILE)
+	@echo " === REPORT DONE === "
 
 .PHONY: report_json
 report_json: $(RESULTS_JSON_OUTPUT_FILE)
@@ -351,7 +361,7 @@ report_summary:
 	@$(RESULTS_ANALYZER) -r -f summary $(LOGDIRNAME)/*
 
 .PHONY: report_html
-report_html: $(RESULTS_JSON_OUTPUT_FILE)
+report_html: $(RESULTS_JSON_OUTPUT_FILE) $(RESULTS_CSV_OUTPUT_FILE)
 	@if [ -d "./$(RESULTS_HTML_OUTPUT_FOLDER)" ]; then \
     echo "A report exist already. Please move it before creating a new one"; \
 	 else \
@@ -360,6 +370,7 @@ report_html: $(RESULTS_JSON_OUTPUT_FILE)
 		echo " folder $(RESULTS_HTML_OUTPUT_FOLDER) created"; \
 	  cp -r $(RESULTS_HTML_REPORT_TEMPLATE)/* $(RESULTS_HTML_OUTPUT_FOLDER); \
 		echo " template copied"; \
+		mv $(RESULTS_CSV_OUTPUT_FILE) $(RESULTS_HTML_OUTPUT_FOLDER); \
 		mv $(RESULTS_JSON_OUTPUT_FILE) $(RESULTS_HTML_OUTPUT_FOLDER); \
 		sed -i "1s/.*/var jsonResults = \[/g" $(RESULTS_HTML_OUTPUT_FOLDER)/$(RESULTS_JSON_OUTPUT_FILE); \
 		sed -i "$$ s/.*/];/g" $(RESULTS_HTML_OUTPUT_FOLDER)/$(RESULTS_JSON_OUTPUT_FILE); \
@@ -422,6 +433,9 @@ help:
 	@echo "    Remove all log files, reports, and executable code (implies clean)"
 	@echo "  compilers"
 	@echo "    Shows available compiler configuration"
+	@echo "  report_csv"
+	@echo "    create a csv file containing the results existing in the logs files inside the $(LOGDIRNAME) folder"
+	@echo "    currently we only support runs that contain output for compile and run"
 	@echo "  report_json"
 	@echo "    create a json file containing the results existing in the logs files inside the $(LOGDIRNAME) folder"
 	@echo "    currently we only support runs that contain output for compile and run"
