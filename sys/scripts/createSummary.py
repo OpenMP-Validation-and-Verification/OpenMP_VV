@@ -93,12 +93,11 @@ class testResult:
 
   def convert2CSV(self):
     ''' Comma Separated Values printing '''
-    return '"%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s"' \
-           % (self.testSystem.replace('\n',''),self.testName.replace('\n',''), self.testPath.replace('\n',''), self.testSystem.replace('\n',''),
-           self.testComments.replace('\n',''), self.compilerName.replace('\n',''),
-           self.compilerCommand.replace('\n',''), self.startingCompilerDate.replace('\n',''), 
+    return '"%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s"' \
+           % (self.testSystem.replace('\n',''),self.testName.replace('\n',''), self.testPath.replace('\n',''),
+           self.compilerName.replace('\n',''), self.compilerCommand.replace('\n',''), self.startingCompilerDate.replace('\n',''),
            self.endingCompilerDate.replace('\n',''), self.compilerPass.replace('\n',''), self.compilerOutput.replace('\n',''),
-           str(self.runtimeOnly), self.binaryPath.replace('\n',''), self.startingRuntimeDate.replace('\n',''), 
+           str(self.runtimeOnly), self.binaryPath.replace('\n',''), self.startingRuntimeDate.replace('\n',''),
            self.endingRuntimeDate.replace('\n',''), self.runtimePass.replace('\n',''), self.runtimeOutput.replace('\n',''), self.testComments.replace('\n', ''))
 
   def convert2dict(self):
