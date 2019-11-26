@@ -8,7 +8,9 @@
 
 
 #ifndef CUDA_CUPTI
+#ifndef NUM_REP
 #define NUM_REP 3
+#endif
 #define OMPVV_GET_TIME(timer) \
 { \
   struct timeval time;\

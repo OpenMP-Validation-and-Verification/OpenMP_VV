@@ -35,6 +35,10 @@ CC?=none
 CPP?=none
 FC?=none
 
+ifdef NUM_REP
+  CFLAGS += -DNUM_REP=${NUM_REP}
+endif 
+
 ifdef CUDA_CUPTI
   ifdef CUDA_HOME
     C_INC+= -I${CUDA_HOME}/extras/CUPTI/include -L${CUDA_HOME}/extras/CUPTI/lib64
