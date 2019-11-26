@@ -1048,7 +1048,7 @@ def main():
     parser.add_argument('fileName', metavar="FILENAME", type=str, nargs=1, help='The file that contains the test summaries (grep logs for SUMMARY)')
     parser.add_argument('--debug', dest='debugMode', type=int, default=0, help='Enable debuging mode')
     parser.add_argument('-o', '--output', dest='output', type=str, nargs=1, required=True, help='output image file name prefix')
-    parser.add_argument('-c', '--cache', dest='cacheFile', type=str, nargs=1, default="", help='output cache file name prefix')
+    parser.add_argument('-c', '--cache', dest='cacheFile', type=str, nargs=1, default=[""], help='output cache file name prefix')
     args = parser.parse_args()
    
     
