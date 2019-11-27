@@ -19,6 +19,7 @@ class testResult:
   compilerCommand = ""
   testSystem = ""
   testComments = ""
+  testGitCommit = ""
 
   # Compiler results
   startingCompilerDate = ""
@@ -40,6 +41,7 @@ class testResult:
     testPath = ""
     compilerName = ""
     compilerCommand = ""
+    testGitCommit = ""
 
     # Compiler results
     startingCompilerDate = ""
@@ -55,50 +57,52 @@ class testResult:
     runtimePass = ""
     runtimeOutput = ""
 
-  def setTestParameters(self, newTestName, newTestPath=None, newCompilerName=None, newCompilerCommand=None):
-    self.testName = newTestName
+  def setTestParameters(self, newTestName, newTestPath=None, newCompilerName=None, newCompilerCommand=None, newTestCommit=None):
     runtimeOnly = (not newTestPath)
-    self.testPath = newTestPath if newTestPath else ""
-    self.compilerName = newCompilerName if newCompilerName else ""
-    self.compilerCommand = newCompilerCommand if newCompilerCommand else ""
+    if newTestPath:  self.testPath = newTestPath 
+    if newCompilerName:  self.compilerName = newCompilerName 
+    if newCompilerCommand:  self.compilerCommand = newCompilerCommand 
+    if newTestCommit:  self.testGitCommit = newTestCommit 
 
   def setCompilerInit(self, newStartingCompilerDate, newSystem):
     self.startingCompilerDate = newStartingCompilerDate
-    self.testSystem = newSystem if newSystem else ""
+    if newSystem:  self.testSystem = newSystem 
 
   def setRuntimeInit(self, newBinaryPath, newStartingRuntimeDate, newSystem):
     self.binaryPath = newBinaryPath
     self.startingRuntimeDate= newStartingRuntimeDate
-    self.testSystem = newSystem if newSystem else ""
+    if newSystem:  self.testSystem = newSystem 
 
   def setCompilerResult(self, itPassed, outputText, newEndingCompilerDate, newComments=None):
     ''' setters for compiler results'''
     self.compilerPass = itPassed
     self.compilerOutput = outputText
     self.endingCompilerDate = newEndingCompilerDate
-    self.testComments = newComments if newComments else ""
+    if newComments:  self.testComments = newComments 
 
   def setRuntimeResult(self, itPassed, outputText, newEndingRuntimeDate, newComments=None):
     ''' setters for runtime results'''
     self.runtimePass = itPassed
     self.runtimeOutput = outputText
     self.endingRuntimeDate = newEndingRuntimeDate
-    self.testComments = newComments if newComments else ""
+    if newComments:  self.testComments = newComments 
   
   def makePathRelative(self, basePath=None):
-    if (basePath):
-      self.testPath = os.path.relpath(self.testPath, basePath)
-    else:
-      self.testPath = os.path.relpath(self.testPath)
+    if (os.path.isabs(self.testPath)):
+      if (basePath):
+        self.testPath = os.path.relpath(self.testPath, basePath)
+      else:
+          self.testPath = os.path.relpath(self.testPath)
 
   def convert2CSV(self):
     ''' Comma Separated Values printing '''
-    return '"%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s"' \
+    return '"%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s"' \
            % (self.testSystem.replace('\n',''),self.testName.replace('\n',''), self.testPath.replace('\n',''),
            self.compilerName.replace('\n',''), self.compilerCommand.replace('\n',''), self.startingCompilerDate.replace('\n',''),
            self.endingCompilerDate.replace('\n',''), self.compilerPass.replace('\n',''), self.compilerOutput.replace('\n',''),
            str(self.runtimeOnly), self.binaryPath.replace('\n',''), self.startingRuntimeDate.replace('\n',''),
-           self.endingRuntimeDate.replace('\n',''), self.runtimePass.replace('\n',''), self.runtimeOutput.replace('\n',''), self.testComments.replace('\n', ''))
+           self.endingRuntimeDate.replace('\n',''), self.runtimePass.replace('\n',''), self.runtimeOutput.replace('\n',''), 
+           self.testGitCommit.replace('\n',''), self.testComments.replace('\n', ''))
 
   def convert2dict(self):
     ''' convert to dictionary, easier to jsonify '''
@@ -107,6 +111,7 @@ class testResult:
         "Test path": self.testPath,
         "Test system": self.testSystem,
         "Test comments": self.testComments,
+        "Test gitCommit": self.testGitCommit,
         "Runtime only": self.runtimeOnly,
         "Compiler name": self.compilerName,
         "Compiler result": self.compilerPass,
@@ -127,6 +132,7 @@ class testResult:
       testPath = "%s"
       testSystem = "%s"
       testComments = "%s"
+      testGitCommit = "%s"
       compilerName = "%s"
       compilerCommand = "%s"
 
@@ -143,7 +149,8 @@ class testResult:
       endingRuntimeDate = "%s"
       runtimePass = "%s"
       runtimeOutput = "%s"
-    """ % (self.testName, self.testPath, self.testSystem, self.testComments, self.compilerName,
+    """ % (self.testName, self.testPath, self.testSystem, self.testComments, 
+           self.testGitCommit, self.compilerName,
            self.compilerCommand, self.startingCompilerDate, 
            self.endingCompilerDate, self.compilerPass, self.compilerOutput,
            str(self.runtimeOnly), self.binaryPath, self.startingRuntimeDate, 
@@ -171,7 +178,7 @@ def parseFile(log_file):
           header_info = interpretHeader(line)
           if header_info["type"] == "COMPILE":
             # We are starting a compiler section
-            current_test.setTestParameters(header_info["testName"], header_info["file"], header_info["compiler"], header_info["compilerCommand"])
+            current_test.setTestParameters(header_info["testName"], header_info["file"], header_info["compiler"], header_info["compilerCommand"], header_info["gitCommit"])
             current_test.setCompilerInit(header_info["date"], header_info["system"])
             current_state = header_info["type"]
           elif header_info["type"] == "RUN":
@@ -181,6 +188,10 @@ def parseFile(log_file):
               # RUN information, and in this case we want to add the info to the logs
               if (header_info["testName"] in ignore_run_information):
                   continue
+
+              # Get commit if it is run only information
+              if (current_test.testGitCommit == ""):
+                current_test.testGitCommit = header_info["gitCommit"]
               current_test.setTestParameters(header_info["testName"])
             current_test.setRuntimeInit(header_info["file"], header_info["date"], header_info["system"])
             current_state = header_info["type"]
@@ -229,11 +240,12 @@ def interpretHeader(header):
     # get the date 
     returned_value["date"] = header_split[2]
     returned_value["system"] = header_split[3]
+    returned_value["gitCommit"] = header_split[6]
     if header_split[0].startswith("BEGIN"):
       if header_split[1].startswith('COMPILE'):
         # case when the header is a compiler header.
         # Example of a compiler line is:
-        #   *-*-*COMPILE CC=xlc -I./ompvv -O3 *-*-*path/to/test/test.c*-*-*Thu Jan 18 19:53:25 EST 2018*-*-*
+        #  *-*-*BEGIN*-*-*COMPILE CC=gcc -I./ompvv -O3 -std=c99 -fopenmp -foffload=-lm -lm*-*-*Tue Nov 26 17:46:58 EST 2019*-*-*summit*-*-*tests/4.5/offloading_success.c*-*-*gcc 8.1.1*-*-*463391f*-*-*
 
         returned_value["type"] = "COMPILE"
         returned_value["file"] = header_split[4]
@@ -253,14 +265,14 @@ def interpretHeader(header):
       elif header_split[1].startswith('RUN'):
         # case when the header is a runtime header.
         # Example of a runtime line is:
-        #   *-*-*RUN*-*-*bin/array_segment_map.c*-*-*Thu Jan 18 19:54:32 EST 2018*-*-*
+        # *-*-*BEGIN*-*-*RUN*-*-*Tue Nov 26 17:46:59 EST 2019*-*-*summit*-*-*bin/offloading_success.c*-*-*none*-*-*463391f*-*-* 
         returned_value["type"] = "RUN"
         returned_value["file"] = header_split[4]
         returned_value["testName"] = os.path.basename(header_split[4])
     elif header_split[0].startswith('END'):
       # case when the header is a closing header.
       # Example of a closing line is:
-      #  *-*-*END*-*-*RUN*-*-*Thu Jan 18 19:54:32 EST 2018*-*-*PASS*-*-*
+      # *-*-*END*-*-*RUN*-*-*Tue Nov 26 17:47:00 EST 2019*-*-*summit*-*-*PASS*-*-*none*-*-*463391f*-*-*
       returned_value["type"] = "END"
       returned_value["result"] = header_split[4]
       returned_value["comments"] = header_split[5]
@@ -313,7 +325,7 @@ def main():
            "compilerCommand, startingCompilerDate," \
            "endingCompilerDate, compilerPass, compilerOutput," \
            "runtimeOnly, binaryPath, startingRuntimeDate," \
-           "endingRuntimeDate, runtimePass, runtimeOutput, testComments \n"
+           "endingRuntimeDate, runtimePass, runtimeOutput, gitCommit, testComments \n"
     for result in results:
       formatedOutput = formatedOutput + result.convert2CSV() + '\n'
   elif args.format and args.format[0].lower() == 'summary':
