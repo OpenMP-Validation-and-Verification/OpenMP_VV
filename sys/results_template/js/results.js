@@ -5,8 +5,8 @@
   var ompvv = angular.module('ompvvSollve', ['ngRoute','ngAnimate', 'ngSanitize', 'ui.bootstrap', 'ansiToHtml']);
 
   ompvv.controller('ompvvSollveController', 
-  ['$scope', '$http', '$log','$uibModal', '$timeout', 'ansi2html', '$filter',
-    function($scope, $http, $log, $uibModal, $timeout, ansi2html, $filter) {
+  ['$scope', '$http', '$log','$uibModal', '$timeout', 'ansi2html', '$filter', '$q',
+    function($scope, $http, $log, $uibModal, $timeout, ansi2html, $filter, $q) {
 
       // Info message regarding table
       $scope.displayMessage = true;
@@ -23,6 +23,14 @@
       // Table variables and getting the json file from the server
       $scope.tableContent = [];
 
+      // Connecting to source code in the git repository
+      $scope.SOLLVEgithubLink = "https://github.com/SOLLVE/sollve_vv"
+      $scope.githubAPI = {};
+      $scope.githubAPI.link = "https://api.github.com/";
+      $scope.githubAPI.commits = "repos/SOLLVE/sollve_vv/commits/";
+
+      $scope.gitCommits = {};
+
       // Function to load results
       $scope.loadResults = function(){
         if (typeof jsonResults == 'undefined'){
@@ -37,6 +45,7 @@
           var compilerName = value["Compiler name"];
           var testSystem = value["Test system"];
           var testName = value["Test name"];
+          var testGitCommit = value["Test gitCommit"];
           var compilerResult = value["Compiler result"];
           var runtimeResult = value ["Runtime result"];
           // Adding test to list of all tests
@@ -50,6 +59,11 @@
           // Adding system name to list of all systems
           if ($scope.filters.systemOptions.indexOf(testSystem) == -1) {
             $scope.filters.systemOptions.push(testSystem);
+          }
+          // Adding github commit
+          if (testGitCommit != "" && !$scope.gitCommits.hasOwnProperty(testGitCommit)) {
+            $scope.gitCommits[testGitCommit] = {};
+            $scope.gitCommits[testGitCommit].isAccessible = false;
           }
 
           // Placing all results indexed by testname
@@ -83,9 +97,30 @@
           }
 
         });
-        
-        $scope.loadingResults = false;
-      }
+
+        var allPromisses = [];
+        angular.forEach($scope.gitCommits, function(value, key) {
+          // See if we can find the corresponding commits in github
+          allPromisses.push($http.get($scope.githubAPI["link"]+$scope.githubAPI["commits"]+key).then(
+            function(data) {
+              // Success
+              $log.log("Commit " + key + " was found");
+              value.isAccessible = true;
+              return true;
+            }, function(err) {
+              // Failure
+              $log.log("Commit " + key + " was not found");
+              value.isAccessible = false;
+              return false;
+            })
+          );// End of append
+        }); // End of for each gitCommits
+
+        // waiting for all commit checks
+        $q.all(allPromisses).then(function(){
+          $scope.loadingResults = false;
+        });
+      };
 
       $scope.testsResults = {};
       $scope.compilerBySystems = new Map();
@@ -180,6 +215,13 @@
             },
             ansi2html: function() {
               return ansi2html;
+            },
+            githubUrl: function() {
+              return $scope.SOLLVEgithubLink;
+            }, 
+            showLink: function() {
+              $log.log()
+              return $scope.gitCommits[value['Test gitCommit']].isAccessible;
             }
 
           }
@@ -202,10 +244,19 @@
     <div class="modal-content">
     <div class="modal-header">
         <h3>
-            <span class="label label-info" id="qid">{{$ctrl.resultEntry['Test name']}}</span>
+            <span class="label label-info" id="qid">{{$ctrl.resultEntry['Test name']}}</span> 
+              <span ng-if="$ctrl.resultEntry['Test gitCommit']!=''" style="font-size:0.5em">
+                <a ng-if="$ctrl.showLink" target="_blank" href="{{$ctrl.githubUrl+'/blob/'+$ctrl.resultEntry['Test gitCommit']+'/'+$ctrl.resultEntry['Test path']}}">
+                  <span class="glyphicon glyphicon-file"> </span> 
+                  source code  
+                </a>
+            </span>
         </h3>
         <h4>
             <span class="label label-primary">Path:</span><span>  {{$ctrl.resultEntry['Test path']}}</span> <br/>
+        </h4>
+        <h4 ng-if="$ctrl.resultEntry['Test gitCommit']!=''">
+            <span class="label label-primary">Git Commit:</span><span>  {{$ctrl.resultEntry['Test gitCommit']}}</span> <br/>
         </h4>
         <h4>
             <span class="label label-primary">Compiler:</span><span>  {{$ctrl.resultEntry['Compiler name']}}</span>
@@ -262,7 +313,9 @@
       $ctrl.runtimeOutputActive = false;
       $ctrl.$onInit = function () {
         $ctrl.resultEntry = $ctrl.resolve.resultEntry;
-        $ctrl.ansi2html = $ctrl.resolve.ansi2html
+        $ctrl.ansi2html = $ctrl.resolve.ansi2html;
+        $ctrl.githubUrl = $ctrl.resolve.githubUrl;
+        $ctrl.showLink = $ctrl.resolve.showLink;
       }
       $ctrl.ok = function () {
         $uibModalInstance.close();
