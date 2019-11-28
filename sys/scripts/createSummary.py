@@ -58,6 +58,7 @@ class testResult:
     runtimeOutput = ""
 
   def setTestParameters(self, newTestName, newTestPath=None, newCompilerName=None, newCompilerCommand=None, newTestCommit=None):
+    self.testName = newTestName
     runtimeOnly = (not newTestPath)
     if newTestPath:  self.testPath = newTestPath 
     if newCompilerName:  self.compilerName = newCompilerName 
