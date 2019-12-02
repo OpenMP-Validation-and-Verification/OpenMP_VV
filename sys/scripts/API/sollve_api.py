@@ -236,8 +236,8 @@ class SOLLVE_API_01_requests(SOLLVE_API_01):
     except Exception as err: 
       print(f"Error obtaining tag [{type(err).__name__}]: {err}",file=sys.stderr)
 
-# try:
-#   import requests
-#   api = SOLLVE_API_01_requests()
-# except:
-api = SOLLVE_API_01_curl()
+try:
+  import requests
+  api = SOLLVE_API_01_requests()
+except:
+  api = SOLLVE_API_01_curl()
