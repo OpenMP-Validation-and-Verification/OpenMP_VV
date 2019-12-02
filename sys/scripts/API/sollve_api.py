@@ -14,6 +14,7 @@ class SOLLVE_API_01(metaclass=abc.ABCMeta):
   UPDATE_RESULT_URL = None
   APPEND_RESULT_URL = None
   DELETE_RESULT_URL = None
+  RESULT_REPORT_URL = None
   DEBUG = -1
 
   def __init__(self):
@@ -25,6 +26,7 @@ class SOLLVE_API_01(metaclass=abc.ABCMeta):
     self.UPDATE_RESULT_URL=self.URL+self.VER+'/update_result/'
     self.APPEND_RESULT_URL=self.URL+self.VER+'/append_result/'
     self.DELETE_RESULT_URL=self.URL+self.VER+'/delete_result/'
+    self.RESULT_REPORT_URL="https://crpl.cis.udel.edu/ompvvsollve/result_report/results.html"
 
   @abc.abstractmethod
   def create_tag(self):
@@ -155,14 +157,17 @@ class SOLLVE_API_01_curl(SOLLVE_API_01):
 
 ## This class if request is installed in the system
 class SOLLVE_API_01_requests(SOLLVE_API_01):
-  def create_tag(self):
+  def __init__(self):
+    super().__init__()
     self.print_log("Using the requests module back end", 1)
+    
+  def create_tag(self):
     self.print_log("create_tag requests")
     try:
       response = requests.get(self.CREATE_TAG_URL)
       # Connection went well
       if (response.status_code == 200):
-        return response.te
+        return response.text
       else:
         raise requests.exceptions.HTTPError(f"Status code not as expected {response.status_code}")
     except Exception as err: 

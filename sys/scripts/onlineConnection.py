@@ -94,6 +94,11 @@ def main():
       print_log("User rejected deletion",1)
       return
 
+  # Obtaining the tag
+  tag = None
+  if (args.tag):
+    tag = args.tag[0]
+
   # Obtaining the json file to be processed
   if (args.jsonLogFile):
     jsonLogFile = args.jsonLogFile
@@ -102,16 +107,15 @@ def main():
 
       ## For obtain
       if (args.obtain_file):
-        result = api.obtain_result(args.tag[0])
+        result = api.obtain_result(tag)
         with open(logFile, "w") as f:
           json.dump(json.loads(result), f, indent=2)
 
       ## For update
       if not (args.append or args.remove or args.obtain_file):
-        if (not args.tag):
+        if (not tag):
           tag = api.create_tag()
-        else:
-          tag = args.tag[0]
+
         if os.path.exists(logFile):
           if (not api.update_result(tag, logFile)):
             print("Something went wrong with the update")
@@ -121,15 +125,20 @@ def main():
       ## For append
       if (args.append):
         if os.path.exists(logFile):
-          api.append_result(args.tag[0], logFile)
+          api.append_result(tag, logFile)
         else:
           print(f"The file {logFile} does not exists")
   elif (not args.remove):
     parser.print_usage()
+    return
 
   ## For remove
   if (args.remove):
-    result = api.delete_result(args.tag[0])
+    result = api.delete_result(tag)
+
+  if (not args.remove):
+    print(f" Your report tag is {tag}. Do not lose this number")
+    print(f" Visit your report at:\n    {api.RESULT_REPORT_URL}?result_report={tag}")
 
 if __name__ == "__main__":
     main()
