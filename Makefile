@@ -71,6 +71,7 @@ RESULTS_JSON_OUTPUT_FILE=results.json
 RESULTS_CSV_OUTPUT_FILE=results.csv
 RESULTS_HTML_OUTPUT_FOLDER=results_report
 RESULTS_HTML_REPORT_TEMPLATE=$(CURDIR)/sys/results_template
+REPORT_ONLINE_CONNECTION=$(CURDIR)/sys/scripts/onlineConnection.py
 
 ##################################################
 # Source files
@@ -379,6 +380,40 @@ report_html: $(RESULTS_JSON_OUTPUT_FILE) $(RESULTS_CSV_OUTPUT_FILE)
 
 	@echo " === REPORT DONE === "
 
+ifdef REPORT_ONLINE_TAG
+  # Check if the lenght is appropriate
+  ifneq ("$(shell echo ${REPORT_ONLINE_TAG} | wc -m | grep -oh '[0-9]\+')", "10")
+    $(error "REPORT_ONLINE_TAG is a 9 digit hex value. Not 9 digits")
+  endif
+  # Check if it's a hex value
+  ifneq ("$(shell echo ${REPORT_ONLINE_TAG} | grep '[^a-f0-9]')" , "")
+    $(error "REPORT_ONLINE_TAG is a 9 digit hex value. Not a Hex")
+  endif
+endif
+
+ifdef REPORT_ONLINE_APPEND
+  # Check if the lenght is appropriate
+  ifndef REPORT_ONLINE_TAG
+    $(error "In order to append to an online report, it is necessary to have an REPORT_ONLINE_TAG")
+  endif
+endif
+.PHONY: report_online
+report_online: $(RESULTS_JSON_OUTPUT_FILE)
+	@echo " === SUBMITTING ONLINE REPORT === ";
+	@FLAGS=""; \
+		if [ "${REPORT_ONLINE_TAG}" != "" ]; then \
+			FLAGS="$$FLAGS -t ${REPORT_ONLINE_TAG}"; \
+		fi; \
+		if [ "1" == "${REPORT_ONLINE_APPEND}" ]; then \
+			FLAGS="$$FLAGS -a"; \
+		fi; \
+		date >> recent_REPORT_ONLINE_tags; \
+		${REPORT_ONLINE_CONNECTION} $$FLAGS ${RESULTS_JSON_OUTPUT_FILE} | tee -a recent_REPORT_ONLINE_tags;
+	@echo " This tool is for visualization purposes. "
+	@echo " Our data retention policy is of 1 month. "
+	@echo " After this time, we do not guarantee this link will work anymore"
+	@echo " === SUBMISSION DONE === "
+
 .PHONY: clean
 clean: clear_fortran_mod
 	- rm -rf $(BINDIR)
@@ -419,6 +454,8 @@ help:
 	@echo "  OMP_VERSION=[e.g. 4.5]    This specifies which version of the specs we are targeting. This version should have its folder in tests/[version]"
 	@echo "                            default value is 4.5"
 	@echo "                            WARNING: WHEN CHANGING VERSIONS START FROM A CLEAN BUILD. OTHERWISE BINARIES and LOG folders may collide."
+	@echo "  REPORT_ONLINE_TAG=1       Allows to control the 9 digit hex value that refers to an already existing online report"
+	@echo "  REPORT_ONLINE_APPEND=1    Allows to append to an already existing report. It requires a tag for a reeport (9 digit hex value)"
 	@echo ""
 	@echo " === RULES ==="
 	@echo "  all"
@@ -441,6 +478,8 @@ help:
 	@echo "    currently we only support runs that contain output for compile and run"
 	@echo "  report_summary"
 	@echo "    Create a summarized report of the tests that failed, and how many runs in total the given log folder '$(LOGDIRNAME)' has."
+	@echo "  repoort_online"
+	@echo "    Upload the resulting JSON file to the ompvvsollve website for easy visualization and sharing."
 	@echo "  report_html"
 	@echo "    create an html based results report. This rule takes the json file and a prebuild template and creates"
 	@echo "    the $(RESULTS_HTML_OUTPUT_FOLDER) folder containing the report. This report allows filtering the results"
