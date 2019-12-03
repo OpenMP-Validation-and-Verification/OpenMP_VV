@@ -4,7 +4,7 @@
 <title> OpenMP Validation & Verification Results Visualization</title>
 <meta charset="utf-8">
 <meta name="viewport" content"width=device-width, initial-scale=1">
-<link rel="shortcut icon" href="img/favicon2.png" type="image/x-icon" />
+<link rel="shortcut icon" href="./img/favicon2.png" type="image/x-icon" />
 <!-- CSS Related stuff -->
 <link href="css/third_party/bootstrap.min.css" rel="stylesheet">
 <link href="css/results.css" rel="stylesheet">
@@ -126,7 +126,7 @@
 								<tbody>
 								<tr ng-repeat="result in tableContent | applyResultsFilter:filters | orderBy:predicate:order.reverseSort" ng-click="openResultModal(result)">
 									<td> {{$index + 1}}
-										<span ng-click="$event.stopPropagation();" ng-if="result['Test gitCommit'] != ''" style="font-size:1em">
+										<span ng-click="$event.stopPropagation();" ng-if="result['Test gitCommit'] != '' && gitCommits[result['Test gitCommit']].isAccessible" style="font-size:1em">
 											<a ng-if="gitCommits[result['Test gitCommit']]" target="_blank" href="{{SOLLVEgithubLink+'/blob/'+result['Test gitCommit']+'/'+result['Test path']}}">
 											<span class="glyphicon glyphicon-file"> </span> </a>  
 										</span>

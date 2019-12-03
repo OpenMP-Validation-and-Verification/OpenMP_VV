@@ -221,6 +221,7 @@
             }, 
             showLink: function() {
               $log.log()
+              if (value['Test gitCommit'] == '') return false;
               return $scope.gitCommits[value['Test gitCommit']].isAccessible;
             }
 
