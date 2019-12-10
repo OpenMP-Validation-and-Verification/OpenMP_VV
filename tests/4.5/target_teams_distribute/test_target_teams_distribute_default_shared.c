@@ -20,57 +20,46 @@
 #include <stdlib.h>
 #include "ompvv.h"
 
-#define SIZE_THRESHOLD 512
+#define N 1024
 
 int main() {
   int isOffloading = 0;
   OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
-  int a[1024];
+  int a[N];
   int share = 0;
   int errors = 0;
   int num_teams;
-
-  for (int x = 0; x < 1024; ++x) {
+  
+  for (int x = 0; x < N; ++x) {
     a[x] = x;
   }
-
-#pragma omp target data map(to: a[0:1024]) map(tofrom: share, num_teams)
+  
+#pragma omp target data map(to: a[0:N]) map(tofrom: share, num_teams)
   {
-#pragma omp target teams distribute default(shared)
-    for (int x = 0; x < 1024; ++x) {
+#pragma omp target teams distribute default(shared) defaultmap(tofrom:scalar)
+    for (int x = 0; x < N; ++x) {
       num_teams = omp_get_num_teams();
 #pragma omp atomic
       share = share + a[x];
     }
   }
-
-  for (int x = 0; x < 1024; ++x) {
+  
+  for (int x = 0; x < N; ++x) {
     share = share - x;
   }
   OMPVV_TEST_AND_SET_VERBOSE(errors, (share != 0));
-
-  share = -1;
-#pragma omp target data map(to: a[0:1024]) map(tofrom: share)
-  {
-#pragma omp target teams distribute default(shared)
-    for (int x = 0; x < 1024; ++x) {
-      share = a[x];
-    }
-  }
-
-  OMPVV_TEST_AND_SET_VERBOSE(errors, (share < -1 || share >= 1024));
-
+    
   share = 5;
 
-#pragma omp target data map(tofrom: a[0:1024]) map(tofrom: share)
+#pragma omp target data map(tofrom: a[0:N]) map(tofrom: share)
   {
-#pragma omp target teams distribute default(shared)
-    for (int x = 0; x < 1024; ++x) {
+#pragma omp target teams distribute default(shared) defaultmap(tofrom:scalar)
+    for (int x = 0; x < N; ++x) {
       a[x] = a[x] + share;
     }
   }
 
-  for (int x = 0; x < 1024; ++x) {
+  for (int x = 0; x < N; ++x) {
     OMPVV_TEST_AND_SET_VERBOSE(errors, (a[x] - 5 != x));
     if (a[x] - 5 != x) {
       break;

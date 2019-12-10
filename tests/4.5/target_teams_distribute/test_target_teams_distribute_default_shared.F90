@@ -30,7 +30,6 @@ PROGRAM test_target_teams_distribute_default_shared
 
   OMPVV_TEST_VERBOSE(default_shared1() .ne. 0)
   OMPVV_TEST_VERBOSE(default_shared2() .ne. 0)
-  OMPVV_TEST_VERBOSE(default_shared3() .ne. 0)
 
   OMPVV_REPORT_AND_RETURN()
 
@@ -46,7 +45,7 @@ CONTAINS
     END DO
 
     !$omp target data map(to: a(1:N)) map(tofrom: share, num_teams)
-    !$omp target teams distribute default(shared)
+    !$omp target teams distribute default(shared) defaultmap(tofrom:scalar)
     DO x = 1, N
        num_teams = omp_get_num_teams()
        !$omp atomic
@@ -66,27 +65,6 @@ CONTAINS
     INTEGER :: a(N)
     INTEGER :: share, errors, x
     errors = 0
-    share = -1
-
-    DO x = 1, N
-       a(x) = x
-    END DO
-
-    !$omp target data map(to: a(1:N)) map(tofrom: share)
-    !$omp target teams distribute default(shared)
-    DO x = 1, N
-       share = a(x)
-    END DO
-    !$omp end target data
-    OMPVV_TEST_AND_SET_VERBOSE(errors, share .lt. -1)
-    OMPVV_TEST_AND_SET_VERBOSE(errors, share .gt. 1024)
-    default_shared2 = errors
-  END FUNCTION default_shared2
-
-  INTEGER FUNCTION default_shared3()
-    INTEGER :: a(N)
-    INTEGER :: share, errors, x
-    errors = 0
     share = 5
 
     DO x = 1, N
@@ -94,7 +72,7 @@ CONTAINS
     END DO
 
     !$omp target data map(tofrom: a(1:N), share)
-    !$omp target teams distribute default(shared)
+    !$omp target teams distribute default(shared) defaultmap(tofrom:scalar)
     DO x = 1, N
        a(x) = a(x) + share
     END DO
@@ -103,6 +81,6 @@ CONTAINS
     DO x = 1, N
        OMPVV_TEST_AND_SET(errors, a(x) .ne. x + 5)
     END DO
-    default_shared3 = errors
-  END FUNCTION default_shared3
+    default_shared2 = errors
+  END FUNCTION default_shared2
 END PROGRAM test_target_teams_distribute_default_shared
