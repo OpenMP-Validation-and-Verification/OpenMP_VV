@@ -8,10 +8,8 @@
 // will be shared within the region.  To test this, we test that a data element
 // that should be shared due to the default(shared) clause is available to
 // all the teams.  The first test uses atomic to write to the variable without
-// race conditions.  The second test allows these race contitions, but then
-// validates that the resulting value is one of the possible values.  The last
-// test, instead of testing writes, only reads from the variable and tests that
-// all teams can read the shared value.
+// race conditions.  The second test uses synchronization constructs to have
+// one thread change the shared variable and ensures all threads see the change.
 //
 ////===----------------------------------------------------------------------===//
 
@@ -49,12 +47,18 @@ int main() {
   }
   OMPVV_TEST_AND_SET_VERBOSE(errors, (share != 0));
     
-  share = 5;
+  share = -1;
 
 #pragma omp target data map(tofrom: a[0:N]) map(tofrom: share)
   {
 #pragma omp target teams distribute default(shared) defaultmap(tofrom:scalar)
     for (int x = 0; x < N; ++x) {
+      if (omp_get_team_num() == 0) {
+	share = 5;
+#pragma omp flush
+      }
+#pragma omp barrier
+#pragma omp flush
       a[x] = a[x] + share;
     }
   }

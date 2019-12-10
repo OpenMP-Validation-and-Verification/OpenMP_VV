@@ -8,10 +8,8 @@
 ! will be shared within the region.  To test this, we test that a data element
 ! that should be shared due to the default(shared) clause is available to
 ! all the teams.  The first test uses atomic to write to the variable without
-! race conditions.  The second test allows these race contitions, but then
-! validates that the resulting value is one of the possible values.  The last
-! test, instead of testing writes, only reads from the variable and tests that
-! all teams can read the shared value.
+! race conditions.  The second test uses synchronization constructs to have
+! one thread change the shared variable and ensures all threads see the change.
 !
 !===------------------------------------------------------------------------===//
 
@@ -65,7 +63,7 @@ CONTAINS
     INTEGER :: a(N)
     INTEGER :: share, errors, x
     errors = 0
-    share = 5
+    share = -1
 
     DO x = 1, N
        a(x) = x
@@ -74,6 +72,12 @@ CONTAINS
     !$omp target data map(tofrom: a(1:N), share)
     !$omp target teams distribute default(shared) defaultmap(tofrom:scalar)
     DO x = 1, N
+       IF (omp_get_team_num() .eq. 0) THEN
+          share = 5
+          !$omp flush
+       END IF
+       !$omp barrier
+       !$omp flush
        a(x) = a(x) + share
     END DO
     !$omp end target data
