@@ -332,11 +332,20 @@ def main():
   elif args.format and args.format[0].lower() == 'summary':
     num_tests = len(results)
     failures = []
+    acceptable_extensions = (".cpp", ".c", ".f90")				   
+    number_tests_by_file_type = dict.fromkeys( acceptable_extensions, 0)	   
+    number_build_failures_by_file_type = dict.fromkeys( acceptable_extensions, 0) 
+    number_pass_by_file_type = dict.fromkeys( acceptable_extensions, 0)
     for result in results: 
+      extension=result.testName[(result.testName).rindex("."):].lower()
+      number_tests_by_file_type[extension] = number_tests_by_file_type[extension] + 1
       if result.compilerPass != "PASS":
         failures.append("  " + result.testName + " on " + result.compilerName + " (compiler) ")
+        number_build_failures_by_file_type[extension] = number_build_failures_by_file_type[extension] + 1
       elif result.runtimePass != "PASS":
         failures.append("  " + result.testName + " on " + result.compilerName + " (runtime) ")
+      else:
+        number_pass_by_file_type[extension] = number_pass_by_file_type[extension] + 1
     if len(failures) == 0:
       formatedOutput = "PASS\nChecked " + str(num_tests) + " runs"
     else:
@@ -350,6 +359,15 @@ def main():
     outputFile.write(formatedOutput)
   else:
     print(formatedOutput)
+    print("Condensed Summary by file type:")
+    for ext in acceptable_extensions:
+      if number_tests_by_file_type[ext] > 0 :
+        print( "  %s pass rate: %d/%d (%d%%) [ %d build failures ]" 
+               % (ext, number_pass_by_file_type[ext],
+                  number_tests_by_file_type[ext],
+                  number_pass_by_file_type[ext]/number_tests_by_file_type[ext]*100,
+                  number_build_failures_by_file_type[ext] ) )
+
  
 # end of main function definition
   
