@@ -81,7 +81,7 @@
           END FUNCTION test_defaultmap_on
 
           INTEGER FUNCTION test_defaultmap_off()
-            INTEGER :: errors_bf, errors_af, i, tmp1, tmp2
+            INTEGER :: errors_bf, errors_af, i, tmp1 = 0, tmp2 = 0
             CHARACTER(len=400) :: longMessage
             CHARACTER(len=100) :: shortMessage
             LOGICAL:: firstprivateCheck(10)
