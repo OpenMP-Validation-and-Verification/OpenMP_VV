@@ -35,13 +35,13 @@ int test_target_teams_distribute_depend_in_in() {
     c[x] = 0;
   }
 
-#pragma omp target data map(to: a[0:N], b[0:N]) map(tofrom:c[0:N])
+#pragma omp target data map(to: a[0:N], b[0:N]) map(tofrom: c[0:N])
   {
-#pragma omp target teams distribute nowait depend(in:c) map(alloc: a[0:N], b[0:N], c[0:N])
+#pragma omp target teams distribute nowait depend(in: c) map(alloc: a[0:N], b[0:N], c[0:N])
     for (int x = 0; x < N; ++x) {
       c[x] += a[x] + b[x];
     }
-#pragma omp target teams distribute nowait depend(in:c) map(alloc: a[0:N], b[0:N], c[0:N])
+#pragma omp target teams distribute nowait depend(in: c) map(alloc: a[0:N], b[0:N], c[0:N])
     for (int x = 0; x < N; ++x) {
       c[x] += 2 * (a[x] + b[x]);
     }
@@ -357,13 +357,13 @@ int test_target_teams_distribute_depend_disjoint_section() {
     c[x] = 0;
   }
 
-#pragma omp target data map(to: a[0:N], b[0:N]) map(tofrom:c[0:N])
+#pragma omp target data map(to: a[0:N], b[0:N]) map(tofrom: c[0:N])
   {
-#pragma omp target teams distribute nowait depend(in:c[0:N/2]) map(alloc: a[0:N], b[0:N], c[0:N])
+#pragma omp target teams distribute nowait depend(in: c[0:N/2]) map(alloc: a[0:N], b[0:N], c[0:N])
     for (int x = 0; x < N; ++x) {
       c[x] += a[x] + b[x];
     }
-#pragma omp target teams distribute nowait depend(in:c[N/2:N/2]) map(alloc: a[0:N], b[0:N], c[0:N])
+#pragma omp target teams distribute nowait depend(in: c[N/2:N/2]) map(alloc: a[0:N], b[0:N], c[0:N])
     for (int x = 0; x < N; ++x) {
       c[x] += 2 * (a[x] + b[x]);
     }

@@ -23,14 +23,14 @@ PROGRAM test_target_teams_distribute_depend
   USE omp_lib
   implicit none
   INTEGER :: errors
-  OMPVV_TEST_OFFLOADING()
+  OMPVV_TEST_OFFLOADING
   errors = 0
 
   OMPVV_TEST_VERBOSE(depend_in_in() .ne. 0)
   OMPVV_TEST_VERBOSE(depend_in_out() .ne. 0)
   OMPVV_TEST_VERBOSE(depend_out_in() .ne. 0)
   OMPVV_TEST_VERBOSE(depend_out_out() .ne. 0)
-  OMPVV_TEST_VERBOSE(depend_array_secion() .ne. 0)
+  OMPVV_TEST_VERBOSE(depend_array_section() .ne. 0)
   OMPVV_TEST_VERBOSE(depend_disjoint_section() .ne. 0)
   OMPVV_TEST_VERBOSE(depend_list() .ne. 0)
   OMPVV_TEST_VERBOSE(depend_unused_data() .ne. 0)
@@ -52,13 +52,13 @@ CONTAINS
        c(x) = 0
     END DO
 
-    !$omp target data map(to: a(1:N), b(1:N)) map(tofrom:c(1:N))
+    !$omp target data map(to: a(1:N), b(1:N)) map(tofrom: c(1:N))
     !$omp target teams distribute nowait depend(in: c) map(alloc: &
     !$omp& a(1:N), b(1:N), c(1:N))
     DO x = 1, N
        c(x) = c(x) + a(x) + b(x)
     END DO
-    !$omp target teams distribute nowait depend(in:c) map(alloc: &
+    !$omp target teams distribute nowait depend(in: c) map(alloc: &
     !$omp& a(1:N), b(1:N), c(1:N))
     DO x = 1, N
        c(x) = c(x) + 2 * a(x)
@@ -75,7 +75,7 @@ CONTAINS
        END IF
     END DO
 
-    IF ((all_valid .eqv. .FALSE) .or. (race_found .eqv. .FALSE.)) THEN
+    IF ((all_valid .eqv. .FALSE.) .or. (race_found .eqv. .FALSE.)) THEN
        OMPVV_WARNING("Could not prove asyncronous operations of ")
        OMPVV_WARNING("depend(in) task with other depend(in) task")
     END IF
@@ -179,12 +179,12 @@ CONTAINS
 
     !$omp target data map(to: a(1:N), b(1:N)) map(alloc: c(1:N)) map( &
     !$omp& from: d(1:N))
-    !$omp target teams distribute nowait depend(inout:c) map(alloc: &
+    !$omp target teams distribute nowait depend(inout: c) map(alloc: &
     !$omp& a(1:N), b(1:N), c(1:N))
     DO x = 1, N
        c(x) = a(x) + b(x)
     END DO
-    !$omp target teams distribute nowait depend(in:c) map(alloc: &
+    !$omp target teams distribute nowait depend(in: c) map(alloc: &
     !$omp& a(1:N), c(1:N), d(1:N))
     DO x = 1, N
        d(x) = c(x) + a(x)
@@ -250,12 +250,12 @@ CONTAINS
 
     !$omp target data map(to: a(1:N), b(1:N)) map(alloc: c(1:N)) map(&
     !$omp& from: d(1:N))
-    !$omp target teams distribute nowait depend(out:c) map(alloc: &
+    !$omp target teams distribute nowait depend(out: c) map(alloc: &
     !$omp& a(1:N), b(1:N), c(1:N))
     DO x = 1, N
        c(x) = a(x) + b(x)
     END DO
-    !$omp target teams distribute nowait depend(inout:c) map(alloc: &
+    !$omp target teams distribute nowait depend(inout: c) map(alloc: &
     !$omp& a(1:N), c(1:N), d(1:N))
     DO x = 1, N
        d(x) = a(x) + c(x)
@@ -270,12 +270,12 @@ CONTAINS
 
     !$omp target data map(to: a(1:N), b(1:N)) map(alloc: c(1:N)) map(&
     !$omp& from: d(1:N))
-    !$omp target teams distribute nowait depend(inout:c) map(alloc: &
+    !$omp target teams distribute nowait depend(inout: c) map(alloc: &
     !$omp& a(1:N), b(1:N), c(1:N))
     DO x = 1, N
        c(x) = a(x) + b(x)
     END DO
-    !$omp target teams distribute nowait depend(out:c) map(alloc: &
+    !$omp target teams distribute nowait depend(out: c) map(alloc: &
     !$omp& b(1:N), c(1:N), d(1:N))
     DO x = 1, N
        d(x) = b(x) + c(x)
@@ -290,12 +290,12 @@ CONTAINS
 
     !$omp target data map(to: a(1:N), b(1:N)) map(alloc: c(1:N)) map(&
     !$omp& from: d(1:N))
-    !$omp target teams distribute nowait depend(inout:c) map(alloc: &
+    !$omp target teams distribute nowait depend(inout: c) map(alloc: &
     !$omp& a(1:N), b(1:N), c(1:N))
     DO x = 1, N
        c(x) = a(x) + b(x)
     END DO
-    !$omp target teams distribute nowait depend(inout:c) map(alloc: &
+    !$omp target teams distribute nowait depend(inout: c) map(alloc: &
     !$omp& a(1:N), c(1:N), d(1:N))
     DO x = 1, N
        d(x) = a(x) + c(x)
@@ -342,12 +342,12 @@ CONTAINS
 
     !$omp target data map(to: a(1:N), b(1:N)) map(alloc: c(1:N)) map( &
     !$omp& from: d(1:N))
-    !$omp target teams distribute nowait depend(out: c(1:N)) map(alloc &
+    !$omp target teams distribute nowait depend(out: c(1:N)) map(alloc: &
     !$omp& a(1:N), b(1:N), c(1:N))
     DO x = 1, N
        c(x) = a(x) + b(x)
     END DO
-    !$omp target teams distribute nowait depend(out: c(1:N)) map(alloc &
+    !$omp target teams distribute nowait depend(out: c(1:N)) map(alloc: &
     !$omp& b(1:N), c(1:N), d(1:N))
     DO x = 1, N
        d(x) = a(x) + b(x)
@@ -378,12 +378,12 @@ CONTAINS
     END DO
 
     !$omp target data map(to: a(1:N), b(1:N)) map(tofrom: c(1:N))
-    !$omp target teams distribute nowait depend(c(1:2)) map(alloc: &
+    !$omp target teams distribute nowait depend(in: c(1:2)) map(alloc: &
     !$omp& a(1:N), b(1:N), c(1:N))
     DO x = 1, N
        c(x) = c(x) + a(x) + b(x)
     END DO
-    !$omp target teams distribute nowait depend(c(3:N)) map(alloc: &
+    !$omp target teams distribute nowait depend(in: c(3:N)) map(alloc: &
     !$omp& a(1:N), b(1:N), c(1:N))
     DO x = 1, N
        c(x) = c(x) + 2 * (a(x) + b(x))
@@ -400,7 +400,7 @@ CONTAINS
        END IF
     END DO
 
-    IF ((all_valid .eqv. .FALSE.) .or. (race_found .eqv. .FALSE)) THEN
+    IF ((all_valid .eqv. .FALSE.) .or. (race_found .eqv. .FALSE.)) THEN
        OMPVV_WARNING("Test could not prove asyncronous operations of")
        OMPVV_WARNING("tasks dependent on disjoint array sections")
     END IF
@@ -424,7 +424,7 @@ CONTAINS
        g(x) = 0
     END DO
 
-    !$omp target data map(to: a(1:N), b(1:N)) map(aloc: c(1:N), d(1:N), &
+    !$omp target data map(to: a(1:N), b(1:N)) map(alloc: c(1:N), d(1:N), &
     !$omp& e(1:N)) map(from: f(1:N), g(1:N))
     !$omp target teams distribute nowait depend(out: c) map(alloc: &
     !$omp& a(1:N), b(1:N), c(1:N))
@@ -436,8 +436,8 @@ CONTAINS
     DO x = 1, N
        d(x) = a(x) + b(x) + x
     END DO
-    !$omp target teams distribute nowait depend(out: c,d,e) map(alloc:&
-    !$omp& c(1:n), d(1:N), e(1:N))
+    !$omp target teams distribute nowait depend(out: c, d, e) map(alloc:&
+    !$omp& c(1:N), d(1:N), e(1:N))
     DO x = 1, N
        e(x) = c(x) + d(x)
     END DO
@@ -447,7 +447,7 @@ CONTAINS
        f(x) = e(x) + a(x)
     END DO
     !$omp target teams distribute nowait depend(out: e) map(alloc: &
-    !$omp& b(1:N, e(1:N), g(1:N))
+    !$omp& b(1:N), e(1:N), g(1:N))
     DO x = 1, N
        g(x) = e(x) + b(x)
     END DO
