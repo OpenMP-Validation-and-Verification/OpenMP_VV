@@ -426,8 +426,8 @@ clear_fortran_mod:
 tidy: clean
 	- rm -rf $(LOGDIRNAME)
 	- rm -rf $(RESULTS_HTML_OUTPUT_FOLDER)
-	- rm -rf $(RRESULTS_JSON_OUTPUT_FILE)
-	- rm -rf $(RRESULTS_CSV_OUTPUT_FILE)
+	- rm -rf $(RESULTS_JSON_OUTPUT_FILE)
+	- rm -rf $(RESULTS_CSV_OUTPUT_FILE)
 
 .PHONY: compilers
 compilers:
