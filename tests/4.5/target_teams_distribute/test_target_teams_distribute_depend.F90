@@ -61,7 +61,7 @@ CONTAINS
     !$omp target teams distribute nowait depend(in: c) map(alloc: &
     !$omp& a(1:N), b(1:N), c(1:N))
     DO x = 1, N
-       c(x) = c(x) + 2 * a(x)
+       c(x) = c(x) + 2 * (a(x) + b(x))
     END DO
     !$omp end target data
 
@@ -153,6 +153,13 @@ CONTAINS
   INTEGER FUNCTION depend_out_in()
     INTEGER:: errors_a, errors_b, x
     INTEGER,DIMENSION(N):: a, b, c, d
+
+    DO x = 1, N
+       a(x) = x
+       b(x) = 2 * x
+       c(x) = 0
+       d(x) = 0
+    END DO
 
     errors_a = 0
     errors_b = 0
@@ -350,7 +357,7 @@ CONTAINS
     !$omp target teams distribute nowait depend(out: c(1:N)) map(alloc: &
     !$omp& b(1:N), c(1:N), d(1:N))
     DO x = 1, N
-       d(x) = a(x) + b(x)
+       d(x) = c(x) + b(x)
     END DO
     !$omp end target data
 
@@ -378,12 +385,12 @@ CONTAINS
     END DO
 
     !$omp target data map(to: a(1:N), b(1:N)) map(tofrom: c(1:N))
-    !$omp target teams distribute nowait depend(in: c(1:2)) map(alloc: &
+    !$omp target teams distribute nowait depend(in: c(1:(N/2))) map(alloc: &
     !$omp& a(1:N), b(1:N), c(1:N))
     DO x = 1, N
        c(x) = c(x) + a(x) + b(x)
     END DO
-    !$omp target teams distribute nowait depend(in: c(3:N)) map(alloc: &
+    !$omp target teams distribute nowait depend(in: c(((N/2) + 1):N)) map(alloc: &
     !$omp& a(1:N), b(1:N), c(1:N))
     DO x = 1, N
        c(x) = c(x) + 2 * (a(x) + b(x))
