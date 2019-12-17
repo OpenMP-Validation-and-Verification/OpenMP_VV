@@ -229,9 +229,9 @@ endif
 ##################################################
 
 ifdef NO_OFFLOADING
-	COFFLOADING = $(C_NO_OFFLOADING)
-	CXXOFFLOADING = $(CXX_NO_OFFLOADING)
-	FOFFLOADING = $(F_NO_OFFLOADING)
+  COFFLOADING = $(C_NO_OFFLOADING)
+  CXXOFFLOADING = $(CXX_NO_OFFLOADING)
+  FOFFLOADING = $(F_NO_OFFLOADING)
 endif
 
 ##################################################
