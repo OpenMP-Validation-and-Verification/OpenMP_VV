@@ -63,7 +63,7 @@ CONTAINS
     INTEGER :: a(N)
     INTEGER :: share, errors, x
     errors = 0
-    share = -1
+    share = 5
 
     DO x = 1, N
        a(x) = x
@@ -72,12 +72,6 @@ CONTAINS
     !$omp target data map(tofrom: a(1:N), share)
     !$omp target teams distribute default(shared) defaultmap(tofrom:scalar)
     DO x = 1, N
-       IF (omp_get_team_num() .eq. 0) THEN
-          share = 5
-          !$omp flush
-       END IF
-       !$omp barrier
-       !$omp flush
        a(x) = a(x) + share
     END DO
     !$omp end target data
