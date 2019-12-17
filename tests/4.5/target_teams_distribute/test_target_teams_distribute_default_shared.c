@@ -47,18 +47,12 @@ int main() {
   }
   OMPVV_TEST_AND_SET_VERBOSE(errors, (share != 0));
     
-  share = -1;
+  share = 5;
 
 #pragma omp target data map(tofrom: a[0:N]) map(tofrom: share)
   {
 #pragma omp target teams distribute default(shared) defaultmap(tofrom:scalar)
     for (int x = 0; x < N; ++x) {
-      if (omp_get_team_num() == 0) {
-	share = 5;
-#pragma omp flush
-      }
-#pragma omp barrier
-#pragma omp flush
       a[x] = a[x] + share;
     }
   }
