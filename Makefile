@@ -18,9 +18,12 @@ endif
 # System specific varibles can be specified
 # in the system files sys/system/###.def
 #################################################
-ifdef SYSTEM
-	-include sys/systems/$(SYSTEM).def
+ifdef OMPVV_SYSTEM
+	SYSTEM = ${OMPVV_SYSTEM}
+else
+	SYSTEM ?= generic
 endif
+-include sys/systems/$(SYSTEM).def
 
 include sys/make/make.def
 
@@ -65,6 +68,7 @@ endif
 RUN_TEST=$(CURDIR)/sys/scripts/run_test.sh
 RESULTS_ANALYZER=$(CURDIR)/sys/scripts/createSummary.py
 RESULTS_JSON_OUTPUT_FILE=results.json
+RESULTS_CSV_OUTPUT_FILE=results.csv
 RESULTS_HTML_OUTPUT_FOLDER=results_report
 RESULTS_HTML_REPORT_TEMPLATE=$(CURDIR)/sys/results_template
 
@@ -86,8 +90,8 @@ $(info SOURCES = $(notdir $(SOURCES_C) $(SOURCES_CPP) $(SOURCES_F)))
 # Obtain the list of files that were previously
 # compiled based on the subsection of tests
 TESTS_TO_RUN := $(foreach testName, \
-									$(notdir $(SOURCES_C) $(SOURCES_CPP) $(SOURCES_F)), \
-									$(shell test -d $(BINDIR) && find $(BINDIR) -name "$(testName)*"))
+                  $(notdir $(SOURCES_C) $(SOURCES_CPP) $(SOURCES_F)), \
+                  $(shell test -d $(BINDIR) && find $(BINDIR) -name "$(testName)*"))
 TESTS_TO_RUN := $(TESTS_TO_RUN:.FOR.o=.FOR.FOR.o) # Adding .FOR.o to fortran
 TESTS_TO_RUN := $(TESTS_TO_RUN:.F90.o=.F90.FOR.o)
 TESTS_TO_RUN := $(TESTS_TO_RUN:.F95.o=.F95.FOR.o)
@@ -139,13 +143,13 @@ SOURCES_F := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -name "*.F90" -o -name 
 
 # Find all the binary files that have been previously compiled
 TESTS_TO_RUN := $(shell test -d $(BINDIR) && \
-												find $(BINDIR) -name "*.F90.o" \
-												-o -name "*.F95.o" \
-												-o -name "*.F03.o" \
-												-o -name "*.F.o" \
-												-o -name "*.FOR.o" \
-												-o -name "*.c.o" \
-												-o -name "*.cpp.o")
+                        find $(BINDIR) -name "*.F90.o" \
+                        -o -name "*.F95.o" \
+                        -o -name "*.F03.o" \
+                        -o -name "*.F.o" \
+                        -o -name "*.FOR.o" \
+                        -o -name "*.c.o" \
+                        -o -name "*.cpp.o")
 TESTS_TO_RUN := $(TESTS_TO_RUN:.FOR.o=.FOR.FOR.o) # Adding .FOR.o to fortran
 TESTS_TO_RUN := $(TESTS_TO_RUN:.F90.o=.F90.FOR.o)
 TESTS_TO_RUN := $(TESTS_TO_RUN:.F95.o=.F95.FOR.o)
@@ -187,16 +191,6 @@ endif
 
 endif
 
-# parameters (1) Action (2) System (3) Filename (4) other Info (compiler) (5) Log File
-define log_section_header
-  -$(if $(LOG), @echo -e "*-*-*BEGIN*-*-*"$(1)"*-*-*$$(date)*-*-*"$(2)"*-*-*"$(3)"*-*-*"$(4)"*-*-*" >> $(LOGDIR)/$(5);,)
-endef
-
-# parameters (1) Action (2) System (3) Output status  (4) other Info (compiler) (5) Log File
-define log_section_footer
-  -$(if $(LOG), @echo -e "*-*-*END*-*-*"$(1)"*-*-*$$(date)*-*-*"$(2)"*-*-*"$(3)"*-*-*"$(4)"\n" >> $(LOGDIR)/$(5);,)
-endef
-
 .PHONY: all
 all: MessageDisplay $(ALL_DEP)
 	@echo "====COMPILE AND RUN DONE===="
@@ -219,23 +213,15 @@ MessageDisplay:
 	@echo "    ====    SOLLVE PROJECT MAKEFILE   ====   "
 	@echo "Running make with the following compilers"
 ifneq "$(CC)" "none"
-	@echo "CC = "$(CC) $(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") ${C_VERSION})
+	@echo "CC = $(CC) $(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") ${C_VERSION})"
 endif
 ifneq "$(CXX)" "none"
-	@echo "CXX = "$(CXX) $(shell $(call loadModules,$(CXX_COMPILER_MODULE),"shut up") ${CXX_VERSION})
+	@echo "CXX = $(CXX) $(shell $(call loadModules,$(CXX_COMPILER_MODULE),"shut up") ${CXX_VERSION})"
 endif
 ifneq "$(FC)" "none"
-	@echo "FC = "$(FC) $(shell $(call loadModules,$(F_COMPILER_MODULE),"shut up") ${F_VERSION})
+	@echo "FC = $(FC) $(shell $(call loadModules,$(F_COMPILER_MODULE),"shut up") ${F_VERSION})"
 endif
 	$(if $(MODULE_LOAD), @echo "C_MODULE = "$(C_COMPILER_MODULE); echo "CXX_MODULE = "$(CXX_COMPILER_MODULE); echo "F_MODULE = "$(F_COMPILER_MODULE),)
-
-##################################################
-# Loading modules
-##################################################
-
-define loadModules
-	$(if $(MODULE_LOAD), module load $(1) $(CUDA_MODULE) $(if $(or $(QUIET), $(2)), > /dev/null 2> /dev/null,);,)
-endef
 
 ##################################################
 # Turn off offloading
@@ -352,10 +338,19 @@ $(BINDIR):
 $(LOGDIR):
 	mkdir $@
 
+$(RESULTS_CSV_OUTPUT_FILE):
+	@echo "Creating $(RESULTS_CSV_OUTPUT_FILE) file"
+	@echo "Currently we only support run logs that contain compilation and run outputs. Use the 'make all' rule to obtain these"
+	@$(RESULTS_ANALYZER) -r -f csv -o $(RESULTS_CSV_OUTPUT_FILE) $(LOGDIRNAME)/*
+
 $(RESULTS_JSON_OUTPUT_FILE):
 	@echo "Creating $(RESULTS_JSON_OUTPUT_FILE) file"
 	@echo "Currently we only support run logs that contain compilation and run outputs. Use the 'make all' rule to obtain these"
 	@$(RESULTS_ANALYZER) -r -f json -o $(RESULTS_JSON_OUTPUT_FILE) $(LOGDIRNAME)/*
+
+.PHONY: report_csv
+report_csv: $(RESULTS_CSV_OUTPUT_FILE)
+	@echo " === REPORT DONE === "
 
 .PHONY: report_json
 report_json: $(RESULTS_JSON_OUTPUT_FILE)
@@ -366,7 +361,7 @@ report_summary:
 	@$(RESULTS_ANALYZER) -r -f summary $(LOGDIRNAME)/*
 
 .PHONY: report_html
-report_html: $(RESULTS_JSON_OUTPUT_FILE)
+report_html: $(RESULTS_JSON_OUTPUT_FILE) $(RESULTS_CSV_OUTPUT_FILE)
 	@if [ -d "./$(RESULTS_HTML_OUTPUT_FOLDER)" ]; then \
     echo "A report exist already. Please move it before creating a new one"; \
 	 else \
@@ -375,6 +370,7 @@ report_html: $(RESULTS_JSON_OUTPUT_FILE)
 		echo " folder $(RESULTS_HTML_OUTPUT_FOLDER) created"; \
 	  cp -r $(RESULTS_HTML_REPORT_TEMPLATE)/* $(RESULTS_HTML_OUTPUT_FOLDER); \
 		echo " template copied"; \
+		mv $(RESULTS_CSV_OUTPUT_FILE) $(RESULTS_HTML_OUTPUT_FOLDER); \
 		mv $(RESULTS_JSON_OUTPUT_FILE) $(RESULTS_HTML_OUTPUT_FOLDER); \
 		sed -i "1s/.*/var jsonResults = \[/g" $(RESULTS_HTML_OUTPUT_FOLDER)/$(RESULTS_JSON_OUTPUT_FILE); \
 		sed -i "$$ s/.*/];/g" $(RESULTS_HTML_OUTPUT_FOLDER)/$(RESULTS_JSON_OUTPUT_FILE); \
@@ -390,6 +386,11 @@ clean: clear_fortran_mod
 .PHONY: clear_fortran_mod
 clear_fortran_mod:
 	- rm -f ./ompvv/*.mod
+
+.PHONY: tidy
+tidy: clean
+	- rm -rf $(LOGDIRNAME)
+	- rm -rf $(RESULTS_HTML_OUTPUT_FOLDER)
 
 .PHONY: compilers
 compilers:
@@ -428,8 +429,13 @@ help:
 	@echo "    Compile the specific SOURCES files. If none is specified compile all the OpenMP test files"
 	@echo "  clean"
 	@echo "    Remove all executables from bin/ directory"
+	@echo "  tidy"
+	@echo "    Remove all log files, reports, and executable code (implies clean)"
 	@echo "  compilers"
 	@echo "    Shows available compiler configuration"
+	@echo "  report_csv"
+	@echo "    create a csv file containing the results existing in the logs files inside the $(LOGDIRNAME) folder"
+	@echo "    currently we only support runs that contain output for compile and run"
 	@echo "  report_json"
 	@echo "    create a json file containing the results existing in the logs files inside the $(LOGDIRNAME) folder"
 	@echo "    currently we only support runs that contain output for compile and run"

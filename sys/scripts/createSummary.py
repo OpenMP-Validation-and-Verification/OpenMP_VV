@@ -93,13 +93,12 @@ class testResult:
 
   def convert2CSV(self):
     ''' Comma Separated Values printing '''
-    return "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s" \
-           % (self.testName.replace('\n',''), self.testPath.replace('\n',''), self.testSystem.replace('\n',''),
-           self.testComments.replace('\n',''), self.compilerName.replace('\n',''),
-           self.compilerCommand.replace('\n',''), self.startingCompilerDate.replace('\n',''), 
+    return '"%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s"' \
+           % (self.testSystem.replace('\n',''),self.testName.replace('\n',''), self.testPath.replace('\n',''),
+           self.compilerName.replace('\n',''), self.compilerCommand.replace('\n',''), self.startingCompilerDate.replace('\n',''),
            self.endingCompilerDate.replace('\n',''), self.compilerPass.replace('\n',''), self.compilerOutput.replace('\n',''),
-           str(self.runtimeOnly), self.binaryPath.replace('\n',''), self.startingRuntimeDate.replace('\n',''), 
-           self.endingRuntimeDate.replace('\n',''), self.runtimePass.replace('\n',''), self.runtimeOutput.replace('\n',''))
+           str(self.runtimeOnly), self.binaryPath.replace('\n',''), self.startingRuntimeDate.replace('\n',''),
+           self.endingRuntimeDate.replace('\n',''), self.runtimePass.replace('\n',''), self.runtimeOutput.replace('\n',''), self.testComments.replace('\n', ''))
 
   def convert2dict(self):
     ''' convert to dictionary, easier to jsonify '''
@@ -310,11 +309,11 @@ def main():
       formatedResults.append(result.convert2dict())
     formatedOutput = json.dumps(formatedResults,indent=2, sort_keys=True)
   elif args.format and args.format[0].lower() == 'csv':
-    formatedOutput = "testName, testPath, compilerName," \
+    formatedOutput = "testSystem, testName, testPath, compilerName," \
            "compilerCommand, startingCompilerDate," \
            "endingCompilerDate, compilerPass, compilerOutput," \
            "runtimeOnly, binaryPath, startingRuntimeDate," \
-           "endingRuntimeDate, runtimePass, runtimeOutput \n"
+           "endingRuntimeDate, runtimePass, runtimeOutput, testComments \n"
     for result in results:
       formatedOutput = formatedOutput + result.convert2CSV() + '\n'
   elif args.format and args.format[0].lower() == 'summary':
