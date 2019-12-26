@@ -20,16 +20,15 @@ int test_and() {
   char a[N];
   char result;
   char host_result;
-  // The below calculation is meant to ensure about half the test arrays will
-  // come out to true under the 'and' operator, and the rest false. For the and
-  // operator, a test array that comes out true requires every entry to be true, 
-  // which is why this margin is so close to 100%.
+      // The below calculation is meant to ensure about half the test arrays will
+      // come out to true under the 'and' operator, and the rest false. For the and
+      // operator, a test array that comes out true requires every entry to be true, 
+      // which is why this margin is so close to 100%.
   double false_margin = pow(exp(1), log(.5)/N);
   int errors = 0;
   int num_teams[N];
   int warned = 0;
   srand(1);
-  printf("%lf\n", false_margin);
 
   for (int itr_count = 0; itr_count < 16; ++itr_count) {
     for (int x = 0; x < N; ++x) {
@@ -44,7 +43,7 @@ int test_and() {
     result = 1;
     host_result = 1;
 
-#pragma omp target teams distribute reduction(&&:result) map(to: a[0:N]) map(tofrom: result, num_teams[0:N])
+#pragma omp target teams distribute reduction(&&:result) defaultmap(tofrom:scalar)
     for (int x = 0; x < N; ++x) {
       num_teams[x] = omp_get_num_teams();
       result = result && a[x];

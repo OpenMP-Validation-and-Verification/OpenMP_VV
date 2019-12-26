@@ -13,14 +13,16 @@
 #include <stdlib.h>
 #include "ompvv.h"
 
-#define ARRAY_SIZE 128 //Array Size of 512 uses over 1 GB target memory and
+#define ARRAY_SIZE 128 //Array Size of 128 uses 16MB target memory and
                        //scales n^3 in test_collapse2()
 
-int test_collapse1(){
-  int a[ARRAY_SIZE][ARRAY_SIZE];
-  int b[ARRAY_SIZE][ARRAY_SIZE + 1];
+int test_collapse1() {
+
+  int * a_mem = malloc(ARRAY_SIZE*ARRAY_SIZE*sizeof(int));
+  int * b_mem = malloc(ARRAY_SIZE*(ARRAY_SIZE+1)*sizeof(int));
+  int (*a)[ARRAY_SIZE] = (int (*)[ARRAY_SIZE])a_mem;
+  int (*b)[ARRAY_SIZE + 1] = (int (*)[ARRAY_SIZE+1])b_mem;
   int errors = 0;
-  int is_host;
 
   // a and b array initialization
   for (int x = 0; x < ARRAY_SIZE; ++x) {
@@ -52,10 +54,11 @@ int test_collapse1(){
 }
 
 int test_collapse2() {
-  int a[ARRAY_SIZE][ARRAY_SIZE][ARRAY_SIZE];
-  int b[ARRAY_SIZE][ARRAY_SIZE][ARRAY_SIZE+1];
+  int * a_mem = malloc(ARRAY_SIZE*ARRAY_SIZE*ARRAY_SIZE*sizeof(int));
+  int * b_mem = malloc(ARRAY_SIZE*ARRAY_SIZE*(ARRAY_SIZE+1)*sizeof(int));
+  int (*a)[ARRAY_SIZE][ARRAY_SIZE] = (int (*)[ARRAY_SIZE][ARRAY_SIZE])a_mem;
+  int (*b)[ARRAY_SIZE][ARRAY_SIZE + 1] = (int (*)[ARRAY_SIZE][ARRAY_SIZE+1])b_mem;
   int errors = 0;
-  int is_host;
   int num_teams = 0;
 
   // a and b array initialization
@@ -73,8 +76,7 @@ int test_collapse2() {
   for (int x = 0; x < ARRAY_SIZE; ++x) {
     for (int y = 0; y < ARRAY_SIZE; ++y) {
       for (int z = 0; z < ARRAY_SIZE; ++z) {
-#pragma omp master
-	{
+	if (omp_get_team_num() == 0) {
 	  num_teams = omp_get_num_teams();
 	}
 	b[x][y][z + 1] = b[x][y][z] + a[x][y][z];
@@ -102,7 +104,6 @@ int test_collapse2() {
   return errors;
 }
 
-// Test for OpenMP 4.5 target data with if
 int main() {
   int errors = 0;
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_collapse1() != 0);

@@ -17,7 +17,7 @@
 int main() {
   int a[ARRAY_SIZE];
   int b[ARRAY_SIZE];
-  int num_teams = 0;
+  int num_teams[ARRAY_SIZE];
   int errors = 0;
   int is_offloading;
 
@@ -26,28 +26,31 @@ int main() {
   for (int x = 0; x < ARRAY_SIZE; ++x) {
     a[x] = 1;
     b[x] = x;
+    num_teams[x] = -1;
   }
 
-#pragma omp target data map(tofrom: a[0:ARRAY_SIZE], num_teams) map(to: b[0:ARRAY_SIZE])
+#pragma omp target data map(tofrom: a[0:ARRAY_SIZE], num_teams[0:ARRAY_SIZE]) map(to: b[0:ARRAY_SIZE])
   {
-#pragma omp target teams distribute map(alloc: a[0:ARRAY_SIZE], b[0:ARRAY_SIZE], num_teams)
+#pragma omp target teams distribute map(alloc: a[0:ARRAY_SIZE], b[0:ARRAY_SIZE], num_teams[0:ARRAY_SIZE])
     for (int x = 0; x < ARRAY_SIZE; ++x) {
-#pragma omp master
-      {
-	num_teams = omp_get_num_teams();
-      }
+      num_teams[x] = omp_get_num_teams();
       a[x] += b[x];
     }
   }
 
+
   for (int x = 0; x < ARRAY_SIZE; ++x) {
+    if (x > 0 && num_teams[x] != num_teams[x - 1]) {
+      OMPVV_ERROR("Test reported an inconsistent number of teams between loop iterations.");
+      errors += 1;
+    }
     OMPVV_TEST_AND_SET_VERBOSE(errors, (a[x] != 1 + b[x]));
     if (a[x] != 1 + b[x]){
       break;
     }
   }
 
-  if (num_teams == 1) {
+  if (num_teams[0] == 1) {
     OMPVV_WARNING("Test operated with one team.  Parallelism of teams distribute can't be guaranteed.");
   }
 
