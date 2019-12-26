@@ -50,14 +50,10 @@ CONTAINS
     !$omp end target data
 
     DO x = 1, N
-       IF (c(x) .ne. a(x)) THEN
-          errors = errors + 1
-       END IF
+       OMPVV_TEST_AND_SET(errors, c(x) .ne. a(x))
     END DO
 
-    IF (privatized .ne. (a(N) - b(N))) THEN
-       errors = errors + 1
-    END IF
+    OMPVV_TEST_AND_SET(errors, privatized .ne. (a(N) - b(N)))
 
     test_scalar = errors
   END FUNCTION test_scalar
@@ -85,12 +81,8 @@ CONTAINS
     END DO
     !$omp end target data
 
-    IF (privatized(1) .ne. a(N) + b(N) + c(N)) THEN
-       errors = errors + 1
-    END IF
-    IF (privatized(2) .ne. (a(N) + b(N)) * c(N)) THEN
-       errors = errors + 1
-    END IF
+    OMPVV_TEST_AND_SET(errors, privatized(1) .ne. a(N) + b(N) + c(N))
+    OMPVV_TEST_AND_SET(errors, privatized(2) .ne. (a(N) + b(N)) * c(N))
 
     test_array = errors
   END FUNCTION test_array
