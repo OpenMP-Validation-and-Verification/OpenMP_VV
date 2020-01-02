@@ -18,7 +18,7 @@
 #define N 1000
 
 int main() {
-  int errors = 0, isHost = 0, map_dummy;
+  int errors = 0, map_dummy;
   int *array_device = NULL;
   int *array_host = NULL;
 
