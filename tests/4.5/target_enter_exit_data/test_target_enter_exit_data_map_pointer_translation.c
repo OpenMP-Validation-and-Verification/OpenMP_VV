@@ -137,5 +137,5 @@ int main() {
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_map_same_function());
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_map_different_function());
-  return errors;
+  OMPVV_REPORT_AND_RETURN(errors);
 }
