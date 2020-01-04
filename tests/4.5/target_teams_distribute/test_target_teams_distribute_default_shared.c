@@ -36,7 +36,9 @@ int main() {
   {
 #pragma omp target teams distribute default(shared) defaultmap(tofrom:scalar)
     for (int x = 0; x < N; ++x) {
-      num_teams = omp_get_num_teams();
+      if (omp_get_team_num() == 0) {
+	num_teams = omp_get_num_teams();
+      }
 #pragma omp atomic
       share = share + a[x];
     }
@@ -64,9 +66,7 @@ int main() {
     }
   }
 
-  if (num_teams == 1) {
-    OMPVV_WARNING("Test operated on one team, results of default shared test are inconclusive.");
-  }
+  OMPVV_WARNING_IF(num_teams == 1, "Test operated on one team, results of default shared test are inconclusive.");
 
   OMPVV_REPORT_AND_RETURN(errors);
 }

@@ -45,7 +45,9 @@ CONTAINS
     !$omp target data map(to: a(1:N)) map(tofrom: share, num_teams)
     !$omp target teams distribute default(shared) defaultmap(tofrom:scalar)
     DO x = 1, N
-       num_teams = omp_get_num_teams()
+       IF (omp_get_team_num() .eq. 0) THEN
+          num_teams = omp_get_num_teams()
+       END IF
        !$omp atomic
        share = share + a(x)
     END DO
@@ -54,6 +56,8 @@ CONTAINS
     DO x = 1, N
        share = share - x
     END DO
+
+    OMPVV_WARNING_IF(num_teams .eq. 1, "Test operated on one team, results of default shared test are inconclusive.")
 
     OMPVV_TEST_AND_SET(errors, share .ne. 0)
     default_shared1 = errors
