@@ -4,8 +4,8 @@
 !
 ! This test uses the default(shared) clause on a target teams distribute
 ! directive.  The test aims to validate that when the default(shared) clause
-! is present, that all variables without explicit data sharing attributes
-! will be shared within the region.  To test this, we test that a data element
+! is present, all variables without explicit data sharing attributes will
+! be shared within the region.  To test this, we test that a data element
 ! that should be shared due to the default(shared) clause is available to
 ! all the teams.  The first test uses atomic to write to the variable without
 ! race conditions.  The second test uses synchronization constructs to have
