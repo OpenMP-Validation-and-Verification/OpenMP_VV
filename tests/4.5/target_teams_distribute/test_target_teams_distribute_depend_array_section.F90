@@ -1,16 +1,11 @@
-!===--- test_target_teams_distribute_depend.F90-----------------------------===//
+!===--- test_target_teams_distribute_depend_array_section.F90---------------===//
 !
 ! OpenMP API Version 4.5 Nov 2015
 !
-! This test defines a series of functions that enumerate the possible
-! combinations of the interactions of the depends clause with the various
-! dependence-types: in, out, inout.  With each combination, it tests if
-! the dependence between them (if necessary) is forced.  If there is no
-! required dependence, then the test tries to see if race conditions between
-! the two independent target regions can be formed.  However, if it fails
-! to do so, it only issues a warning as this is both a imperfect test of
-! the independence and it is not requried that they both execute at the
-! same time.
+! This test checks if out-out dependency works even if the data in the list
+! is an array section. Both tasks are given the nowait clause to allow
+! for the possibility that they will be incorrectly run out of order. If the
+! two target teams ditribute loops run out of order, the test fails.
 !
 !//===----------------------------------------------------------------------===//
 #include "ompvv.F90"

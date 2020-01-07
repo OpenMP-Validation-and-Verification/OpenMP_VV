@@ -1,16 +1,11 @@
-//===--- test_target_teams_distribute_depend.c-------------------------------===//
+//===--- test_target_teams_distribute_depend_disjoint_section.c--------------===//
 //
 // OpenMP API Version 4.5 Nov 2015
 //
-// This test defines a series of functions that enumerate the possible
-// combinations of the interactions of the depends clause with the various
-// dependence-types: in, out, inout.  With each combination, it tests if
-// the dependence between them (if necessary) is forced.  If there is no
-// required dependence, then the test tries to see if race conditions between
-// the two independent target regions can be formed.  However, if it fails
-// to do so, it only issues a warning as this is both a imperfect test of
-// the independence and it is not requried that they both execute at the
-// same time.
+// This test checks the out-out dependency of two tasks when the array
+// sections in the depend lists are disjoint (non-overlapping). If no race
+// condition can be shown, then the test gives only a warning, since this is
+// still complaint. This test will always pass.
 //
 ////===----------------------------------------------------------------------===//
 
@@ -37,11 +32,11 @@ int test_target_teams_distribute_depend_disjoint_section() {
 
 #pragma omp target data map(to: a[0:N], b[0:N]) map(tofrom: c[0:N])
   {
-#pragma omp target teams distribute nowait depend(in: c[0:N/2]) map(alloc: a[0:N], b[0:N], c[0:N])
+#pragma omp target teams distribute nowait depend(out: c[0:N/2]) map(alloc: a[0:N], b[0:N], c[0:N])
     for (int x = 0; x < N; ++x) {
       c[x] += a[x] + b[x];
     }
-#pragma omp target teams distribute nowait depend(in: c[N/2:N/2]) map(alloc: a[0:N], b[0:N], c[0:N])
+#pragma omp target teams distribute nowait depend(out: c[N/2:N/2]) map(alloc: a[0:N], b[0:N], c[0:N])
     for (int x = 0; x < N; ++x) {
       c[x] += 2 * (a[x] + b[x]);
     }
@@ -57,7 +52,7 @@ int test_target_teams_distribute_depend_disjoint_section() {
   }
 
   if (!(all_valid == 1 && race_found == 1)) {
-    OMPVV_WARNING("Test could not prove asyncronous operations of tasks dependent on disjoint array sections");
+    OMPVV_WARNING("Test could not prove asynchronous operations of tasks dependent on disjoint array sections");
   }
   return 0;
 }
