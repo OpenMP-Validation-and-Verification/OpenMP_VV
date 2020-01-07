@@ -46,6 +46,7 @@ int test_target_teams_distribute_parallel_for_map_tofrom() {
     a[j] = 10;
     b[j] = 11;
     c[j] = 12;
+#pragma omp atomic write
     scalar_from = 13; // This is to avoid data races on a single scalar
   }
 
