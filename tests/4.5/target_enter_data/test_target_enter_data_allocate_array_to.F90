@@ -141,7 +141,7 @@
 
             ! Make sure it is not copied back
             IF (.NOT. isSharedEnv) THEN
-              OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my2DPtr /= 10))
+              OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my3DPtr /= 10))
             END IF
             OMPVV_TEST_AND_SET_VERBOSE(errors, SUM(my3DArr) /= (N**6+N**3)/2)
 
