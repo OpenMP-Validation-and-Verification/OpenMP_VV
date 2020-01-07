@@ -1,3 +1,17 @@
+//===--- test_target_map_devices.c --- target map to multiple devces ---------===//
+//
+// OpenMP API Version 4.5 Nov 2015
+//
+//  This test checks for data mapping on multiple devices when using the target
+//  directive. It makes sure that data mapping is happening on each device
+//  through the use of omp_set_default_device as well as the device() clause
+//
+//  Since OpenMP 4.5 does not have an API call to obtain the current device, 
+//  this test does not guarantee that the execution devices are different. 
+//  
+//  Last modified by Jose M Monsalve Diaz, December 25, 2019
+//
+////===----------------------------------------------------------------------===//
 #include <assert.h>
 #include <omp.h>
 #include <stdio.h>
