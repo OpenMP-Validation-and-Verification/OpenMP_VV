@@ -68,14 +68,14 @@ int test_target_teams_distribute_depend_in_out() {
 	return 1;
       }
       else {
-	OMPVV_ERROR("Test of depend(inout) task becoming dependent task of depend(in) task did not pass with offloading %s", (isOffloading ? "enabled" : "disabled"))
-	  return 1;
+	OMPVV_ERROR("Test of depend(inout) task becoming dependent task of depend(in) task did not pass with offloading %s", (isOffloading ? "enabled" : "disabled"));
+	return 1;
       }
     }
   }
   if (errors == 1) {
-    OMPVV_ERROR("Test of depend(out) task becoming dependent task of depend(in) task did not pass with offloading %s", (isOffloading ? "enabled" : "disabled"))
-      return 1;
+    OMPVV_ERROR("Test of depend(out) task becoming dependent task of depend(in) task did not pass with offloading %s", (isOffloading ? "enabled" : "disabled"));
+    return 1;
   }
   else {
     return 0;
@@ -87,8 +87,6 @@ int main() {
   int isOffloading = 0;
   OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
   errors += test_target_teams_distribute_depend_in_out();
-  if (errors != 0) {
-    OMPVV_INFOMSG("Test passed with offloading %s", (isOffloading ? "enabled" : "disabled"));
-  }
+  OMPVV_INFOMSG(errors != 0, "Test passed with offloading %s", (isOffloading ? "enabled" : "disabled"));
   OMPVV_REPORT_AND_RETURN(errors);
 }

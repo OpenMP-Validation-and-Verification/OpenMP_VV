@@ -50,10 +50,9 @@ int test_target_teams_distribute_depend_disjoint_section() {
       race_found = 1;
     }
   }
-
-  if (!(all_valid == 1 && race_found == 1)) {
-    OMPVV_WARNING("Test could not prove asynchronous operations of tasks dependent on disjoint array sections");
-  }
+  
+  OMPVV_WARNING_IF(!(all_valid == 1 && race_found == 1), "Test could not prove asynchronous operations of tasks dependent on disjoint array sections");
+  
   return 0;
 }
 
@@ -62,8 +61,6 @@ int main() {
   int isOffloading = 0;
   OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
   errors += test_target_teams_distribute_depend_disjoint_section();
-  if (errors != 0) {
-    OMPVV_INFOMSG("Test passed with offloading %s", (isOffloading ? "enabled" : "disabled"));
-  }
+  OMPVV_INFOMSG_IF(errors != 0, "Test passed with offloading %s", (isOffloading ? "enabled" : "disabled"));
   OMPVV_REPORT_AND_RETURN(errors);
 }

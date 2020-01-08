@@ -51,9 +51,7 @@ int test_target_teams_distribute_depend_in_in() {
     }
   }
 
-  if (!(all_valid == 1 && race_found == 1)) {
-    OMPVV_WARNING("Test could not prove asyncronous operations of depend(in) task with other depend(in) task with offloading %s", (isOffloading ? "enabled" : "disabled"));
-  }
+  OMPVV_WARNING_IF(!(all_valid == 1 && race_found == 1), "Test could not prove asyncronous operations of depend(in) task with other depend(in) task with offloading %s", (isOffloading ? "enabled" : "disabled"));
   return 0;
 }
 int main() {
@@ -61,8 +59,6 @@ int main() {
   int isOffloading = 0;
   OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
   errors += test_target_teams_distribute_depend_in_in();
-  if (errors != 0) {
-    OMPVV_INFOMSG("Test passed with offloading %s", (isOffloading ? "enabled" : "disabled"));
-  }
+  OMPVV_INFOMSG_IF(errors != 0, "Test passed with offloading %s", (isOffloading ? "enabled" : "disabled"));
   OMPVV_REPORT_AND_RETURN(errors);
 }

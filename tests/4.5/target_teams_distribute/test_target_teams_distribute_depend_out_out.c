@@ -132,8 +132,6 @@ int main() {
   int isOffloading = 0;
   OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
   errors += test_target_teams_distribute_depend_out_out();
-  if (errors != 0) {
-    OMPVV_INFOMSG("Test passed with offloading %s", (isOffloading ? "enabled" : "disabled"));
-  }
+  OMPVV_INFOMSG(errors != 0, "Test passed with offloading %s", (isOffloading ? "enabled" : "disabled"));
   OMPVV_REPORT_AND_RETURN(errors);
 }
