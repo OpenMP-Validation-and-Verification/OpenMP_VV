@@ -1,144 +1,145 @@
-/* This test creates a linked list, maps it to a device 
- * (if available) and modidifies the data on the device. 
- * The data is mapped back and contents are verified 
- * 
- * Last modified by Swaroop Pophale, October 2, 2017
- */
+//===---linked_list.c--- Test that implements a linked list in the device-----===//
+//
+// OpenMP API Version 4.5 Nov 2015
+//
+//
+//  This test creates a linked list, maps it to a device 
+//  (if available) and modidifies the data on the device. 
+//  The data is mapped back and contents are verified 
+//  
+//  Last modified by Jose M Monsalve Diaz, December 24, 2019
+//
+////===----------------------------------------------------------------------===//
 
 #include <stdlib.h>
 #include <omp.h>
 #include <stdio.h>
+#include "ompvv.h"
+
+#define SIZE_LIST 10
 
 typedef struct node {
-    int data;
-    struct node *next;
+  int data;
+  struct node *next;
 } node_t;
 
-int  map_ll(node_t * head) {
-    int i, isHost = -1, exeW[2]={-1,-1};
- //   printf("Entering map_ll\n");
+void map_ll(node_t * head) {
+  OMPVV_INFOMSG("Entering map_ll");
+  int i;
 
-    node_t * temp = head;
-    if (!temp) return(2);
+  node_t * temp = head;
+  if (!temp) {
+    OMPVV_ERROR("Head was null");
+    return;
+  }
 
-    #pragma omp target enter data map(to:temp[:1])
-    #pragma omp target map(tofrom: isHost, exeW)
+#pragma omp target enter data map(to:temp[:1])
+#pragma omp target 
+  {
+    temp->data += 1;  
+  }
+  while(temp->next) {
+    //version 1
+    // Note: using array dereference syntax, array section on leaf only
+    // Attachment is *not* explicitly guaranteed
+    //#pragma omp target enter data map(to:head[0].next[:1])
+    //version 2
+    //user does an explicit attachment, this is unequivocally correct code
+    //but rather slower and nastier.
+    node_t * cur = temp->next;
+#pragma omp target enter data map(to:cur[:1])
+#pragma omp target 
     {
-      isHost = omp_is_initial_device();
-      exeW[0] = (isHost == 0)? 1 : 0; // 1 = device, 0 = host
-      temp->data += 1;  
+      cur->data += 1;
+      temp->next = cur;
     }
-    isHost=-1;
-    while(temp->next) {
-        //version 1
-        // Note: using array dereference syntax, array section on leaf only
-        // Attachment is *not* explicitly guaranteed
-        //#pragma omp target enter data map(to:head[0].next[:1])
-        //version 2
-        //user does an explicit attachment, this is unequivocally correct code
-        //but rather slower and nastier.
-        node_t * cur = temp->next;
-        #pragma omp target enter data map(to:cur[:1])
-        #pragma omp target map(tofrom: isHost, exeW)
-        {
-            isHost = omp_is_initial_device();
-            exeW[1] = (isHost == 0)? 1 : 0; // 1 = device, 0 = host
-            cur->data += 1;
-            temp->next = cur;
-        }
-        temp=temp->next;
-    }
-    //printf("Executed on %s\n",(exeW[0] && exeW[1])? "device":"host");
-    return((exeW[0] && exeW[1])? 1:0);
+    temp=temp->next;
+  }
 }
+
 void unmap_ll(node_t * head) {
-    node_t * temp = head, *tempNext;
-    if (!temp) return;
+  OMPVV_INFOMSG("Entering unmap_ll");
+  node_t * temp = head, *tempNext;
+
+  if (!temp) {
+    OMPVV_ERROR("Head was null");
+    return;
+  }
+
+  tempNext = temp->next;
+#pragma omp target exit data map(from:temp[0:1])
+  temp->next = tempNext;
+  while(temp->next) {
+    // Note: only copies back the data element to avoid overwriting next
+    // pointer
+
+    temp = temp->next;
+    // Save broken link
     tempNext = temp->next;
-    #pragma omp target exit data map(from:temp[0:1])
+#pragma omp target exit data map(from: temp[0:1])
+    // Fix broken link
     temp->next = tempNext;
-    while(temp->next) {
-        // Note: only copies back the data element to avoid overwriting next
-        // pointer
-        
-    	temp = temp->next;
-	// Save broken link
-    	tempNext = temp->next;
-        #pragma omp target exit data map(from: temp[0:1])
-	// Fix broken link
-	temp->next = tempNext;
-    }
-    //printf("Leaving unmap_ll\n");
+  }
 }
 void push(node_t * head, int data) {
-    //printf("Entering push\n");
-    node_t * current = head;
-    while (current->next != NULL) {
-        current = current->next;
-    }
+  node_t * current = head;
+  while (current->next != NULL) {
+    current = current->next;
+  }
 
-    /* now we can add a new variable */
-    current->next = (node_t *) malloc(sizeof(node_t));
-    current->next->data = data;
-    current->next->next = NULL;
-    //printf("Leaving push\n");
+  // now we can add a new variable
+  current->next = (node_t *) malloc(sizeof(node_t));
+  current->next->data = data;
+  current->next->next = NULL;
 }
 
 void display(node_t * head)
 {
-    //printf("Entering display\n");
-    node_t * temp=head;
-    while(temp!=NULL)
-    {
+  node_t * temp=head;
+  while(temp!=NULL)
+  {
     printf("%d\n",temp->data);
     temp=temp->next;
-    }
-    //printf("Leaving display\n");
+  }
 }
 
 int check(node_t * head)
 {
-    //printf("Entering check\n");
-    int error = 0, i=0;
-    node_t * temp=head;
-    while(temp!=NULL)
-    {
-      if(temp->data != i+1)
-        error=1;
-      i++;  
-      temp=temp->next;
-    }
-   return(error);
+  OMPVV_INFOMSG("Entering check");
+  int error = 0, i=0;
+  node_t * temp=head;
+  while(temp!=NULL)
+  {
+    OMPVV_TEST_AND_SET_VERBOSE(error, temp->data != i+1);
+    i++;  
+    temp=temp->next;
+  }
+  return error;
 }
 
 int main() {
-    int i, exeW, error=-1;
-    node_t * head = NULL;
-    head = (node_t *)malloc(sizeof(node_t));
-    if (head == NULL) {
-        return 1;
-    }
-    
-    head->data = 0;
-    head->next = NULL;
-    
-    for(i=1;i<10;i++)
-      push(head,i);
 
-    //display(head);
+  OMPVV_TEST_OFFLOADING;
+  int i, error = 0;
+  node_t * head = NULL;
+  head = (node_t *) malloc(sizeof(node_t));
+  if (head == NULL) {
+    OMPVV_ERROR("There was a problem allocating the head node");
+    return 1;
+  }
 
-    exeW = map_ll(head);
-    if(exeW == 2)
-      printf("ERROR: Head is NULL. Test not executed.\n");
-    unmap_ll(head);
-    if(check(head))
-      printf("Test failed on %s\n",exeW > 0? "device":"host");
-    else
-      printf("Test passed on %s\n",exeW > 0? "device":"host");
-    
+  head->data = 0;
+  head->next = NULL;
 
-    //display(head);
+  for(i=1; i < SIZE_LIST; i++)
+    push(head,i);
 
-return 0;
+  map_ll(head);
+  unmap_ll(head);
+  
+  OMPVV_TEST_AND_SET_VERBOSE(error, check(head));
+
+  OMPVV_REPORT_AND_RETURN(error);
+  return 0;
 }
 

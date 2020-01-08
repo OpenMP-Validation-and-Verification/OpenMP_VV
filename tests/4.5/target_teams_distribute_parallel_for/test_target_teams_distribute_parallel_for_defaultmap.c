@@ -79,7 +79,7 @@ int test_defaultmap_on() {
   return errors;
 }
 
-int test_defaultmap_off(int isOffloading, int isShared) {
+int test_defaultmap_off() {
   OMPVV_INFOMSG("test_defaultmap_off");
   
   int errors = 0;
@@ -119,7 +119,7 @@ int test_defaultmap_off(int isOffloading, int isShared) {
     OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_enum_cpy[i] != VAL1);
   }
   // Map the same array to multiple devices. initialize with device number
-#pragma omp target teams distribute parallel for map(from: isOffloading)
+#pragma omp target teams distribute parallel for 
   for (i = 0; i < ITERATIONS; ++i) {
       scalar_char = 'b';
       scalar_short = 20;
@@ -129,37 +129,21 @@ int test_defaultmap_off(int isOffloading, int isShared) {
       scalar_enum = VAL4;
   } // end of omp target 
   
-  // If it is initial device then we will modify the original memory region
-  if (!isOffloading || isShared) {
-    OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_char != 'b');
-    OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_short != 20);
-    OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_int != 33);
-    OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(scalar_float - 6.5f) > 0.0001);
-    OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(scalar_double - 20.45) > 0.0001);
-    OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_enum != VAL4);
-  } else {
-    OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_char != 'a');
-    OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_short != 10);
-    OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_int != 11);
-    OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(scalar_float - 5.5f) > 0.0001);
-    OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(scalar_double - 10.45) > 0.0001);
-    OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_enum != VAL1);
-  }
+  OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_char != 'a');
+  OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_short != 10);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_int != 11);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(scalar_float - 5.5f) > 0.0001);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(scalar_double - 10.45) > 0.0001);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_enum != VAL1);
   
   return errors;
 }
 int main() {
-  int isOffloading, isShared;
-  OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
-  OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(isShared);
-
-
-  OMPVV_WARNING_IF(!isOffloading, "Test running on host. Do not test defaultmap");
-  OMPVV_WARNING_IF(isOffloading && isShared, "Test running on shared data environment. Do not test defaultmap");
+  OMPVV_TEST_OFFLOADING;
 
   int errors = 0;
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_defaultmap_on());
-  OMPVV_TEST_AND_SET_VERBOSE(errors, test_defaultmap_off(isOffloading, isShared));
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_defaultmap_off());
 
   OMPVV_REPORT_AND_RETURN(errors);
 }
