@@ -183,18 +183,6 @@ int test_defaultmap_off() {
   OMPVV_INFOMSG("test_defaultmap_off");
 
   int errors = 0;
-  int* devtest = (int *)malloc(sizeof(int));
-
-  // Checking for sharedmemory environment
-  devtest[0] = 1;
-#pragma omp target enter data map(to: devtest[0:1])
-#pragma omp target map(alloc: devtest[0:1])
-  {
-    devtest[0] = 0;
-  }
-
-  OMPVV_WARNING_IF(devtest[0] == 0, "Shared memory environment. Scalars are not copied over but modified. This part of the tests is inconclusive");
-
 
   // we try with all the scalars
   char scalar_char = 'a';
@@ -401,16 +389,12 @@ int test_defaultmap_off() {
     }
   }
 
-  // If not shared memory, test if the scalars were not modified
-  if (devtest[0] == 1) {
-    OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_char != scalar_char_copy);
-    OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_short != scalar_short_copy);
-    OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_int != scalar_int_copy);
-    OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(scalar_float - scalar_float_copy) > .00001);
-    OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(scalar_double - scalar_double_copy) > .000000001);
-    OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_enum != scalar_enum_copy);
-  }
-
+  OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_char != scalar_char_copy);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_short != scalar_short_copy);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_int != scalar_int_copy);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(scalar_float - scalar_float_copy) > .00001);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(scalar_double - scalar_double_copy) > .000000001);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_enum != scalar_enum_copy);
 
   return errors;
 }
