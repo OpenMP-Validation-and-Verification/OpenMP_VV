@@ -32,17 +32,17 @@ int test_target_teams_distribute_depend_array_section() {
 
 #pragma omp target data map(to: a[0:N], b[0:N]) map(alloc: c[0:N]) map(from: d[0:N])
   {
-#pragma omp target teams distribute nowait depend(out: c[0:N - 1]) map(alloc: a[0:N], b[0:N], c[0:N])
+#pragma omp target teams distribute nowait depend(out: c[0:N]) map(alloc: a[0:N], b[0:N], c[0:N])
     for (int x = 0; x < N; ++x) {
       c[x] = a[x] + b[x];
     }
-#pragma omp target teams distribute nowait depend(out: c[0:N - 1]) map(alloc: b[0:N], c[0:N], d[0:N])
+#pragma omp target teams distribute nowait depend(out: c[0:N]) map(alloc: b[0:N], c[0:N], d[0:N])
     for (int x = 0; x < N; ++x) {
       d[x] = c[x] + b[x];
     }
   }
 
-  for (int x = 0; x < N - 1; ++x) {
+  for (int x = 0; x < N; ++x) {
     if (d[x] != 5 * x) {
       OMPVV_ERROR("Test of depend clause using array sections did not pass with offloading %s", (isOffloading ? "enabled" : "disabled"));
       return 1;
