@@ -106,18 +106,10 @@ int test_target_teams_distribute_depend_out_out() {
     }
   }
 
-  if (out_out_errors == 1) {
-    OMPVV_ERROR("Test of depend(out) task becoming dependent task of depend(out) task did not pass with offloading %s", (isOffloading ? "enabled" : "disabled"));
-  }
-  if (inout_out_errors == 1) {
-    OMPVV_ERROR("Test of depend(out) task becoming dependent task of depend(inout) task did not pass with offloading %s", (isOffloading ? "enabled" : "disabled"));
-  }
-  if (out_inout_errors == 1) {
-    OMPVV_ERROR("Test of depend(inout) task becoming dependent task of depend(out) task did not pass with offloading %s", (isOffloading ? "enabled" : "disabled"));
-  }
-  if (inout_inout_errors == 1) {
-    OMPVV_ERROR("Test of depend(inout) task becoming dependent task of depend(inout) task did not pass with offloading %s", (isOffloading ? "enabled" : "disabled"));
-  }
+  OMPVV_ERROR_IF(out_out_errors == 1, "Test of depend(out) task becoming dependent task of depend(out) task did not pass with offloading %s", (isOffloading ? "enabled" : "disabled"));
+  OMPVV_ERROR_IF(inout_out_errors == 1, "Test of depend(out) task becoming dependent task of depend(inout) task did not pass with offloading %s", (isOffloading ? "enabled" : "disabled"));
+  OMPVV_ERROR_IF(out_inout_errors == 1, "Test of depend(inout) task becoming dependent task of depend(out) task did not pass with offloading %s", (isOffloading ? "enabled" : "disabled"));
+  OMPVV_ERROR_IF(inout_inout_errors == 1, "Test of depend(inout) task becoming dependent task of depend(inout) task did not pass with offloading %s", (isOffloading ? "enabled" : "disabled"));
 
   if (inout_inout_errors + inout_out_errors + out_inout_errors + out_out_errors > 0) {
     return 1;
@@ -132,6 +124,6 @@ int main() {
   int isOffloading = 0;
   OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
   errors += test_target_teams_distribute_depend_out_out();
-  OMPVV_INFOMSG(errors != 0, "Test passed with offloading %s", (isOffloading ? "enabled" : "disabled"));
+  OMPVV_INFOMSG_IF(errors != 0, "Test passed with offloading %s", (isOffloading ? "enabled" : "disabled"));
   OMPVV_REPORT_AND_RETURN(errors);
 }
