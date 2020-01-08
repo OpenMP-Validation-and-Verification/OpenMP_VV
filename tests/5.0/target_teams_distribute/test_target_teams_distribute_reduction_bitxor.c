@@ -30,7 +30,7 @@ int test_bitxor() {
 
   unsigned int b = 0;
 
-#pragma omp target teams distribute reduction(^:b) defaultmap(tofrom:scalar)
+#pragma omp target teams distribute reduction(^:b) map(to: a[0:N]) map(tofrom: b, num_teams[0:N])
   for (int x = 0; x < N; ++x) {
     num_teams[x] = omp_get_num_teams();
     b = (b ^ a[x]);

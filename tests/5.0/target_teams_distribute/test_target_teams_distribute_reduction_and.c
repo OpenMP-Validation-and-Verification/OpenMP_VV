@@ -43,7 +43,7 @@ int test_and() {
     result = 1;
     host_result = 1;
 
-#pragma omp target teams distribute reduction(&&:result) defaultmap(tofrom:scalar)
+#pragma omp target teams distribute reduction(&&:result) map(to: a[0:N]) map(tofrom: result, num_teams[0:N])
     for (int x = 0; x < N; ++x) {
       num_teams[x] = omp_get_num_teams();
       result = result && a[x];

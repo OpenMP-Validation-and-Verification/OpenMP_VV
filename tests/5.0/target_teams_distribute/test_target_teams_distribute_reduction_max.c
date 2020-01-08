@@ -32,7 +32,7 @@ int test_max() {
 
   int result = 0;
 
-#pragma omp target teams distribute reduction(max:result) defaultmap(tofrom:scalar)
+#pragma omp target teams distribute reduction(max:result) map(to: a[0:N], b[0:N]) map(tofrom: result, num_teams[0:N])
   for (int x = 0; x < N; ++x) {
     result = fmax(a[x] + b[x], result);
     num_teams[x] = omp_get_num_teams();

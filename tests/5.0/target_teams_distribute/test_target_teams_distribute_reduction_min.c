@@ -32,7 +32,7 @@ int test_min() {
 
   int result = a[0] + b[0];
 
-#pragma omp target teams distribute reduction(min:result) defaultmap(tofrom:scalar)
+#pragma omp target teams distribute reduction(min:result) map(to: a[0:N], b[0:N]) map(tofrom: result, num_teams[0:N])
   for (int x = 0; x < N; ++x) {
     num_teams[x] = omp_get_num_teams();
     result = fmin(result, a[x] + b[x]);
