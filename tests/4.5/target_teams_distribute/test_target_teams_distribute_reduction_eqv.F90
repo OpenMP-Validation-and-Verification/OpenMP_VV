@@ -19,9 +19,9 @@ PROGRAM test_target_teams_distribute_device
   INTEGER :: errors
   errors = 0
 
-  OMPVV_TEST_OFFLOADING()
+  OMPVV_TEST_OFFLOADING
 
-  OMPVV_TEST_VERBSOE(test_eqv() .ne. 0)
+  OMPVV_TEST_VERBOSE(test_eqv() .ne. 0)
 
   OMPVV_REPORT_AND_RETURN()
 CONTAINS
@@ -48,7 +48,7 @@ CONTAINS
           host_result = a(x) .eqv. host_result
        END DO
 
-       !$omp target teams distribute reduction(eqv: &
+       !$omp target teams distribute reduction(.eqv.: &
        !$omp& result) defaultmap(tofrom:scalar)
        DO x = 1, N
           result = a(x) .eqv. result

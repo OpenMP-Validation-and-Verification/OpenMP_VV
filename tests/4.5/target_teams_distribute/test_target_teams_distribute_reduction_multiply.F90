@@ -19,45 +19,40 @@ PROGRAM test_target_teams_distribute_device
   INTEGER :: errors
   errors = 0
 
-  OMPVV_TEST_OFFLOADING()
-
+  OMPVV_TEST_OFFLOADING
 
   OMPVV_TEST_VERBOSE(test_multiply() .ne. 0)
 
   OMPVV_REPORT_AND_RETURN()
 CONTAINS
   INTEGER FUNCTION test_multiply()
-    INTEGER,DIMENSION(N, 8):: a
-    INTEGER,DIMENSION(N):: results, host_results
-    INTEGER:: x, y, errors
+    REAL(8),DIMENSION(N):: r
+    INTEGER,DIMENSION(N):: a
+    INTEGER:: x, y, errors, device_result, host_result
+
+    CALL RANDOM_SEED()
+    CALL RANDOM_NUMBER(r)
 
     errors = 0
-    host_results = 1
-    results = 1
 
     DO x = 1, N
-       DO y = 1, 8
-          a(x, y) = MOD(x, 8) + y
-       END DO
+       a(x) = INT(1 + (r(x) * 2))
     END DO
-
-    DO x = 1, N
-       DO y = 1, 8
-          host_results(x) = a(x, y) * host_results(x)
-       END DO
-    END DO
-
-    DO x = 1, N
+    
+    DO x = 1, N, 16
+       device_result = 1
        !$omp target teams distribute defaultmap(tofrom:scalar) &
-       !$omp& reduction(*:results(x))
-       DO y = 1, 8
-          results(x) = a(x, y) * results(x)
+       !$omp& reduction(*:device_result)
+       DO y = 1, 16
+          device_result = a(x + y) * device_result
        END DO
-    END DO
-
-    DO x = 1, N
-       IF (host_results(x) .ne. results(x)) THEN
-          errors = errors+ 1
+       host_result = 1
+       DO y = 1, 16
+          host_result = a(x + y) * host_result
+       END DO
+       OMPVV_TEST_AND_SET_VERBOSE(errors, host_result .ne. device_result)
+       IF (host_result .ne. device_result) THEN
+          exit
        END IF
     END DO
 

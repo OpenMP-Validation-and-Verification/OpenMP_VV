@@ -19,7 +19,7 @@ PROGRAM test_target_teams_distribute_device
   INTEGER :: errors
   errors = 0
 
-  OMPVV_TEST_OFFLOADING()
+  OMPVV_TEST_OFFLOADING
 
   OMPVV_TEST_VERBOSE(test_or() .ne. 0)
 

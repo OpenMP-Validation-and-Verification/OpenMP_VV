@@ -19,13 +19,14 @@ PROGRAM test_target_teams_distribute_device
   INTEGER :: errors
   errors = 0
 
-  OMPVV_TEST_OFFLOADING()
+  OMPVV_TEST_OFFLOADING
 
   OMPVV_TEST_VERBOSE(test_bitxor() .ne. 0)
 
   OMPVV_REPORT_AND_RETURN()
 CONTAINS
   INTEGER FUNCTION test_bitxor()
+    REAL(8),DIMENSION(N):: r
     INTEGER,DIMENSION(N):: a
     INTEGER:: result, host_result, x, y, errors
     errors = 0
@@ -33,16 +34,17 @@ CONTAINS
     CALL RANDOM_SEED()
 
     DO y = 1, 32
-       CALL RANDOM_NUMBER(a)
+       CALL RANDOM_NUMBER(r)
        host_result = 0
        result = 0
 
        DO x = 1, N
+          a(x) = INT(r(x) * 2)
           host_result = ieor(a(x), host_result)
        END DO
 
        !$omp target teams distribute defaultmap(tofrom:scalar) &
-       !$omp& reduction(ixor:result)
+       !$omp& reduction(ieor:result)
        DO x = 1, N
           result = ieor(a(x), result)
        END DO
