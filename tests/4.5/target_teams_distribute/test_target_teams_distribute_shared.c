@@ -8,13 +8,7 @@
 // the variable should be done atomically.  If the value is the correct value
 // at the end of the region, then all teams operated on the same variable.
 //
-// The second test sets the value of the shared value to a range of values.
-// Since the variable is being updated by each team, it is impossible to know
-// which value will be the last to be assigned to the variable.  However, we
-// test to make sure that the variable is assigned by one of the values that
-// could result from the operation.
-//
-// The third test, instead of writing to the variable, only reads from the
+// The second test, instead of writing to the variable, only reads from the
 // variable.  This tests that the value of the shared variable has not been
 // initiallized improperly or privatized.
 //
@@ -33,7 +27,6 @@ int main() {
   int a[SIZE];
   int share = 0;
   int errors = 0;
-  int prev_errors = errors;
   int num_teams;
 
   for (int x = 0; x < SIZE; ++x) {
@@ -56,8 +49,7 @@ int main() {
   }
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, (share != 0));
-  OMPVV_ERROR_IF(errors != prev_errors, "The value of share is = %d", share);
-  prev_errors = errors;
+  OMPVV_ERROR_IF(errors != 0, "The value of share is = %d", share);
 
   share = 5;
 
