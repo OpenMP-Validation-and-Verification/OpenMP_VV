@@ -1,5 +1,12 @@
+# NEWS!
+
+We have recently moved from Bitbucket into Github. The old Bitbucket repository is now a mirror of Github, it has been set up to read only and it will not be maintained any further. Any communication please use our [Github Repo](https://github.com/SOLLVE/sollve_vv)
+
 # Welcome
 
 Welcome to our SOLLVE project!
 
-For more information go to our [wiki](https://bitbucket.org/crpl_cisc/sollve_vv/wiki)
+For more information, publications, presentations and results, please check out our 
+[website](https://crpl.cis.udel.edu/ompvvsollve/) 
+
+For documentation please check out (https://crpl.cis.udel.edu/ompvvsollve/documentation)

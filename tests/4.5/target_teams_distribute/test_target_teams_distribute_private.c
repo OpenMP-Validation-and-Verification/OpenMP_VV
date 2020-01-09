@@ -29,29 +29,29 @@ int main() {
   int errors = 0;
 
   for (int x = 0; x < SIZE; ++x) {
-      a[x] = 1;
-      b[x] = x;
-      c[x] = 2*x;
-      d[x] = 0;
+    a[x] = 1;
+    b[x] = x;
+    c[x] = 2*x;
+    d[x] = 0;
   }
 
-  #pragma omp target data map(from: d[0:SIZE]) map(to: a[0:SIZE], b[0:SIZE], c[0:SIZE])
+#pragma omp target data map(from: d[0:SIZE]) map(to: a[0:SIZE], b[0:SIZE], c[0:SIZE])
   {
-      #pragma omp target teams distribute private(privatized) map(alloc: a[0:SIZE], b[0:SIZE], c[0:SIZE], d[0:SIZE])
-      for (int x = 0; x < SIZE; ++x){
-          privatized = 0;
-          for (int y = 0; y < a[x] + b[x]; ++y){
-              privatized++;
-          }
-          d[x] = c[x] * privatized;
+#pragma omp target teams distribute private(privatized) map(alloc: a[0:SIZE], b[0:SIZE], c[0:SIZE], d[0:SIZE])
+    for (int x = 0; x < SIZE; ++x) {
+      privatized = 0;
+      for (int y = 0; y < a[x] + b[x]; ++y) {
+	privatized++;
       }
+      d[x] = c[x] * privatized;
+    }
   }
 
-  for (int x = 0; x < SIZE; ++x){
-      OMPVV_TEST_AND_SET_VERBOSE(errors, d[x] != (1 + x) * 2 * x);
-      if (d[x] != (1 + x)*2*x){
-          break;
-      }
+  for (int x = 0; x < SIZE; ++x) {
+    OMPVV_TEST_AND_SET_VERBOSE(errors, d[x] != (1 + x) * 2 * x);
+    if (d[x] != (1 + x)*2*x) {
+      break;
+    }
   }
 
   OMPVV_REPORT_AND_RETURN(errors);
