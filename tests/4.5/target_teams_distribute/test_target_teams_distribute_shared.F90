@@ -69,6 +69,7 @@ CONTAINS
           OMPVV_ERROR("Shared variable read incorrectly")
           errors = errors + 1
           exit
+       END IF
     END DO
 
     test_shared = errors
