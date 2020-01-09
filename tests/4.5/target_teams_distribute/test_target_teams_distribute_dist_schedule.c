@@ -21,42 +21,66 @@
 
 int test_dist_schedule() {
   int errors = 0;
-  int num_teams_a, num_teams_b;
+  int num_teams;
   int a[N];
   int b[N];
-  int a_check[N];
-  int b_check[N];
 
   for (int i = 0; i < N; ++i) {
     a[i] = -1;
     b[i] = -1;
   }
 
-#pragma omp target teams distribute map(from: num_teams_a) map(tofrom: a[0:N]) dist_schedule(static, CHUNK_SIZE)
+#pragma omp target teams distribute map(from: num_teams) map(tofrom: a[0:N]) dist_schedule(static, CHUNK_SIZE)
   for (int i = 0; i < N; ++i) {
     if (omp_get_team_num() == 0) {
-      num_teams_a = omp_get_num_teams();
+      num_teams = omp_get_num_teams();
     }
     a[i] = omp_get_team_num();
   }
 
-  for (int i = 0; i < N; ++i) {
-    printf("%d ", a[i]);
+  if (num_teams < 1) {
+    OMPVV_WARNING("Cannot test dist_schedule(static, chunk_size) because num_teams was 1.");
+  } else if (num_teams < 1) {
+    OMPVV_ERROR("omp_get_num_teams() returned a value less than 1.");
+    return 1;
   }
-  printf("\n\n");
 
-#pragma omp target teams distribute map(from: num_teams_b) map(tofrom: b[0:N]) dist_schedule(static)
+  int counter = -1;
+  for (int i = 0; i < N; ++i) {
+    if (i % CHUNK_SIZE == 0) {
+      counter = (counter + 1) % num_teams;
+    }
+    if (a[i] != counter) {
+      OMPVV_ERROR("Loop iterations were not properly scheduled with specified chunk_size of %d.", CHUNK_SIZE);
+      errors++;
+      break;
+    }
+  }
+
+  num_teams = -1;
+
+#pragma omp target teams distribute map(from: num_teams) map(tofrom: b[0:N]) dist_schedule(static)
   for (int i = 0; i < N; ++i) {
     if (omp_get_team_num() == 0) {
-      num_teams_b = omp_get_num_teams();
+      num_teams = omp_get_num_teams();
     }
     b[i] = omp_get_team_num();
   }
 
-  for (int i = 0; i < N; ++i) {
-    printf("%d ", b[i]);
+  if (num_teams == 1) {
+    OMPVV_WARNING("Cannot test dist_schedule(static) because num_teams was 1.");
+  } else if (num_teams < 1) {
+    OMPVV_ERROR("omp_get_num_teams() returned a value less than 1.");
+    return 1;
   }
-  printf("\n");
+
+  for (int i = 1; i < N; ++i) {
+    if (a[i] < a[i - 1] || a[i] > (a[i - 1] + 1)) {
+      OMPVV_ERROR("Loop iterations were not properly sheduled with unspecified chunk_size.");
+      errors++;
+      break;
+    }
+  }
 
   return errors;
 }
