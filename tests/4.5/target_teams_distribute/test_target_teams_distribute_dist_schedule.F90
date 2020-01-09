@@ -55,7 +55,7 @@ CONTAINS
     IF (num_teams .eq. 1) THEN
        OMPVV_WARNING("Cannot test because num_teams was 1.")
     ELSE IF (num_teams .lt. 1) THEN
-       OMPVV_ERROR("omp_get_num_teams(0 returned less than 1.")
+       OMPVV_ERROR("omp_get_num_teams() returned less than 1.")
        errors = errors + 1
     ELSE
        DO x = 1, N
