@@ -50,8 +50,10 @@ CONTAINS
        share = share - x
     END DO
 
-    OMPVV_TEST_AND_SET_VERBOSE(errors, share .ne. 0)
-    OMPVV_ERROR_IF(errors .ne. 0, "Shared variable written incorrectly")
+    IF (share .ne. 0) THEN
+       OMPVV_ERROR("Shared variable written incorrectly")
+       errors = errors + 1
+    END IF
     
     share = 5
     
@@ -63,9 +65,12 @@ CONTAINS
     !$omp end target data
 
     DO x = 1, N
-       OMPVV_TEST_AND_SET_VERBOSE(errors, a(x) - 5 .ne. x)
+       IF ((a(x) - 5) .ne. x) THEN
+          OMPVV_ERROR("Shared variable read incorrectly")
+          errors = errors + 1
+          exit
     END DO
 
     test_shared = errors
   END FUNCTION test_shared
-END PROGRAM test_target_teams_distribute_device
+END PROGRAM test_target_teams_distribute_shared
