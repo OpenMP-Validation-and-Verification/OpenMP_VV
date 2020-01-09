@@ -27,46 +27,52 @@ PROGRAM test_target_teams_distribute_depend
 
 CONTAINS
   INTEGER FUNCTION depend_in_in()
-    INTEGER :: x
-    INTEGER, DIMENSION(N):: a, b, c
-    LOGICAL:: race_found, all_valid
+    INTEGER :: x, errors
+    LOGICAL :: invalid_found, race_found
+    INTEGER,DIMENSION(N):: a, b, c, d
 
-    all_valid = .TRUE.
+    invalid_found = .FALSE.
     race_found = .FALSE.
+    errors = 0
 
     DO x = 1, N
        a(x) = x
-       b(x) = 2 * x
+       b(x) = 2*x
        c(x) = 0
+       d(x) = 0
     END DO
 
-    !$omp target data map(to: a(1:N), b(1:N)) map(tofrom: c(1:N))
-    !$omp target teams distribute nowait depend(in: c) map(alloc: &
-    !$omp& a(1:N), b(1:N), c(1:N))
+    !$omp target data map(to: a(1:N), b(1:N)) map(tofrom: c(1:N), d(1:N))
+    !$omp target teams distribute nowait depend(in:d) map(alloc: &
+    !$omp& a(1:N), b(1:N), d(1:N))
     DO x = 1, N
-       c(x) = c(x) + a(x) + b(x)
+       d(x) = d(x) + a(x) + b(x)
     END DO
-    !$omp target teams distribute nowait depend(in: c) map(alloc: &
-    !$omp& a(1:N), b(1:N), c(1:N))
+    !$omp target teams distribute nowait depend(in:d) map(alloc: &
+    !$omp& a(1:N), b(1:N), c(1:N), d(1:N))
     DO x = 1, N
-       c(x) = c(x) + 2 * (a(x) + b(x))
+       c(x) = c(x) + 2*(a(x) + b(x)) + d(x)
     END DO
     !$omp end target data
 
     DO x = 1, N
-       IF ((c(x) .eq. 3 * x) .or. (c(x) .eq. 6 * x) .or. (c(x) .eq. 9 * x &
-            & )) THEN
-          all_valid = .FALSE.
+       IF ((c(x) .ne. 6*x) .and. (c(x) .ne. 9*x)) THEN
+          invalid_found = .TRUE.
+          errors = 1
+          OMPVV_ERROR("Found invalid values")
+          exit
        END IF
-       IF ((c(x) .eq. 3 * x) .or. (c(x) .eq. 6 * x)) THEN
+       IF (c(x) .eq. 6*x) THEN
           race_found = .TRUE.
        END IF
     END DO
 
-    IF ((all_valid .eqv. .FALSE.) .or. (race_found .eqv. .FALSE.)) THEN
-       OMPVV_WARNING("Could not prove asyncronous operations of ")
-       OMPVV_WARNING("depend(in) task with other depend(in) task")
+    IF ((invalid_found .eqv. .FALSE.) .and. (race_found .eqv. .TRUE.)) THEN
+       OMPVV_INFOMSG("Found independence between depend(in) clauses")
+    ELSE
+       OMPVV_WARNING("Could not find independence between depend(in) clauses")
     END IF
-    depend_in_in = 0
+
+    depend_in_in = errors
   END FUNCTION depend_in_in
 END PROGRAM test_target_teams_distribute_depend

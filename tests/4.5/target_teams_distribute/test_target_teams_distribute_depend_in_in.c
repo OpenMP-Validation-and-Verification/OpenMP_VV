@@ -21,38 +21,47 @@ int test_target_teams_distribute_depend_in_in() {
   int a[N];
   int b[N];
   int c[N];
-  int all_valid = 1;
+  int d[N];
+  int invalid_found = 0;
   int race_found = 0;
 
   for (int x = 0; x < N; ++x) {
     a[x] = x;
-    b[x] = 2 * x;
+    b[x] = 2*x;
     c[x] = 0;
+    d[x] = 0;
   }
 
-#pragma omp target data map(to: a[0:N], b[0:N]) map(tofrom: c[0:N])
+#pragma omp target data map(to: a[0:N], b[0:N]) map(tofrom: c[0:N], d[0:N])
   {
-#pragma omp target teams distribute nowait depend(in: c) map(alloc: a[0:N], b[0:N], c[0:N])
+#pragma omp target teams distribute nowait depend(in:d) map(alloc: a[0:N], b[0:N], d[0:N])
     for (int x = 0; x < N; ++x) {
-      c[x] += a[x] + b[x];
+      d[x] += a[x] + b[x];
     }
-#pragma omp target teams distribute nowait depend(in: c) map(alloc: a[0:N], b[0:N], c[0:N])
+#pragma omp target teams distribute nowait depend(in:d) map(alloc: a[0:N], b[0:N], c[0:N], d[0:N])
     for (int x = 0; x < N; ++x) {
-      c[x] += 2 * (a[x] + b[x]);
+      c[x] += 2*(a[x] + b[x]) + d[x];
     }
   }
 
   for (int x = 0; x < N; ++x) {
-    if (!(c[x] == 3 * x || c[x] == 6 * x || c[x] == 9 * x)) {
-      all_valid = 0;
+    if (c[x] != 6*x && c[x] != 9*x) {
+      invalid_found = 1;
+      OMPVV_ERROR("Found invalid results, cannot show independence between depend(in) clauses.");
+      break;
     }
-    if (c[x] == 3 * x || c[x] == 6 * x) {
+    if (c[x] == 6*x) {
       race_found = 1;
     }
   }
 
-  OMPVV_WARNING_IF(!(all_valid == 1 && race_found == 1), "Test could not prove asyncronous operations of depend(in) task with other depend(in) task with offloading %s", (isOffloading ? "enabled" : "disabled"));
-  return 0;
+  if (invalid_found == 0 && race_found == 1) {
+    OMPVV_INFOMSG("Found independence between depend(in) clauses.");
+  } else {
+    OMPVV_WARNING("Could not find independence between depend(in) clauses.");
+  } 
+
+  return invalid_found;
 }
 int main() {
   int errors = 0;
