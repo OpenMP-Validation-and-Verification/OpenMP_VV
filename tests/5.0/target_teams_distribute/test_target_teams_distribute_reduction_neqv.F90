@@ -19,7 +19,7 @@ PROGRAM test_target_teams_distribute_device
   INTEGER :: errors
   errors = 0
 
-  OMPVV_TEST_OFFLOADING()
+  OMPVV_TEST_OFFLOADING
 
   OMPVV_TEST_VERBOSE(test_neqv() .ne. 0)
 
@@ -48,7 +48,7 @@ CONTAINS
           host_result = a(x) .neqv. host_result
        END DO
 
-       !$omp target teams distribute map(to: a(1:N)) reduction(neqv: &
+       !$omp target teams distribute map(to: a(1:N)) reduction(.neqv.: &
        !$omp& result) map(tofrom: result)
        DO x = 1, N
           result = a(x) .neqv. result

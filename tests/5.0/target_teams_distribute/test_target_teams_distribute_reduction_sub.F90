@@ -19,7 +19,7 @@ PROGRAM test_target_teams_distribute_device
   INTEGER :: errors
   errors = 0
 
-  OMPVV_TEST_OFFLOADING()
+  OMPVV_TEST_OFFLOADING
 
   OMPVV_TEST_VERBOSE(test_sub() .ne. 0)
 
@@ -41,7 +41,7 @@ CONTAINS
           host_result = host_result - a(x)
        END DO
 
-       !$omp target teams distribute map(to: a(1:N)) reduction(result) &
+       !$omp target teams distribute map(to: a(1:N)) reduction(-:result) &
        !$omp& map(tofrom: result)
        DO x = 1, N
           result = result - a(x)
