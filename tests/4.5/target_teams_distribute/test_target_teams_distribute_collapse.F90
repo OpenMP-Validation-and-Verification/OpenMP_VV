@@ -1,4 +1,4 @@
-!===--- test_target_teams_distribute.F90------------------------------------===//
+!===--- test_target_teams_distribute_collapse.F90 --------------------------===//
 !
 ! OpenMP API Version 4.5 Nov 2015
 !
@@ -21,7 +21,7 @@
         errors = 0
         OMPVV_TEST_OFFLOADING
 
-        OMPVV_WARNING("Testing of collasping cannot be tested.")
+        OMPVV_WARNING("Collapse cannot be postively tested.")
         OMPVV_WARNING("Test only verifies that the collapse doesn't ")
         OMPVV_WARNING("collapse too many loops.")
         OMPVV_TEST_VERBOSE(test_collapse1() .ne. 0)
