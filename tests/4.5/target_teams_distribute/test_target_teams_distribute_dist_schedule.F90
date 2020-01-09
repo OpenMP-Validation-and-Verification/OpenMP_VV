@@ -25,17 +25,78 @@ PROGRAM main
 
   OMPVV_TEST_SHARED_ENVIRONMENT
 
-  OMPVV_TEST_VERBOSE(test_function() .ne. 0)
+  OMPVV_TEST_VERBOSE(test_dist_schedule() .ne. 0)
 
   OMPVV_REPORT_AND_RETURN()
 
 CONTAINS
   INTEGER FUNCTION test_dist_schedule() 
-    INTEGER:: errors
-    test_function = 1;
-    !$omp target map(from: errors)
-    test_function = 0;
-    !$omp end target
+    INTEGER:: errors, num_teams, x, counter
+    INTEGER,DIMENSION(N):: a, b
+
+    errors = 0
+    counter = -1
+    
+    DO x = 1, N
+       a(x) = -1
+       b(x) = -1
+    END DO
+
+    !$omp target teams distribute map(from: num_teams) map(tofrom: a(1:N))&
+    !$omp& dist_schedule(static, CHUNK_SIZE)
+    DO x = 1, N
+       IF (omp_get_team_num() .eq. 0) THEN
+          num_teams = omp_get_num_teams()
+       END IF
+       a(x)= omp_get_team_num()
+    END DO
+    !$omp end target teams distribute
+    
+    IF (num_teams .eq. 1) THEN
+       OMPVV_WARNING("Cannot test because num_teams was 1.")
+    ELSE IF (num_teams .lt. 1) THEN
+       OMPVV_ERROR("omp_get_num_teams(0 returned less than 1.")
+       errors = errors + 1
+    ELSE
+       DO x = 1, N
+          IF (MOD(x - 1, CHUNK_SIZE) .eq. 0) THEN
+             counter = MOD(counter + 1, num_teams)
+          END IF
+          IF (a(x) .ne. counter) THEN
+             OMPVV_ERROR("Iterations improperly scheduled for dist(static, chunk_size)")
+             errors = errors + 1
+             exit
+          END IF
+       END DO
+    END IF
+
+    num_teams = -1
+
+    !$omp target teams distribute map(from: num_teams) &
+    !$omp& map(tofrom: b(1:N)) dist_schedule(static)
+    DO x = 1, N
+       IF (omp_get_team_num() .eq. 0) THEN
+          num_teams = omp_get_num_teams()
+       END IF
+       b(x) = omp_get_team_num()
+    END DO
+    !$omp end target teams distribute
+    
+    IF (num_teams .eq. 1) THEN
+       OMPVV_WARNING("Cannot test because num_teams was 1.")
+    ELSE IF (num_teams .lt. 1) THEN
+       OMPVV_ERROR("omp_get_num_teams(0 returned less than 1.")
+       errors = errors + 1
+    ELSE
+       DO x = 2, N
+          IF ((b(x) .lt. b(x - 1)) .or. (b(x) .gt. (b(x - 1) + 1))) THEN
+             OMPVV_ERROR("Iterations improperly scheduled for dist(static)")
+             errors = errors + 1
+             exit
+          END IF
+       END DO
+    END IF    
+    
     test_dist_schedule = errors
   END FUNCTION test_dist_schedule
 END PROGRAM main

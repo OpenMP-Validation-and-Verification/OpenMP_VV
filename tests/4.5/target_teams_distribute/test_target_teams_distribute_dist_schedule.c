@@ -38,7 +38,7 @@ int test_dist_schedule() {
     a[i] = omp_get_team_num();
   }
 
-  if (num_teams < 1) {
+  if (num_teams == 1) {
     OMPVV_WARNING("Cannot test dist_schedule(static, chunk_size) because num_teams was 1.");
   } else if (num_teams < 1) {
     OMPVV_ERROR("omp_get_num_teams() returned a value less than 1.");
