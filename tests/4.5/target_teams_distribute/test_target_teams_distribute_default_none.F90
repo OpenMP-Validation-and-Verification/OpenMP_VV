@@ -20,8 +20,11 @@ PROGRAM test_target_teams_distribute_default_none
   implicit none
   OMPVV_TEST_OFFLOADING
 
-  OMPVV_WARNING("Test only uses default(none) clause and does not")
-  OMPVV_WARNING("guarantee that the default(none) is enforced.")
+  CHARACTER(len=300) :: infoMessage
+  WRITE(infoMessage, *) "Test only uses the default(none) clause and &
+       & does not guarantee that the default(none) is enforced."
+  OMPVV_WARNING(infoMessage)
+
   OMPVV_TEST_VERBOSE(default_none1() .ne. 0)
   OMPVV_TEST_VERBOSE(default_none2() .ne. 0)
   OMPVV_REPORT_AND_RETURN()
@@ -41,7 +44,7 @@ CONTAINS
 
     !$omp target data map(from: d(1:N)) map(to: a(1:N), b(1:N), c(1:N))
     !$omp target teams distribute default(none) shared(a, b, c, d) &
-    !$omp& private(x, privatized)
+    !$omp& private(x, y, privatized)
     DO x = 1, N
        privatized = 0
        DO y = 1, a(x) + b(x)
