@@ -45,24 +45,20 @@ CONTAINS
     END DO
     !$omp end target data
 
-    IF (num_teams(1) .eq. 1) THEN
-       OMPVV_WARNING("Test ran with one team, can't guarantee parallelism of teams")
-    ELSE IF (num_teams(1) .lt. 1) THEN
-       OMPVV_ERROR("omp_get_num_teams() reported a value below one")
-       errors = errors + 1
-    END IF
+    OMPVV_WARNING_IF(num_teams(1) .eq. 1, "Test ran with one team, can't guarantee parallelism of teams")
 
-    DO x = 2, N
-       IF (num_teams(x) .ne. num_teams(x - 1)) THEN
-          OMPVV_ERROR("Test reported an inconsistent number of teams")
-          errors = errors + 1
-       END IF
-       OMPVV_TEST_AND_SET_VERBOSE(errors, a(x) .ne. 1 + b(x))
-       IF (a(x) .ne. 1 + b(x)) THEN
-          errors = errors + 1
-          exit
-       END IF
-    END DO
+    OMPVV_TEST_AND_SET_VERBOSE(errors, num_teams(1) .lt. 1)
+
+    IF (errors .eq. 0) THEN 
+       DO x = 2, N
+          OMPVV_TEST_AND_SET_VERBOSE(errors, num_teams(x) .ne. num_teams(x - 1))
+          OMPVV_ERROR_IF(num_teams(x) .ne. num_teams(x - 1), "Test reported an inconsistent number of teams")
+          OMPVV_TEST_AND_SET_VERBOSE(errors, a(x) .ne. 1 + b(x))
+          IF (errors .gt. 0) THEN
+             exit
+          END IF
+       END DO
+    END IF
 
     test_distribute = errors
   END FUNCTION test_distribute
