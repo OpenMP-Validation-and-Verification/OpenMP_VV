@@ -34,32 +34,30 @@ CONTAINS
   INTEGER FUNCTION test_threads()
     INTEGER:: num_threads, default_threads, errors, x
     errors = 0
-    
+
     !$omp target teams distribute map(from: default_threads)
     DO x = 1, N
-       default_threads = omp_get_thread_limit()
+       IF (omp_get_team_num() .eq. 0) THEN
+          default_threads = omp_get_thread_limit()
+       END IF
     END DO
 
-    IF (default_threads .eq. 1) THEN
-       OMPVV_WARNING("Test operated with one thread. Cannot test thread_limit.")
-    ELSE IF (default_threads .lt. 1) THEN
-       OMPVV_ERROR("Test returned thread_limit <= 0")
-       errors = errors + 1
-    ELSE
+    OMPVV_WARNING_IF(default_threads .eq. 1, "Test operated with one thread. Cannot test thread_limit clause.")
+    OMPVV_TEST_AND_SET(errors, default_threads .lt. 1)
+
+    IF (default_threads .gt. 0) THEN
        !$omp target teams distribute map(from: num_threads) thread_limit(&
        !$omp& default_threads - 1)
        DO x = 1, N
-          num_threads = omp_get_thread_limit()
+          IF (omp_get_team_num() .eq. 0) THEN
+             num_threads = omp_get_thread_limit()
+          END IF
        END DO
 
-       IF (num_threads .gt. default_threads - 1) THEN
-          errors = errors + 1
-          OMPVV_ERROR("Test ran on more threads than requested.")
-       ELSE IF (num_threads .lt. default_threads - 1) THEN
-          OMPVV_WARNING("Test ran on less threads than requested.")
-          OMPVV_WARNING("This behavior is still spec-conformant.")
-       END IF
+       OMPVV_TEST_AND_SET(errors, num_threads .gt. default_threads - 1)
+       OMPVV_WARNING_IF(num_threads .lt. default_threads - 1, "Test limited to fewer threads than were indicated.")
     END IF
+
     test_threads = errors
   END FUNCTION test_threads
 END PROGRAM test_target_teams_distribute_device

@@ -23,36 +23,32 @@
 #define N 1024
 
 int main() {
-  int isOffloading;
-  OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
+  OMPVV_TEST_OFFLOADING;
   int default_threads;
   int num_threads;
   int errors = 0;
 
 #pragma omp target teams distribute map(from: default_threads)
   for (int x = 0; x < N; ++x) {
-    default_threads = omp_get_thread_limit();
+    if (omp_get_team_num() == 0) {
+      default_threads = omp_get_thread_limit();
+    }
   }
 
-  if (default_threads == 1) {
-    OMPVV_WARNING("Test operated with one thread. Cannot test thread_limit clause.");
-  } else if(default_threads <= 0) {
-    OMPVV_ERROR("omp_get_thread_limit() returned thread_limit <= 0.");
-    errors = 1;
-  } else {
-#pragma omp target teams distribute thread_limit(default_threads - 1) map(from: default_threads)
+  OMPVV_WARNING_IF(default_threads == 1, "Test operated with one thread. Cannot test thread_limit clause.");
+  OMPVV_TEST_AND_SET(errors, default_threads <= 0);
+
+  if (default_threads > 0) {
+#pragma omp target teams distribute thread_limit(default_threads / 2) map(from: default_threads)
     for (int x = 0; x < N; ++x) {
-      num_threads = omp_get_thread_limit();
+      if (omp_get_team_num() == 0) {
+        num_threads = omp_get_thread_limit();
+      }
     }
-    if (num_threads > default_threads - 1) {
-      errors += 1;
-      OMPVV_ERROR("Test ran on more threads than requested.");
-      return errors;
-    } else if (num_threads < default_threads - 1) {
-      OMPVV_WARNING("Test ran on less threads than requested.  Still spec-conformant.");
-    } else {
-      OMPVV_INFOMSG("Test passed with offloading %s", (isOffloading ? "enabled" : "disabled"));
-    }
+
+    OMPVV_TEST_AND_SET(errors, num_threads > default_threads / 2);
+    OMPVV_WARNING_IF(num_threads < default_threads / 2, "Test limited to fewer threads than were indicated. Still spec-conformant.");
+
   }
 
   OMPVV_REPORT_AND_RETURN(errors);
