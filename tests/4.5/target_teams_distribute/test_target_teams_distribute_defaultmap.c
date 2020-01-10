@@ -45,11 +45,11 @@ int test_defaultmap_on() {
   enum enum_type enum_array[ARRAY_SIZE];
 
 #pragma omp target teams distribute defaultmap(tofrom: scalar) map(from: char_array[0:ARRAY_SIZE], \
-								   short_array[0:ARRAY_SIZE], \
-								   int_array[0:ARRAY_SIZE], \
-								   float_array[0:ARRAY_SIZE], \
-								   double_array[0:ARRAY_SIZE], \
-								   enum_array[0:ARRAY_SIZE])
+                                                                   short_array[0:ARRAY_SIZE], \
+                                                                   int_array[0:ARRAY_SIZE], \
+                                                                   float_array[0:ARRAY_SIZE], \
+                                                                   double_array[0:ARRAY_SIZE], \
+                                                                   enum_array[0:ARRAY_SIZE])
   for (int x = 0; x < ARRAY_SIZE; ++x){
     char_array[x] = scalar_char;
     short_array[x] = scalar_short;
@@ -111,11 +111,11 @@ int test_defaultmap_on() {
   }
 
 #pragma omp target teams distribute defaultmap(tofrom: scalar) map(tofrom: char_array[0:ARRAY_SIZE], \
-								   short_array[0:ARRAY_SIZE], \
-								   int_array[0:ARRAY_SIZE], \
-								   float_array[0:ARRAY_SIZE], \
-								   double_array[0:ARRAY_SIZE], \
-								   enum_array[0:ARRAY_SIZE])
+                                                                   short_array[0:ARRAY_SIZE], \
+                                                                   int_array[0:ARRAY_SIZE], \
+                                                                   float_array[0:ARRAY_SIZE], \
+                                                                   double_array[0:ARRAY_SIZE], \
+                                                                   enum_array[0:ARRAY_SIZE])
   for (int x = 0; x < ARRAY_SIZE; ++x) {
     scalar_char = char_array[x];
     scalar_short = short_array[x];
@@ -228,11 +228,11 @@ int test_defaultmap_off() {
 
   //Testing the privatization nature of firstprivate default action
 #pragma omp target teams distribute map(tofrom: char_array_a[0:ARRAY_SIZE], char_array_b[0:ARRAY_SIZE], \
-					short_array_a[0:ARRAY_SIZE], short_array_b[0:ARRAY_SIZE], \
-					int_array_a[0:ARRAY_SIZE], int_array_b[0:ARRAY_SIZE], \
-					float_array_a[0:ARRAY_SIZE], float_array_b[0:ARRAY_SIZE], \
-					double_array_a[0:ARRAY_SIZE], double_array_b[0:ARRAY_SIZE], \
-					enum_array_a[0:ARRAY_SIZE], enum_array_b[0:ARRAY_SIZE])
+                                        short_array_a[0:ARRAY_SIZE], short_array_b[0:ARRAY_SIZE], \
+                                        int_array_a[0:ARRAY_SIZE], int_array_b[0:ARRAY_SIZE], \
+                                        float_array_a[0:ARRAY_SIZE], float_array_b[0:ARRAY_SIZE], \
+                                        double_array_a[0:ARRAY_SIZE], double_array_b[0:ARRAY_SIZE], \
+                                        enum_array_a[0:ARRAY_SIZE], enum_array_b[0:ARRAY_SIZE])
   for (int x = 0; x < ARRAY_SIZE; ++x) {
     scalar_char = 0;
     for (int y = 0; y < char_array_a[x]; ++y) {
@@ -324,8 +324,8 @@ int test_defaultmap_off() {
 
   // Testing the copy of scalar values to the device
 #pragma omp target teams distribute map(tofrom: char_array_a[0:ARRAY_SIZE], short_array_a[0:ARRAY_SIZE], \
-					int_array_a[0:ARRAY_SIZE], float_array_a[0:ARRAY_SIZE], \
-					double_array_a[0:ARRAY_SIZE], enum_array_a[0:ARRAY_SIZE])
+                                        int_array_a[0:ARRAY_SIZE], float_array_a[0:ARRAY_SIZE], \
+                                        double_array_a[0:ARRAY_SIZE], enum_array_a[0:ARRAY_SIZE])
   for (int x = 0; x < ARRAY_SIZE; ++x) {
     char_array_a[x] = scalar_char;
     short_array_a[x] = scalar_short;
