@@ -1,6 +1,6 @@
 //===--- test_target_teams_distribute_reduction_or.c-------------------------===//
 //
-// OpenMP API Version 4.5 Nov 2015
+// OpenMP API Version 5.0 Nov 2018
 //
 // This test uses the reduction clause on a target teams distribute directive,
 // testing that the variable in the reduction clause is properly reduced using
@@ -18,18 +18,14 @@
 
 int test_or() {
   char a[N];
-  double false_margin = pow(exp(1), log(.5)/N);   // See the 'and' operator test for
+  double true_margin = pow(exp(1), log(.5)/N);   // See the 'and' operator test for
   int errors = 0;                                 // an explanation of this math.
   int num_teams[N];
   int warned = 0;
   srand(1);
 
   for (int x = 0; x < N; ++x) {
-    if (rand() / (double)(RAND_MAX) > false_margin) {
-      a[x] = 1;
-    } else {
-      a[x] = 0;
-    }
+    a[x] = (rand() / (double) (RAND_MAX) > true_margin);
     num_teams[x] = -x;
   }
 

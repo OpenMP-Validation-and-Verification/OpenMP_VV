@@ -1,6 +1,6 @@
 //===--- test_target_teams_distribute_reduction_multiply.c-------------------===//
 //
-// OpenMP API Version 4.5 Nov 2015
+// OpenMP API Version 5.0 Nov 2018
 //
 // This test uses the reduction clause on a target teams distribute directive,
 // testing that the variable in the reduction clause is properly reduced using
@@ -43,10 +43,7 @@ int test_multiply() {
       host_result *= a[x + y];
     }
     OMPVV_TEST_AND_SET_VERBOSE(errors, host_result != result);
-    OMPVV_INFOMSG("Device result is %d and host result is %d.", result, host_result);
-    if (host_result != result) {
-      break;
-    }
+    OMPVV_INFOMSG_IF(host_result != result, "Device result is %d and host result is %d.", result, host_result);
   }
 
   for (int x = 1; x < N; ++x) {

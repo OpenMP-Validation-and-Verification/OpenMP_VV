@@ -1,6 +1,6 @@
 //===--- test_target_teams_distribute_reduction_bitor.c----------------------===//
 //
-// OpenMP API Version 4.5 Nov 2015
+// OpenMP API Version 5.0 Nov 2018
 //
 // This test uses the reduction clause on a target teams distribute directive,
 // testing that the variable in the reduction clause is properly reduced using
@@ -19,7 +19,7 @@
 int test_bitor() {
   int a[N];
   // See the 'and' operator test for an exaplantion of this math.
-  double false_margin = pow(exp(1), log(.5)/N);
+  double true_margin = pow(exp(1), log(.5)/N);
   int errors = 0;
   int num_teams[N];
   int warned = 0;
@@ -27,8 +27,8 @@ int test_bitor() {
 
   for (int x = 0; x < N; ++x) {
     for (int y = 0; y < 16; ++y) {
-      if (rand() / (double) RAND_MAX > false_margin) {
-	a[x] += (1 << y);
+      if (rand() / (double) RAND_MAX > true_margin) {
+        a[x] += (1 << y);
       }
     }
     num_teams[x] = -x;

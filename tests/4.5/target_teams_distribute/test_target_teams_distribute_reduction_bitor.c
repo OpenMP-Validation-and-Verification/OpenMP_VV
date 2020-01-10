@@ -19,7 +19,7 @@
 int test_bitor() {
   int a[N];
   // See the 'and' operator test for an exaplantion of this math.
-  double false_margin = pow(exp(1), log(.5)/N);
+  double true_margin = pow(exp(1), log(.5)/N);
   int errors = 0;
   int num_teams[N];
   int warned = 0;
@@ -27,8 +27,8 @@ int test_bitor() {
 
   for (int x = 0; x < N; ++x) {
     for (int y = 0; y < 16; ++y) {
-      if (rand() / (double) RAND_MAX > false_margin) {
-	a[x] += (1 << y);
+      if (rand() / (double) RAND_MAX > true_margin) {
+        a[x] += (1 << y);
       }
     }
     num_teams[x] = -x;

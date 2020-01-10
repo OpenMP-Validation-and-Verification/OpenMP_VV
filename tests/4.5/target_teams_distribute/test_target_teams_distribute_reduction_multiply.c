@@ -43,10 +43,7 @@ int test_multiply() {
       host_result *= a[x + y];
     }
     OMPVV_TEST_AND_SET_VERBOSE(errors, host_result != result);
-    OMPVV_INFOMSG("Device result is %d and host result is %d.", result, host_result);
-    if (host_result != result) {
-      break;
-    }
+    OMPVV_INFOMSG_IF(host_result != result, "Device result is %d and host result is %d.", result, host_result);
   }
 
   for (int x = 1; x < N; ++x) {

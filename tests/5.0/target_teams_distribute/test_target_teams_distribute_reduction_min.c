@@ -1,6 +1,6 @@
-//===--- test_target_teams_distribute_reduction_min.c----------------------------===//
+//===--- test_target_teams_distribute_reduction_min.c-------------------------===//
 //
-// OpenMP API Version 4.5 Nov 2015
+// OpenMP API Version 5.0 Nov 2018
 //
 // This test uses the reduction clause on a target teams distribute directive,
 // testing that the variable in the reduction clause is properly reduced using
@@ -58,7 +58,7 @@ int test_min() {
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, host_min != result);
   OMPVV_ERROR_IF(host_min != result, "Min on device is %d but expected min from host is %d.", result, host_min);
-  
+
   return errors;
 }
 

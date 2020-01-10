@@ -1,6 +1,6 @@
 //===--- test_target_teams_distribute_reduction_bitand.c---------------------===//
 //
-// OpenMP API Version 4.5 Nov 2015
+// OpenMP API Version 5.0 Nov 2018
 //
 // This test uses the reduction clause on a target teams distribute directive,
 // testing that the variable in the reduction clause is properly reduced using
@@ -27,7 +27,7 @@ int test_bitand() {
   for (int x = 0; x < N; ++x) {
     for (int y = 0; y < 16; ++y) {
       if (rand() / (double) RAND_MAX < false_margin) {
-	a[x] += 1 << y;
+        a[x] += 1 << y;
       }
     }
     num_teams[x] = -x;
