@@ -4,13 +4,13 @@
 //
 // This test uses the device clause to indicate which device should execute the
 // given target regions.  The test uses the separate device data environments to
-// ensure that operations are executed on the specified device.  If only one device
-// is available, the test issues a warning.
+// ensure that operations are executed on the specified device.  If only one
+// device is available, the test issues a warning.
 //
 // By having a separate initialization of the same array on each device at the
-// same time, if all operations were occuring on the same device, we would expect
-// the same results from each device and it wouldn't be able to give proper answers
-// for each initialization.
+// same time, if all operations were occuring on the same device, we would
+// expect the same results from each device and it wouldn't be able to give
+// proper answers for each initialization.
 //
 ////===----------------------------------------------------------------------===//
 
@@ -32,7 +32,7 @@ int main() {
   int errors[num_devices];
   int sum_errors = 0;
 
-  OMPVV_INFOMSG("running tests on %d devices", num_devices);
+  OMPVV_INFOMSG("Running tests on %d devices", num_devices);
 
   for (int x = 0; x < ARRAY_SIZE; ++x) {
     a[x] = 1;
@@ -61,7 +61,7 @@ int main() {
     for (int x = 0; x < ARRAY_SIZE; ++x) {
       OMPVV_TEST_AND_SET_VERBOSE(errors[dev], a[x] != 1 + dev + b[x]);
       if (a[x] != 1 + dev + b[x]) {
-	break;
+        break;
       }
     }
   }
@@ -71,12 +71,8 @@ int main() {
   }
 
   for (int dev = 0; dev < num_devices; ++dev) {
-    if (!errors[dev] && num_teams[dev] == 1) {
-      OMPVV_WARNING("Test operated with one team. Parallelism of teams distribute can't be guarnunteed.");
-    }
-    else if (errors[dev]) {
-      OMPVV_ERROR("Test failed with device %d", dev);
-    }
+    OMPVV_WARNING_IF(!errors[dev] && num_teams[dev] == 1, "Test operated with one team. Parallelism of teams distribute can't be guaranteed.");
+    OMPVV_ERROR_IF(errors[dev], "Test failed with device %d", dev);
   }
 
   OMPVV_REPORT_AND_RETURN(sum_errors);
