@@ -1,6 +1,6 @@
 !===--- test_target_teams_distribute_reduction_bitand.F90-------------------===//
 !
-! OpenMP API Version 4.5 Nov 2015
+! OpenMP API Version 5.0 Nov 2018
 !
 ! This test uses the reduction clause on a target teams distribute
 ! directive, testing, for the bitand operator, that the variable in the
@@ -64,9 +64,7 @@ CONTAINS
           result = iand(a(x), result)
        END DO
 
-       IF (host_result .ne. result) THEN
-          errors = errors + 1
-       END IF
+       OMPVV_TEST_AND_SET_VERBOSE(errors, result .ne. host_result)
     END DO
 
     test_bitand = errors

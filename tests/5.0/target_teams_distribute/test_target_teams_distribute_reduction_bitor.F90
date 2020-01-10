@@ -1,6 +1,6 @@
 !===--- test_target_teams_distribute_reduction_bitor.F90--------------------===//
 !
-! OpenMP API Version 4.5 Nov 2015
+! OpenMP API Version 5.0 Nov 2018
 !
 ! This test uses the reduction clause on a target teams distribute
 ! directive, testing, for the bitor operator, that the variable in the
@@ -29,11 +29,11 @@ CONTAINS
     INTEGER,DIMENSION(N) :: a
     REAL(8),DIMENSION(N, 32):: randoms
     INTEGER:: result, host_result, x, y, z, errors
-    REAL(8):: false_margin
+    REAL(8):: true_margin
     errors = 0
 
     CALL RANDOM_SEED()
-    false_margin = exp(log(.5) / N)
+    true_margin = exp(log(.5) / N)
 
     DO y = 1, 32
        CALL RANDOM_NUMBER(randoms)
@@ -42,7 +42,7 @@ CONTAINS
        DO x = 1, N
           a(x) = 0
           DO z = 1, 32
-             IF (randoms(x, y) .gt. false_margin) THEN
+             IF (randoms(x, y) .gt. true_margin) THEN
                 a(x) = a(x) + (2**z)
              END IF
           END DO
@@ -58,9 +58,7 @@ CONTAINS
           result = ior(a(x), result)
        END DO
 
-       IF (host_result .ne. result) THEN
-          errors = errors + 1
-       END IF
+       OMPVV_TEST_AND_SET_VERBOSE(errors, host_result .ne. result)
     END DO
 
     test_bitor = errors

@@ -1,6 +1,6 @@
 !===--- test_target_teams_distribute_reduction_or.F90-----------------------===//
 !
-! OpenMP API Version 4.5 Nov 2015
+! OpenMP API Version 5.0 Nov 2018
 !
 ! This test uses the reduction clause on a target teams distribute
 ! directive, testing, for the or operator, that the variable in the
@@ -28,12 +28,12 @@ CONTAINS
   INTEGER FUNCTION test_or()
     LOGICAL,DIMENSION(N):: a
     REAL(8),DIMENSION(N):: randoms
-    REAL(8):: false_margin
+    REAL(8):: true_margin
     LOGICAL:: result, host_result
     INTEGER:: x, y, errors
     errors = 0
 
-    false_margin = exp(log(.5) / N)
+    true_margin = exp(log(.5) / N)
     CALL RANDOM_SEED()
 
     DO y = 1, 32
@@ -41,7 +41,7 @@ CONTAINS
        host_result = .FALSE.
        result = .FALSE.
        DO x = 1, N
-          IF (randoms(x) .gt. false_margin) THEN
+          IF (randoms(x) .gt. true_margin) THEN
              a(x) = .TRUE.
           ELSE
              a(x) = .FALSE.
@@ -58,9 +58,7 @@ CONTAINS
           result = a(x) .OR. result
        END DO
 
-       IF (host_result .neqv. result) THEN
-          errors = errors + 1
-       END IF
+       OMPVV_TEST_AND_SET_VERBOSE(errors, result .neqv. host_result)
     END DO
 
     test_or = errors

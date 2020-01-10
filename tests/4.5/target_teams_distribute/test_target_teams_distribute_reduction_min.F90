@@ -1,6 +1,6 @@
 !===--- test_target_teams_distribute_reduction_min.F90----------------------===//
 !
-! OpenMP API Version 4.5 Nov 2015
+! OpenMP API Version 5.0 Nov 2018
 !
 ! This test uses the reduction clause on a target teams distribute
 ! directive, testing, for the min operator, that the variable in the
@@ -43,9 +43,7 @@ CONTAINS
           result = min(a(x), result)
        END DO
 
-       IF (result .ne. 1 + y) THEN
-          errors = errors + 1
-       END IF
+       OMPVV_TEST_AND_SET_VERBOSE(errors, result .ne. 1 + y)
     END DO
 
     test_min = errors

@@ -1,6 +1,6 @@
 !===--- test_target_teams_distribute_reduction_add.F90----------------------===//
 !
-! OpenMP API Version 4.5 Nov 2015
+! OpenMP API Version 5.0 Nov 2018
 !
 ! This test uses the reduction clause on a target teams distribute
 ! directive, testing, for the add operator, that the variable in the
@@ -47,9 +47,7 @@ CONTAINS
        dev_sum = a(x) + b(x) + dev_sum
     END DO
 
-    IF (dev_sum .ne. host_sum) THEN
-       errors = errors + 1
-    END IF
+    OMPVV_TEST_AND_SET_VERBOSE(errors, dev_sum .ne. host_sum)
     test_add = errors
   END FUNCTION test_add
 END PROGRAM test_target_teams_distribute_device

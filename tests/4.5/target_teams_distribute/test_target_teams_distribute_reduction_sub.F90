@@ -47,9 +47,7 @@ CONTAINS
           result = result - a(x)
        END DO
 
-       IF (result .ne. host_result) THEN
-          errors = errors + 1
-       END IF
+       OMPVV_TEST_AND_SET_VERBOSE(errors, result .ne. host_result)
     END DO
 
     test_sub = errors

@@ -1,6 +1,6 @@
 !===--- test_target_teams_distribute_reduction_multiply.F90-----------------===//
 !
-! OpenMP API Version 4.5 Nov 2015
+! OpenMP API Version 5.0 Nov 2018
 !
 ! This test uses the reduction clause on a target teams distribute
 ! directive, testing, for the multiply operator, that the variable in the
@@ -38,7 +38,7 @@ CONTAINS
     DO x = 1, N
        a(x) = INT(1 + (r(x) * 2))
     END DO
-    
+
     DO x = 1, N, 16
        device_result = 1
        !$omp target teams distribute defaultmap(tofrom:scalar) &
@@ -51,9 +51,6 @@ CONTAINS
           host_result = a(x + y) * host_result
        END DO
        OMPVV_TEST_AND_SET_VERBOSE(errors, host_result .ne. device_result)
-       IF (host_result .ne. device_result) THEN
-          exit
-       END IF
     END DO
 
     test_multiply = errors
