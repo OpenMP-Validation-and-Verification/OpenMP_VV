@@ -416,7 +416,6 @@ CONTAINS
        OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(IMAG(scalar_complex) - IMAG(scalar_complex_copy)) .gt. .000001)
        OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(REAL(scalar_double_complex) - REAL(scalar_double_complex)) .gt. .0000000001)
        OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(IMAG(scalar_double_complex) - IMAG(scalar_double_complex)) .gt. .0000000001)
-       END IF
     END IF
     test_defaultmap_off = errors
   END FUNCTION test_defaultmap_off
