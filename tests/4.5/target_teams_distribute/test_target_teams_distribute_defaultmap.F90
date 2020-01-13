@@ -229,7 +229,7 @@ CONTAINS
     !$omp & logical_kind4_array_b(1:N), logical_kind8_array_a(1:N, 1:16),&
     !$omp & logical_kind8_array_b(1:N), complex_array_a(1:N), &
     !$omp & complex_array_b(1:N), double_complex_array_a(1:N), &
-    !$omp & double_complex_array_b(1:N)) defaultmap(tofrom: scalar)
+    !$omp & double_complex_array_b(1:N))
     DO x = 1, N
        scalar_char = char_array_a(x)
        char_array_b(x) = scalar_char
