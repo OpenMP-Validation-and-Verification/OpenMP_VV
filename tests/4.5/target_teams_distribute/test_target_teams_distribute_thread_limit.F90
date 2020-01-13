@@ -55,7 +55,7 @@ for sure,
        END DO
 
        OMPVV_TEST_AND_SET(errors, num_threads .gt. default_threads / 2)
-       OMPVV_WARNING_IF(num_threads .lt. default_threads / 2, "Test limited to fewer threads than were indicated.")
+       OMPVV_WARNING_IF(num_threads .lt. default_threads / 2, "Test provided fewer threads than clause indicated.")
     END IF
 
     test_threads = errors
