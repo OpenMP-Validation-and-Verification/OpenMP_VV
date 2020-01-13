@@ -25,12 +25,12 @@ PROGRAM test_target_teams_distribute_device
   implicit none
   INTEGER :: errors
   errors = 0
-  OMPVV_TEST_OFFLOADING()
-  OMPVV_TEST_VERBOSE(test_multiple_devices_with_shared() .ne. 0)
+  OMPVV_TEST_OFFLOADING
+  OMPVV_TEST_VERBOSE(test_multiple_devices() .ne. 0)
 
   OMPVV_REPORT_AND_RETURN()
 CONTAINS
-  INTEGER FUNCTION test_multiple_devices_with_shared()
+  INTEGER FUNCTION test_multiple_devices()
     INTEGER :: x, dev, num_devices, total_errors
     INTEGER, DIMENSION(N) :: a, b
     INTEGER, ALLOCATABLE :: c(:, :)
@@ -70,8 +70,8 @@ CONTAINS
     END DO
 
     DO dev = 1, num_devices
-       !$omp target exit data map(from: c(1:N, dev:dev),num_teams(dev:dev)&
-       !$omp& map(delete: a(1:N), b(1:N)) device(dev)
+       !$omp target exit data map(from: c(1:N, dev:dev), &
+       !$omp& num_teams(dev:dev)) map(delete: a(1:N), b(1:N)) device(dev)
        DO x = 1, N
           IF (c(x, dev) .ne. (1 + dev + x)) THEN
              errors(dev) = errors(dev) + 1
@@ -91,5 +91,5 @@ CONTAINS
        END IF
     END DO
     test_multiple_devices = total_errors
-  END FUNCTION test_multiple_devices_with_shared
+  END FUNCTION test_multiple_devices
 END PROGRAM test_target_teams_distribute_device
