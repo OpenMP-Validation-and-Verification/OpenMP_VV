@@ -25,7 +25,7 @@ PROGRAM test_target_teams_distribute_defaultmap
   USE omp_lib
   implicit none
   LOGICAL :: isSharedEnv
-  OMPVV_TEST_OFFLOADING()
+  OMPVV_TEST_OFFLOADING
   OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(isSharedEnv)
   IF (isSharedEnv) THEN
      OMPVV_WARNING("Shared memory environment. Scalars are not copied")
@@ -107,23 +107,15 @@ CONTAINS
        OMPVV_TEST_AND_SET_VERBOSE(errors, short_array(x) .ne. scalar_short)
        OMPVV_TEST_AND_SET_VERBOSE(errors, int_array(x) .ne. scalar_int)
        OMPVV_TEST_AND_SET_VERBOSE(errors, long_int_array(x) .ne. scalar_long_int)
-       OMPVV_TEST_AND_SET_VERBOSE(errors, abs(float_array(x) - scalar_float) &
-            & .gt. .00001)
-       OMPVV_TEST_AND_SET_VERBOSE(errors, abs(double_array(x) - scalar_double) &
-            & .gt. .0000000001)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, abs(float_array(x) - scalar_float) .gt. .00001)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, abs(double_array(x) - scalar_double) .gt. .0000000001)
        OMPVV_TEST_AND_SET_VERBOSE(errors, logical_array(x) .neqv. scalar_logical)
-       OMPVV_TEST_AND_SET_VERBOSE(errors, logical_kind4_array(x) &
-            & .neqv. scalar_logical_kind4)
-       OMPVV_TEST_AND_SET_VERBOSE(errors, logical_kind8_array(x) &
-            & .neqv. scalar_logical_kind8)
-       OMPVV_TEST_AND_SET_VERBOSE(errors, abs(REAL(complex_array(x)) &
-            & - REAL(scalar_complex)) .gt. .00001)
-       OMPVV_TEST_AND_SET_VERBOSE(errors, abs(IMAG(complex_array(x)) &
-            & - IMAG(scalar_complex)) .gt. .00001)
-       OMPVV_TEST_AND_SET_VERBOSE(errors, abs(REAL(double_complex_array(x)) &
-            & - REAL(scalar_double_complex)) .gt. .0000000001)
-       OMPVV_TEST_AND_SET_VERBOSE(errors, abs(IMAG(double_complex_array(x)) &
-            & - IMAG(scalar_double_complex)) .gt. .0000000001)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, logical_kind4_array(x) .neqv. scalar_logical_kind4)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, LOGICAL(logical_kind8_array(x) .neqv. scalar_logical_kind8, 4))
+       OMPVV_TEST_AND_SET_VERBOSE(errors, abs(REAL(complex_array(x)) - REAL(scalar_complex)) .gt. .00001)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, abs(IMAG(complex_array(x)) - IMAG(scalar_complex)) .gt. .00001)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, abs(REAL(double_complex_array(x)) - REAL(scalar_double_complex)) .gt. .0000000001)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, abs(IMAG(double_complex_array(x)) - IMAG(scalar_double_complex)) .gt. .0000000001)
     END DO
 
     !$omp target teams distribute defaultmap(tofrom: scalar)
