@@ -107,15 +107,15 @@ CONTAINS
        OMPVV_TEST_AND_SET_VERBOSE(errors, short_array(x) .ne. scalar_short)
        OMPVV_TEST_AND_SET_VERBOSE(errors, int_array(x) .ne. scalar_int)
        OMPVV_TEST_AND_SET_VERBOSE(errors, long_int_array(x) .ne. scalar_long_int)
-       OMPVV_TEST_AND_SET_VERBOSE(errors, abs(float_array(x) - scalar_float) .gt. .00001)
-       OMPVV_TEST_AND_SET_VERBOSE(errors, abs(double_array(x) - scalar_double) .gt. .0000000001)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(float_array(x) - scalar_float) .gt. .00001)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(double_array(x) - scalar_double) .gt. .0000000001)
        OMPVV_TEST_AND_SET_VERBOSE(errors, logical_array(x) .neqv. scalar_logical)
        OMPVV_TEST_AND_SET_VERBOSE(errors, logical_kind4_array(x) .neqv. scalar_logical_kind4)
        OMPVV_TEST_AND_SET_VERBOSE(errors, LOGICAL(logical_kind8_array(x) .neqv. scalar_logical_kind8, 4))
-       OMPVV_TEST_AND_SET_VERBOSE(errors, abs(REAL(complex_array(x)) - REAL(scalar_complex)) .gt. .00001)
-       OMPVV_TEST_AND_SET_VERBOSE(errors, abs(IMAG(complex_array(x)) - IMAG(scalar_complex)) .gt. .00001)
-       OMPVV_TEST_AND_SET_VERBOSE(errors, abs(REAL(double_complex_array(x)) - REAL(scalar_double_complex)) .gt. .0000000001)
-       OMPVV_TEST_AND_SET_VERBOSE(errors, abs(IMAG(double_complex_array(x)) - IMAG(scalar_double_complex)) .gt. .0000000001)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(REAL(complex_array(x)) - REAL(scalar_complex)) .gt. .00001)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(IMAG(complex_array(x)) - IMAG(scalar_complex)) .gt. .00001)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(REAL(double_complex_array(x)) - REAL(scalar_double_complex)) .gt. .0000000001)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(IMAG(double_complex_array(x)) - IMAG(scalar_double_complex)) .gt. .0000000001)
     END DO
 
     !$omp target teams distribute defaultmap(tofrom: scalar)
@@ -135,48 +135,21 @@ CONTAINS
     END DO
     !$omp end target teams distribute
 
-    IF (scalar_char .ne. 'b') THEN
-       errors = errors + 1
-    END IF
-    IF (scalar_byte .ne. 5) THEN
-       errors = errors + 1
-    END IF
-    IF (scalar_short .ne. 83) THEN
-       errors = errors + 1
-    END IF
-    IF (scalar_int .ne. 49) THEN
-       errors = errors + 1
-    END IF
-    IF (scalar_long_int .ne. 12345) THEN
-       errors = errors + 1
-    END IF
-    IF (abs(scalar_float - 11.2) .gt. .00001) THEN
-       errors = errors + 1
-    END IF
-    IF (abs(scalar_double - 9.5) .gt. .0000000001) THEN
-       errors = errors + 1
-    END IF
-    IF (scalar_logical .neqv. .false.) THEN
-       errors = errors + 1
-    END IF
-    IF (scalar_logical_kind4 .neqv. .false.) THEN
-       errors = errors + 1
-    END IF
-    IF (scalar_logical_kind8 .neqv. .false.) THEN
-       errors = errors + 1
-    END IF
-    IF (abs(REAL(scalar_complex) - 5) .gt. .00001) THEN
-       errors = errors + 1
-    END IF
-    IF (abs(IMAG(scalar_complex) - 5) .gt. .00001) THEN
-       errors = errors + 1
-    END IF
-    IF (abs(REAL(scalar_double_complex) - 5e+9) .gt. .0000000001) THEN
-       errors = errors + 1
-    END IF
-    IF (abs(IMAG(scalar_double_complex) - 5e+9) .gt. .0000000001) THEN
-       errors = errors + 1
-    END IF
+    OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_char .ne. 'b')
+    OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_byte .ne. 5)
+    OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_short .ne. 83)
+    OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_int .ne. 49)
+    OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_long_int .ne. 12345)
+    OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(scalar_float - 11.2) .gt. .00001)
+    OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(scalar_double - 9.5) .gt. .0000000001)
+    OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_logical .neqv. .false.)
+    OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_logical_kind4 .neqv. .false.)
+    OMPVV_TEST_AND_SET_VERBOSE(errors, LOGICAL(scalar_logical_kind8 .neqv. .false., 4))
+    OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(REAL(scalar_complex) - 5) .gt. .00001)
+    OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(IMAG(scalar_complex) - 5) .gt. .00001)
+    OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(REAL(scalar_double_complex) - 5e+9) .gt. .0000000001)
+    OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(IMAG(scalar_double_complex) - 5e+9) .gt. .0000000001)
+
     test_defaultmap_on = errors
   END FUNCTION test_defaultmap_on
 
@@ -295,6 +268,7 @@ CONTAINS
        DO y = 1, INT(double_array_a(x))
           scalar_double = scalar_double + .7
        END DO
+       double_array_b(x) = scalar_double
 
        scalar_logical = .FALSE.
        DO y = 1, 16
@@ -333,51 +307,20 @@ CONTAINS
 
 
     DO x = 1, N
-       IF (char_array_a(x) .ne. char_array_b(x)) THEN
-          errors = errors + 1
-       END IF
-       IF (byte_array_a(x) .ne. byte_array_b(x)) THEN
-          errors = errors + 1
-       END IF
-       IF (short_array_a(x) .ne. short_array_b(x)) THEN
-          errors = errors + 1
-       END IF
-       IF (int_array_a(x) .ne. int_array_b(x)) THEN
-          errors = errors + 1
-       END IF
-       IF (long_int_array_a(x) .ne. long_int_array_b(x)) THEN
-          errors = errors + 1
-       END IF
-       IF (abs((INT(float_array_a(x)) * .7) - float_array_b(x)) .gt. &
-            & .00001) THEN
-          errors = errors + 1
-       END IF
-       IF (abs((INT(double_array_a(x)) * .7) - double_array_b(x)) .gt. &
-            & .0000000001) THEN
-          errors = errors + 1
-       END IF
-       IF (logical_array_b(x) .neqv. .FALSE.) THEN
-          errors = errors + 1
-       END IF
-       IF (logical_kind4_array_b(x) .neqv. .FALSE.) THEN
-          errors = errors + 1
-       END IF
-       IF (logical_kind8_array_b(x) .neqv. .FALSE.) THEN
-          errors = errors + 1
-       END IF
-       IF (ABS(complex_array_b(x)) - ABS(complex_array_a(x)) .lt. 0) THEN
-          errors = errors + 1
-       ELSEIF (ABS(complex_array_b(x) - (1, 1)) - (ABS(complex_array_a(x) &
-            & )) .gt. 0) THEN
-          errors = errors + 1
-       END IF
-       IF (ABS(double_complex_array_b(x)) - ABS(complex_array_a(x)) .lt. &
-            & 0) THEN
-          errors = errors + 1
-       ELSEIF (ABS(double_complex_array_b(x) - (1, 1)) - (ABS(double_&
-            &complex_array_a(x))) .gt. 0) THEN
-          errors = errors + 1
-       END IF
+       OMPVV_TEST_AND_SET_VERBOSE(errors, char_array_a(x) .ne. char_array_b(x))
+       OMPVV_TEST_AND_SET_VERBOSE(errors, byte_array_a(x) .ne. byte_array_b(x))
+       OMPVV_TEST_AND_SET_VERBOSE(errors, short_array_a(x) .ne. short_array_b(x))
+       OMPVV_TEST_AND_SET_VERBOSE(errors, int_array_a(x) .ne. int_array_b(x))
+       OMPVV_TEST_AND_SET_VERBOSE(errors, long_int_array_a(x) .ne. long_int_array_b(x))
+       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS((INT(float_array_a(x)) * .7) - float_array_b(x)) .gt. .00001)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS((INT(double_array_a(x)) * .7) - double_array_b(x)) .gt. .0000000001)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, logical_array_b(x) .neqv. .FALSE.)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, logical_kind4_array_b(x) .neqv. .FALSE.)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, LOGICAL(logical_kind8_array_b(x) .neqv. .FALSE., 4))
+       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(complex_array_b(x)) - ABS(complex_array_a(x)) .lt. 0)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(complex_array_b(x) - (1, 1)) - (ABS(complex_array_a(x))) .gt. 0)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(double_complex_array_b(x)) - ABS(complex_array_a(x)) .lt. 0)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(double_complex_array_b(x) - (1, 1)) - (ABS(double_complex_array_a(x))) .gt. 0)
     END DO
 
     scalar_char = 'c'
@@ -444,91 +387,35 @@ CONTAINS
     END DO
 
     DO x = 1, N
-       IF (char_array_a(x) .ne. scalar_char_copy) THEN
-          errors = errors + 1
-       END IF
-       IF (byte_array_a(x) .ne. scalar_byte_copy) THEN
-          errors = errors + 1
-       END IF
-       IF (short_array_a(x) .ne. scalar_short_copy) THEN
-          errors = errors + 1
-       END IF
-       IF (int_array_a(x) .ne. scalar_int_copy) THEN
-          errors = errors + 1
-       END IF
-       IF (long_int_array_a(x) .ne. scalar_long_int_copy) THEN
-          errors = errors + 1
-       END IF
-       IF (ABS(float_array_a(x) - scalar_float_copy) .gt. .000001) THEN
-          errors = errors + 1
-       END IF
-       IF (ABS(double_array_a(x) - scalar_double_copy) .gt. .0000000001) &
-            &THEN
-          errors = errors + 1
-       END IF
-       IF (logical_array_b(x) .neqv. scalar_logical_copy) THEN
-          errors = errors + 1
-       END IF
-       IF (logical_kind4_array_b(x) .neqv. scalar_logical_kind4_copy) THEN
-          errors = errors + 1
-       END IF
-       IF (logical_kind8_array_b(x) .neqv. scalar_logical_kind8_copy) THEN
-          errors = errors + 1
-       END IF
-       IF (complex_array_a(x) .ne. scalar_complex_copy) THEN
-          errors = errors + 1
-       END IF
-       IF (double_complex_array_a(x) .ne. scalar_double_complex_copy) THEN
-          errors = errors + 1
-       END IF
+       OMPVV_TEST_AND_SET_VERBOSE(errors, char_array_a(x) .ne. scalar_char_copy)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, byte_array_a(x) .ne. scalar_byte_copy)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, short_array_a(x) .ne. scalar_short_copy)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, int_array_a(x) .ne. scalar_int_copy)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, long_int_array_a(x) .ne. scalar_long_int_copy)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(float_array_a(x) - scalar_float_copy) .gt. .000001)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(double_array_a(x) - scalar_double_copy) .gt. .0000000001)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, logical_array_b(x) .neqv. scalar_logical_copy)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, logical_kind4_array_b(x) .neqv. scalar_logical_kind4_copy)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, LOGICAL(logical_kind8_array_b(x) .neqv. scalar_logical_kind8_copy, 4))
+       OMPVV_TEST_AND_SET_VERBOSE(errors, complex_array_a(x) .ne. scalar_complex_copy)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, double_complex_array_a(x) .ne. scalar_double_complex_copy)
     END DO
 
     IF (isSharedEnv .neqv. .TRUE.) THEN
-       IF (scalar_char .ne. scalar_char_copy) THEN
-          errors = errors + 1
-       END IF
-       IF (scalar_byte .ne. scalar_byte_copy) THEN
-          errors = errors + 1
-       END IF
-       IF (scalar_short .ne. scalar_short_copy) THEN
-          errors = errors + 1
-       END IF
-       IF (scalar_int .ne. scalar_int_copy) THEN
-          errors = errors + 1
-       END IF
-       IF (scalar_long_int .ne. scalar_long_int_copy) THEN
-          errors = errors + 1
-       END IF
-       IF (ABS(scalar_float - scalar_float_copy) .gt. .000001) THEN
-          errors = errors + 1
-       END IF
-       IF (ABS(scalar_double - scalar_double_copy) .gt. .0000000001) THEN
-          errors = errors + 1
-       END IF
-       IF (scalar_logical .neqv. scalar_logical_copy) THEN
-          errors = errors + 1
-       END IF
-       IF (scalar_logical_kind4 .neqv. scalar_logical_kind4_copy) THEN
-          errors = errors + 1
-       END IF
-       IF (scalar_logical_kind8 .neqv. scalar_logical_kind8_copy) THEN
-          errors = errors + 1
-       END IF
-       IF (ABS(REAL(scalar_complex) - REAL(scalar_complex_copy)) .gt. &
-            & .000001) THEN
-          errors = errors + 1
-       END IF
-       IF (ABS(IMAG(scalar_complex) - IMAG(scalar_complex_copy)) .gt. &
-            & .000001) THEN
-          errors = errors + 1
-       END IF
-       IF (ABS(REAL(scalar_double_complex) - REAL(scalar_double_complex)) &
-            & .gt. .0000000001) THEN
-          errors = errors + 1
-       END IF
-       IF (ABS(IMAG(scalar_double_complex) - IMAG(scalar_double_complex)) &
-            & .gt. .0000000001) THEN
-          errors = errors + 1
+       OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_char .ne. scalar_char_copy)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_byte .ne. scalar_byte_copy)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_short .ne. scalar_short_copy)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_int .ne. scalar_int_copy)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_long_int .ne. scalar_long_int_copy)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(scalar_float - scalar_float_copy) .gt. .000001)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(scalar_double - scalar_double_copy) .gt. .0000000001)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_logical .neqv. scalar_logical_copy)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_logical_kind4 .neqv. scalar_logical_kind4_copy)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, LOGICAL(scalar_logical_kind8 .neqv. scalar_logical_kind8_copy, 4))
+       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(REAL(scalar_complex) - REAL(scalar_complex_copy)) .gt. .000001)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(IMAG(scalar_complex) - IMAG(scalar_complex_copy)) .gt. .000001)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(REAL(scalar_double_complex) - REAL(scalar_double_complex)) .gt. .0000000001)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(IMAG(scalar_double_complex) - IMAG(scalar_double_complex)) .gt. .0000000001)
        END IF
     END IF
     test_defaultmap_off = errors
