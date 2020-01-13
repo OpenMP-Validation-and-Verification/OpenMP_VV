@@ -4,7 +4,7 @@
 //
 // This test uses the num_threads clause on a target teams distribute directive to
 // indicate a requested number of threads to execute the teams distribute region.
-// The specifications indicate that the number of threads that are given can be any
+// The specification indicates that the number of threads that are given can be any
 // number that is equal to or less than the indicated value. We first run a
 // target teams distribute region without the clause to see what the default
 // number of threads is, and then we use a value that is less than that in the
@@ -47,7 +47,7 @@ int main() {
     }
 
     OMPVV_TEST_AND_SET(errors, num_threads > default_threads / 2);
-    OMPVV_WARNING_IF(num_threads < default_threads / 2, "Test limited to fewer threads than were indicated. Still spec-conformant.");
+    OMPVV_WARNING_IF(num_threads < default_threads / 2, "Test was provided fewer threads than the thread_limit clause indicated. Still spec-conformant.");
 
   }
 
