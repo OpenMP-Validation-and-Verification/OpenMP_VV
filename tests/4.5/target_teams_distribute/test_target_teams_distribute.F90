@@ -37,19 +37,17 @@ CONTAINS
        num_teams(x) = -1
     END DO
 
-    !$omp target data map(tofrom: a(1:N), num_teams(1:N)) map(to: b(1:N))
-    !$omp target teams distribute map(alloc: a(1:N), num_teams(1:N), b(1:N))
+    !$omp target teams distribute map(tofrom: a(1:N), num_teams(1:N)) map(to: b(1:N))
     DO x = 1, N
        num_teams(x) = omp_get_num_teams();
        a(x) = a(x) + b(x)
     END DO
-    !$omp end target data
 
     OMPVV_WARNING_IF(num_teams(1) .eq. 1, "Test ran with one team, can't guarantee parallelism of teams")
 
     OMPVV_TEST_AND_SET_VERBOSE(errors, num_teams(1) .lt. 1)
 
-    IF (errors .eq. 0) THEN 
+    IF (errors .eq. 0) THEN
        DO x = 2, N
           OMPVV_TEST_AND_SET_VERBOSE(errors, num_teams(x) .ne. num_teams(x - 1))
           OMPVV_ERROR_IF(num_teams(x) .ne. num_teams(x - 1), "Test reported an inconsistent number of teams")

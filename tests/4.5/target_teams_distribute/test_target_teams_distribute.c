@@ -31,13 +31,10 @@ int main() {
     num_teams[x] = -1;
   }
 
-#pragma omp target data map(tofrom: a[0:N], num_teams[0:N]) map(to: b[0:N])
-  {
-#pragma omp target teams distribute map(alloc: a[0:N], b[0:N], num_teams[0:N])
-    for (int x = 0; x < N; ++x) {
-      num_teams[x] = omp_get_num_teams();
-      a[x] += b[x];
-    }
+#pragma omp target teams distribute map(tofrom: a[0:N], num_teams[0:N]) map(to: b[0:N])
+  for (int x = 0; x < N; ++x) {
+    num_teams[x] = omp_get_num_teams();
+    a[x] += b[x];
   }
 
   if (num_teams[0] == 1) {
@@ -45,7 +42,7 @@ int main() {
   } else if (num_teams[0] < 1) {
     OMPVV_ERROR("omp_get_num_teams() reported a value below one.");
   }
-  
+
   for (int x = 1; x < N; ++x) {
     if (num_teams[x] != num_teams[x - 1]) {
       OMPVV_ERROR("Test reported an inconsistent number of teams between loop iterations.");
