@@ -1,13 +1,13 @@
 !===------ test_target_teams_distribute_dist_schedule.F90 ----------------===//
-! 
+!
 ! OpenMP API Version 4.5 Nov 2015
-! 
-! This test checks that the dist_schedule clause (which must have kind 
+!
+! This test checks that the dist_schedule clause (which must have kind
 ! static) correctly causes CHUNK_SIZE iterations to be split among the
-! number of teams the test is run with, in a round-robin faction in order
-! of the team number, when a chunk size is given. The test also confirms
+! number of teams the test is run with (in a round-robin fashion in order
+! of the team number) when a chunk size is given. The test also confirms
 ! that when no chunk size is given, that each team receives no more than
-! one chunk.
+! one "chunk" of implementation-defined size.
 !
 !===----------------------------------------------------------------------===//
 
@@ -30,13 +30,14 @@ PROGRAM main
   OMPVV_REPORT_AND_RETURN()
 
 CONTAINS
-  INTEGER FUNCTION test_dist_schedule() 
+  INTEGER FUNCTION test_dist_schedule()
     INTEGER:: errors, num_teams, x, counter
+    LOGICAL:: err_cond
     INTEGER,DIMENSION(N):: a, b
 
     errors = 0
     counter = -1
-    
+
     DO x = 1, N
        a(x) = -1
        b(x) = -1
@@ -51,24 +52,17 @@ CONTAINS
        a(x)= omp_get_team_num()
     END DO
     !$omp end target teams distribute
-    
-    IF (num_teams .eq. 1) THEN
-       OMPVV_WARNING("Cannot test because num_teams was 1.")
-    ELSE IF (num_teams .lt. 1) THEN
-       OMPVV_ERROR("omp_get_num_teams() returned less than 1.")
-       errors = errors + 1
-    ELSE
-       DO x = 1, N
-          IF (MOD(x - 1, CHUNK_SIZE) .eq. 0) THEN
-             counter = MOD(counter + 1, num_teams)
-          END IF
-          IF (a(x) .ne. counter) THEN
-             OMPVV_ERROR("Iterations improperly scheduled for dist(static, chunk_size)")
-             errors = errors + 1
-             exit
-          END IF
-       END DO
-    END IF
+
+    OMPVV_WARNING_IF(num_teams .eq. 1, "Cannot test because num_teams was 1.")
+    OMPVV_TEST_AND_SET_VERBOSE(errors, num_teams .lt. 1)
+
+    DO x = 1, N
+       IF (MOD(x - 1, CHUNK_SIZE) .eq. 0) THEN
+          counter = MOD(counter + 1, num_teams)
+       END IF
+       OMPVV_TEST_AND_SET_VERBOSE(errors, a(x) .ne. counter)
+       OMPVV_ERROR_IF(a(x) .ne. counter, "Iterations improperly scheduled for dist(static, chunk_size)")
+    END DO
 
     num_teams = -1
 
@@ -81,22 +75,19 @@ CONTAINS
        b(x) = omp_get_team_num()
     END DO
     !$omp end target teams distribute
-    
-    IF (num_teams .eq. 1) THEN
-       OMPVV_WARNING("Cannot test because num_teams was 1.")
-    ELSE IF (num_teams .lt. 1) THEN
-       OMPVV_ERROR("omp_get_num_teams(0 returned less than 1.")
-       errors = errors + 1
-    ELSE
-       DO x = 2, N
-          IF ((b(x) .lt. b(x - 1)) .or. (b(x) .gt. (b(x - 1) + 1))) THEN
-             OMPVV_ERROR("Iterations improperly scheduled for dist(static)")
-             errors = errors + 1
-             exit
-          END IF
-       END DO
-    END IF    
-    
+
+    OMPVV_WARNING_IF(num_teams .eq. 1, "Cannot test because num_teams was 1.")
+    OMPVV_TEST_AND_SET_VERBOSE(errors, num_teams .lt. 1)
+
+    DO x = 2, N
+       err_cond = (b(x) .lt. b(x - 1)) .or. (b(x) .gt. (b(x - 1) + 1))
+       OMPVV_ERROR_IF(err_cond, "Iterations improperly scheduled for dist(static)")
+       OMPVV_TEST_AND_SET_VERBOSE(errors, err_cond);
+       IF (err_cond) THEN
+          exit
+       END IF
+    END DO
+
     test_dist_schedule = errors
   END FUNCTION test_dist_schedule
 END PROGRAM main

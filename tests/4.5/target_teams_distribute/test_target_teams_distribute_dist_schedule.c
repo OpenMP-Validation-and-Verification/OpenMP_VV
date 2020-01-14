@@ -1,14 +1,14 @@
 //===------ test_target_teams_distribute_dist_schedule.c ------------------===//
-// 
+//
 // OpenMP API Version 4.5 Nov 2015
-// 
-// This test checks that the dist_schedule clause (which must have kind 
+//
+// This test checks that the dist_schedule clause (which must have kind
 // static) correctly causes CHUNK_SIZE iterations to be split among the
-// number of teams the test is run with, in a round-robin faction in order
-// of the team number, when a chunk size is given. The test also confirms
+// number of teams the test is run with (in a round-robin fashion in order
+// of the team number) when a chunk size is given. The test also confirms
 // that when no chunk size is given, that each team receives no more than
-// one chunk.
-// 
+// one "chunk" of implementation-defined size.
+//
 //===----------------------------------------------------------------------===//
 
 #include <omp.h>
@@ -38,23 +38,16 @@ int test_dist_schedule() {
     a[i] = omp_get_team_num();
   }
 
-  if (num_teams == 1) {
-    OMPVV_WARNING("Cannot test dist_schedule(static, chunk_size) because num_teams was 1.");
-  } else if (num_teams < 1) {
-    OMPVV_ERROR("omp_get_num_teams() returned a value less than 1.");
-    return 1;
-  }
+  OMPVV_WARNING_IF(num_teams == 1, "Cannot test dist_schedule(static, chunk_size) because num_teams was 1.");
+  OMPVV_TEST_AND_SET_VERBOSE(errors, num_teams < 1);
 
   int counter = -1;
   for (int i = 0; i < N; ++i) {
     if (i % CHUNK_SIZE == 0) {
       counter = (counter + 1) % num_teams;
     }
-    if (a[i] != counter) {
-      OMPVV_ERROR("Loop iterations were not properly scheduled with specified chunk_size of %d.", CHUNK_SIZE);
-      errors++;
-      break;
-    }
+    OMPVV_TEST_AND_SET_VERBOSE(errors, a[i] != counter);
+    OMPVV_ERROR_IF(a[i] != counter, "Loop iterations were not properly scheduled with specified chunk_size of %d.", CHUNK_SIZE);
   }
 
   num_teams = -1;
@@ -67,17 +60,17 @@ int test_dist_schedule() {
     b[i] = omp_get_team_num();
   }
 
-  if (num_teams == 1) {
-    OMPVV_WARNING("Cannot test dist_schedule(static) because num_teams was 1.");
-  } else if (num_teams < 1) {
-    OMPVV_ERROR("omp_get_num_teams() returned a value less than 1.");
-    return 1;
-  }
+  OMPVV_WARNING_IF(num_teams == 1, "Cannot test dist_schedule(static, chunk_size) because num_teams was 1.");
+  OMPVV_TEST_AND_SET_VERBOSE(errors, num_teams < 1);
 
+  counter = 1;
+
+  int err_cond = 0;
   for (int i = 1; i < N; ++i) {
-    if (a[i] < a[i - 1] || a[i] > (a[i - 1] + 1)) {
-      OMPVV_ERROR("Loop iterations were not properly sheduled with unspecified chunk_size.");
-      errors++;
+    err_cond = a[i] < a[i - 1] || a[i] > (a[i - 1] + 1);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, err_cond);
+    OMPVV_ERROR_IF(err_cond, "Loop iterations were not properly sheduled with unspecified chunk_size.");
+    if (err_cond) {
       break;
     }
   }
