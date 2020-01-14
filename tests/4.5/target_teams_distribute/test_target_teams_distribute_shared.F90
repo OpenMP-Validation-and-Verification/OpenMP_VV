@@ -6,11 +6,12 @@
 ! tests in a few ways that the variable is shared between the teams.  In the
 ! first test, the atomic directive is used to indicate that all operations on
 ! the variable should be done atomically.  If the value is the correct value
-! at the end of the region, then all teams operated on the same variable.
+! at the end of the region, then all teams operated on the same variable, and
+! the variable was not privatized.
 !
 ! The second test, instead of writing to the variable, only reads from the
 ! variable.  This tests that the value of the shared variable has not been
-! initiallized improperly or privatized.
+! initialized improperly.
 !
 !//===----------------------------------------------------------------------===//
 
