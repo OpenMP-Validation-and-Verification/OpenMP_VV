@@ -55,11 +55,8 @@ int test_target_teams_distribute_depend_disjoint_section() {
     }
   }
 
-  if (invalid_found == 0 && race_found == 1) {
-    OMPVV_INFOMSG("Found independence between depend clauses on disjoint array sections.");
-  } else {
-    OMPVV_WARNING("Could not find independence between depend clauses on disjoint array sections.");
-  } 
+  OMPVV_INFOMSG_IF(invalid_found == 0 && race_found == 1, "Found asynchronous behavior between depend clauses on disjoint array sections.");
+  OMPVV_WARNING_IF(invalid_found == 0 && race_found == 0, "Constructs ran in sequence, could not show lack of dependence since nowait had no effect.");
 
   return invalid_found;
 }

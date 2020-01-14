@@ -3,7 +3,7 @@
 // OpenMP API Version 4.5 Nov 2015
 //
 // This test checks for dependency between all combinations of out and inout
-// by checking order-dependent results from pairs of possibly asynchronous 
+// by checking order-dependent results from pairs of possibly asynchronous
 // loops. The test fails if any required dependency is broken.
 //
 ////===----------------------------------------------------------------------===//
@@ -46,10 +46,7 @@ int test_target_teams_distribute_depend_out_out() {
   }
 
   for (int x = 0; x < N; ++x) {
-    if (d[x] != 5 * x) {
-      out_out_errors = 1;
-      break;
-    }
+    OMPVV_TEST_AND_SET_VERBOSE(out_out_errors, d[x] != 5*x);
   }
 
 #pragma omp target data map(to: a[0:N], b[0:N]) map(alloc: c[0:N]) map(from: d[0:N])
@@ -65,9 +62,7 @@ int test_target_teams_distribute_depend_out_out() {
   }
 
   for (int x = 0; x < N; ++x) {
-    if (d[x] != 4 * x) {
-      out_inout_errors = 1;
-    }
+    OMPVV_TEST_AND_SET_VERBOSE(out_inout_errors, d[x] != 4*x);
   }
 
 #pragma omp target data map(to: a[0:N], b[0:N]) map(alloc: c[0:N]) map(from: d[0:N])
@@ -83,9 +78,7 @@ int test_target_teams_distribute_depend_out_out() {
   }
 
   for (int x = 0; x < N; ++x) {
-    if (d[x] != 5 * x) {
-      inout_out_errors = 1;
-    }
+    OMPVV_TEST_AND_SET_VERBOSE(inout_out_errors, d[x] != 5*x);
   }
 
 #pragma omp target data map(to: a[0:N], b[0:N]) map(alloc: c[0:N]) map(from: d[0:N])
@@ -101,9 +94,7 @@ int test_target_teams_distribute_depend_out_out() {
   }
 
   for (int x = 0; x < N; ++x) {
-    if (d[x] != 4 * x) {
-      inout_inout_errors = 1;
-    }
+    OMPVV_TEST_AND_SET_VERBOSE(inout_inout_errors, d[x] != 4*x);
   }
 
   OMPVV_ERROR_IF(out_out_errors == 1, "Test of depend(out) task becoming dependent task of depend(out) task did not pass with offloading %s", (isOffloading ? "enabled" : "disabled"));
@@ -111,12 +102,7 @@ int test_target_teams_distribute_depend_out_out() {
   OMPVV_ERROR_IF(out_inout_errors == 1, "Test of depend(inout) task becoming dependent task of depend(out) task did not pass with offloading %s", (isOffloading ? "enabled" : "disabled"));
   OMPVV_ERROR_IF(inout_inout_errors == 1, "Test of depend(inout) task becoming dependent task of depend(inout) task did not pass with offloading %s", (isOffloading ? "enabled" : "disabled"));
 
-  if (inout_inout_errors + inout_out_errors + out_inout_errors + out_out_errors > 0) {
-    return 1;
-  }
-  else {
-    return 0;
-  }
+  return inout_inout_errors + inout_out_errors + out_inout_errors + out_out_errors;
 }
 
 int main() {

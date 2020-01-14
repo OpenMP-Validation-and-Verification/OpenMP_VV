@@ -4,7 +4,7 @@
 //
 // This test checks if two depend(in) tasks are independent by trying to
 // create a race condition. If no race condition can be shown, then the test
-// gives only a warning, since this is still complaint. This test will 
+// gives only a warning, since this is still complaint. This test will
 // always pass.
 //
 ////===----------------------------------------------------------------------===//
@@ -55,11 +55,8 @@ int test_target_teams_distribute_depend_in_in() {
     }
   }
 
-  if (invalid_found == 0 && race_found == 1) {
-    OMPVV_INFOMSG("Found independence between depend(in) clauses.");
-  } else {
-    OMPVV_WARNING("Could not find independence between depend(in) clauses.");
-  } 
+  OMPVV_INFOMSG_IF(invalid_found == 0 && race_found == 1, "Found asynchronous behavior between depend clauses on disjoint array sections.");
+  OMPVV_WARNING_IF(invalid_found == 0 && race_found == 0, "Constructs ran in sequence, could not show lack of dependence since nowait had no effect.");
 
   return invalid_found;
 }

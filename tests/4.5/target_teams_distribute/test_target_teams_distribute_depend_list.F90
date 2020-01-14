@@ -71,9 +71,7 @@ CONTAINS
     !$omp end target data
 
     DO x = 1, N
-       IF ((f(x) .ne. 8 * x) .or. (g(x) .ne. 9 * x)) THEN
-          errors = errors + 1
-       END IF
+       OMPVV_TEST_AND_SET_VERBOSE(errors, (f(x) .ne. 8 * x) .or. (g(x) .ne. 9 * x))
     END DO
 
     depend_list = errors

@@ -54,9 +54,7 @@ CONTAINS
     !$omp end target data
 
     DO x = 1, N
-       IF (d(x) .ne. 5 * x) THEN
-          errors_a = errors_a + 1
-       END IF
+       OMPVV_TEST_AND_SET_VERBOSE(errors_a, d(x) .ne. 5*x)
     END DO
 
     !$omp target data map(to: a(1:N), b(1:N)) map(alloc: c(1:N)) map( &
@@ -74,9 +72,7 @@ CONTAINS
     !$omp end target data
 
     DO x = 1, N
-       IF (d(x) .ne. 4 * x) THEN
-          errors_b = errors_b + 1
-       END IF
+       OMPVV_TEST_AND_SET_VERBOSE(errors_b, d(x) .ne. 4*x)
     END DO
 
     IF ((errors_a .gt. 0) .and. (errors_b .gt. 0)) THEN

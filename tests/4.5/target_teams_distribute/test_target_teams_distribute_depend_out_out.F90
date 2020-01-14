@@ -3,7 +3,7 @@
 ! OpenMP API Version 4.5 Nov 2015
 !
 ! This test checks for dependency between all combinations of out and inout
-! by checking order-dependent results from pairs of possibly asynchronous 
+! by checking order-dependent results from pairs of possibly asynchronous
 ! loops. The test fails if any required dependency is broken.
 !
 !//===----------------------------------------------------------------------===//
@@ -57,9 +57,7 @@ CONTAINS
     !$omp end target data
 
     DO x = 1, N
-       IF (d(x) .ne. 5 * x) THEN
-          out_out_errors = out_out_errors + 1
-       END IF
+       OMPVV_TEST_AND_SET(out_out_errors, d(x) .ne. 5*x)
     END DO
 
     !$omp target data map(to: a(1:N), b(1:N)) map(alloc: c(1:N)) map(&
@@ -77,9 +75,7 @@ CONTAINS
     !$omp end target data
 
     DO x = 1, N
-       IF (d(x) .ne. 4 * x) THEN
-          out_inout_errors = out_inout_errors + 1
-       END IF
+       OMPVV_TEST_AND_SET_VERBOSE(out_inout_errors, d(x) .ne. 4*x)
     END DO
 
     !$omp target data map(to: a(1:N), b(1:N)) map(alloc: c(1:N)) map(&
@@ -97,9 +93,7 @@ CONTAINS
     !$omp end target data
 
     DO x = 1, N
-       IF (d(x) .ne. 5 * x) THEN
-          inout_out_errors = inout_out_errors + 1
-       END IF
+       OMPVV_TEST_AND_SET_VERBOSE(inout_out_errors, d(x) .ne. 5*x)
     END DO
 
     !$omp target data map(to: a(1:N), b(1:N)) map(alloc: c(1:N)) map(&
@@ -117,27 +111,13 @@ CONTAINS
     !$omp end target data
 
     DO x = 1, N
-       IF (d(x) .ne. 4 * x) THEN
-          inout_inout_errors = inout_inout_errors + 1
-       END IF
+       OMPVV_TEST_AND_SET_VERBOSE(inout_inout_errors, d(x) .ne. 4*x)
     END DO
-    
-    IF ((inout_inout_errors + inout_out_errors + out_inout_errors + &
-         & out_out_errors) .gt. 0) THEN
-       OMPVV_ERROR("The following task dependencies fail: ")
-    END IF
-    IF (inout_inout_errors .gt. 0) THEN
-       OMPVV_ERROR("inout task on inout task")
-    END IF
-    IF (inout_out_errors .gt. 0) THEN
-       OMPVV_ERROR("inout task on out task")
-    END IF
-    IF (out_inout_errors .gt. 0) THEN
-       OMPVV_ERROR("out task on inout task")
-    END IF
-    IF (out_out_errors .gt. 0) THEN
-       OMPVV_ERROR("out task on out task")
-    END IF
+
+    OMPVV_ERROR_IF(inout_inout_errors .gt. 0, "Inout task on inout task dependence failed")
+    OMPVV_ERROR_IF(inout_out_errors .gt. 0, "Inout task on out task dependence failed")
+    OMPVV_ERROR_IF(out_inout_errors .gt. 0, "Out task on inout task dependence failed")
+    OMPVV_ERROR_IF(out_out_errors .gt. 0, "Out task on out task dependence failed")
 
     depend_out_out = inout_inout_errors + inout_out_errors + &
          & out_inout_errors + out_out_errors

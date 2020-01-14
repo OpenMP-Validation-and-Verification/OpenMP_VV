@@ -43,10 +43,8 @@ int test_target_teams_distribute_depend_in_out() {
   }
 
   for (int x = 0; x < N; ++x) {
-    if (d[x] != 5 * x) {
-      errors = 1;
-      break;
-    }
+    OMPVV_TEST_AND_SET_VERBOSE(errors, d[x] != 5*x);
+    OMPVV_ERROR_IF(d[x] != 5*x, "Test of depend(out) task becoming dependent on depend(in) task failed.");
   }
 
 #pragma omp target data map(to: a[0:N], b[0:N]) map(alloc: c[0:N]) map(from: d[0:N])
@@ -62,24 +60,11 @@ int test_target_teams_distribute_depend_in_out() {
   }
 
   for (int x = 0; x < N; ++x) {
-    if (d[x] != 4 * x) {
-      if (errors == 1) {
-	OMPVV_ERROR("Test of depend(inout/out) task becoming dependent task of depend(in) task did not pass with offloading %s", (isOffloading ? "enabled" : "disabled"));
-	return 1;
-      }
-      else {
-	OMPVV_ERROR("Test of depend(inout) task becoming dependent task of depend(in) task did not pass with offloading %s", (isOffloading ? "enabled" : "disabled"));
-	return 1;
-      }
-    }
+    OMPVV_TEST_AND_SET_VERBOSE(errors, d[x] != 4*x);
+    OMPVV_ERROR_IF(d[x] != 4*x, "Test of depend(inout) task becoming dependent on depend(in) task failed.");
   }
-  if (errors == 1) {
-    OMPVV_ERROR("Test of depend(out) task becoming dependent task of depend(in) task did not pass with offloading %s", (isOffloading ? "enabled" : "disabled"));
-    return 1;
-  }
-  else {
-    return 0;
-  }
+
+  return errors;
 }
 
 int main() {

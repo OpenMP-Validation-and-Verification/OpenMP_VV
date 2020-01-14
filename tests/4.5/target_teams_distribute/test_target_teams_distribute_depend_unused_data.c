@@ -18,6 +18,7 @@
 
 int test_target_teams_distribute_depend_unused_data() {
   int isOffloading = 0;
+  int errors = 0;
   int a[N];
   int b[N];
   int c[N];
@@ -44,12 +45,14 @@ int test_target_teams_distribute_depend_unused_data() {
   }
 
   for (int x = 0; x < N; ++x) {
-    if (d[x] != 5 * x) {
-      OMPVV_ERROR("Test of depend clause using array sections did not pass with offloading %s", (isOffloading ? "enabled" : "disabled"));
-      return 1;
-    }
+      OMPVV_ERROR_IF(d[x] != 5*x, "Test of depend clause using array sections did not pass with offloading %s", (isOffloading ? "enabled" : "disabled"));
+      OMPVV_TEST_AND_SET_VERBOSE(errors, d[x] != 5*x);
+      if (d[x] != 5*x) {
+        break;
+      }
   }
-  return 0;
+
+  return errors;
 }
 
 

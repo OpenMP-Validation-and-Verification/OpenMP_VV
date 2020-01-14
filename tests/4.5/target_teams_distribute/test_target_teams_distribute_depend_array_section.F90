@@ -51,11 +51,11 @@ CONTAINS
     END DO
     !$omp end target data
 
+    errors = 0
     DO x = 1, N
-       IF (d(x) .ne. 5 * x) THEN
-          errors = errors + 1
-       END IF
+       OMPVV_TEST_AND_SET_VERBOSE(errors, d(x) .ne. 5*x)
     END DO
+
 
     depend_array_section = errors
   END FUNCTION depend_array_section

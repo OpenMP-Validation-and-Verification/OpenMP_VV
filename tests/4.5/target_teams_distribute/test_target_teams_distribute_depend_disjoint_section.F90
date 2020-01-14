@@ -68,11 +68,13 @@ CONTAINS
     END DO
 
     IF ((invalid_found .eqv. .FALSE.) .and. (race_found .eqv. .TRUE.)) THEN
-       OMPVV_INFOMSG("Found independence between depend clauses on")
+       OMPVV_INFOMSG("Found asynchronicity between depend clauses on")
        OMPVV_INFOMSG("disjoint array sections")
-    ELSE
-       OMPVV_WARNING("Could not find independence between depend")
-       OMPVV_WARNING("clauses on disjoint array sections")
+    END IF
+    IF ((invalid_found .eqv. .FALSE.) .and. (race_found .eqv. .FALSE.)) THEN
+       OMPVV_WARNING("Constructs ran in sequence, can't show lack of")
+       OMPVV_WARNING("dependence between depend clauses on disjoint")
+       OMPVV_WARNING("array sections since nowait had no effect")
     END IF
 
     depend_disjoint_section = errors

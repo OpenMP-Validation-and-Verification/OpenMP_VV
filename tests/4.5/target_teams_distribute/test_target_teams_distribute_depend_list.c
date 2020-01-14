@@ -17,6 +17,7 @@
 
 int test_target_teams_distribute_depend_list() {
   int isOffloading = 0;
+  int errors = 0;
   int a[N];
   int b[N];
   int c[N];
@@ -60,12 +61,11 @@ int test_target_teams_distribute_depend_list() {
   }
 
   for (int x = 0; x < N; ++x) {
-    if (f[x] != 8 * x || g[x] != 9 * x) {
-      OMPVV_ERROR("Test of depend clause using multiple dependencies did not pass with offloading %s", (isOffloading ? "enabled" : "disabled"));
-      return 1;
-    }
+    OMPVV_ERROR_IF(f[x] != 8*x || g[x] != 9*x, "Test of depend clause using multiple dependencies did not pass with offloading %s", (isOffloading ? "enabled" : "disabled"));
+    OMPVV_TEST_AND_SET_VERBOSE(errors, f[x] != 8*x || g[x] != 9*x);
   }
-  return 0;
+
+  return errors;
 }
 
 int main() {

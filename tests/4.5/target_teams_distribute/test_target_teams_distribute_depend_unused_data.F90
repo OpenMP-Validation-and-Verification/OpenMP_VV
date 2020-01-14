@@ -55,9 +55,7 @@ CONTAINS
     !$omp end target data
 
     DO x = 1, N
-       IF (d(x) .ne. 5 * x) THEN
-          errors = errors + 1
-       END IF
+       OMPVV_TEST_AND_SET_VERBOSE(errors, d(x) .ne. 5*x)
     END DO
 
     depend_unused_data = errors
