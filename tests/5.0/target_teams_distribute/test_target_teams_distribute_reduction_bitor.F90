@@ -10,6 +10,7 @@
 #include "ompvv.F90"
 
 #define N 1024
+#define THRESHOLD 512
 
 PROGRAM test_target_teams_distribute_device
   USE iso_fortran_env
@@ -28,14 +29,20 @@ CONTAINS
   INTEGER FUNCTION test_bitor()
     INTEGER,DIMENSION(N) :: a
     REAL(8),DIMENSION(N, 32):: randoms
-    INTEGER:: result, host_result, x, y, z, errors
+    INTEGER:: result, host_result, x, y, z, errors, itr_count
+    LOGICAL:: tested_true, tested_false
     REAL(8):: true_margin
     errors = 0
+
+    tested_true = .FALSE.
+    tested_false = .FALSE.
+    itr_count = 0
 
     CALL RANDOM_SEED()
     true_margin = exp(log(.5) / N)
 
-    DO y = 1, 32
+    DO WHILE ((.NOT. tested_true .OR. .NOT. tested_false) &
+         & .AND. (itr_count .lt. THRESHOLD))
        CALL RANDOM_NUMBER(randoms)
        host_result = 0
        result = 0
@@ -44,6 +51,9 @@ CONTAINS
           DO z = 1, 32
              IF (randoms(x, y) .gt. true_margin) THEN
                 a(x) = a(x) + (2**z)
+                tested_true = .TRUE.
+             ELSE
+                tested_false = .TRUE.
              END IF
           END DO
        END DO
@@ -59,7 +69,12 @@ CONTAINS
        END DO
 
        OMPVV_TEST_AND_SET_VERBOSE(errors, host_result .ne. result)
+
+       itr_count = itr_count + 1
     END DO
+
+    OMPVV_WARNING_IF(.NOT. tested_true, "Did not test true case")
+    OMPVV_WARNING_IF(.NOT. tested_false, "Did not test false case")
 
     test_bitor = errors
   END FUNCTION test_bitor
