@@ -20,7 +20,6 @@ int test_bitxor() {
   unsigned int a[N];
   int errors = 0;
   int num_teams[N];
-  int warned = 0;
   srand(1);
 
   for (int x = 0; x < N; ++x) {
