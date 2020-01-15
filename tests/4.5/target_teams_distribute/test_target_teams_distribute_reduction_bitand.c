@@ -15,23 +15,36 @@
 #include <math.h>
 
 #define N 1024
+#define THRESHOLD 512
 
 int test_bitand() {
   unsigned int a[N];
   double false_margin = pow(exp(1), log(.5)/N); // See the 'and' operator test for
   int errors = 0;                               // an exaplantion of this math.
   int num_teams[N];
-  int warned = 0;
+  int num_attempts = 0;
+  int have_true, have_false;
   srand(1);
 
-  for (int x = 0; x < N; ++x) {
-    for (int y = 0; y < 16; ++y) {
-      if (rand() / (double) RAND_MAX < false_margin) {
-        a[x] += 1 << y;
+  while ((!have_true || !have_false) && (num_attempts < THRESHOLD)) {
+    have_true = 0;
+    have_false = 0;
+    for (int x = 0; x < N; ++x) {
+      for (int y = 0; y < 16; ++y) {
+        if (rand() / (double) RAND_MAX < false_margin) {
+          a[x] += (1 << y);
+          have_true = 1;
+        } else {
+          have_false = 1;
+        }
       }
+      num_teams[x] = -x;
     }
-    num_teams[x] = -x;
+    num_attempts++;
   }
+
+  OMPVV_WARNING_IF(!have_true, "No true bits were generated to test");
+  OMPVV_WARNING_IF(!have_false, "No false bits were generated to test");
 
   unsigned int b = 0;
   for (int x = 0; x < 16; ++x) {
@@ -51,16 +64,10 @@ int test_bitand() {
   }
 
   for (int x = 1; x < N; ++x) {
-    if (num_teams[x-1] != num_teams[x]) {
-      OMPVV_WARNING("Kernel reported differing numbers of teams.  Validity of testing of reduction clause cannot be guaranteed.");
-      warned += 1;
-    }
+    OMPVV_WARNING_IF(num_teams[x - 1] != num_teams[x], "Kernel reported differing numbers of teams.  Validity of testing of reduction clause cannot be guaranteed.");
   }
-  if ((num_teams[0] == 1) && (warned == 0)) {
-    OMPVV_WARNING("Test operated with one team.  Reduction clause cannot be tested.");
-  } else if ((num_teams[0] <= 0) && (warned == 0)) {
-    OMPVV_WARNING("Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guaranteed.");
-  }
+  OMPVV_WARNING_IF(num_teams[0] == 1, "Test operated with one team.  Reduction clause cannot be tested.");
+  OMPVV_WARNING_IF(num_teams[0] <= 0, "Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guaranteed.");
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, b != host_b);
   OMPVV_ERROR_IF(host_b != b, "Bit on device is %d but expected bit from host is %d.", b, host_b);
