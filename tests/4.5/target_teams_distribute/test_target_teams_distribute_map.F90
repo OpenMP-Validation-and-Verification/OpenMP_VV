@@ -21,7 +21,10 @@ PROGRAM test_target_teams_distribute_map
 
   OMPVV_TEST_OFFLOADING
   OMPVV_TEST_SHARED_ENVIRONMENT
-  OMPVV_TEST_VERBOSE(test_map_to() + test_map_from() + test_map_alloc() + test_map_tofrom() .ne. 0)
+  OMPVV_TEST_VERBOSE(test_map_to() .ne. 0)
+  OMPVV_TEST_VERBOSE(test_map_from() .ne. 0)
+  OMPVV_TEST_VERBOSE(test_map_alloc() .ne. 0)
+  OMPVV_TEST_VERBOSE(test_map_tofrom() .ne. 0)
 
   OMPVV_REPORT_AND_RETURN()
 CONTAINS
