@@ -42,11 +42,11 @@ int main() {
     for (x = 0; x < N; ++x) {
       privatized = 0;
       for (int y = 0; y < a[x] + b[x]; ++y) {
-	privatized++;
+        privatized++;
       }
       d[x] = c[x] * privatized;
       if (omp_get_team_num() == 0) {
-	num_teams = omp_get_num_teams();
+        num_teams = omp_get_num_teams();
       }
     }
   }
@@ -67,7 +67,7 @@ int main() {
 #pragma omp atomic update
       share = share + b[x];
       if (omp_get_team_num() == 0) {
-	num_teams = omp_get_num_teams();
+        num_teams = omp_get_num_teams();
       }
     }
   }

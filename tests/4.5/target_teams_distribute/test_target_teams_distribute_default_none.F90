@@ -25,8 +25,8 @@ PROGRAM test_target_teams_distribute_default_none
        & does not guarantee that the default(none) is enforced."
   OMPVV_WARNING(infoMessage)
 
-  OMPVV_TEST_VERBOSE(default_none1() .ne. 0)
-  OMPVV_TEST_VERBOSE(default_none2() .ne. 0)
+  OMPVV_TEST_VERBOSE(default_none1() .ne. 0)  !check read/write to private
+  OMPVV_TEST_VERBOSE(default_none2() .ne. 0)  !check atomic update of shared
   OMPVV_REPORT_AND_RETURN()
 
 CONTAINS
