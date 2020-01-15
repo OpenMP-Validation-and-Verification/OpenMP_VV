@@ -1,4 +1,4 @@
-//===------------------- test_target_map_global_arrays.c---------------------===//
+//===--- test_target_map_global_arrays.c ------------------------------------===//
 // 
 // OpenMP API Version 4.5 Nov 2015
 //
