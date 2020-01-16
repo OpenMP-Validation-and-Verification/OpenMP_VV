@@ -117,12 +117,14 @@ int test_defaultmap_on() {
                                                                    double_array[0:ARRAY_SIZE], \
                                                                    enum_array[0:ARRAY_SIZE])
   for (int x = 0; x < ARRAY_SIZE; ++x) {
-    scalar_char = char_array[x];
-    scalar_short = short_array[x];
-    scalar_int = int_array[x];
-    scalar_float = float_array[x];
-    scalar_double = double_array[x];
-    scalar_enum = enum_array[x];
+    if (omp_get_team_num() == 0) {
+      scalar_char = char_array[x];
+      scalar_short = short_array[x];
+      scalar_int = int_array[x];
+      scalar_float = float_array[x];
+      scalar_double = double_array[x];
+      scalar_enum = enum_array[x];
+    }
   }
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_char != char_array[0]);
@@ -173,8 +175,6 @@ int test_defaultmap_on() {
       break;
     }
   }
-
-
 
   return errors;
 }

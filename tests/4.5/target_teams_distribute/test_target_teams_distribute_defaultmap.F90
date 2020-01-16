@@ -38,7 +38,6 @@ PROGRAM test_target_teams_distribute_defaultmap
 CONTAINS
   INTEGER FUNCTION test_defaultmap_on()
     INTEGER :: errors, x
-    CHARACTER :: scalar_char
     BYTE :: scalar_byte
     INTEGER(kind = 2) :: scalar_short
     INTEGER(kind = 4) :: scalar_int
@@ -49,9 +48,7 @@ CONTAINS
     LOGICAL(kind = 4) :: scalar_logical_kind4
     LOGICAL(kind = 8) :: scalar_logical_kind8
     COMPLEX :: scalar_complex
-    COMPLEX(kind = 16) :: scalar_double_complex
 
-    CHARACTER,DIMENSION(N) :: char_array
     BYTE,DIMENSION(N) :: byte_array
     INTEGER(kind = 2),DIMENSION(N) :: short_array
     INTEGER(kind = 4),DIMENSION(N) :: int_array
@@ -62,9 +59,7 @@ CONTAINS
     LOGICAL(kind = 4),DIMENSION(N) :: logical_kind4_array
     LOGICAL(kind = 8),DIMENSION(N) :: logical_kind8_array
     COMPLEX,DIMENSION(N) :: complex_array
-    COMPLEX(kind = 16),DIMENSION(N) :: double_complex_array
 
-    scalar_char = 'a'
     scalar_byte = 8
     scalar_short = 23
     scalar_int = 56
@@ -75,18 +70,16 @@ CONTAINS
     scalar_logical_kind4 = .TRUE.
     scalar_logical_kind8 = .TRUE.
     scalar_complex = (1, 1)
-    scalar_double_complex = (1e+10, 1e+10)
 
     errors = 0
 
     !$omp target teams distribute defaultmap(tofrom: scalar) map(tofrom: &
-    !$omp& char_array(1:N), byte_array(1:N), short_array(1:N), &
+    !$omp& byte_array(1:N), short_array(1:N), &
     !$omp& int_array(1:N), long_int_array(1:N), float_array(1:N), &
     !$omp& double_array(1:N), logical_array(1:N), &
     !$omp& logical_kind4_array(1:N),  logical_kind8_array(1:N), &
-    !$omp& complex_array(1:N), double_complex_array(1:N))
+    !$omp& complex_array(1:N))
     DO x = 1, N
-       char_array(x) = scalar_char
        byte_array(x) = scalar_byte
        short_array(x) = scalar_short
        int_array(x) = scalar_int
@@ -97,12 +90,10 @@ CONTAINS
        logical_kind4_array(x) = scalar_logical_kind4
        logical_kind8_array(x) = scalar_logical_kind8
        complex_array(x) = scalar_complex
-       double_complex_array(x) = scalar_double_complex
     END DO
     !$omp end target teams distribute
 
     DO x = 1, N
-       OMPVV_TEST_AND_SET_VERBOSE(errors, char_array(x) .ne. scalar_char)
        OMPVV_TEST_AND_SET_VERBOSE(errors, byte_array(x) .ne. scalar_byte)
        OMPVV_TEST_AND_SET_VERBOSE(errors, short_array(x) .ne. scalar_short)
        OMPVV_TEST_AND_SET_VERBOSE(errors, int_array(x) .ne. scalar_int)
@@ -114,28 +105,25 @@ CONTAINS
        OMPVV_TEST_AND_SET_VERBOSE(errors, LOGICAL(logical_kind8_array(x) .neqv. scalar_logical_kind8, 4))
        OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(REAL(complex_array(x)) - REAL(scalar_complex)) .gt. .00001)
        OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(IMAG(complex_array(x)) - IMAG(scalar_complex)) .gt. .00001)
-       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(REAL(double_complex_array(x)) - REAL(scalar_double_complex)) .gt. .0000000001)
-       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(IMAG(double_complex_array(x)) - IMAG(scalar_double_complex)) .gt. .0000000001)
     END DO
 
     !$omp target teams distribute defaultmap(tofrom: scalar)
     DO x = 1, N
-       scalar_char = 'b'
-       scalar_byte = 5
-       scalar_short = 83
-       scalar_int = 49
-       scalar_long_int = 12345
-       scalar_float  = 11.2
-       scalar_double  = 9.5
-       scalar_logical = .false.
-       scalar_logical_kind4 = .false.
-       scalar_logical_kind8 = .false.
-       scalar_complex = (5, 5)
-       scalar_double_complex = (5e+9, 5e+9)
+       IF (omp_get_team_num() .eq. 0) THEN
+          scalar_byte = 5
+          scalar_short = 83
+          scalar_int = 49
+          scalar_long_int = 12345
+          scalar_float  = 11.2
+          scalar_double  = 9.5
+          scalar_logical = .false.
+          scalar_logical_kind4 = .false.
+          scalar_logical_kind8 = .false.
+          scalar_complex = (5, 5)
+       END IF
     END DO
     !$omp end target teams distribute
 
-    OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_char .ne. 'b')
     OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_byte .ne. 5)
     OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_short .ne. 83)
     OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_int .ne. 49)
@@ -147,15 +135,12 @@ CONTAINS
     OMPVV_TEST_AND_SET_VERBOSE(errors, LOGICAL(scalar_logical_kind8 .neqv. .false., 4))
     OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(REAL(scalar_complex) - 5) .gt. .00001)
     OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(IMAG(scalar_complex) - 5) .gt. .00001)
-    OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(REAL(scalar_double_complex) - 5e+9) .gt. .0000000001)
-    OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(IMAG(scalar_double_complex) - 5e+9) .gt. .0000000001)
 
     test_defaultmap_on = errors
   END FUNCTION test_defaultmap_on
 
   INTEGER FUNCTION test_defaultmap_off()
     INTEGER :: errors, x, y
-    CHARACTER :: scalar_char, scalar_char_copy
     BYTE :: scalar_byte, scalar_byte_copy
     INTEGER(kind = 2) :: scalar_short, scalar_short_copy
     INTEGER(kind = 4) :: scalar_int, scalar_int_copy
@@ -166,10 +151,7 @@ CONTAINS
     LOGICAL(kind = 4) :: scalar_logical_kind4, scalar_logical_kind4_copy
     LOGICAL(kind = 8) :: scalar_logical_kind8, scalar_logical_kind8_copy
     COMPLEX :: scalar_complex, scalar_complex_copy
-    COMPLEX(kind = 16) :: scalar_double_complex
-    COMPLEX(kind = 16) :: scalar_double_complex_copy
 
-    CHARACTER,DIMENSION(N) :: char_array_a, char_array_b
     BYTE,DIMENSION(N) :: byte_array_a, byte_array_b
     INTEGER(kind = 2),DIMENSION(N) :: short_array_a, short_array_b
     INTEGER(kind = 4),DIMENSION(N) :: int_array_a, int_array_b
@@ -183,10 +165,7 @@ CONTAINS
     LOGICAL(kind = 8),DIMENSION(N, 16) :: logical_kind8_array_a
     LOGICAL(kind = 8),DIMENSION(N) :: logical_kind8_array_b
     COMPLEX,DIMENSION(N) :: complex_array_a, complex_array_b
-    COMPLEX(kind = 16),DIMENSION(N) :: double_complex_array_a
-    COMPLEX(kind = 16),DIMENSION(N) :: double_complex_array_b
 
-    scalar_char = 'a'
     scalar_byte = 8
     scalar_short = 23
     scalar_int = 56
@@ -197,10 +176,8 @@ CONTAINS
     scalar_logical_kind4 = .TRUE.
     scalar_logical_kind8 = .TRUE.
     scalar_complex = (1, 1)
-    scalar_double_complex = (14, 13)
 
     DO x = 1, N
-       char_array_a(x) = 'b'
        byte_array_a(x) = 9
        short_array_a(x) = 50
        int_array_a(x) = 70
@@ -213,14 +190,13 @@ CONTAINS
           logical_kind8_array_a(x, y) = .TRUE.
        END DO
        complex_array_a(x) = (20, 40)
-       double_complex_array_a(x) = (49, 82)
     END DO
 
 
     errors = 0
 
-    !$omp target teams distribute map(tofrom: char_array_a(1:N), &
-    !$omp & char_array_b(1:N), byte_array_a(1:N), byte_array_b(1:N), &
+    !$omp target teams distribute map(tofrom: &
+    !$omp & byte_array_a(1:N), byte_array_b(1:N), &
     !$omp & short_array_a(1:N), short_array_b(1:N), int_array_a(1:N),  &
     !$omp & int_array_b(1:N), float_array_a(1:N), &
     !$omp & float_array_b(1:N), double_array_a(1:N), &
@@ -228,12 +204,8 @@ CONTAINS
     !$omp & logical_array_b(1:N), logical_kind4_array_a(1:N, 1:16), &
     !$omp & logical_kind4_array_b(1:N), logical_kind8_array_a(1:N, 1:16),&
     !$omp & logical_kind8_array_b(1:N), complex_array_a(1:N), &
-    !$omp & complex_array_b(1:N), double_complex_array_a(1:N), &
-    !$omp & double_complex_array_b(1:N))
+    !$omp & complex_array_b(1:N))
     DO x = 1, N
-       scalar_char = char_array_a(x)
-       char_array_b(x) = scalar_char
-
        scalar_byte = 0
        DO y = 1, byte_array_a(x)
           scalar_byte = scalar_byte + 1
@@ -295,19 +267,11 @@ CONTAINS
           scalar_complex = scalar_complex + (1, 1)
        END DO
        complex_array_b(x) = scalar_complex
-
-       scalar_double_complex = (0, 0)
-       DO WHILE (ABS(scalar_double_complex) .lt. ABS(double_complex_array&
-            &_a(x)))
-          scalar_double_complex = scalar_double_complex + (1, 1)
-       END DO
-       double_complex_array_b(x) = scalar_double_complex
     END DO
 
 
 
     DO x = 1, N
-       OMPVV_TEST_AND_SET_VERBOSE(errors, char_array_a(x) .ne. char_array_b(x))
        OMPVV_TEST_AND_SET_VERBOSE(errors, byte_array_a(x) .ne. byte_array_b(x))
        OMPVV_TEST_AND_SET_VERBOSE(errors, short_array_a(x) .ne. short_array_b(x))
        OMPVV_TEST_AND_SET_VERBOSE(errors, int_array_a(x) .ne. int_array_b(x))
@@ -319,11 +283,8 @@ CONTAINS
        OMPVV_TEST_AND_SET_VERBOSE(errors, LOGICAL(logical_kind8_array_b(x) .neqv. .FALSE., 4))
        OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(complex_array_b(x)) - ABS(complex_array_a(x)) .lt. 0)
        OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(complex_array_b(x) - (1, 1)) - (ABS(complex_array_a(x))) .gt. 0)
-       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(double_complex_array_b(x)) - ABS(complex_array_a(x)) .lt. 0)
-       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(double_complex_array_b(x) - (1, 1)) - (ABS(double_complex_array_a(x))) .gt. 0)
     END DO
 
-    scalar_char = 'c'
     scalar_byte = 8
     scalar_short = 23
     scalar_int = 56
@@ -334,9 +295,7 @@ CONTAINS
     scalar_logical_kind4 = .TRUE.
     scalar_logical_kind8 = .TRUE.
     scalar_complex = (1, 1)
-    scalar_double_complex = (14, 13)
 
-    scalar_char_copy = scalar_char
     scalar_byte_copy = scalar_byte
     scalar_short_copy = scalar_short
     scalar_int_copy = scalar_int
@@ -347,16 +306,13 @@ CONTAINS
     scalar_logical_kind4_copy = scalar_logical_kind4
     scalar_logical_kind8_copy = scalar_logical_kind8
     scalar_complex_copy = scalar_complex
-    scalar_double_complex_copy = scalar_double_complex
 
-    !$omp target teams distribute map(tofrom: char_array_a(1:N), byte_&
-    !$omp &array_a(1:N), short_array_a(1:N), int_array_a(1:N), long_int_&
+    !$omp target teams distribute map(tofrom: byte_array_a(1:N), &
+    !$omp &short_array_a(1:N), int_array_a(1:N), long_int_&
     !$omp &array_a(1:N), float_array_a(1:N), double_array_a(1:N), &
     !$omp & logical_array_b(1:N), logical_kind4_array_b(1:N), logical_&
-    !$omp &kind8_array_b(1:N), complex_array_a(1:N), &
-    !$omp & double_complex_array_a(1:N))
+    !$omp &kind8_array_b(1:N), complex_array_a(1:N))
     DO x = 1, N
-       char_array_a(x) = scalar_char
        byte_array_a(x) = scalar_byte
        short_array_a(x) = scalar_short
        int_array_a(x) = scalar_int
@@ -367,12 +323,10 @@ CONTAINS
        logical_kind4_array_b(x) = scalar_logical_kind4
        logical_kind8_array_b(x) = scalar_logical_kind8
        complex_array_a(x) = scalar_complex
-       double_complex_array_a(x) = scalar_double_complex
     END DO
 
     !$omp target teams distribute
     DO x = 1, N
-       scalar_char = 'z'
        scalar_byte = 0
        scalar_short = 0
        scalar_int = 0
@@ -383,11 +337,9 @@ CONTAINS
        scalar_logical_kind4 = .FALSE.
        scalar_logical_kind8 = .FALSE.
        scalar_complex = (0, 0)
-       scalar_double_complex = (0, 0)
     END DO
 
     DO x = 1, N
-       OMPVV_TEST_AND_SET_VERBOSE(errors, char_array_a(x) .ne. scalar_char_copy)
        OMPVV_TEST_AND_SET_VERBOSE(errors, byte_array_a(x) .ne. scalar_byte_copy)
        OMPVV_TEST_AND_SET_VERBOSE(errors, short_array_a(x) .ne. scalar_short_copy)
        OMPVV_TEST_AND_SET_VERBOSE(errors, int_array_a(x) .ne. scalar_int_copy)
@@ -398,11 +350,9 @@ CONTAINS
        OMPVV_TEST_AND_SET_VERBOSE(errors, logical_kind4_array_b(x) .neqv. scalar_logical_kind4_copy)
        OMPVV_TEST_AND_SET_VERBOSE(errors, LOGICAL(logical_kind8_array_b(x) .neqv. scalar_logical_kind8_copy, 4))
        OMPVV_TEST_AND_SET_VERBOSE(errors, complex_array_a(x) .ne. scalar_complex_copy)
-       OMPVV_TEST_AND_SET_VERBOSE(errors, double_complex_array_a(x) .ne. scalar_double_complex_copy)
     END DO
 
     IF (isSharedEnv .neqv. .TRUE.) THEN
-       OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_char .ne. scalar_char_copy)
        OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_byte .ne. scalar_byte_copy)
        OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_short .ne. scalar_short_copy)
        OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_int .ne. scalar_int_copy)
@@ -414,8 +364,6 @@ CONTAINS
        OMPVV_TEST_AND_SET_VERBOSE(errors, LOGICAL(scalar_logical_kind8 .neqv. scalar_logical_kind8_copy, 4))
        OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(REAL(scalar_complex) - REAL(scalar_complex_copy)) .gt. .000001)
        OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(IMAG(scalar_complex) - IMAG(scalar_complex_copy)) .gt. .000001)
-       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(REAL(scalar_double_complex) - REAL(scalar_double_complex)) .gt. .0000000001)
-       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(IMAG(scalar_double_complex) - IMAG(scalar_double_complex)) .gt. .0000000001)
     END IF
     test_defaultmap_off = errors
   END FUNCTION test_defaultmap_off
