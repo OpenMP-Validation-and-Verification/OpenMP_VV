@@ -1,4 +1,4 @@
-//===--- test_target_is_device_ptr.c-----------------------===//
+//===--- test_target_is_device_ptr.c--is_device_ptr clause on target directive--===//
 //
 // OpenMP API Version 4.5 Nov 2015
 //
@@ -6,7 +6,7 @@
 //  is allocated with the omp_target_alloc() API call. If this test runs on the
 //  host, we will warn that we won't be allocating on any device
 //
-////===----------------------------------------------------------------------===//
+////===-------------------------------------------------------------------------===//
 
 
 #include <omp.h>
@@ -50,5 +50,5 @@ int main() {
   omp_target_free(array_device, omp_get_default_device());
   free(array_host);
 
-  OMPVV_REPORT_AND_RETURN(errors)
+  OMPVV_REPORT_AND_RETURN(errors);
 }
