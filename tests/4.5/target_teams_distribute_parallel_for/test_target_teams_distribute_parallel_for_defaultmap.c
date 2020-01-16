@@ -1,10 +1,10 @@
 //===---- test_target_teams_distribute_parallel_for_defaultmap.c - combined consutrct -===//
-// 
+//
 // OpenMP API Version 4.5 Nov 2015
-// 
-// testing de defaultmap of different scalar values. We check when it is off and when it is
-// on. The first one should not copy values back from the device of scalars. the second one 
-// should copy the values back even if they are not mapped explicitely
+//
+// Testing defaultmap of different scalar values. We check when it is off and when it is
+// on. The first one should not copy values back from the device of scalars. The second
+// should copy the values back even if they are not mapped explicitly.
 //
 //===----------------------------------------------------------------------------------===//
 
@@ -35,7 +35,7 @@ int test_defaultmap_on() {
   double scalar_double = 10.45;
   double scalar_double_cpy[ITERATIONS];
   enum { VAL1 = 1, VAL2, VAL3, VAL4} scalar_enum = VAL1, scalar_enum_cpy[ITERATIONS];
-  
+
 
   // Testing the to behavior of the tofrom we use an array to avoid data
   // races and check that all threads get the value
@@ -61,13 +61,17 @@ int test_defaultmap_on() {
   // Map the same array to multiple devices. initialize with device number
 #pragma omp target teams distribute parallel for defaultmap(tofrom: scalar)
   for (i = 0; i < ITERATIONS; ++i) {
-    scalar_char = 'b';
-    scalar_short = 20;
-    scalar_int = 33;
-    scalar_float = 6.5f;
-    scalar_double = 20.45;
-    scalar_enum = VAL4;
-  } // end of omp target 
+    if (omp_get_team_num() == 0) {
+      if (omp_get_thread_num() == 0) {
+        scalar_char = 'b';
+        scalar_short = 20;
+        scalar_int = 33;
+        scalar_float = 6.5f;
+        scalar_double = 20.45;
+        scalar_enum = VAL4;
+      }
+    }
+  } // end of omp target
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_char != 'b');
   OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_short != 20);
@@ -75,16 +79,16 @@ int test_defaultmap_on() {
   OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(scalar_float - 6.5f) > 0.0001);
   OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(scalar_double - 20.45) > 0.00001);
   OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_enum != VAL4);
-  
+
   return errors;
 }
 
 int test_defaultmap_off() {
   OMPVV_INFOMSG("test_defaultmap_off");
-  
+
   int errors = 0;
   int i;
-  
+
   // we try with all the scalars
   char scalar_char = 'a';
   char scalar_char_cpy[ITERATIONS];
@@ -119,7 +123,7 @@ int test_defaultmap_off() {
     OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_enum_cpy[i] != VAL1);
   }
   // Map the same array to multiple devices. initialize with device number
-#pragma omp target teams distribute parallel for 
+#pragma omp target teams distribute parallel for
   for (i = 0; i < ITERATIONS; ++i) {
       scalar_char = 'b';
       scalar_short = 20;
@@ -127,15 +131,15 @@ int test_defaultmap_off() {
       scalar_float = 6.5f;
       scalar_double = 20.45;
       scalar_enum = VAL4;
-  } // end of omp target 
-  
+  } // end of omp target
+
   OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_char != 'a');
   OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_short != 10);
   OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_int != 11);
   OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(scalar_float - 5.5f) > 0.0001);
   OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(scalar_double - 10.45) > 0.0001);
   OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_enum != VAL1);
-  
+
   return errors;
 }
 int main() {
@@ -147,4 +151,3 @@ int main() {
 
   OMPVV_REPORT_AND_RETURN(errors);
 }
-
