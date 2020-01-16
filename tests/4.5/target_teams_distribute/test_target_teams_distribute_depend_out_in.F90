@@ -3,7 +3,7 @@
 ! OpenMP API Version 4.5 Nov 2015
 !
 ! This test checks out-in and inout-in dependency by checking order-dependent
-! results from pairs of possibly asynchronous loops. The test fails if either 
+! results from pairs of possibly asynchronous loops. The test fails if either
 ! out-in or inout-in dependency is broken.
 !
 !//===----------------------------------------------------------------------===//
@@ -51,6 +51,7 @@ CONTAINS
     DO x = 1, N
        d(x) = c(x) + b(x)
     END DO
+    !$omp taskwait
     !$omp end target data
 
     DO x = 1, N
@@ -69,6 +70,7 @@ CONTAINS
     DO x = 1, N
        d(x) = c(x) + a(x)
     END DO
+    !$omp taskwait
     !$omp end target data
 
     DO x = 1, N

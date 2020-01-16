@@ -36,12 +36,15 @@ int test_target_teams_distribute_depend_disjoint_section() {
   {
 #pragma omp target teams distribute nowait depend(out: c[0:N/2]) map(alloc: a[0:N], b[0:N], d[0:N])
     for (int x = 0; x < N; ++x) {
+#pragma omp atomic
       d[x] += a[x] + b[x];
     }
 #pragma omp target teams distribute nowait depend(out: c[N/2:N/2]) map(alloc: a[0:N], b[0:N], c[0:N], d[0:N])
     for (int x = 0; x < N; ++x) {
+#pragma omp atomic
       c[x] += 2*(a[x] + b[x]) + d[x];
     }
+#pragma omp taskwait
   }
 
   for (int x = 0; x < N; ++x) {

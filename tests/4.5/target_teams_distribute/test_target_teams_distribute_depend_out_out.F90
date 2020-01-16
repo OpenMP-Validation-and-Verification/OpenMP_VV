@@ -54,6 +54,7 @@ CONTAINS
     DO x = 1, N
        d(x) = c(x) + b(x)
     END DO
+    !$omp taskwait
     !$omp end target data
 
     DO x = 1, N
@@ -72,6 +73,7 @@ CONTAINS
     DO x = 1, N
        d(x) = a(x) + c(x)
     END DO
+    !$omp taskwait
     !$omp end target data
 
     DO x = 1, N
@@ -90,6 +92,7 @@ CONTAINS
     DO x = 1, N
        d(x) = b(x) + c(x)
     END DO
+    !$omp taskwait
     !$omp end target data
 
     DO x = 1, N
@@ -108,6 +111,7 @@ CONTAINS
     DO x = 1, N
        d(x) = a(x) + c(x)
     END DO
+    !$omp taskwait
     !$omp end target data
 
     DO x = 1, N

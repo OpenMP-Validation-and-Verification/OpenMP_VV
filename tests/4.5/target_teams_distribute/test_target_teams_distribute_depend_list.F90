@@ -68,6 +68,7 @@ CONTAINS
     DO x = 1, N
        g(x) = e(x) + b(x)
     END DO
+    !$omp taskwait
     !$omp end target data
 
     DO x = 1, N

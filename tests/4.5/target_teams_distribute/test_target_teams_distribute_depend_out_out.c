@@ -43,6 +43,7 @@ int test_target_teams_distribute_depend_out_out() {
     for (int x = 0; x < N; ++x) {
       d[x] = c[x] + b[x];
     }
+#pragma omp taskwait
   }
 
   for (int x = 0; x < N; ++x) {
@@ -59,6 +60,7 @@ int test_target_teams_distribute_depend_out_out() {
     for (int x = 0; x < N; ++x) {
       d[x] = c[x] + a[x];
     }
+#pragma omp taskwait
   }
 
   for (int x = 0; x < N; ++x) {
@@ -75,6 +77,7 @@ int test_target_teams_distribute_depend_out_out() {
     for (int x = 0; x < N; ++x) {
       d[x] = c[x] + b[x];
     }
+#pragma omp taskwait
   }
 
   for (int x = 0; x < N; ++x) {
@@ -91,6 +94,7 @@ int test_target_teams_distribute_depend_out_out() {
     for (int x = 0; x < N; ++x) {
       d[x] = c[x] + a[x];
     }
+#pragma omp taskwait
   }
 
   for (int x = 0; x < N; ++x) {

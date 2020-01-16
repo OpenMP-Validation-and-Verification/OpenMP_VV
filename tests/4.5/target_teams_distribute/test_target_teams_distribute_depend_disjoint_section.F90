@@ -46,13 +46,16 @@ CONTAINS
     !$omp target teams distribute nowait depend(out: c(1:(N/2))) map(alloc: &
     !$omp& a(1:N), b(1:N), d(1:N))
     DO x = 1, N
-       d(x) = d(x) + a(x) + b(x)
+       !$omp atomic
+       d(x) = d(x) + (a(x) + b(x))
     END DO
     !$omp target teams distribute nowait depend(out: c(((N/2) + 1):N)) map(alloc: &
     !$omp& a(1:N), b(1:N), c(1:N), d(1:N))
     DO x = 1, N
-       c(x) = c(x) + 2*(a(x) + b(x)) + d(x)
+       !$omp atomic
+       c(x) = c(x) + (2*(a(x) + b(x)) + d(x))
     END DO
+    !omp taskwait
     !$omp end target data
 
     DO x = 1, N

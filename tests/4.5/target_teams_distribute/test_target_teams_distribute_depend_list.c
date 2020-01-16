@@ -58,6 +58,7 @@ int test_target_teams_distribute_depend_list() {
     for (int x = 0; x < N; ++x) {
       g[x] = e[x] + b[x];
     }
+#pragma omp taskwait
   }
 
   for (int x = 0; x < N; ++x) {
