@@ -26,9 +26,6 @@ PROGRAM array_reduce_v1
   OMPVV_REPORT_AND_RETURN()
 CONTAINS
   INTEGER FUNCTION test_array_reduce()
-
-    ! xl : mpif90 -O3 -qstrict -qsmp=omp -qoffload array_reduce_v1.F90 -o array_reduce.x
-
     REAL,ALLOCATABLE:: vx(:,:,:)
     REAL,ALLOCATABLE:: rrs(:,:), rrs_host(:,:)
     INTEGER:: nx, nz, nxh, my, errors

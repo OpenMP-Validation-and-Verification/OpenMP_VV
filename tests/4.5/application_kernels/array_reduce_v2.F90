@@ -61,9 +61,6 @@ PROGRAM array_reduce_v2
   OMPVV_REPORT_AND_RETURN()
 CONTAINS
   INTEGER FUNCTION test_array_reduce()
-
-    ! xl : mpif90 -O3 -qstrict -qsmp=omp -qoffload array_reduce.F90 -o array_reduce.x
-
     REAL,ALLOCATABLE:: vx(:,:,:)
     type(MyReal),ALLOCATABLE:: rrs(:,:), rrs_host(:,:)
     INTEGER:: nx, nz, nxh, my, errors
@@ -94,12 +91,7 @@ CONTAINS
     END DO
 
 
-    !$omp target data map(to:vx) map(from:rrs)
-    !$omp target
-    rrs(:,:)%x=0.
-    !$omp end target
-
-    ! separation in x
+    !$omp target data map(to:vx) map(tofrom:rrs)
     !$omp target teams distribute parallel do collapse(4) default(none) &
     !$omp private(yp, z, x, x1, ir, term1, term2, sqterm) shared(my, &
     !$omp nz, nx, nxh, inc, norder, vx) &
