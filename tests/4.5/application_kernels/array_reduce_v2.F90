@@ -2,7 +2,10 @@
 !
 ! OpenMP API Version 4.5 Nov 2015
 !
-! This test uses the firstprivate clause and tests it in two separate parts.
+! This test conducts an array reduction on both the host and device and
+! compares the result. The reduction operator is a custom declared add
+! operator over reals. The reduction occurs within a four-level collapsed
+! loop.
 !
 !//===----------------------------------------------------------------------===//
 

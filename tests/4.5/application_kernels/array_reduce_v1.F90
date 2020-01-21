@@ -2,7 +2,10 @@
 !
 ! OpenMP API Version 4.5 Nov 2015
 !
-! then separately tests the proper initialization of them separately
+! This test conducts an array reduction on both the host and device and
+! compares the result. The reduction operator is the default OpenMP add
+! operator over reals. The reduction occurs within a four-level collapsed
+! loop.
 !
 !//===----------------------------------------------------------------------===//
 
