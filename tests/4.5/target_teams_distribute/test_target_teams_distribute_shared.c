@@ -35,7 +35,7 @@ int main() {
   }
 
   // The defaultmap(tofrom:scalar) is used here because the OpenMP 4.5 specification
-  // forbids the use of map and data-sharing clauses on the same list item in the 
+  // forbids the use of map and data-sharing clauses on the same list item in the
   // same construct. See pg. 218, lines 15-16.
 #pragma omp target teams distribute num_teams(10) shared(share, num_teams) map(to: a[0:SIZE]) defaultmap(tofrom:scalar)
   for (int x = 0; x < SIZE; ++x) {
@@ -50,7 +50,7 @@ int main() {
   }
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, (share != 0));
-  OMPVV_ERROR_IF(errors != 0, "The value of share is = %d", share);
+  OMPVV_ERROR_IF(errors != 0, "The value of share is = %d but expected 0.", share);
 
   share = 5;
 

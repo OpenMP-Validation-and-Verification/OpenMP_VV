@@ -32,6 +32,7 @@ PROGRAM test_target_teams_distribute_shared
   OMPVV_REPORT_AND_RETURN()
 CONTAINS
   INTEGER FUNCTION test_shared()
+    CHARACTER(len=300):: errMsg
     INTEGER,DIMENSION(N):: a
     INTEGER:: share, errors, x
     errors = 0
@@ -51,13 +52,12 @@ CONTAINS
        share = share - x
     END DO
 
-    IF (share .ne. 0) THEN
-       OMPVV_ERROR("Shared variable written incorrectly")
-       errors = errors + 1
-    END IF
-    
+    WRITE(errMsg, *) "Share was", share, "but expected 0"
+    OMPVV_TEST_AND_SET_VERBOSE(errors, share .ne. 0)
+    OMPVV_ERROR_IF(errors .ne. 0, errMsg)
+
     share = 5
-    
+
     !$omp target data map(tofrom: a(1:N)) map(tofrom: share)
     !$omp target teams distribute num_teams(10) shared(share)
     DO x = 1, N
@@ -66,11 +66,7 @@ CONTAINS
     !$omp end target data
 
     DO x = 1, N
-       IF ((a(x) - 5) .ne. x) THEN
-          OMPVV_ERROR("Shared variable read incorrectly")
-          errors = errors + 1
-          exit
-       END IF
+       OMPVV_TEST_AND_SET_VERBOSE(errors, (a(x) - 5 .ne. x))
     END DO
 
     test_shared = errors
