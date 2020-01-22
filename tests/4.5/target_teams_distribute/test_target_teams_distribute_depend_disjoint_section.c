@@ -3,9 +3,9 @@
 // OpenMP API Version 4.5 Nov 2015
 //
 // This test checks the out-out dependency of two tasks when the array
-// sections in the depend lists are disjoint (non-overlapping). If no race
-// condition can be shown, then the test gives only a warning, since this is
-// still complaint. This test will always pass.
+// sections in the depend lists are disjoint (non-overlapping). If no
+// asynchronous behavior can be shown, then the test gives only a warning,
+// since this is still complaint. This test will always pass.
 //
 ////===----------------------------------------------------------------------===//
 
@@ -23,7 +23,7 @@ int test_target_teams_distribute_depend_disjoint_section() {
   int c[N];
   int d[N];
   int invalid_found = 0;
-  int race_found = 0;
+  int async_found = 0;
 
   for (int x = 0; x < N; ++x) {
     a[x] = x;
@@ -54,12 +54,12 @@ int test_target_teams_distribute_depend_disjoint_section() {
       break;
     }
     if (c[x] == 6*x) {
-      race_found = 1;
+      async_found = 1;
     }
   }
 
-  OMPVV_INFOMSG_IF(invalid_found == 0 && race_found == 1, "Found asynchronous behavior between depend clauses on disjoint array sections.");
-  OMPVV_WARNING_IF(invalid_found == 0 && race_found == 0, "Constructs ran in sequence, could not show lack of dependence since nowait had no effect.");
+  OMPVV_INFOMSG_IF(invalid_found == 0 && async_found == 1, "Found asynchronous behavior between depend clauses on disjoint array sections.");
+  OMPVV_WARNING_IF(invalid_found == 0 && async_found == 0, "Constructs ran in sequence, could not show lack of dependence since nowait had no effect.");
 
   return invalid_found;
 }

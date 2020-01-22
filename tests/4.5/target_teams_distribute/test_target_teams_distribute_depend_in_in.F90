@@ -3,9 +3,9 @@
 ! OpenMP API Version 4.5 Nov 2015
 !
 ! This test checks if two depend(in) tasks are independent by trying to
-! create a race condition. If no race condition can be shown, then the test
-! gives only a warning, since this is still complaint. This test will 
-! always pass.
+! create a asynchronous behavior. If no asynchronicity can be shown, then
+! the testgives only a warning, since this is still complaint. This test
+! will always pass.
 !
 !//===----------------------------------------------------------------------===//
 #include "ompvv.F90"
@@ -28,11 +28,11 @@ PROGRAM test_target_teams_distribute_depend
 CONTAINS
   INTEGER FUNCTION depend_in_in()
     INTEGER :: x, errors
-    LOGICAL :: invalid_found, race_found
+    LOGICAL :: invalid_found, async_found
     INTEGER,DIMENSION(N):: a, b, c, d
 
     invalid_found = .FALSE.
-    race_found = .FALSE.
+    async_found = .FALSE.
     errors = 0
 
     DO x = 1, N
@@ -66,15 +66,15 @@ CONTAINS
           exit
        END IF
        IF (c(x) .eq. 6*x) THEN
-          race_found = .TRUE.
+          async_found = .TRUE.
        END IF
     END DO
 
-    IF ((invalid_found .eqv. .FALSE.) .and. (race_found .eqv. .TRUE.)) THEN
+    IF ((invalid_found .eqv. .FALSE.) .and. (async_found .eqv. .TRUE.)) THEN
        OMPVV_INFOMSG("Found asynchronicity between depend clauses on")
        OMPVV_INFOMSG("disjoint array sections")
     END IF
-    IF ((invalid_found .eqv. .FALSE.) .and. (race_found .eqv. .FALSE.)) THEN
+    IF ((invalid_found .eqv. .FALSE.) .and. (async_found .eqv. .FALSE.)) THEN
        OMPVV_WARNING("Constructs ran in sequence, can't show lack of")
        OMPVV_WARNING("dependence between depend clauses on disjoint")
        OMPVV_WARNING("array sections since nowait had no effect")
