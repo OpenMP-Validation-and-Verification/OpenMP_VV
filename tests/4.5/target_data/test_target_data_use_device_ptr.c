@@ -34,7 +34,7 @@ int main() {
   {
 #pragma omp target data map(map_dummy) use_device_ptr(array_device)
     {
-#pragma omp target is_device_ptr(array_device) map(tofrom: array_host[0:N]) map(tofrom: isHost)
+#pragma omp target is_device_ptr(array_device) map(tofrom: array_host[0:N])
       {
         for (int i = 0; i < N; ++i) {
           array_device[i] = i;
