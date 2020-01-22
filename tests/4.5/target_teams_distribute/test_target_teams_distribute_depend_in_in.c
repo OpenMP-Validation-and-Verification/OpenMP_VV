@@ -5,7 +5,7 @@
 // This test checks if two depend(in) tasks are independent by trying to
 // create a asynchronous behavior. If no asynchronicity can be shown, then
 // the test gives only a warning, since this is still complaint. This test
-// will always pass.
+// will fail if invalid values are written.
 //
 ////===----------------------------------------------------------------------===//
 
@@ -22,8 +22,8 @@ int test_target_teams_distribute_depend_in_in() {
   int b[N];
   int c[N];
   int d[N];
-  int invalid_found = 0;
   int async_found = 0;
+  int errors = 0;
 
   for (int x = 0; x < N; ++x) {
     a[x] = x;
@@ -48,9 +48,9 @@ int test_target_teams_distribute_depend_in_in() {
   }
 
   for (int x = 0; x < N; ++x) {
-    if (c[x] != 6*x && c[x] != 9*x) {
-      invalid_found = 1;
-      OMPVV_ERROR("Found invalid results, cannot show independence between depend(in) clauses.");
+    OMPVV_TEST_AND_SET_VERBOSE(errors, c[x] != 6*x && c[x] != 9*x);
+    OMPVV_ERROR_IF(errors, "Found invalid results, cannot show independence between depend clauses on disjoint array sections.");
+    if (errors) {
       break;
     }
     if (c[x] == 6*x) {
@@ -58,10 +58,10 @@ int test_target_teams_distribute_depend_in_in() {
     }
   }
 
-  OMPVV_INFOMSG_IF(invalid_found == 0 && async_found == 1, "Found asynchronous behavior between depend clauses on disjoint array sections.");
-  OMPVV_WARNING_IF(invalid_found == 0 && async_found == 0, "Constructs ran in sequence, could not show lack of dependence since nowait had no effect.");
+  OMPVV_INFOMSG_IF(!errors && async_found, "Found asynchronous behavior between depend clauses on disjoint array sections.");
+  OMPVV_WARNING_IF(!errors && !async_found, "Constructs ran in sequence, could not show lack of dependence since nowait had no effect.");
 
-  return invalid_found;
+  return errors;
 }
 int main() {
   int errors = 0;

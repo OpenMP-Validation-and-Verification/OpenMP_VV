@@ -5,7 +5,8 @@
 ! This test checks the out-out dependency of two tasks when the array
 ! sections in the depend lists are disjoint (non-overlapping). If no
 ! asynchronous behavior can be shown, then the test gives only a warning,
-! since this is still complaint. This test will always pass.
+! since this is still complaint. This test will fail if invalid values
+! are written.
 !
 !//===----------------------------------------------------------------------===//
 #include "ompvv.F90"
@@ -27,11 +28,10 @@ PROGRAM test_target_teams_distribute_depend
 
 CONTAINS
   INTEGER FUNCTION depend_disjoint_section()
-    INTEGER :: x, errors
-    LOGICAL :: invalid_found, async_found
+    INTEGER:: x, errors
+    LOGICAL:: async_found
     INTEGER,DIMENSION(N):: a, b, c, d
 
-    invalid_found = .FALSE.
     async_found = .FALSE.
     errors = 0
 
@@ -59,10 +59,9 @@ CONTAINS
     !$omp end target data
 
     DO x = 1, N
-       IF ((c(x) .ne. 6*x) .and. (c(x) .ne. 9*x)) THEN
-          invalid_found = .TRUE.
-          errors = 1
-          OMPVV_ERROR("Found invalid values")
+       OMPVV_TEST_AND_SET_VERBOSE(errors, (c(x) .ne. 6*x) .and. (c(x) .ne. 9*x))
+       OMPVV_ERROR_IF(errors .ne. 0, "Found invalid values")
+       IF (errors .ne. 0) THEN
           exit
        END IF
        IF (c(x) .eq. 6*x) THEN
@@ -70,11 +69,11 @@ CONTAINS
        END IF
     END DO
 
-    IF ((invalid_found .eqv. .FALSE.) .and. (async_found .eqv. .TRUE.)) THEN
+    IF ((errors .eq. 0) .and. (async_found .eqv. .TRUE.)) THEN
        OMPVV_INFOMSG("Found asynchronicity between depend clauses on")
        OMPVV_INFOMSG("disjoint array sections")
     END IF
-    IF ((invalid_found .eqv. .FALSE.) .and. (async_found .eqv. .FALSE.)) THEN
+    IF ((errors .eq. 0) .and. (async_found .eqv. .FALSE.)) THEN
        OMPVV_WARNING("Constructs ran in sequence, can't show lack of")
        OMPVV_WARNING("dependence between depend clauses on disjoint")
        OMPVV_WARNING("array sections since nowait had no effect")
