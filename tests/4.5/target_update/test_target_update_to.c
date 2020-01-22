@@ -29,11 +29,9 @@ void update_b() {
 int main() {
   int errors= 0;
   int i = 0;
-  int isHost = -1;
-  int isOffloading = 0;
   int change_flag = 0;
 
-  OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
+  OMPVV_TEST_OFFLOADING;
 
   for (i = 0; i < N; i++) {
     a[i] = 10;
@@ -45,11 +43,10 @@ int main() {
     c[i] = 0;
   }
 
-#pragma omp target data map(to: a[:N], b[:N]) map(from: c) map(tofrom: isHost)
+#pragma omp target data map(to: a[:N], b[:N]) map(from: c)
   {
 #pragma omp target
     {
-      isHost = omp_is_initial_device();
       int j = 0;
       for (j = 0; j < N; j++) {
         c[j] = (a[j] + b[j]);        // c = 12
@@ -72,9 +69,6 @@ int main() {
   for (i = 0; i < N; i++) {
     OMPVV_TEST_AND_SET_VERBOSE(errors, c[i] != 16);
   }
-
-  OMPVV_INFOMSG_IF(!errors, "Test passed on %s.\n", (isOffloading ? "device" : "host"));
-  OMPVV_ERROR_IF(errors, "Test failed on %s\n", (isOffloading ? "device" : "host"));
 
   OMPVV_REPORT_AND_RETURN(errors);
 }
