@@ -35,10 +35,6 @@ int main() {
 
   for (i = 0; i < N; i++) {
     a[i] = 10;
-  }
-
-  // a and b array initialization
-  for (i = 0; i < N; i++) {
     b[i] = 2;
     c[i] = 0;
   }
