@@ -55,5 +55,7 @@ int main() {
     }
   }
 
+  OMPVV_INFOMSG_IF(!errors, "Test passed with %d teams.", num_teams[0]);
+
   OMPVV_REPORT_AND_RETURN(errors);
 }

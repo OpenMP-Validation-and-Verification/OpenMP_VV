@@ -27,6 +27,7 @@ PROGRAM test_target_teams_distribute
 
 CONTAINS
   INTEGER FUNCTION test_distribute()
+    CHARACTER(len=300):: infoMsg
     INTEGER,DIMENSION(N):: num_teams, a, b
     INTEGER:: errors, x
     errors = 0
@@ -57,6 +58,9 @@ CONTAINS
           END IF
        END DO
     END IF
+
+    WRITE(infoMsg, *) "Test passed with", num_teams(1), "teams."
+    OMPVV_INFOMSG_IF(errors .eq. 0, infoMsg)
 
     test_distribute = errors
   END FUNCTION test_distribute
