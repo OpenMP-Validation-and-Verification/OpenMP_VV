@@ -7,7 +7,7 @@
 // inheritance in classes and templates. The target enter and exit data are used
 // in the constructor and destructor of all the levels of the hierarchy. 
 // It requires the use of helper_ variables since it
-// is not legal to use the "this" pointer (implicitely or explicitely) in 4.5. 
+// is not legal to use the "this" pointer (implicitly or explicitly) in 4.5. 
 //
 // We use a modify method, which is propagated through the hierarchy of classes,
 // to assign values to the array. Following we use a method to obtain a copy of the values 
