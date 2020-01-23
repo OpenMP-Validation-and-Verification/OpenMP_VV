@@ -32,7 +32,6 @@ CONTAINS
   INTEGER FUNCTION test_default_firstprivate()
     INTEGER,DIMENSION(N):: a, b, c, d
     INTEGER:: privatized, errors, x, y
-    CHARACTER(len=300):: errMsg
     errors = 0
 
     DO x = 1, N
