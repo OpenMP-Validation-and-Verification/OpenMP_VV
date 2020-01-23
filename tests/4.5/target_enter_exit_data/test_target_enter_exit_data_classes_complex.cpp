@@ -3,6 +3,20 @@
 // OpenMP API Version 4.5 Nov 2015
 // 
 //
+// This test uses target enter data and exit data to map multiple levels of 
+// inheritance in classes and templates. The target enter and exit data are used
+// in the constructor and destructor of all the levels of the hierarchy. 
+// It requires the use of helper_ variables since it
+// is not legal to use the "this" pointer (implicitely or explicitely) in 4.5. 
+//
+// We use a modify method, which is propagated through the hierarchy of classes,
+// to assign values to the array. Following we use a method to obtain a copy of the values 
+// from the device. The disctintion between methods allows to show that
+// data is mapped and remains mapped in the device memory. This test does
+// not use any inheritance or anything similar, therefore the simple connotation
+//
+// Contrary to the test of target_enter_data, this test checks if during the exit
+// data it successfully copies back the attributes of the object
 ////===----------------------------------------------------------------------===//
 
 #include <iostream>

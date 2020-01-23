@@ -6,9 +6,11 @@
 // constructor and destructor. It requires the use of helper_ variables since it
 // is not legal to use the "this" pointer (implicitely or explicitely) in 4.5. 
 //
-// We use a modify method, and a method to obtain a copy of the values from the
-// device memory, to guarantee that the mapping is done correctly. This test does
-// not use any inheritance or anything similar, therefore the simple connotation
+// We use a modify method to assign values to the array and we use a method to 
+// obtain a copy of the values from the device. The disctintion between methods 
+// allows to show that data is mapped and remains mapped in the device memory. 
+// This test does not use any inheritance or anything similar, therefore 
+// the simple connotation
 //
 // Contrary to the test of target_enter_data, this test checks if during the exit
 // data it successfully copies back the attributes of the object
