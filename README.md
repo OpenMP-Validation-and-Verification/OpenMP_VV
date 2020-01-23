@@ -9,4 +9,4 @@ Welcome to our SOLLVE project!
 For more information, publications, presentations and results, please check out our 
 [website](https://crpl.cis.udel.edu/ompvvsollve/).
 
-For documentation is availible on our [website](https://crpl.cis.udel.edu/ompvvsollve/documentation) and on the [wiki](https://github.com/SOLLVE/sollve_vv/wiki)
+For documentation visit our [website](https://crpl.cis.udel.edu/ompvvsollve/documentation) and on the [wiki](https://github.com/SOLLVE/sollve_vv/wiki)
