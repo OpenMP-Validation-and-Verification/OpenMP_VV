@@ -7,6 +7,6 @@ We have recently moved from Bitbucket into Github. The old Bitbucket repository 
 Welcome to our SOLLVE project!
 
 For more information, publications, presentations and results, please check out our 
-[website](https://crpl.cis.udel.edu/ompvvsollve/) 
+[website](https://crpl.cis.udel.edu/ompvvsollve/).
 
-For documentation please check out (https://crpl.cis.udel.edu/ompvvsollve/documentation)
+For documentation is availible on our [website](https://crpl.cis.udel.edu/ompvvsollve/documentation) and on the [wiki](https://github.com/SOLLVE/sollve_vv/wiki)
