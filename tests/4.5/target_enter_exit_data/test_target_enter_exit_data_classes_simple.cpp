@@ -95,7 +95,6 @@ int test_simple_class() {
 
   int sum = 0, errors = 0, h_sum = 0;
   int* h_array = new int[N];
-  int* obj_array_ptr = NULL, *obj_sum_ptr = NULL;
 
   // allocation on the device
   Simple *obj = new Simple(N, &errors);
