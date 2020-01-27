@@ -43,7 +43,8 @@ CONTAINS
     END DO
 
     !$omp target data map(to: a(1:N)) map(tofrom: share, num_teams)
-    !$omp target teams distribute default(shared) defaultmap(tofrom:scalar)
+    !$omp target teams distribute default(shared) defaultmap(tofrom:scalar) &
+    !$omp& num_teams(OMPVV_NUM_TEAMS_DEVICE)
     DO x = 1, N
        IF (omp_get_team_num() .eq. 0) THEN
           num_teams = omp_get_num_teams()
@@ -74,7 +75,8 @@ CONTAINS
     END DO
 
     !$omp target data map(tofrom: a(1:N), share)
-    !$omp target teams distribute default(shared) defaultmap(tofrom:scalar)
+    !$omp target teams distribute default(shared) defaultmap(tofrom:scalar) &
+    !$omp& num_teams(OMPVV_NUM_TEAMS_DEVICE)
     DO x = 1, N
        a(x) = a(x) + share
     END DO
