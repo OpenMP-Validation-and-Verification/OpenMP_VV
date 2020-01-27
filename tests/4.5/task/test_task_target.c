@@ -15,9 +15,9 @@
 
 #define N 1000
 
-int test_task_target(){
+int test_task_target() {
   int a[N], b[N], c[N];
-  int errors=0, i;
+  int errors = 0, i;
 
 #pragma omp task shared(a) private(i)
   #pragma omp target map(from: a)
@@ -41,13 +41,13 @@ int test_task_target(){
 
 // #pragma omp taskwait
 
-  for (i = 0; i < N; i++){
-    OMPVV_TEST_AND_SET(errors, (c[i] != i+10));
+  for (i = 0; i < N; i++) {
+    OMPVV_TEST_AND_SET(errors, (c[i] != i + 10));
   }
   return(errors);
 }
 
-int main(){
+int main() {
 
   OMPVV_TEST_OFFLOADING;
 
