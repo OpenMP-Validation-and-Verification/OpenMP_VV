@@ -35,21 +35,6 @@ include sys/make/make.def
 LOG_NOTE?="none"
 
 ###################################################
-# Thread & Team Numbers
-###################################################
-ifdef OMPVV_NUM_THREADS_DEVICE
-	DTHREADS = -DOMPVV_NUM_THREADS_DEVICE=${OMPVV_NUM_THREADS_DEVICE}
-endif
-
-ifdef OMPVV_NUM_TEAMS_DEVICE
-	DTEAMS = -DOMPVV_NUM_TEAMS_DEVICE=${OMPVV_NUM_TEAMS_DEVICE}
-endif
-
-ifdef OMPVV_NUM_THREADS_HOST
-	HTHREADS = -DOMPVV_NUM_THREADS_HOST=${OMPVV_NUM_THREADS_HOST}
-endif
-
-###################################################
 # Verbose & Log
 ###################################################
 QUIET:=@
