@@ -1,4 +1,4 @@
-//===--- test_target_map_pointer.c - test target with map pointer p[:N] -----===//
+//===-------- test_task_target.c - test task with target offload  ------------===//
 // 
 // OpenMP API Version 4.5 Nov 2015
 //
