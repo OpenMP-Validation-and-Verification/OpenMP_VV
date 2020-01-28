@@ -39,7 +39,7 @@ int test_task_target() {
       for (i = 0; i < N; i++)
         c[i] = a[i] + b[i];
 
-// #pragma omp taskwait
+#pragma omp taskwait
 
   for (i = 0; i < N; i++) {
     OMPVV_TEST_AND_SET(errors, (c[i] != i + 10));
