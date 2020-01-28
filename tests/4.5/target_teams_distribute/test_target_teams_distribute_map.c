@@ -91,8 +91,8 @@ int main() {
   }
 
   for (int x = 0; x < N; ++x) {
-    OMPVV_TEST_AND_SET_VERBOSE(errors, b[x] != 2 * x);
-    if (b[x] != 2 * x) {
+    OMPVV_TEST_AND_SET_VERBOSE(errors, b[x] != 2*x);
+    if (b[x] != 2*x) {
       break;
     }
   }
