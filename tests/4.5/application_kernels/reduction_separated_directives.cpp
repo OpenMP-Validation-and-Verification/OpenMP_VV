@@ -34,7 +34,9 @@ int main()
 #pragma omp atomic
         counts_team += 1;
     }
-    counts_atomic = counts_team;
+    if (omp_get_team_num() == 0) {
+      counts_atomic = counts_team;
+    }
   }
 
 #pragma omp target teams map(from: counts_reduction)
@@ -46,7 +48,9 @@ int main()
       for (int i = 0; i < N; ++i)
         counts_team += 1;
     }
-    counts_reduction = counts_team;
+    if (omp_get_team_num() == 0) {
+      counts_reduction = counts_team;
+    }
   }
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, counts_atomic != N);
