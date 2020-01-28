@@ -1,10 +1,10 @@
-//===--- test_target_teams_distribute_reduction_bitxor.c----------------------------===//
+//===--- test_target_teams_distribute_reduction_multiply.c-------------------===//
 //
-// OpenMP API Version 4.5 Nov 2015
+// OpenMP API Version 5.0 Nov 2018
 //
 // This test uses the reduction clause on a target teams distribute directive,
 // testing that the variable in the reduction clause is properly reduced using
-// the bitxor operator.
+// the multiply operator.
 //
 ////===----------------------------------------------------------------------===//
 
@@ -16,29 +16,33 @@
 
 #define N 1024
 
-int test_bitxor() {
-  unsigned int a[N];
+int test_multiply() {
+  int a[N];
   int errors = 0;
   int num_teams[N];
   srand(1);
 
   for (int x = 0; x < N; ++x) {
-    a[x] = (unsigned int) rand() / (double) (RAND_MAX / 2);
+    a[x] = 1 + (int) rand() / (double) RAND_MAX;
     num_teams[x] = -x;
   }
 
-  unsigned int b = 0;
+  int result = 1;
+  int host_result;
 
-#pragma omp target teams distribute reduction(^:b) defaultmap(tofrom:scalar)
-  for (int x = 0; x < N; ++x) {
-    num_teams[x] = omp_get_num_teams();
-    b = (b ^ a[x]);
-  }
-
-  unsigned int host_b = 0;
-
-  for (int x = 0; x < N; ++x) {
-    host_b = (host_b ^ a[x]);
+  for (int x = 0; x < N; x = x + 16) {
+    result = 1;
+#pragma omp target teams distribute reduction(*:result) map(to: a[0:N]) map(tofrom: result, num_teams[0:N])
+    for (int y = 0; y < 16; ++y) {
+      result *= a[x + y];
+      num_teams[x + y] = omp_get_num_teams();
+    }
+    host_result = 1;
+    for (int y = 0; y < 16; ++y) {
+      host_result *= a[x + y];
+    }
+    OMPVV_TEST_AND_SET_VERBOSE(errors, host_result != result);
+    OMPVV_INFOMSG_IF(host_result != result, "Device result is %d and host result is %d.", result, host_result);
   }
 
   for (int x = 1; x < N; ++x) {
@@ -46,9 +50,6 @@ int test_bitxor() {
   }
   OMPVV_WARNING_IF(num_teams[0] == 1, "Test operated with one team.  Reduction clause cannot be tested.");
   OMPVV_WARNING_IF(num_teams[0] <= 0, "Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guaranteed.");
-
-  OMPVV_TEST_AND_SET_VERBOSE(errors, b != host_b);
-  OMPVV_ERROR_IF(host_b != b, "Bit on device is %d but expected bit from host is %d.", b, host_b);
 
   return errors;
 }
@@ -58,7 +59,7 @@ int main() {
 
   int total_errors = 0;
 
-  OMPVV_TEST_AND_SET_VERBOSE(total_errors, test_bitxor() != 0);
+  OMPVV_TEST_AND_SET_VERBOSE(total_errors, test_multiply() != 0);
 
   OMPVV_REPORT_AND_RETURN(total_errors);
 }
