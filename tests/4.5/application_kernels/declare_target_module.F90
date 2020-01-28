@@ -1,4 +1,4 @@
-!===--- declare_target_1.F90 -----------------------------------------------===//
+!===--- declare_target_module.F90 ------------------------------------------===//
 !
 ! OpenMP API Version 4.5 Nov 2015
 !
@@ -27,7 +27,7 @@ MODULE params
   INTEGER:: THRESHOLD = N - 1
 END MODULE params
 
-PROGRAM declare_target_1
+PROGRAM declare_target_module
   USE iso_fortran_env
   USE ompvv_lib
   USE omp_lib
@@ -49,4 +49,4 @@ PROGRAM declare_target_1
   OMPVV_TEST_VERBOSE(x .ne. N + 1)
 
   OMPVV_REPORT_AND_RETURN()
-END PROGRAM declare_target_1
+END PROGRAM declare_target_module

@@ -1,4 +1,4 @@
-!===--- declare_target_2.F90 -----------------------------------------------===//
+!===--- declare_target_subroutine.F90 --------------------------------------===//
 !
 ! OpenMP API Version 4.5 Nov 2015
 !
@@ -14,38 +14,21 @@
 
 #define N 1024
 
-PROGRAM declare_target_2
+PROGRAM declare_target_subroutine
   USE iso_fortran_env
   USE ompvv_lib
   USE omp_lib
   implicit none
-  INTEGER:: sum
+  INTEGER,POINTER:: a(:)
+  INTEGER:: x, sum
+  
+  !$omp declare target(test_declare)
+
   sum = 0
 
   OMPVV_TEST_OFFLOADING
 
   OMPVV_TEST_SHARED_ENVIRONMENT
-
-  CALL main(sum)
-
-  OMPVV_TEST_VERBOSE(sum .ne. N)
-
-  OMPVV_REPORT_AND_RETURN()
-END PROGRAM declare_target_2
-
-SUBROUTINE main(sum)
-  INTEGER,POINTER:: a(:)
-  INTEGER,INTENT(inout):: sum
-  INTEGER:: x
-
-  INTERFACE
-     SUBROUTINE test_declare(a, sum)
-       INTEGER,POINTER,INTENT(in) :: a(:)
-       INTEGER,INTENT(inout):: sum
-     END SUBROUTINE test_declare
-  END INTERFACE
-  
-  !$omp declare target(test_declare)
 
   ALLOCATE(a(N))
   DO x = 1, N
@@ -55,7 +38,11 @@ SUBROUTINE main(sum)
   !$omp target map(tofrom: sum) map(to: a)
   CALL test_declare(a, sum)
   !$omp end target
-END SUBROUTINE main
+
+  OMPVV_TEST_VERBOSE(sum .ne. N)
+
+  OMPVV_REPORT_AND_RETURN()
+END PROGRAM declare_target_subroutine
 
 SUBROUTINE test_declare(a, sum)
   INTEGER,POINTER,INTENT(in) :: a(:)
