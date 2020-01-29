@@ -1,8 +1,8 @@
-//===--- test_target_teams_distribute_collapse.c--------------------------------------===//
+//===--- test_target_simd_collapse.c------ testing collapse with SIMD--------===//
 //
 // OpenMP API Version 4.5 Nov 2015
 //
-// This test uses the collapse clause and tests that for loops out of the scope
+// This test uses the collapse clause and tests that for simd loops out of the scope
 // of the collapsed loops are not parallelized.  This test tests using one and
 // two collapsed loops.
 //
@@ -14,10 +14,10 @@
 #include "ompvv.h"
 
 #define ARRAY_SIZE 128 //Array Size of 128 uses 16MB target memory and
-                       //scales n^3 in test_collapse2()
+//scales n^3 in test_collapse2()
 
 int test_collapse1() {
-
+  OMPVV_INFOMSG("Testing for collapse(1)");
   int * a_mem = malloc(ARRAY_SIZE*ARRAY_SIZE*sizeof(int));
   int * b_mem = malloc(ARRAY_SIZE*(ARRAY_SIZE+1)*sizeof(int));
   int (*a)[ARRAY_SIZE] = (int (*)[ARRAY_SIZE])a_mem;
@@ -33,7 +33,7 @@ int test_collapse1() {
     }
   }
 
-#pragma omp target teams distribute map(to: a[0:ARRAY_SIZE][0:ARRAY_SIZE]) map(tofrom: b[0:ARRAY_SIZE][0:ARRAY_SIZE+1]) collapse(1)
+#pragma omp target simd map(to: a[0:ARRAY_SIZE][0:ARRAY_SIZE]) map(tofrom: b[0:ARRAY_SIZE][0:ARRAY_SIZE+1]) collapse(1)
   for (int x = 0; x < ARRAY_SIZE; ++x) {
     for (int y = 0; y < ARRAY_SIZE; ++y) {
       b[x][y + 1] = b[x][y] + a[x][y];
@@ -54,6 +54,7 @@ int test_collapse1() {
 }
 
 int test_collapse2() {
+  OMPVV_INFOMSG("Testing for collapse(2)");
   int * a_mem = malloc(ARRAY_SIZE*ARRAY_SIZE*ARRAY_SIZE*sizeof(int));
   int * b_mem = malloc(ARRAY_SIZE*ARRAY_SIZE*(ARRAY_SIZE+1)*sizeof(int));
   int (*a)[ARRAY_SIZE][ARRAY_SIZE] = (int (*)[ARRAY_SIZE][ARRAY_SIZE])a_mem;
@@ -72,7 +73,7 @@ int test_collapse2() {
     }
   }
 
-#pragma omp target teams distribute map(to: a[0:ARRAY_SIZE][0:ARRAY_SIZE][0:ARRAY_SIZE]) map(tofrom: b[0:ARRAY_SIZE][0:ARRAY_SIZE][0:ARRAY_SIZE+1], num_teams) collapse(2)
+#pragma omp target simd map(to: a[0:ARRAY_SIZE][0:ARRAY_SIZE][0:ARRAY_SIZE]) map(tofrom: b[0:ARRAY_SIZE][0:ARRAY_SIZE][0:ARRAY_SIZE+1], num_teams) collapse(2)
   for (int x = 0; x < ARRAY_SIZE; ++x) {
     for (int y = 0; y < ARRAY_SIZE; ++y) {
       for (int z = 0; z < ARRAY_SIZE; ++z) {

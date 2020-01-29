@@ -1,10 +1,10 @@
-//===--- test_target_teams_distribute_reduction_bitxor.c----------------------------===//
+//===--- test_target_teams_distribute_reduction_max.c------------------------===//
 //
-// OpenMP API Version 4.5 Nov 2015
+// OpenMP API Version 5.0 Nov 2018
 //
 // This test uses the reduction clause on a target teams distribute directive,
 // testing that the variable in the reduction clause is properly reduced using
-// the bitxor operator.
+// the max operator.
 //
 ////===----------------------------------------------------------------------===//
 
@@ -16,29 +16,31 @@
 
 #define N 1024
 
-int test_bitxor() {
-  unsigned int a[N];
+int test_max() {
+  int a[N];
+  int b[N];
   int errors = 0;
   int num_teams[N];
   srand(1);
 
   for (int x = 0; x < N; ++x) {
-    a[x] = (unsigned int) rand() / (double) (RAND_MAX / 2);
+    a[x] = (int) rand() / (double)(RAND_MAX / 100);
+    b[x] = (int) rand() / (double)(RAND_MAX / 100);
     num_teams[x] = -x;
   }
 
-  unsigned int b = 0;
+  int result = 0;
 
-#pragma omp target teams distribute reduction(^:b) defaultmap(tofrom:scalar)
+#pragma omp target teams distribute reduction(max:result) map(to: a[0:N], b[0:N]) map(tofrom: result, num_teams[0:N])
   for (int x = 0; x < N; ++x) {
+    result = fmax(a[x] + b[x], result);
     num_teams[x] = omp_get_num_teams();
-    b = (b ^ a[x]);
   }
 
-  unsigned int host_b = 0;
+  int host_max = 0;
 
   for (int x = 0; x < N; ++x) {
-    host_b = (host_b ^ a[x]);
+    host_max = fmax(host_max, a[x] + b[x]);
   }
 
   for (int x = 1; x < N; ++x) {
@@ -47,8 +49,8 @@ int test_bitxor() {
   OMPVV_WARNING_IF(num_teams[0] == 1, "Test operated with one team.  Reduction clause cannot be tested.");
   OMPVV_WARNING_IF(num_teams[0] <= 0, "Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guaranteed.");
 
-  OMPVV_TEST_AND_SET_VERBOSE(errors, b != host_b);
-  OMPVV_ERROR_IF(host_b != b, "Bit on device is %d but expected bit from host is %d.", b, host_b);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, result != host_max);
+  OMPVV_ERROR_IF(host_max != result, "Max on device is %d but expected max from host is %d.", result, host_max);
 
   return errors;
 }
@@ -58,7 +60,7 @@ int main() {
 
   int total_errors = 0;
 
-  OMPVV_TEST_AND_SET_VERBOSE(total_errors, test_bitxor() != 0);
+  OMPVV_TEST_AND_SET_VERBOSE(total_errors, test_max() != 0);
 
   OMPVV_REPORT_AND_RETURN(total_errors);
 }
