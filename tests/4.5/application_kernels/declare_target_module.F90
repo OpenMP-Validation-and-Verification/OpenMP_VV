@@ -5,7 +5,8 @@
 ! This test uses the declare target construct within a subroutine, called
 ! in a target region. It checks the result of a simple offloaded addition.
 ! This test was provided by the LLNL FGPU repository, derived from the
-! OpenMP 4.5 examples document.
+! OpenMP 4.5 examples document. Find the repo at https://github.com/LLNL/FGPU/.
+! Thanks to David Richards and Aaron Black for providing this test.
 !
 !===------------------------------------------------------------------------===//
 

@@ -5,7 +5,8 @@
 ! This test uses a declare target construct to within a subroutine, called
 ! on the device. It takes in an array argument and checks that the array
 ! is summed correctly. This test was provided by the LLNL FGPU repository,
-! derived from the OpenMP 4.5 examples document.
+! https://github.com/LLNL/FGPU/, derived from the OpenMP 4.5 examples.
+! Thanks to David Richards and Aaron Black for providing this test.
 !
 !===------------------------------------------------------------------------===//
 
