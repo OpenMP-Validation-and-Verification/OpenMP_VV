@@ -1,10 +1,11 @@
-//===---- test_target_parallel.cpp ----------------------------------------------------===//
+//===---- reduction_separated_directives.cpp ------------------------------------------===//
 //
 // OpenMP API Version 4.5 Nov 2015
 //
 // This test checks the behavior of a reduction clause with separated target teams
 // parallel for directives by comparing the results to those from atomic-protected
-// writes without a reduction.
+// writes without a reduction. This test comes from the aomp development repo, see
+// https://github.com/ROCm-Developer-Tools/aomp/issues/51.
 //
 //===----------------------------------------------------------------------------------===//
 
