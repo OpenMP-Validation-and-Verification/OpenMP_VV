@@ -1,6 +1,6 @@
 //===--- test_target_teams_distribute_reduction_bitand.c---------------------===//
 //
-// OpenMP API Version 4.5 Nov 2015
+// OpenMP API Version 5.0 Nov 2018
 //
 // This test uses the reduction clause on a target teams distribute directive,
 // testing that the variable in the reduction clause is properly reduced using
@@ -22,8 +22,8 @@ int test_bitand() {
   double false_margin = pow(exp(1), log(.5)/N); // See the 'and' operator test for
   int errors = 0;                               // an exaplantion of this math.
   int num_teams[N];
-  int num_attempts = 0;
   int have_true, have_false;
+  int num_attempts = 0;
   srand(1);
 
   while ((!have_true || !have_false) && (num_attempts < THRESHOLD)) {
@@ -32,7 +32,7 @@ int test_bitand() {
     for (int x = 0; x < N; ++x) {
       for (int y = 0; y < 16; ++y) {
         if (rand() / (double) RAND_MAX < false_margin) {
-          a[x] += (1 << y);
+          a[x] += 1 << y;
           have_true = 1;
         } else {
           have_false = 1;
@@ -51,7 +51,7 @@ int test_bitand() {
     b = b + (1 << x);
   }
 
-#pragma omp target teams distribute reduction(&:b) defaultmap(tofrom:scalar)
+#pragma omp target teams distribute reduction(&:b) map(to: a[0:N]) map(tofrom: b, num_teams[0:N])
   for (int x = 0; x < N; ++x) {
     num_teams[x] = omp_get_num_teams();
     b = b & a[x];

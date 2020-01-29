@@ -18,10 +18,11 @@ PROGRAM test_target_teams_distribute_default_none
   USE ompvv_lib
   USE omp_lib
   implicit none
+  CHARACTER(len=300):: infoMessage
+
   OMPVV_TEST_OFFLOADING
 
-  CHARACTER(len=300) :: infoMessage
-  WRITE(infoMessage, *) "Test only uses the default(none) clause and &
+  WRITE(infoMessage, *) "Test only uses the default(none) clause and&
        & does not guarantee that the default(none) is enforced."
   OMPVV_WARNING(infoMessage)
 

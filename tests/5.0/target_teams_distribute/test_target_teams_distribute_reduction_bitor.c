@@ -1,10 +1,10 @@
-//===--- test_target_teams_distribute_reduction_bitand.c---------------------===//
+//===--- test_target_teams_distribute_reduction_bitor.c----------------------===//
 //
-// OpenMP API Version 4.5 Nov 2015
+// OpenMP API Version 5.0 Nov 2018
 //
 // This test uses the reduction clause on a target teams distribute directive,
 // testing that the variable in the reduction clause is properly reduced using
-// the bitand operator.
+// the bitor operator.
 //
 ////===----------------------------------------------------------------------===//
 
@@ -15,15 +15,15 @@
 #include <math.h>
 
 #define N 1024
-#define THRESHOLD 512
 
-int test_bitand() {
-  unsigned int a[N];
-  double false_margin = pow(exp(1), log(.5)/N); // See the 'and' operator test for
-  int errors = 0;                               // an exaplantion of this math.
+int test_bitor() {
+  int a[N];
+  // See the 'and' operator test for an exaplantion of this math.
+  double true_margin = pow(exp(1), log(.5)/N);
+  int errors = 0;
   int num_teams[N];
-  int num_attempts = 0;
   int have_true, have_false;
+  int num_attempts = 0;
   srand(1);
 
   while ((!have_true || !have_false) && (num_attempts < THRESHOLD)) {
@@ -31,7 +31,7 @@ int test_bitand() {
     have_false = 0;
     for (int x = 0; x < N; ++x) {
       for (int y = 0; y < 16; ++y) {
-        if (rand() / (double) RAND_MAX < false_margin) {
+        if (rand() / (double) RAND_MAX > true_margin) {
           a[x] += (1 << y);
           have_true = 1;
         } else {
@@ -47,20 +47,17 @@ int test_bitand() {
   OMPVV_WARNING_IF(!have_false, "No false bits were generated to test");
 
   unsigned int b = 0;
-  for (int x = 0; x < 16; ++x) {
-    b = b + (1 << x);
-  }
 
-#pragma omp target teams distribute reduction(&:b) defaultmap(tofrom:scalar)
+#pragma omp target teams distribute reduction(|:b) map(to: a[0:N]) map(from: b, num_teams[0:N])
   for (int x = 0; x < N; ++x) {
     num_teams[x] = omp_get_num_teams();
-    b = b & a[x];
+    b = b | a[x];
   }
 
-  unsigned int host_b = a[0];
+  unsigned int host_b = 0;
 
   for (int x = 0; x < N; ++x) {
-    host_b = host_b & a[x];
+    host_b = host_b | a[x];
   }
 
   for (int x = 1; x < N; ++x) {
@@ -80,7 +77,7 @@ int main() {
 
   int total_errors = 0;
 
-  OMPVV_TEST_AND_SET_VERBOSE(total_errors, test_bitand() != 0);
+  OMPVV_TEST_AND_SET_VERBOSE(total_errors, test_bitor() != 0);
 
   OMPVV_REPORT_AND_RETURN(total_errors);
 }
