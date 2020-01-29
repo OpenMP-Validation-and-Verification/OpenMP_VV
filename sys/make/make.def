@@ -257,16 +257,16 @@ F_INC = -I./ompvv
 #---------------------------------------------------------------------------
 # Thread and team numbers for the compiler
 #---------------------------------------------------------------------------
-ifdef OMPVV_NUM_THREADS_DEVICE
-      DTHREADS = -DOMPVV_NUM_THREADS_DEVICE=${OMPVV_NUM_THREADS_DEVICE}
+ifdef NUM_THREADS_DEVICE
+      DTHREADS = -DOMPVV_NUM_THREADS_DEVICE=${NUM_THREADS_DEVICE}
 endif
 
-ifdef OMPVV_NUM_TEAMS_DEVICE
-      DTEAMS = -DOMPVV_NUM_TEAMS_DEVICE=${OMPVV_NUM_TEAMS_DEVICE}
+ifdef NUM_TEAMS_DEVICE
+      DTEAMS = -DOMPVV_NUM_TEAMS_DEVICE=${NUM_TEAMS_DEVICE}
 endif
 
-ifdef OMPVV_NUM_THREADS_HOST
-      HTHREADS = -DOMPVV_NUM_THREADS_HOST=${OMPVV_NUM_THREADS_HOST}
+ifdef NUM_THREADS_HOST
+      HTHREADS = -DOMPVV_NUM_THREADS_HOST=${NUM_THREADS_HOST}
 endif
 
 #---------------------------------------------------------------------------
