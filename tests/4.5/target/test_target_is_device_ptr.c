@@ -1,52 +1,54 @@
+//===--- test_target_is_device_ptr.c--is_device_ptr clause on target directive--===//
+//
+// OpenMP API Version 4.5 Nov 2015
+//
+//  This test checks for the use of the is_device_ptr() clause on an array that 
+//  is allocated with the omp_target_alloc() API call. If this test runs on the
+//  host, we will warn that we won't be allocating on any device
+//
+////===-------------------------------------------------------------------------===//
+
+
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-// Test for OpenMP 4.5 target is_device_ptr with allocation on device with omp_target_alloc
+#include "ompvv.h"
+
+#define N 10000
+
 int main() {
-  int errors = 0, len = 10000, isHost = -1, device_num = 0;
+  int isOffloading;
+  OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
+  
+  OMPVV_WARNING_IF(!isOffloading, "This test is running on the host, the allocation of the memory returns a host pointer");
+
+  int errors = 0;
   int *array_device = NULL;
   int *array_host = NULL;
 
-  device_num = omp_get_default_device();
-  array_device = (int *)omp_target_alloc(len*sizeof(int),device_num);
-  array_host = (int *)malloc(len*sizeof(int));
+  array_device = (int *) omp_target_alloc(N*sizeof(int), omp_get_default_device());
+  array_host = (int *) malloc(N*sizeof(int));
 
-  for (int i = 0; i < len; ++i)
+  for (int i = 0; i < N; ++i) {
     array_host[i] = i;
-
-#pragma omp target is_device_ptr(array_device) map(tofrom: array_host[0:len]) map(tofrom: isHost)
-{
-      isHost = omp_is_initial_device();
-      if(!isHost){
-        for (int i = 0; i < len; ++i) {
-          array_device[i] = i;
-          array_host[i] += array_device[i];
-        } 
-      }
-      else{
-        printf("Test test_target_is_device_ptr.c skipped\n");
-      }
-} // end target
-  //The test is skipped if the allocation on default device is not possible
-  //Using omp_target_alloc without offloading to device == omp_get_default_device() 
-  //leads to a Segmentation fault (with clang).
-  if(isHost)
-    return 0;
-
-  // checking results
-  for (int i = 0; i < len; ++i) {
-    if (array_host[i] != 2*i)
-      errors = 1;
   }
 
-  omp_target_free(array_device, device_num);
+#pragma omp target is_device_ptr(array_device) map(tofrom: array_host[0:N]) 
+{
+  for (int i = 0; i < N; ++i) {
+    array_device[i] = i;
+    array_host[i] += array_device[i];
+  } 
+} // end target
+
+  // checking results
+  for (int i = 0; i < N; ++i) {
+    OMPVV_TEST_AND_SET_VERBOSE(errors, array_host[i] != 2*i);
+  }
+
+  omp_target_free(array_device, omp_get_default_device());
   free(array_host);
 
-  if (!errors)
-    printf("Test passed on %s\n", (isHost ? "host" : "device"));
-  else
-    printf("Test failed on %s\n", (isHost ? "host" : "device"));
-
-  return errors;
+  OMPVV_REPORT_AND_RETURN(errors);
 }

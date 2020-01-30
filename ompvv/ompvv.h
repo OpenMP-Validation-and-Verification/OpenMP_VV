@@ -1,7 +1,7 @@
 //===------ ompvv.h ------------------ OMPVV HEADER FILE ------------------===//
-// 
+//
 // Header file for OMP Validation and verification test suite
-// 
+//
 //===----------------------------------------------------------------------===//
 
 #include <stdio.h>
@@ -20,7 +20,7 @@
       printf("[OMPVV_WARNING: %s:%i] " message "\n", __FILENAME__, __LINE__, ##__VA_ARGS__); \
     } \
   }
-  
+
   #define OMPVV_ERROR(message, ...) { \
     fprintf(stderr, "[OMPVV_ERROR: %s:%i] " message "\n", __FILENAME__, __LINE__, ##__VA_ARGS__); \
   }
@@ -29,7 +29,7 @@
       fprintf(stderr, "[OMPVV_ERROR: %s:%i] " message "\n", __FILENAME__, __LINE__, ##__VA_ARGS__); \
     } \
   }
-  
+
   #define OMPVV_INFOMSG(message, ...) { \
     printf("[OMPVV_INFO: %s:%i] " message "\n", __FILENAME__, __LINE__, ##__VA_ARGS__); \
   }
@@ -102,7 +102,7 @@ _Pragma("omp target map (from: _ompvv_isOffloadingOn) map(to: _ompvv_isSharedEnv
      _ompvv_isSharedEnv = 0; \
   }
 
-// Macro to report warning if it is a shared environment 
+// Macro to report warning if it is a shared environment
 #define OMPVV_TEST_SHARED_ENVIRONMENT {\
   OMPVV_TEST_SHARED_ENVIRONMENT_PROBE \
   OMPVV_WARNING_IF((_ompvv_isOffloadingOn && _ompvv_isSharedEnv == 0),"This tests is running on a shared data environment between host and device. This may cause errors") \
@@ -115,4 +115,15 @@ _Pragma("omp target map (from: _ompvv_isOffloadingOn) map(to: _ompvv_isSharedEnv
   var2set = (_ompvv_isOffloadingOn && _ompvv_isSharedEnv == 0);\
   }
 
+// Macros to provide thread and team nums if they are not specified
+#ifndef OMPVV_NUM_THREADS_DEVICE
+  #define OMPVV_NUM_THREADS_DEVICE 128
+#endif
 
+#ifndef OMPVV_NUM_TEAMS_DEVICE
+  #define OMPVV_NUM_TEAMS_DEVICE 8
+#endif
+
+#ifndef OMPVV_NUM_THREADS_HOST
+  #define OMPVV_NUM_THREADS_HOST 8
+#endif
