@@ -42,7 +42,7 @@ CONTAINS
        END DO
 
        !$omp target teams distribute reduction(-:result) &
-       !$omp& map(tofrom: result) defaultmap(tofrom:scalar)
+       !$omp& defaultmap(tofrom:scalar)
        DO x = 1, N
           result = result - a(x)
        END DO

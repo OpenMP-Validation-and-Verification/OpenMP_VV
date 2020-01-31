@@ -43,11 +43,11 @@ CONTAINS
        device_result = 1
        !$omp target teams distribute map(tofrom: device_result) &
        !$omp& reduction(*:device_result) map(to: a(1:N))
-       DO y = 1, 16
+       DO y = 1, 15
           device_result = a(x + y) * device_result
        END DO
        host_result = 1
-       DO y = 1, 16
+       DO y = 1, 15
           host_result = a(x + y) * host_result
        END DO
        OMPVV_TEST_AND_SET_VERBOSE(errors, host_result .ne. device_result)
