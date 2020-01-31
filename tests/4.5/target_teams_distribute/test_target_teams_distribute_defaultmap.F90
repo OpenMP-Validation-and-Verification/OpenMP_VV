@@ -277,7 +277,7 @@ CONTAINS
        OMPVV_TEST_AND_SET_VERBOSE(errors, int_array_a(x) .ne. int_array_b(x))
        OMPVV_TEST_AND_SET_VERBOSE(errors, long_int_array_a(x) .ne. long_int_array_b(x))
        OMPVV_TEST_AND_SET_VERBOSE(errors, ABS((INT(float_array_a(x)) * .7) - float_array_b(x)) .gt. .00001)
-       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS((INT(double_array_a(x)) * .7) - double_array_b(x)) .gt. .0000000001)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS((INT(double_array_a(x)) * .7) - double_array_b(x)) .gt. .00001)
        OMPVV_TEST_AND_SET_VERBOSE(errors, logical_array_b(x) .neqv. .FALSE.)
        OMPVV_TEST_AND_SET_VERBOSE(errors, logical_kind4_array_b(x) .neqv. .FALSE.)
        OMPVV_TEST_AND_SET_VERBOSE(errors, LOGICAL(logical_kind8_array_b(x) .neqv. .FALSE., 4))
