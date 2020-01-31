@@ -5,7 +5,7 @@
 ! This test conducts an array reduction on both the host and device and
 ! compares the result. The reduction operator is a custom declared add
 ! operator over reals. The reduction occurs within a four-level collapsed
-! loop.
+! loop. This test was provided by Kiran Ravikumar at Georgia Tech.
 !
 !//===----------------------------------------------------------------------===//
 
