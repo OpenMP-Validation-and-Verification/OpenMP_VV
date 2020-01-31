@@ -13,66 +13,68 @@
 #include <stdlib.h>
 #include "ompvv.h"
 
+#define N 1024
+
 int main() {
   int is_offloading = 0;
   OMPVV_TEST_AND_SET_OFFLOADING(is_offloading);
   OMPVV_WARNING("Test only uses default(none) clause and does not guarantee that the default(none) is enforced.");
-  int a[1024];
-  int b[1024];
-  int c[1024];
-  int d[1024];
+  int a[N];
+  int b[N];
+  int c[N];
+  int d[N];
   int privatized;
   int num_teams;
   int share = 0;
   int x;
   int errors = 0;
 
-  for (int x = 0; x < 1024; ++x) {
+  for (int x = 0; x < N; ++x) {
     a[x] = 1;
     b[x] = x;
     c[x] = 2*x;
     d[x] = 0;
   }
 
-#pragma omp target data map(from: d[0:1024], num_teams) map(to: a[0:1024], b[0:1024], c[0:1024])
+#pragma omp target data map(from: d[0:N], num_teams) map(to: a[0:N], b[0:N], c[0:N])
   {
 #pragma omp target teams distribute default(none) shared(a, b, c, d, num_teams) private(x, privatized)
-    for (x = 0; x < 1024; ++x) {
+    for (x = 0; x < N; ++x) {
       privatized = 0;
       for (int y = 0; y < a[x] + b[x]; ++y) {
-	privatized++;
+        privatized++;
       }
       d[x] = c[x] * privatized;
       if (omp_get_team_num() == 0) {
-	num_teams = omp_get_num_teams();
+        num_teams = omp_get_num_teams();
       }
     }
   }
 
   OMPVV_WARNING_IF(num_teams == 1, "The number of teams was 1. This is not a specification error but we could not guarantee parallelism of teams.");
 
-  for (x = 0; x < 1024; ++x) {
+  for (x = 0; x < N; ++x) {
     OMPVV_TEST_AND_SET_VERBOSE(errors, (d[x] != (1 + x)*2*x));
     if (d[x] != (1 + x)*2*x) {
       break;
     }
   }
 
-#pragma omp target data map(from: num_teams) map(to: b[0:1024])
+#pragma omp target data map(from: num_teams) map(to: b[0:N])
   {
 #pragma omp target teams distribute default(none) private(x) shared(share, b, num_teams) defaultmap(tofrom:scalar)
-    for (x = 0; x < 1024; ++x) {
+    for (x = 0; x < N; ++x) {
 #pragma omp atomic update
       share = share + b[x];
       if (omp_get_team_num() == 0) {
-	num_teams = omp_get_num_teams();
+        num_teams = omp_get_num_teams();
       }
     }
   }
 
   OMPVV_WARNING_IF(num_teams == 1, "The number of teams was 1. This is not a specification error but we could not guarantee parallelism of teams.");
 
-  for (int x = 0; x < 1024; ++x) {
+  for (int x = 0; x < N; ++x) {
     share = share - x;
   }
   OMPVV_TEST_AND_SET_VERBOSE(errors, (share != 0));
