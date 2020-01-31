@@ -2,7 +2,12 @@
 //
 // OpenMP API Version 4.5 Nov 2015
 //
-// This test is in two parts. First,
+// This test is in two parts. First, the test checks that mapping to on enter
+// followed by mapping from on exit works, by modifying the data on the
+// device. Then, the delete clause is tested by making sure that deleting
+// an array mapped to the device resets its reference count, meaning that
+// modifications made on the host are remapped back in when another map(to)
+// is encountered.
 //
 ////===----------------------------------------------------------------------===//
 
@@ -54,7 +59,7 @@ int test_delete() {
     for (int i = 0; i < N; ++i) {
       A[i] = 0;
     }
-#pragma omp target map(to: A)
+#pragma omp target map(to: A)   // if the delete does not work, this map will not happen.
     {
       for (int i = 0; i < N; ++i) {
         B[i] = A[i];
