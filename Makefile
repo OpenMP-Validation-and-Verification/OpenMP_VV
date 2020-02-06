@@ -222,7 +222,7 @@ endif
 ifneq "$(FC)" "none"
 	@echo "FC = $(FC) $(shell $(call loadModules,$(F_COMPILER_MODULE),"shut up") ${F_VERSION})"
 endif
-	$(if $(MODULE_LOAD), @echo "C_MODULE = "$(C_COMPILER_MODULE); echo "CXX_MODULE = "$(CXX_COMPILER_MODULE); echo "F_MODULE = "$(F_COMPILER_MODULE),)
+	$(if $(MODULE_LOAD), @echo "C_MODULE = "$(subst ;,\;,$(C_COMPILER_MODULE)); echo "CXX_MODULE = "$(subst ;,\;,${CXX_COMPILER_MODULE}); echo "F_MODULE = "$(subst ;,\;,${F_COMPILER_MODULE}),)
 
 ##################################################
 # Turn off offloading
