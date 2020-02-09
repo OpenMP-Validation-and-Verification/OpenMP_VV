@@ -114,8 +114,8 @@ int unified_shared_memory_heap() {
   }
 
   for (int i = 0; i < N; i++) {
-    OMPVV_TEST_AND_SET_VERBOSE(errors, anArray[i] != i + 30);
-    OMPVV_TEST_AND_SET_VERBOSE(errors, anArrayCopy[i] != i + 30);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, anArray[i] != i + 20);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, anArrayCopy[i] != i + 20);
     if (errors) break;
   }
 
