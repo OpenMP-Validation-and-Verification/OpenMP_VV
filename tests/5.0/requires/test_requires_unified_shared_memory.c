@@ -74,6 +74,7 @@ int unified_shared_memory_stack() {
   for (int i = 0; i < N; i++) {
     OMPVV_TEST_AND_SET_VERBOSE(errors, anArray[i] != i + 30);
     OMPVV_TEST_AND_SET_VERBOSE(errors, anArrayCopy[i] != i + 30);
+    if (errors) break;
   }
   return errors;
 }
@@ -115,7 +116,11 @@ int unified_shared_memory_heap() {
   for (int i = 0; i < N; i++) {
     OMPVV_TEST_AND_SET_VERBOSE(errors, anArray[i] != i + 30);
     OMPVV_TEST_AND_SET_VERBOSE(errors, anArrayCopy[i] != i + 30);
+    if (errors) break;
   }
+
+  free(anArray);
+  free(anArrayCopy);
   return errors;
 }
 int main() {
