@@ -27,7 +27,7 @@ PROGRAM test_target_teams_distribute_device
 CONTAINS
   INTEGER FUNCTION test_sub()
     INTEGER,DIMENSION(N):: a
-    INTEGER:: x, y, errors, host_result, result
+    INTEGER:: x, y, host_result, result
 
     DO y = 1, N
        result = 0
