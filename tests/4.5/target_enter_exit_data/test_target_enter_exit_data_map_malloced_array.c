@@ -31,7 +31,7 @@ int test_tofrom() {
 
   x = A;
 
-#pragma omp target enter data map(to: x)
+#pragma omp target enter data map(to: x[:N])
 
 #pragma omp target
   {
@@ -40,7 +40,7 @@ int test_tofrom() {
     }
   }
 
-#pragma omp target exit data map(from: x)
+#pragma omp target exit data map(from: x[:N])
 
   for (i = 0; i < N; i++) {
     OMPVV_TEST_AND_SET_VERBOSE(errors, A[i] != N);
@@ -67,13 +67,13 @@ int test_delete() {
   x = A;
   y = B;
 
-#pragma omp target data map(tofrom: x) map(from: y)
+#pragma omp target data map(tofrom: x[:N]) map(from: y[:N])
   {
-#pragma omp target exit data map(delete: x)
+#pragma omp target exit data map(delete: x[:N])
     for (i = 0; i < N; ++i) {
       x[i] = 0;
     }
-#pragma omp target map(to: x)
+#pragma omp target map(to: x[:N])
     {
       for (i = 0; i < N; i++) {
         y[i] = x[i];
