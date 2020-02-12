@@ -11,7 +11,7 @@
 ! the computation completes without errors, we assume that the
 ! firstprivatization occured.
 !
-!//===----------------------------------------------------------------------===//
+!===----------------------------------------------------------------------===//
 
 #include "ompvv.F90"
 
