@@ -31,12 +31,12 @@ int test_tofrom() {
 
   x = A;
 
-#pragma omp target enter data map(to: A)
+#pragma omp target enter data map(to: x)
 
 #pragma omp target
   {
     for (i = 0; i < N; i++) {
-      A[i] = N;
+      x[i] = N;
     }
   }
 
