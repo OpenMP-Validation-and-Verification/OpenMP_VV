@@ -1,4 +1,4 @@
-//===--- test_target_enter_exit_data_map_global_array.c ---------------------===//
+//===--- test_target_enter_exit_data_map_malloced_array.c ---------------------===//
 //
 // OpenMP API Version 4.5 Nov 2015
 //
