@@ -17,10 +17,12 @@
 #define N 1000
 
 int main() {
-  int compute_array[N], *p;
-  int sum = 0, result = 0;
-  int i, errors;
-
+  int compute_array[N];
+  int *p;
+  int sum = 0, result = 0, errors = 0;
+  int i;
+  
+  
   // Array initialization
   for (i = 0; i < N; i++)
     compute_array[i] = 0;
