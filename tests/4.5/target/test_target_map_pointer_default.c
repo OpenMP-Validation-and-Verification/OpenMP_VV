@@ -1,4 +1,4 @@
-//===--- test_target_map_pointer.c - test default behavior pointer mapping --===//
+//===--- test_target_map_pointer_default.c -------------------------------------===//
 // 
 // OpenMP API Version 4.5 Nov 2015
 // 
@@ -9,45 +9,53 @@
 // inside the omp target region. The array is then changed through the pointer.
 // Array is mapped as tofrom, while pointer is mapped with default value
 //
-////===----------------------------------------------------------------------===//
+////===------------------------------------------------------------------------===//
 
 #include <stdio.h>
 #include <omp.h>
+#include "ompvv.h"
 
 #define N 1000
 
-int main() {
-  int compute_array[N], *p;
-  int sum = 0, result = 0;
-  int i, isHost = -1;
+int test_default_tofrom() {
+  int compute_array[N];
+  int *p;	
+  int sum = 0, result = 0, errors = 0;
+  int i;
  
   for (i = 0; i < N; i++) 
     compute_array[i] = 0;
+  
   p = &compute_array[0];
 
-// p is mapped as a pointer to compute_array
+// p is default mapped tofrom as a pointer to compute_array
 #pragma omp target data map(tofrom: compute_array)
-#pragma omp target map(tofrom: isHost)//default mapping-->map(p[0:0])
+#pragma omp target map(p[0:N])// checks behavior default mapping which is tofrom
   {
-    // Record where the computation was executed
-    isHost = omp_is_initial_device();
-
+  //OMPVV_TEST_AND_SET_VERBOSE(errors, test != 5);
+  
     for (i = 0; i < N; i++)
       p[i] = i;
   } // end target
 
   for (i = 0; i < N; i++)
-     sum = sum + compute_array[i];    
+    sum = sum + compute_array[i];    
 
   for (i = 0; i < N; i++)
-  result += i;
+    result += i;
 
-  if (result != sum) {
-    printf("Test failed on %s\n", isHost ? "host":"device");
-    return 1;
-  }
-  else {
-    printf("Test passed on %s\n", isHost ? "host":"device");
-    return 0;
-  }
+  OMPVV_TEST_AND_SET_VERBOSE(errors, result != sum);
+  
+  return errors; 
+}
+
+int main() {
+  int errors = 0;
+    
+  int isOffloading;
+  OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
+  
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_default_tofrom());
+
+  OMPVV_REPORT_AND_RETURN(errors);
 }
