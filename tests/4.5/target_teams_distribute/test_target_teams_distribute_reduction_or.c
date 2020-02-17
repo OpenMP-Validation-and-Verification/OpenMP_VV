@@ -15,52 +15,63 @@
 #include <math.h>
 
 #define N 1024
+#define THRESHOLD 512
 
 int test_or() {
   char a[N];
-  double false_margin = pow(exp(1), log(.5)/N);   // See the 'and' operator test for
-  int errors = 0;                                 // an explanation of this math.
+  double true_margin = pow(exp(1), log(.5)/N);   // See the 'and' operator test for
+  int errors = 0;                                // an explanation of this math.
   int num_teams[N];
-  int warned = 0;
+  int tested_true;
+  int tested_false;
+  int itr_count;
   srand(1);
 
-  for (int x = 0; x < N; ++x) {
-    if (rand() / (double)(RAND_MAX) > false_margin) {
-      a[x] = 1;
-    } else {
-      a[x] = 0;
+  while ((!tested_true || !tested_false) && (itr_count < THRESHOLD)) {
+    for (int x = 0; x < N; ++x) {
+      a[x] = rand() / (double)(RAND_MAX) > true_margin;
+      num_teams[x] = -x;
     }
-    num_teams[x] = -x;
-  }
 
-  char result = 0;
-
+    char result = 0;
+    char host_result = 0;
 
 #pragma omp target teams distribute reduction(||:result) defaultmap(tofrom:scalar)
-  for (int x = 0; x < N; ++x) {
-    num_teams[x] = omp_get_num_teams();
-    result = result || a[x];
-  }
-
-  char host_result = 0;
-  for (int x = 0; x < N; ++x) {
-    host_result = host_result || a[x];
-  }
-
-  for (int x = 1; x < N; ++x) {
-    if (num_teams[x-1] != num_teams[x]) {
-      OMPVV_WARNING("Kernel reported differing numbers of teams.  Validity of testing of reduction clause cannot be guarunteed.");
-      warned += 1;
+    for (int x = 0; x < N; ++x) {
+      num_teams[x] = omp_get_num_teams();
+      result = result || a[x];
     }
-  }
-  if ((num_teams[0] == 1) && (warned == 0)) {
-    OMPVV_WARNING("Test operated with one team.  Reduction clause cannot be tested.");
-  } else if ((num_teams[0] <= 0) && (warned == 0)) {
-    OMPVV_WARNING("Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guarunteed.");
+
+    for (int x = 0; x < N; ++x) {
+      host_result = host_result || a[x];
+    }
+
+    if (itr_count == 0) {
+      for (int x = 1; x < N; ++x) {
+        OMPVV_WARNING_IF(num_teams[x - 1] != num_teams[x], "Kernel reported differing numbers of teams.  Validity of testing of reduction clause cannot be guaranteed.");
+      }
+      OMPVV_WARNING_IF(num_teams[0] == 1, "Test operated with one team.  Reduction clause cannot be tested.");
+      OMPVV_WARNING_IF(num_teams[0] <= 0, "Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guaranteed.");
+    }
+
+    OMPVV_TEST_AND_SET_VERBOSE(errors, host_result != result);
+    OMPVV_ERROR_IF(host_result != result, "Result on device is %d but expected result from host is %d.", result, host_result);
+
+    if (host_result) {
+      tested_true = 1;
+    } else {
+      tested_false = 1;
+    }
+
+    if (host_result != result) {
+      break;
+    }
+
+    itr_count++;
   }
 
-  OMPVV_TEST_AND_SET_VERBOSE(errors, host_result != result);
-  OMPVV_ERROR_IF(host_result != result, "Result on device is %d but expected result from host is %d.", result, host_result);
+  OMPVV_WARNING_IF(!tested_true, "Did not test a case in which final result was true.");
+  OMPVV_WARNING_IF(!tested_false, "Did not test a case in which final result was false.");
 
   return errors;
 }
