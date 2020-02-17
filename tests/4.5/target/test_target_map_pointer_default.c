@@ -30,10 +30,8 @@ int test_default_tofrom() {
 
 // p is default mapped tofrom as a pointer to compute_array
 #pragma omp target data map(tofrom: compute_array)
-#pragma omp target map(p[0:N])// checks behavior default mapping which is tofrom
+#pragma omp target map(p[0:N]) 
   {
-  //OMPVV_TEST_AND_SET_VERBOSE(errors, test != 5);
-  
     for (i = 0; i < N; i++)
       p[i] = i;
   } // end target
