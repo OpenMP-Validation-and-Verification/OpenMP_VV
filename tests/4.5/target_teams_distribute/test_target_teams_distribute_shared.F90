@@ -36,25 +36,26 @@ CONTAINS
     INTEGER,DIMENSION(N):: a
     INTEGER:: share, errors, x
     errors = 0
+    share = 0
 
     DO x = 1, N
        a(x) = x
     END DO
 
     !$omp target teams distribute num_teams(10) shared(share) &
-    !$omp& defaultmap(tofrom:scalar)
+    !$omp& defaultmap(tofrom:scalar) map(to: a(1:N))
     DO x = 1, N
        !$omp atomic
        share = share + a(x)
     END DO
 
     DO x = 1, N
-       share = share - x
+       share = share - a(x)
     END DO
 
     WRITE(errMsg, *) "Share was", share, "but expected 0"
     OMPVV_TEST_AND_SET_VERBOSE(errors, share .ne. 0)
-    OMPVV_ERROR_IF(errors .ne. 0, errMsg)
+    OMPVV_ERROR_IF(share .ne. 0, errMsg)
 
     share = 5
 
