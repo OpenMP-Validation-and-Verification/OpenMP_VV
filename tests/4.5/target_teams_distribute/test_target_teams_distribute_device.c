@@ -51,7 +51,9 @@ int main() {
   for (int dev = 0; dev < num_devices; ++dev) {
 #pragma omp target teams distribute map(alloc: a[0:ARRAY_SIZE], b[0:ARRAY_SIZE], num_teams[dev]) device(dev)
     for (int x = 0; x < ARRAY_SIZE; ++x) {
-      num_teams[dev] = omp_get_num_teams();
+      if (omp_get_team_num() == 0) {
+        num_teams[dev] = omp_get_num_teams();
+      }
       a[x] += b[x] + dev;
     }
   }

@@ -64,7 +64,9 @@ CONTAINS
        !$omp target teams distribute map(alloc: a(1:N), b(1:N), &
        !$omp& c(1:N, dev:dev), num_teams(dev:dev)) device(dev)
        DO x = 1, N
-          num_teams(dev) = omp_get_num_teams()
+          IF (omp_get_team_num() .eq. 0) THEN
+             num_teams(dev) = omp_get_num_teams()
+          END IF
           c(x, dev) = a(x) + b(x) + dev
        END DO
     END DO
