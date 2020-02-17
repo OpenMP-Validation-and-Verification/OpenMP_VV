@@ -21,16 +21,13 @@ PROGRAM test_target_teams_distribute_map
 
   OMPVV_TEST_OFFLOADING
   OMPVV_TEST_SHARED_ENVIRONMENT
-  OMPVV_TEST_VERBOSE(test_map_to() .ne. 0)
-  OMPVV_TEST_VERBOSE(test_map_from() .ne. 0)
-  OMPVV_TEST_VERBOSE(test_map_alloc() .ne. 0)
-  OMPVV_TEST_VERBOSE(test_map_tofrom() .ne. 0)
+  OMPVV_TEST_VERBOSE(test_map_to() + test_map_from() + test_map_alloc() + test_map_tofrom() .ne. 0)
 
   OMPVV_REPORT_AND_RETURN()
 CONTAINS
   INTEGER FUNCTION test_map_to()
     INTEGER,DIMENSION(N):: a, b
-    INTEGER:: errors, x
+    INTEGER:: errors
     errors = 0
 
     DO x = 1, N
@@ -57,7 +54,7 @@ CONTAINS
 
   INTEGER FUNCTION test_map_from()
     INTEGER,DIMENSION(N):: a, b
-    INTEGER:: errors, x
+    INTEGER:: errors
     errors = 0
 
     DO x = 1, N
@@ -84,7 +81,7 @@ CONTAINS
 
   INTEGER FUNCTION test_map_alloc()
     INTEGER,DIMENSION(N):: a, b, c
-    INTEGER:: errors, x
+    INTEGER:: errors
     errors = 0
 
     DO x = 1, N
@@ -113,7 +110,7 @@ CONTAINS
 
   INTEGER FUNCTION test_map_tofrom()
     INTEGER,DIMENSION(N):: a, b
-    INTEGER:: errors, x
+    INTEGER:: errors
     errors = 0
 
     DO x = 1, N
@@ -127,8 +124,8 @@ CONTAINS
     END DO
 
     DO x = 1, N
-       OMPVV_TEST_AND_SET_VERBOSE(errors, b(x) .ne. 2*x)
-       IF (b(x) .ne. 2*x) THEN
+       OMPVV_TEST_AND_SET_VERBOSE(errors, a(x) .ne. 2*x)
+       IF (a(x) .ne. b(x)) THEN
           exit
        END IF
     END DO

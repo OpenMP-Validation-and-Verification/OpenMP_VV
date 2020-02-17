@@ -15,7 +15,6 @@
 #include <math.h>
 
 #define N 1024
-#define THRESHOLD 512
 
 int test_and() {
   char a[N];
@@ -28,19 +27,17 @@ int test_and() {
   double false_margin = pow(exp(1), log(.5)/N);
   int errors = 0;
   int num_teams[N];
-  int itr_count = 0;
-  int tested_true = 0;
-  int tested_false = 0;
+  int warned = 0;
   srand(1);
 
-  while ((!tested_true || !tested_false) && itr_count < THRESHOLD) {
+  for (int itr_count = 0; itr_count < 16; ++itr_count) {
     for (int x = 0; x < N; ++x) {
       a[x] = (rand() / (double) (RAND_MAX) < false_margin);
       num_teams[x] = -x;
     }
 
-    char result = 1;
-    char host_result = 1;
+    result = 1;
+    host_result = 1;
 
 #pragma omp target teams distribute reduction(&&:result) map(to: a[0:N]) map(tofrom: result, num_teams[0:N])
     for (int x = 0; x < N; ++x) {
@@ -54,31 +51,25 @@ int test_and() {
 
     if (itr_count == 0) {
       for (int x = 1; x < N; ++x) {
-        OMPVV_WARNING_IF(num_teams[x - 1] != num_teams[x], "Kernel reported differing numbers of teams.  Validity of testing of reduction clause cannot be guaranteed.");
+        if (num_teams[x-1] != num_teams[x]) {
+          OMPVV_WARNING("Kernel reported differing numbers of teams.  Validity of testing of reduction clause cannot be guaranteed.");
+          warned += 1;
+        }
       }
-      OMPVV_WARNING_IF(num_teams[0] == 1, "Test operated with one team.  Reduction clause cannot be tested.");
-      OMPVV_WARNING_IF(num_teams[0] <= 0, "Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guaranteed.");
+      if ((num_teams[0] == 1) && (warned == 0)) {
+        OMPVV_WARNING("Test operated with one team.  Reduction clause cannot be tested.");
+      } else if ((num_teams[0] <= 0) && (warned == 0)) {
+        OMPVV_WARNING("Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guaranteed.");
+      }
     }
 
     OMPVV_TEST_AND_SET_VERBOSE(errors, host_result != result);
     OMPVV_ERROR_IF(host_result != result, "Result on device is %d but expected result from host is %d.", result, host_result);
 
-    if (host_result) {
-      tested_true = 1;
-    } else {
-      tested_false = 1;
-    }
-
     if (host_result != result) {
       break;
     }
-
-    itr_count++;
   }
-
-  OMPVV_WARNING_IF(!tested_true, "Did not test a case in which final result was true.");
-  OMPVV_WARNING_IF(!tested_false, "Did not test a case in which final result was false.");
-
   return errors;
 }
 
