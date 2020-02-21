@@ -15,17 +15,27 @@
 #include "ompvv.h"
 
 template<int Dim> struct V {
+  int version_called;
+
   template<bool B = (Dim == 0),
            typename = typename std::enable_if<B>::type>
-  V() {}
+  V() {
+    version_called = 1;
+  }
 
   template<typename TArg0,
            typename = typename std::enable_if<(std::is_same<unsigned long,
                                                typename std::decay<TArg0>::type>::value)>::type>
-  V(TArg0 && arg0) {}
+  V(TArg0 && arg0) {
+    version_called = 2;
+  }
 };
 
 template<int Dim> struct S {
+  V<Dim> v;
+};
+
+template<int Dim> struct R {
   V<Dim> v;
 };
 
@@ -35,11 +45,19 @@ int main(int argc, char *argv[]) {
   OMPVV_TEST_SHARED_ENVIRONMENT;
 
   int errors = 0;
+  int version_set[2] = {-1};
 
-#pragma omp target
+#pragma omp target map(from: version_set[0:2])
   {
     S<0> s;
+    version_set[0] = s.v.version_called;
+    R<0> r;
+    r.v = *(new V<0>((unsigned long) 1));
+    version_set[1] = r.v.version_called;
   }
+
+  OMPVV_TEST_AND_SET_VERBOSE(errors, version_set[0] != 1);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, version_set[1] != 2);
 
   OMPVV_REPORT_AND_RETURN(errors);
 }
