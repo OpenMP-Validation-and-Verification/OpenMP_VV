@@ -3,7 +3,7 @@
 // OpenMP API Version 4.5 Nov 2015
 // 
 // When no map-type-modifier (e.g. to, from and tofrom) are not specified, the 
-// default behavior should be tofrom. This test checks if this is sattisfied with
+// default behavior should be tofrom. The checks if this is satisfied with
 // a simple integer value. An array is created an initialized to zero in the host
 // then changed in the device with a scalar value.
 //
@@ -50,14 +50,12 @@ int test_scalar_from() {
 
 #pragma omp target map(new_scalar)
   {
-  // Test that asclr is default mapped 'to' the device 
-  OMPVV_TEST_AND_SET_VERBOSE(errors, new_scalar != 25);
-  //new_scalar = 15;
+  //Change scalar value on device
+  new_scalar = 27;
 
   }
   
-  // Test that asclr is default mapped 'from' back to host
-  //OMPVV_TEST_AND_SET_VERBOSE(errors, new_scalar!=25);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, new_scalar!=27);
   
   return errors;	
 }
