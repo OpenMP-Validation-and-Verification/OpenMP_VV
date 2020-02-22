@@ -5,8 +5,8 @@
 // When no map-type-modifier (e.g. to, from and tofrom) are not specified, the 
 // default behavior should be tofrom. The checks if this is satisfied with
 // a simple integer value. An array is created an initialized to zero in the host
-// then changed in the device with a scalar value.
-//
+// then changed in the device with a scalar value. An additional simple test 
+// function also checks from behavior by changing scalar value on device.
 ////===----------------------------------------------------------------------===//
 
 #include <omp.h>
