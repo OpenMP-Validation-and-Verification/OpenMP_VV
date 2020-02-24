@@ -25,7 +25,7 @@ int main() {
       compute_array[i][j] = 0;
 
   omp_set_num_threads(NUM_THREADS);
-#pragma omp parallel private(i)
+#pragma omp parallel
 {
   int p_val = omp_get_thread_num();
   actualNumThreads = omp_get_num_threads();

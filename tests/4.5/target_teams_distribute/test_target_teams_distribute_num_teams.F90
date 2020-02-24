@@ -61,7 +61,7 @@ CONTAINS
        OMPVV_ERROR("omp_get_num_teams() returned result less than or")
        OMPVV_ERROR("equal to 0.")
     ELSE
-       !$omp target teams distribute num_teams(default_num_teams / 2) &
+       !$omp target teams distribute num_teams(default_num_teams - 1) &
        !$omp& map(to: a(1:N), b(1:N)) map(from: c(1:N), num_team(1:N))
        DO x = 1, N
           c(x) = a(x) + b(x)
@@ -77,10 +77,10 @@ CONTAINS
           END IF
        END DO
 
-       IF (num_team(1) .gt. default_num_teams / 2) THEN
+       IF (num_team(1) .gt. default_num_teams - 1) THEN
           errors = errors + 1
           OMPVV_ERROR("Test ran on more teams than requested")
-       ELSEIF (num_team(1) .lt. default_num_teams / 2) THEN
+       ELSEIF (num_team(1) .lt. default_num_teams - 1) THEN
           OMPVV_WARNING("Test ran on less teams than requested. This ")
           OMPVV_WARNING("is still spec-conformant.")
        END IF

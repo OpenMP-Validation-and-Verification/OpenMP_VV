@@ -20,10 +20,10 @@ int test_and() {
   char a[N];
   char result;
   char host_result;
-      // The below calculation is meant to ensure about half the arrays we will
-      // test will come out to true under the 'and' operator, and the rest false.
-      // For the and operator, a test array that comes out true requires every
-      // entry to be false, which is why this margin is so close to 100%.
+      // The below calculation is meant to ensure about half the test arrays will
+      // come out to true under the 'and' operator, and the rest false. For the and
+      // operator, a test array that comes out true requires every entry to be true, 
+      // which is why this margin is so close to 100%.
   double false_margin = pow(exp(1), log(.5)/N);
   int errors = 0;
   int num_teams[N];
@@ -32,7 +32,11 @@ int test_and() {
 
   for (int itr_count = 0; itr_count < 16; ++itr_count) {
     for (int x = 0; x < N; ++x) {
-      a[x] = (rand() / (double) (RAND_MAX) < false_margin);
+      if (rand() / (double)(RAND_MAX) < false_margin) {
+	a[x] = 1;
+      } else {
+	a[x] = 0;
+      }
       num_teams[x] = -x;
     }
 
@@ -51,21 +55,21 @@ int test_and() {
 
     if (itr_count == 0) {
       for (int x = 1; x < N; ++x) {
-        if (num_teams[x-1] != num_teams[x]) {
-          OMPVV_WARNING("Kernel reported differing numbers of teams.  Validity of testing of reduction clause cannot be guaranteed.");
-          warned += 1;
-        }
+	if (num_teams[x-1] != num_teams[x]) {
+	  OMPVV_WARNING("Kernel reported differing numbers of teams.  Validity of testing of reduction clause cannot be guaranteed.");
+	  warned += 1;
+	}
       }
       if ((num_teams[0] == 1) && (warned == 0)) {
-        OMPVV_WARNING("Test operated with one team.  Reduction clause cannot be tested.");
+	OMPVV_WARNING("Test operated with one team.  Reduction clause cannot be tested.");
       } else if ((num_teams[0] <= 0) && (warned == 0)) {
-        OMPVV_WARNING("Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guaranteed.");
+	OMPVV_WARNING("Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guaranteed.");
       }
     }
-
+        
     OMPVV_TEST_AND_SET_VERBOSE(errors, host_result != result);
     OMPVV_ERROR_IF(host_result != result, "Result on device is %d but expected result from host is %d.", result, host_result);
-
+    
     if (host_result != result) {
       break;
     }

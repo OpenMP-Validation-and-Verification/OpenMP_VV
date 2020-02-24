@@ -20,6 +20,7 @@ int test_multiply() {
   int a[N];
   int errors = 0;
   int num_teams[N];
+  int warned = 0;
   srand(1);
 
   for (int x = 0; x < N; ++x) {
@@ -42,14 +43,23 @@ int test_multiply() {
       host_result *= a[x + y];
     }
     OMPVV_TEST_AND_SET_VERBOSE(errors, host_result != result);
-    OMPVV_INFOMSG_IF(host_result != result, "Device result is %d and host result is %d.", result, host_result);
+    OMPVV_INFOMSG("Device result is %d and host result is %d.", result, host_result);
+    if (host_result != result) {
+      break;
+    }
   }
 
   for (int x = 1; x < N; ++x) {
-    OMPVV_WARNING_IF(num_teams[x - 1] != num_teams[x], "Kernel reported differing numbers of teams.  Validity of testing of reduction clause cannot be guaranteed.");
+    if (num_teams[x-1] != num_teams[x]) {
+      OMPVV_WARNING("Kernel reported differing numbers of teams.  Validity of testing of reduction clause cannot be guaranteed.");
+      warned += 1;
+    }
   }
-  OMPVV_WARNING_IF(num_teams[0] == 1, "Test operated with one team.  Reduction clause cannot be tested.");
-  OMPVV_WARNING_IF(num_teams[0] <= 0, "Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guaranteed.");
+  if ((num_teams[0] == 1) && (warned == 0)) {
+    OMPVV_WARNING("Test operated with one team.  Reduction clause cannot be tested.");
+  } else if ((num_teams[0] <= 0) && (warned == 0)) {
+    OMPVV_WARNING("Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guaranteed.");
+  }
 
   return errors;
 }

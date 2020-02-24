@@ -1,7 +1,7 @@
 //===------ ompvv.h ------------------ OMPVV HEADER FILE ------------------===//
-//
+// 
 // Header file for OMP Validation and verification test suite
-//
+// 
 //===----------------------------------------------------------------------===//
 
 #include <stdio.h>
@@ -9,7 +9,6 @@
 #include <string.h>
 
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
-int _ompvv_isOffloadingOn = -1;
 
 // Macro for output of information, warning and error messages
 #ifdef VERBOSE_MODE
@@ -21,7 +20,7 @@ int _ompvv_isOffloadingOn = -1;
       printf("[OMPVV_WARNING: %s:%i] " message "\n", __FILENAME__, __LINE__, ##__VA_ARGS__); \
     } \
   }
-
+  
   #define OMPVV_ERROR(message, ...) { \
     fprintf(stderr, "[OMPVV_ERROR: %s:%i] " message "\n", __FILENAME__, __LINE__, ##__VA_ARGS__); \
   }
@@ -30,7 +29,7 @@ int _ompvv_isOffloadingOn = -1;
       fprintf(stderr, "[OMPVV_ERROR: %s:%i] " message "\n", __FILENAME__, __LINE__, ##__VA_ARGS__); \
     } \
   }
-
+  
   #define OMPVV_INFOMSG(message, ...) { \
     printf("[OMPVV_INFO: %s:%i] " message "\n", __FILENAME__, __LINE__, ##__VA_ARGS__); \
   }
@@ -49,7 +48,7 @@ int _ompvv_isOffloadingOn = -1;
 #endif // END IF VERBOSE_MODE
 
 #define OMPVV_TEST_OFFLOADING_PROBE \
-  _ompvv_isOffloadingOn = 0; \
+  int _ompvv_isOffloadingOn = 0; \
 _Pragma("omp target map (from: _ompvv_isOffloadingOn)") \
   {  _ompvv_isOffloadingOn = !omp_is_initial_device();  }
 
@@ -78,11 +77,9 @@ _Pragma("omp target map (from: _ompvv_isOffloadingOn)") \
 }
 // Macro for reporting results
 #define OMPVV_REPORT(err) { \
+  OMPVV_TEST_OFFLOADING_PROBE \
   OMPVV_INFOMSG("The value of " #err " is %d.", err); \
-  if (_ompvv_isOffloadingOn == -1) \
-    printf("[OMPVV_RESULT: %s] Test %s.\n", __FILENAME__, (err == 0)? "passed":"failed"); \
-  else \
-    printf("[OMPVV_RESULT: %s] Test %s on the %s.\n", __FILENAME__, (err == 0)? "passed":"failed", (_ompvv_isOffloadingOn)? "device" : "host"); \
+  printf("[OMPVV_RESULT: %s] Test %s on the %s.\n", __FILENAME__, (err == 0)? "passed":"failed", (_ompvv_isOffloadingOn)? "device" : "host"); \
 }
 
 // Macro for correct exit code
@@ -99,13 +96,13 @@ _Pragma("omp target map (from: _ompvv_isOffloadingOn)") \
 // Macro to check if it is a shared data environment
 #define OMPVV_TEST_SHARED_ENVIRONMENT_PROBE \
   int _ompvv_isSharedEnv = 1; \
-  _ompvv_isOffloadingOn = 0; \
+  int _ompvv_isOffloadingOn = 0; \
 _Pragma("omp target map (from: _ompvv_isOffloadingOn) map(to: _ompvv_isSharedEnv)") \
   {  _ompvv_isOffloadingOn = !omp_is_initial_device();  \
      _ompvv_isSharedEnv = 0; \
   }
 
-// Macro to report warning if it is a shared environment
+// Macro to report warning if it is a shared environment 
 #define OMPVV_TEST_SHARED_ENVIRONMENT {\
   OMPVV_TEST_SHARED_ENVIRONMENT_PROBE \
   OMPVV_WARNING_IF((_ompvv_isOffloadingOn && _ompvv_isSharedEnv == 0),"This tests is running on a shared data environment between host and device. This may cause errors") \
@@ -118,15 +115,4 @@ _Pragma("omp target map (from: _ompvv_isOffloadingOn) map(to: _ompvv_isSharedEnv
   var2set = (_ompvv_isOffloadingOn && _ompvv_isSharedEnv == 0);\
   }
 
-// Macros to provide thread and team nums if they are not specified
-#ifndef OMPVV_NUM_THREADS_DEVICE
-  #define OMPVV_NUM_THREADS_DEVICE 128
-#endif
 
-#ifndef OMPVV_NUM_TEAMS_DEVICE
-  #define OMPVV_NUM_TEAMS_DEVICE 8
-#endif
-
-#ifndef OMPVV_NUM_THREADS_HOST
-  #define OMPVV_NUM_THREADS_HOST 8
-#endif

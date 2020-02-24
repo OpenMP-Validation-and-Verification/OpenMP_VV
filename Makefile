@@ -3,10 +3,10 @@ SHELL=/bin/bash -o pipefail
 # When using make alone show the help message
 .DEFAULT_GOAL:=help
 
-###################################################
+#################################################
 # OpenMP Versions. This is to support multiple
 # versions of the standard in the same testsuite
-###################################################
+#################################################
 OMP_VERSION?=4.5
 TEST_FOLDER_EXISTS=$(shell if [ -d tests/$(OMP_VERSION) ]; then echo "exist";fi)
 ifeq "$(TEST_FOLDER_EXISTS)" ""
@@ -14,10 +14,10 @@ ifeq "$(TEST_FOLDER_EXISTS)" ""
 endif
 
 
-###################################################
+##################################################
 # System specific varibles can be specified
 # in the system files sys/system/###.def
-###################################################
+#################################################
 ifdef OMPVV_SYSTEM
 	SYSTEM = ${OMPVV_SYSTEM}
 else
@@ -27,16 +27,16 @@ endif
 
 include sys/make/make.def
 
-###################################################
+##################################################
 # It is possible to annotate a set of results with
 # a LOG_NOTE which will be added to the log header
 # files
-###################################################
+#################################################
 LOG_NOTE?="none"
 
-###################################################
+##################################################
 # Verbose & Log
-###################################################
+#################################################
 QUIET:=@
 ifdef VERBOSE
   QUIET:=
@@ -75,10 +75,10 @@ REPORT_ONLINE_CONNECTION=$(CURDIR)/sys/scripts/onlineConnection.py
 
 ##################################################
 # Source files
-##################################################
+#################################################
 
 ifneq "$(SOURCES_C)$(SOURCES_CPP)$(SOURCES_F)$(TESTS_TO_RUN)" ""
-$(error The SOURCES_C SOURCES_CPP SOURCES_F and TESTS_TO_RUN flags were depreciated. Use SOURCES instead)
+$(error The SOURCES_C SOURCES_CPP SOURCES_F and TESTS_TO_RUN flags where depreciated. Use SOURCES instead)
 endif
 
 ifneq "$(SOURCES)" ""
@@ -203,7 +203,7 @@ compile: MessageDisplay $(COMP_DEP)
 
 ##################################################
 # FOR RUNNING TESTS ONLY
-##################################################
+#################################################
 
 .PHONY: run
 run: $(RUN_TESTS)
@@ -222,7 +222,7 @@ endif
 ifneq "$(FC)" "none"
 	@echo "FC = $(FC) $(shell $(call loadModules,$(F_COMPILER_MODULE),"shut up") ${F_VERSION})"
 endif
-	$(if $(MODULE_LOAD), @echo "C_MODULE = "$(subst ;,\;,$(C_COMPILER_MODULE)); echo "CXX_MODULE = "$(subst ;,\;,${CXX_COMPILER_MODULE}); echo "F_MODULE = "$(subst ;,\;,${F_COMPILER_MODULE}),)
+	$(if $(MODULE_LOAD), @echo "C_MODULE = "$(C_COMPILER_MODULE); echo "CXX_MODULE = "$(CXX_COMPILER_MODULE); echo "F_MODULE = "$(F_COMPILER_MODULE),)
 
 ##################################################
 # Turn off offloading
@@ -241,7 +241,7 @@ endif
 %.c.o: %.c $(BINDIR) $(LOGDIR)
 	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC)
 	$(call log_section_header,"COMPILE CC="${CCOMPILE},$(SYSTEM),$<,$(CC) $(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(C_VERSION)),$(notdir $(@:.o=.log)))
-	-$(QUIET)$(call loadModules,$(C_COMPILER_MODULE)) $(CCOMPILE) $(VERBOSE_MODE) $(DTHREADS) $(DTEAMS) $(HTHREADS) $< -o $(BINDIR)/$(notdir $@) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
+	-$(QUIET)$(call loadModules,$(C_COMPILER_MODULE)) $(CCOMPILE) $(VERBOSE_MODE) $< -o $(BINDIR)/$(notdir $@) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
 		|| echo "FAIL" > $(LOGTEMPFILE))
 	-$(call log_section_footer,"COMPILE CC="${CCOMPILE},$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.o=.log)))
@@ -251,7 +251,7 @@ endif
 %.cpp.o: %.cpp $(BINDIR) $(LOGDIR)
 	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC)
 	$(call log_section_header,"COMPILE CPP="${CXXCOMPILE},$(SYSTEM),$<,$(CXX) $(shell $(call loadModules,$(CXX_COMPILER_MODULE),"shut up") $(CXX_VERSION)),$(notdir $(@:.o=.log)))
-	-$(QUIET)$(call loadModules,$(CXX_COMPILER_MODULE)) $(CXXCOMPILE) $(VERBOSE_MODE) $(DTHREADS) $(DTEAMS) $(HTHREADS) $< -o $(BINDIR)/$(notdir $@) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
+	-$(QUIET)$(call loadModules,$(CXX_COMPILER_MODULE)) $(CXXCOMPILE) $(VERBOSE_MODE) $< -o $(BINDIR)/$(notdir $@) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
 		|| echo "FAIL" > $(LOGTEMPFILE))
 	-$(call log_section_footer,"COMPILE",$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.o=.log)))
@@ -261,7 +261,7 @@ endif
 %.FOR.o: % $(BINDIR) $(LOGDIR) clear_fortran_mod
 	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC)
 	$(call log_section_header,"COMPILE F="${FCOMPILE},$(SYSTEM),$<,$(FC) $(shell $(call loadModules,$(F_COMPILER_MODULE),"shut up") $(F_VERSION)),$(notdir $(@:.FOR.o=.log)))
-	-$(QUIET)$(call loadModules,$(F_COMPILER_MODULE)) $(FCOMPILE) $(VERBOSE_MODE) $(DTHREADS) $(DTEAMS) $(HTHREADS) $< -o $(BINDIR)/$(notdir $(@:.FOR.o=.o)) $(if $(LOG),$(RECORD)$(notdir $(@:.FOR.o=.log))\
+	-$(QUIET)$(call loadModules,$(F_COMPILER_MODULE)) $(FCOMPILE) $(VERBOSE_MODE) $< -o $(BINDIR)/$(notdir $(@:.FOR.o=.o)) $(if $(LOG),$(RECORD)$(notdir $(@:.FOR.o=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
 		|| echo "FAIL" > $(LOGTEMPFILE))
 	-$(call log_section_footer,"COMPILE",$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.FOR.o=.log)))
@@ -358,7 +358,7 @@ report_json: $(RESULTS_JSON_OUTPUT_FILE)
 	@echo " === REPORT DONE === "
 
 .PHONY: report_summary
-report_summary:
+report_summary: 
 	@$(RESULTS_ANALYZER) -r -f summary $(LOGDIRNAME)/*
 
 .PHONY: report_html

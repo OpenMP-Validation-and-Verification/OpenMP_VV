@@ -18,14 +18,14 @@
 
 int test_or() {
   char a[N];
-  double true_margin = pow(exp(1), log(.5)/N);   // See the 'and' operator test for
+  double false_margin = pow(exp(1), log(.5)/N);   // See the 'and' operator test for
   int errors = 0;                                 // an explanation of this math.
   int num_teams[N];
   int warned = 0;
   srand(1);
 
   for (int x = 0; x < N; ++x) {
-    if (rand() / (double)(RAND_MAX) > true_margin) {
+    if (rand() / (double)(RAND_MAX) > false_margin) {
       a[x] = 1;
     } else {
       a[x] = 0;

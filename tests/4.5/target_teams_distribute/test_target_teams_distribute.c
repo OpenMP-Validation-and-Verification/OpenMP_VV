@@ -12,50 +12,51 @@
 #include <stdlib.h>
 #include "ompvv.h"
 
-#define N 1024
+#define ARRAY_SIZE 1024
 
 int main() {
-  int a[N];
-  int b[N];
-  int num_teams[N];
+  int a[ARRAY_SIZE];
+  int b[ARRAY_SIZE];
+  int num_teams[ARRAY_SIZE];
   int errors = 0;
   int is_offloading;
 
   OMPVV_TEST_AND_SET_OFFLOADING(is_offloading);
-  OMPVV_TEST_SHARED_ENVIRONMENT
-
   // a and b array initialization
-  for (int x = 0; x < N; ++x) {
+  for (int x = 0; x < ARRAY_SIZE; ++x) {
     a[x] = 1;
     b[x] = x;
     num_teams[x] = -1;
   }
 
-#pragma omp target teams distribute map(tofrom: a[0:N], num_teams[0:N]) map(to: b[0:N])
-  for (int x = 0; x < N; ++x) {
-    num_teams[x] = omp_get_num_teams();
-    a[x] += b[x];
+#pragma omp target data map(tofrom: a[0:ARRAY_SIZE], num_teams[0:ARRAY_SIZE]) map(to: b[0:ARRAY_SIZE])
+  {
+#pragma omp target teams distribute map(alloc: a[0:ARRAY_SIZE], b[0:ARRAY_SIZE], num_teams[0:ARRAY_SIZE])
+    for (int x = 0; x < ARRAY_SIZE; ++x) {
+      num_teams[x] = omp_get_num_teams();
+      a[x] += b[x];
+    }
   }
 
-  if (num_teams[0] == 1) {
-    OMPVV_WARNING("Test operated with one team.  Parallelism of teams distribute can't be guaranteed.");
-  } else if (num_teams[0] < 1) {
-    OMPVV_ERROR("omp_get_num_teams() reported a value below one.");
-  }
 
-  for (int x = 1; x < N; ++x) {
-    if (num_teams[x] != num_teams[x - 1]) {
+  for (int x = 0; x < ARRAY_SIZE; ++x) {
+    if (x > 0 && num_teams[x] != num_teams[x - 1]) {
       OMPVV_ERROR("Test reported an inconsistent number of teams between loop iterations.");
-      errors++;
+      errors += 1;
     }
     OMPVV_TEST_AND_SET_VERBOSE(errors, (a[x] != 1 + b[x]));
     if (a[x] != 1 + b[x]){
-      errors++;
       break;
     }
   }
 
-  OMPVV_INFOMSG_IF(!errors, "Test passed with %d teams.", num_teams[0]);
+  if (num_teams[0] == 1) {
+    OMPVV_WARNING("Test operated with one team.  Parallelism of teams distribute can't be guaranteed.");
+  }
+
+  if (!is_offloading) {
+    OMPVV_WARNING("Test operated on host.  Target region was ignored.");
+  }
 
   OMPVV_REPORT_AND_RETURN(errors);
 }

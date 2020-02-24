@@ -27,7 +27,7 @@ int test_bitand() {
   for (int x = 0; x < N; ++x) {
     for (int y = 0; y < 16; ++y) {
       if (rand() / (double) RAND_MAX < false_margin) {
-        a[x] += 1 << y;
+	a[x] += 1 << y;
       }
     }
     num_teams[x] = -x;
