@@ -16,8 +16,6 @@ PROGRAM test_target_teams_distribute_device
   USE ompvv_lib
   USE omp_lib
   implicit none
-  INTEGER :: errors
-  errors = 0
 
   OMPVV_TEST_OFFLOADING
 
@@ -28,6 +26,7 @@ CONTAINS
   INTEGER FUNCTION test_sub()
     INTEGER,DIMENSION(N):: a
     INTEGER:: x, y, errors, host_result, result
+    errors = 0
 
     DO y = 1, N
        result = 0

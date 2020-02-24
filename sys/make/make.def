@@ -69,9 +69,9 @@ FC?=none
 
 # CRAY compiler
 ifeq ($(CC), cc)
-  CFLAGS += -homp -O3
+  CFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
   CLINK = cc
-  CLINKFLAGS += -homp -lm
+  CLINKFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
 endif
 
 # GCC compiler
@@ -146,9 +146,9 @@ CXX_VERSION?= echo "version unknown"
 
 # CRAY compiler
 ifeq ($(CXX), CC)
-  CXXFLAGS += -homp -O3
+  CXXFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
   CXXLINK = cc
-  CXXLINKFLAGS += -homp -lm
+  CXXLINKFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
 endif
 
 # GCC compiler
