@@ -6,7 +6,8 @@
 // structs which use standard library functions. A templated struct
 // containing the other struct is declared on the device. This test does
 // not check any results as it is only a test of declaring a templated
-// struct on the device.
+// struct on the device. This test was provided by Jonas Hahnfeld from
+// https://bugs.llvm.org/show_bug.cgi?id=43771.
 //
 ////===----------------------------------------------------------------------===//
 
