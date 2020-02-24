@@ -2,8 +2,8 @@
 !
 ! OpenMP API Version 4.5 Nov 2015
 !
-! This test uses the declare target construct within a subroutine, called
-! in a target region. It checks the result of a simple offloaded addition.
+! This test uses the declare target construct within a module, used in
+! a target region. It checks the result of a simple offloaded addition.
 ! This test was provided by the LLNL FGPU repository, derived from the
 ! OpenMP 4.5 examples document. Find the repo at https://github.com/LLNL/FGPU/.
 ! Thanks to David Richards and Aaron Black for providing this test.
