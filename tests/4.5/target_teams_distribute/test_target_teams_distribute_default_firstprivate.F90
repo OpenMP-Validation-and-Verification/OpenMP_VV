@@ -11,7 +11,7 @@
 ! the computation completes without errors, we assume that the
 ! firstprivatization occured.
 !
-!===----------------------------------------------------------------------===//
+!===------------------------------------------------------------------------===//
 
 #include "ompvv.F90"
 
@@ -22,8 +22,7 @@ PROGRAM test_target_teams_distribute_device
   USE ompvv_lib
   USE omp_lib
   implicit none
-  INTEGER :: errors
-  errors = 0
+
   OMPVV_TEST_OFFLOADING
   OMPVV_TEST_VERBOSE(test_default_firstprivate() .ne. 0)
 
