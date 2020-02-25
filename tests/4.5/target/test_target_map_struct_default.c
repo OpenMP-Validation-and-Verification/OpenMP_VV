@@ -13,12 +13,13 @@
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "ompvv.h"
 
 #define N 1000
 
 int test_map_struct() {
 
-  puts("test_map_struct");
+  OMPVV_INFOMSG("Running test_map_struct()");
 
   int errors = 0;
   int* pointers[6];
@@ -29,15 +30,15 @@ int test_map_struct() {
     int *p;
   } single, array[5];
 
-  single.p = (int*)malloc(5*sizeof(int));
+  single.p = (int*) malloc(5 * sizeof(int));
   pointers[0] = single.p;
 
   for (int i = 0; i < 5; ++i) {
-    array[i].p = (int*)malloc(5*sizeof(int));
+    array[i].p = (int*) malloc(5 * sizeof(int));
     pointers[i + 1] = array[i].p;
   }
 
-  // By default. map(tofrom: single) map(tofrom: array) map(tofrom: pointers)
+  // By default. map(tofrom: single) map(tofrom: array) map(tofrom: pointers[0:0])
   {
 #pragma omp target
     if (!omp_is_initial_device()) {
@@ -53,27 +54,23 @@ int test_map_struct() {
     }
   } // end target
   // checking results
-  errors |= (single.a != 1); 
+  OMPVV_TEST_AND_SET_VERBOSE(errors, (single.a != 1)); 
   for (int i = 0; i < N; ++i)
-    errors |= (single.b[i] != 1);
-  errors |= (pointers[0] != single.p);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, (single.b[i] != 1));
+  OMPVV_TEST_AND_SET_VERBOSE(errors, (pointers[0] != single.p));
   for (int i = 0; i < 5; ++i) {
-    errors |= (array[i].a != 1); 
+    OMPVV_TEST_AND_SET_VERBOSE(errors, (array[i].a != 1)); 
     for (int j = 0; j < N; ++j)
-      errors |= (array[i].b[j] != 1);
-    errors |= (pointers[i + 1] != array[i].p);
+      OMPVV_TEST_AND_SET_VERBOSE(errors, (array[i].b[j] != 1));
+    OMPVV_TEST_AND_SET_VERBOSE(errors, (pointers[i + 1] != array[i].p));
   }
-
-  if (!errors)
-    puts("Test passed");
-  else
-    puts("Test failed");
 
   return errors;
 }
 
 int test_map_typedef() {
-  puts("test_map_typedef");
+
+  OMPVV_INFOMSG("Running test_map_typedef()");
 
   int errors = 0;
   int* pointers[6];
@@ -97,7 +94,7 @@ int test_map_typedef() {
   //By default: map(tofrom: single) map(tofrom: array) map(tofrom: pointers)
   {
 #pragma omp target
-    if (!omp_is_initial_device()) {
+    if (!omp_is_initial_device()) {  
       single.a = 1;
       for (int i = 0; i < N; ++i)
         single.b[i] = 1;
@@ -110,28 +107,29 @@ int test_map_typedef() {
     }
   } // end target
   // checking results
-  errors |= (single.a != 1); 
+  OMPVV_TEST_AND_SET_VERBOSE(errors, (single.a != 1)); 
   for (int i = 0; i < N; ++i)
-    errors |= (single.b[i] != 1);
-  errors |= (pointers[0] != single.p);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, (single.b[i] != 1));
+  OMPVV_TEST_AND_SET_VERBOSE(errors, (pointers[0] != single.p));
   for (int i = 0; i < 5; ++i) {
-    errors |= (array[i].a != 1); 
+   OMPVV_TEST_AND_SET_VERBOSE(errors, (array[i].a != 1)); 
     for (int j = 0; j < N; ++j)
-      errors |= (array[i].b[j] != 1);
-    errors |= (pointers[i + 1] != array[i].p);
+      OMPVV_TEST_AND_SET_VERBOSE(errors, (array[i].b[j] != 1));
+    OMPVV_TEST_AND_SET_VERBOSE(errors, (pointers[i + 1] != array[i].p));
   }
-
-  if (!errors)
-    puts("Test passed");
-  else
-    puts("Test failed");
 
   return errors;
 }
 
+
 int main () {
+
+  //Check that offloading is enabled
+  int is_offloading;
+  OMPVV_TEST_AND_SET_OFFLOADING(is_offloading);
+ 
   int errors = 0;
   errors += test_map_struct();
   errors += test_map_typedef();
-  return errors;
+  OMPVV_REPORT_AND_RETURN(errors);
 }
