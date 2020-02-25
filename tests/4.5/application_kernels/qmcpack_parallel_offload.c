@@ -1,15 +1,16 @@
-//===---- test_target_parallel.c - combined consutrct target and parallel  -------------===//
+//===---- qmcpack_parallel_offload.c ---------------------------------------------------===//
 // 
 // OpenMP API Version 4.5 Nov 2015
 // 
 // This test checks for multiple parallel offloading kernels. 
-// Kernel1 does parallel offload without specifying a device id while 
+// Kernel1 does parallel offload without specifying a device number while 
 // kernel2 tries to offload to specific devices.
 // Adapted from https://reviews.llvm.org/D74145 to match V&V coding and
 // reporting style. 
 //
 //===----------------------------------------------------------------------------------===//
 //
+
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
