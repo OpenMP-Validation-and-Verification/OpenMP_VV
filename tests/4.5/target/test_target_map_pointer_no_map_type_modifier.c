@@ -1,4 +1,4 @@
-//===--- test_target_map_pointer_default.c -------------------------------------===//
+//===--- test_target_map_pointer_no_map_type_modifier.c -----------------------===//
 // 
 // OpenMP API Version 4.5 Nov 2015
 // 
