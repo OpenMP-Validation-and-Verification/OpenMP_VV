@@ -1,27 +1,27 @@
-//===---- test_target_update_to.c - check the to data motion clause of target update -===//
+//===---- test_target_update_from.c -------------------------------------------===//
 // 
 // OpenMP API Version 4.5 Nov 2015
-// 
-//===----------------------------------------------------------------------===//
+//
+// This test checks the target update motion clause 'from' by mapping an array 
+// to the device with map-type 'to', changing the values of array on the device,
+// and finally using the update 'from' motion clause to assign the value of the 
+// list item. Back on the host, measures are taken to ensure the value was properly
+// updated.  
+//===--------------------------------------------------------------------------===//
 
 #include <omp.h>
 #include <stdio.h>
+#include "ompvv.h"
 
 #define N 100
 int a[N];
 int b[N];
 int c[N];
 
-void update_b(){
-    int i;
-    for (i = 0; i < N; i++) {
-      b[i] = b[i] * 2; 
-    }
-}
-  
+
 // Test for OpenMP 4.5 target update with to
 int main() {
-  int errors= 0, i = 0, isHost = -1, isOffloading = 0, change_flag=0;
+  int errors = 0, i = 0, change_flag=0;
 
   for (i = 0; i < N; i++) {
     a[i] = 10;
@@ -29,16 +29,14 @@ int main() {
   }
 
   // We test for offloading
-#pragma omp target map(from: isOffloading)
-  {
-    isOffloading = !omp_is_initial_device();
-  }
+  int is_offloading;
+  OMPVV_TEST_AND_SET_OFFLOADING(is_offloading);
 
-#pragma omp target data map(to: a[:N], b[:N]) map(tofrom: isHost)
+
+#pragma omp target data map(to: a[:N], b[:N]) 
 {
   #pragma omp target
   {
-        isHost = omp_is_initial_device();
         int j = 0;
         for (j = 0; j < N; j++) {
           b[j] = (a[j] + b[j]);//b=12 
@@ -58,16 +56,9 @@ int main() {
 }// end target-data
 
     // checking results 
-    for (i = 0; i < N; i++) {
-        if (c[i] != 24) {
-          errors += 1;
-        }
-    }
+    for (i = 0; i < N; i++) 
+      OMPVV_TEST_AND_SET_VERBOSE(errors, (c[i] != 24)); 
 
-  if (!errors)
-    printf("Test passed on %s.\n", (isOffloading ? "device" : "host"));
-  else
-    printf("Test failed on %s\n", (isOffloading ? "device" : "host"));
 
-  return (errors);
+    OMPVV_REPORT_AND_RETURN(errors);
 }
