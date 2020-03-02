@@ -57,12 +57,12 @@ CONTAINS
 
     DO dev = 1, num_devices
        !$omp target enter data map(to: a(1:N), b(1:N), c(1:N, dev:dev), &
-       !$omp& num_teams(dev:dev)) device(dev)
+       !$omp& num_teams(dev:dev)) device(dev - 1)
     END DO
 
     DO dev = 1, num_devices
        !$omp target teams distribute map(alloc: a(1:N), b(1:N), &
-       !$omp& c(1:N, dev:dev), num_teams(dev:dev)) device(dev)
+       !$omp& c(1:N, dev:dev), num_teams(dev:dev)) device(dev - 1)
        DO x = 1, N
           IF (omp_get_team_num() .eq. 0) THEN
              num_teams(dev) = omp_get_num_teams()
@@ -73,7 +73,7 @@ CONTAINS
 
     DO dev = 1, num_devices
        !$omp target exit data map(from: c(1:N, dev:dev), &
-       !$omp& num_teams(dev:dev)) map(delete: a(1:N), b(1:N)) device(dev)
+       !$omp& num_teams(dev:dev)) map(delete: a(1:N), b(1:N)) device(dev - 1)
        DO x = 1, N
           IF (c(x, dev) .ne. (1 + dev + x)) THEN
              errors(dev) = errors(dev) + 1
