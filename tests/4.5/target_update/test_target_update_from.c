@@ -21,7 +21,7 @@ int c[N];
 
 // Test for OpenMP 4.5 target update with to
 int main() {
-  int errors = 0, i = 0, change_flag=0;
+  int errors = 0, i = 0, change_flag = 0;
 
   for (i = 0; i < N; i++) {
     a[i] = 10;
@@ -37,20 +37,20 @@ int main() {
 {
   #pragma omp target
   {
-        int j = 0;
-        for (j = 0; j < N; j++) {
-          b[j] = (a[j] + b[j]);//b=12 
-        }
+    int j = 0;
+    for (j = 0; j < N; j++) {
+      b[j] = (a[j] + b[j]);//b=12 
+    }
   } // end target
 
   #pragma omp target update from(b[:N]) //update b=12 on host 
 
   #pragma omp target 
   {
-        int j = 0;
-        for (j = 0; j < N; j++) {
-          c[j] = (2* b[j]);// c=24 
-        }
+    int j = 0;
+    for (j = 0; j < N; j++) {
+      c[j] = (2* b[j]);// c=24 
+    }
   } // end target
 
 }// end target-data
@@ -58,7 +58,9 @@ int main() {
     // checking results 
     for (i = 0; i < N; i++) 
       OMPVV_TEST_AND_SET_VERBOSE(errors, (c[i] != 24)); 
-
-
+    
+    for (i = 0; i < N; i++)
+      OMPVV_TEST_AND_SET_VERBOSE(errors, (b[i] != 12));
+    
     OMPVV_REPORT_AND_RETURN(errors);
 }
