@@ -49,6 +49,7 @@ CONTAINS
           privatized = privatized + 1
        END DO
        d(x) = c(x)*privatized
+       privatized = 5
     END DO
 
     DO x = 1, N
