@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
     S<0> s;
     version_set[0] = s.v.version_called;
     R<0> r;
-    r.v = *(new V<0>((unsigned long) 1));
+    r.v = *(new V<1>((unsigned long) 1));
     version_set[1] = r.v.version_called;
   }
 
