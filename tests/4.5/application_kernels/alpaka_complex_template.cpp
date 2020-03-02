@@ -52,9 +52,8 @@ int main(int argc, char *argv[]) {
   {
     S<0> s;
     version_set[0] = s.v.version_called;
-    R<0> r;
-    r.v = *(new V<1>((unsigned long) 1));
-    version_set[1] = r.v.version_called;
+    V<1> v2((unsigned long) 1);
+    version_set[1] = v2.version_called;
   }
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, version_set[0] != 1);
