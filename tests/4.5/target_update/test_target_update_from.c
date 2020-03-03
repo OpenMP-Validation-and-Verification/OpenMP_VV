@@ -14,6 +14,7 @@
 #include "ompvv.h"
 
 #define N 100
+
 int a[N];
 int b[N];
 int c[N];
@@ -39,28 +40,29 @@ int main() {
   {
     int j = 0;
     for (j = 0; j < N; j++) {
-      b[j] = (a[j] + b[j]);//b=12 
+      b[j] = (a[j] + b[j]);// b = 12 
     }
   } // end target
 
-  #pragma omp target update from(b[:N]) //update b=12 on host 
+  #pragma omp target update from(b[:N]) // update b = 12 on host 
+
+} //end target-data
+ 
+  // Checking values of b[N] 
+  for (i = 0; i < N; i++) 
+    OMPVV_TEST_AND_SET_VERBOSE(errors, (b[i] != 12)); 
 
   #pragma omp target 
   {
     int j = 0;
     for (j = 0; j < N; j++) {
-      c[j] = (2* b[j]);// c=24 
+      c[j] = (2* b[j]);// c = 24 
     }
   } // end target
 
-}// end target-data
-
-    // checking results 
-    for (i = 0; i < N; i++) 
-      OMPVV_TEST_AND_SET_VERBOSE(errors, (c[i] != 24)); 
+  // Checking values of c[N] 
+  for (i = 0; i < N; i++) 
+    OMPVV_TEST_AND_SET_VERBOSE(errors, (c[i] != 24)); 
     
-    for (i = 0; i < N; i++)
-      OMPVV_TEST_AND_SET_VERBOSE(errors, (b[i] != 12));
-    
-    OMPVV_REPORT_AND_RETURN(errors);
+  OMPVV_REPORT_AND_RETURN(errors);
 }
