@@ -78,7 +78,7 @@ CONTAINS
     test_firstprivate_private = errors
   END FUNCTION test_firstprivate_private
   INTEGER FUNCTION test_firstprivate_first()
-    INTEGER:: errors, x, p, privatized, idx
+    INTEGER:: errors, x, p, privatized
     INTEGER,DIMENSION(N):: a, b, c, d, num_teams
     INTEGER,DIMENSION(10):: privatized_array
 
@@ -102,22 +102,12 @@ CONTAINS
     !$omp map(alloc: a(1:N), b(1:N), c(1:N), d(1:N)) num_teams(10)
     DO x = 1, N
        num_teams(x) = omp_get_num_teams()
-       IF (MOD(x, 10).eq.0) THEN
-         idx = 1;
-       ELSE 
-         idx = MOD(x, 10)
-       END IF
-       d(x) = a(x) + b(x) + c(x) + privatized_array(idx) + privatized
+       d(x) = a(x) + b(x) + c(x) + privatized_array(MOD(x, 10) + 1) + privatized
     END DO
     !$omp end target data
 
     DO x = 1, N
-       IF (MOD(x, 10).eq.0) THEN
-         idx = 1;
-       ELSE 
-         idx = MOD(x, 10)
-       END IF
-       IF (d(x) .ne. 2 + 3*x + idx ) THEN
+       IF (d(x) .ne. 2 + 3*x + MOD(x, 10) + 1 ) THEN
           errors = errors + 1
        END IF
        OMPVV_WARNING_IF(num_teams(x) .eq. 1, "Did not create enough teams to check for potential data races.")
