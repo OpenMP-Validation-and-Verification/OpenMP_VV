@@ -36,10 +36,6 @@ template<int Dim> struct S {
   V<Dim> v;
 };
 
-template<int Dim> struct R {
-  V<Dim> v;
-};
-
 int main(int argc, char *argv[]) {
   OMPVV_TEST_OFFLOADING;
 
