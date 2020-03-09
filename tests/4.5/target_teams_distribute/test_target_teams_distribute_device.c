@@ -25,9 +25,9 @@ int main() {
   int isOffloading = 0;
   OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
 
-  int a[ARRAY_SIZE];
-  int b[ARRAY_SIZE];
   int num_devices = omp_get_num_devices();
+  int a[num_devices][ARRAY_SIZE];
+  int b[ARRAY_SIZE];
   int num_teams[num_devices];
   int errors[num_devices];
   int sum_errors = 0;
@@ -35,7 +35,9 @@ int main() {
   OMPVV_INFOMSG("Running tests on %d devices", num_devices);
 
   for (int x = 0; x < ARRAY_SIZE; ++x) {
-    a[x] = 1;
+    for (int dev = 0; dev < num_devices; ++dev) {
+      a[dev][x] = 1;
+    }
     b[x] = x;
   }
 
@@ -45,24 +47,24 @@ int main() {
   }
 
   for (int dev = 0; dev < num_devices; ++dev) {
-#pragma omp target enter data map(to: a[0:ARRAY_SIZE], b[0:ARRAY_SIZE], num_teams[dev]) device(dev)
+#pragma omp target enter data map(to: a[dev][0:ARRAY_SIZE], b[0:ARRAY_SIZE], num_teams[dev]) device(dev)
   }
 
   for (int dev = 0; dev < num_devices; ++dev) {
-#pragma omp target teams distribute map(alloc: a[0:ARRAY_SIZE], b[0:ARRAY_SIZE], num_teams[dev]) device(dev)
+#pragma omp target teams distribute map(alloc: a[dev][0:ARRAY_SIZE], b[0:ARRAY_SIZE], num_teams[dev]) device(dev)
     for (int x = 0; x < ARRAY_SIZE; ++x) {
       if (omp_get_team_num() == 0) {
         num_teams[dev] = omp_get_num_teams();
       }
-      a[x] += b[x] + dev;
+      a[dev][x] += b[x] + dev;
     }
   }
 
   for (int dev = 0; dev < num_devices; ++dev) {
-#pragma omp target exit data map(from: a[0:ARRAY_SIZE], num_teams[dev]) map(delete: b[0:ARRAY_SIZE]) device(dev)
+#pragma omp target exit data map(from: a[dev][0:ARRAY_SIZE], num_teams[dev]) map(delete: b[0:ARRAY_SIZE]) device(dev)
     for (int x = 0; x < ARRAY_SIZE; ++x) {
-      OMPVV_TEST_AND_SET_VERBOSE(errors[dev], a[x] != 1 + dev + b[x]);
-      if (a[x] != 1 + dev + b[x]) {
+      OMPVV_TEST_AND_SET_VERBOSE(errors[dev], a[dev][x] != 1 + dev + b[x]);
+      if (a[dev][x] != 1 + dev + b[x]) {
         break;
       }
     }
