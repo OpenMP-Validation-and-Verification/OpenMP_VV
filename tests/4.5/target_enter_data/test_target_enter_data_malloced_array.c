@@ -1,4 +1,4 @@
-//===---- test_target_enter_data_malloced_array.c -------------------------===//
+//===---- test_target_enter_data_malloced_array.c ------------------------------------------===//
 // 
 // OpenMP API Version 4.5 Nov 2015
 // 
@@ -10,7 +10,7 @@
 // are set equal to values of x[n] to ensure that values of x[n] were properly mapped to device.
 // Back on the host, a final check is made to confirm values of array B[10] are all integer 10.
 // 
-//===----------------------------------------------------------------------===//
+//===---------------------------------------------------------------------------------------===//
 
 #include <stdio.h>
 #include <stdlib.h>
