@@ -1,16 +1,16 @@
-//===---- test_target_enter_data_malloced_array.c ------------------------------------------===//
+//===---- test_target_enter_data_malloced_array.c -------------------------------------------------===//
 // 
 // OpenMP API Version 4.5 Nov 2015
 // 
 // Tests for target enter data with heap allocated arrays. The test begins by creating
 // a pointer to a block of memory that is of size n*sizeof(int) and is allocated using malloc(). 
-// A check is made to ensure that the pointer is not null, variable x is set equal to the 
+// A check is made to ensure that the pointer is not null, variable x is set equal to the dereferenced 
 // pointer and is filled with int value 10. Global array B[10] is filled with int value 0. 
 // The values of x[n] are mapped onto the device using enter data map, and values in array B[10]
 // are set equal to values of x[n] to ensure that values of x[n] were properly mapped to device.
 // Back on the host, a final check is made to confirm values of array B[10] are all integer 10.
 // 
-//===---------------------------------------------------------------------------------------===//
+//===----------------------------------------------------------------------------------------------===//
 
 #include <stdio.h>
 #include <stdlib.h>
