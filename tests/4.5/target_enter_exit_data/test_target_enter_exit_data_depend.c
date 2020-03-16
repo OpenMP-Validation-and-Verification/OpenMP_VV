@@ -1,3 +1,17 @@
+//===---test_target_enter_exit_data_depend.c --------------------------------===//
+// 
+// OpenMP API Version 4.5 Nov 2015
+// 
+// This test checks functionality of target enter data and target exit data 
+// to depend 'in' and 'out' using two separate functions. The first function 
+// test_async_between_task_target() mixes host-based tasks with target-based
+// tasks, while the second function test_async_between_target() is testing 
+// for target enter exit data to depend 'in' and 'out' respectively, while also
+// checking that a nowait clause can be used to ensure asynchronous behavior.
+//
+//===------------------------------------------------------------------------===//
+
+
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
