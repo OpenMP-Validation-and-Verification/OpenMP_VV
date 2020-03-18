@@ -1,3 +1,19 @@
+//===--- test_target_enter_exit_data_devices.c---------------------------------------===//
+//
+//  OpenMP API Version 4.5 Nov 2015
+//
+//  This test checks for data mapping on multiple devices when using the target
+//  data map directive. The test uses omp_get_num_devices to confirm the number 
+//  of total devices available. There are two separate functions, and both make sure 
+//  that data mapping is happening on each available device. The first function does 
+//  this through the use of omp_set_default_device, while the second function explicity 
+//  uses the device() clause to control which device is being utilized.
+//
+//  Since OpenMP 4.5 does not have an API call to obtain the current device, 
+//  this test does not guarantee that the execution devices are different. 
+//
+////===------------------------------------------------------------------------------===/
+
 #include <assert.h>
 #include <omp.h>
 #include <stdio.h>
