@@ -105,8 +105,14 @@ int test_collapse2() {
 }
 
 int main() {
+  
+  //Check for offloading
+  int is_offloading;
+  OMPVV_TEST_AND_SET_OFFLOADING(is_offloading);  
+
   int errors = 0;
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_collapse1() != 0);
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_collapse2() != 0);
   OMPVV_REPORT_AND_RETURN(errors);
+
 }
