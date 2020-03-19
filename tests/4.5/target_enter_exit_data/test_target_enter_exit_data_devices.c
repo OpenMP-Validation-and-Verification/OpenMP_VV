@@ -28,11 +28,11 @@ int test_set_default_dev() {
 
   // Get number of devices
   int num_dev = omp_get_num_devices();
-  printf("num_devices: %d\n", num_dev);
+  OMPVV_INFOMSG("num_devices: %d", num_dev);
 
   int def_dev = omp_get_default_device();
-  printf("initial device: %d\n", omp_get_initial_device());
-  printf("default device: %d\n", def_dev);
+  OMPVV_INFOMSG("initial device: %d", omp_get_initial_device());
+  OMPVV_INFOMSG("default device: %d", def_dev);
 
   int sum[num_dev], errors = 0;
   int h_matrix[num_dev][N];
@@ -42,7 +42,6 @@ int test_set_default_dev() {
 
 #pragma omp target enter data map(alloc: h_matrix[dev][0 : N])
     
-    // assert(dev == omp_get_default_device() && "message");
 #pragma omp target map(alloc: h_matrix[dev][0 : N]) // map(alloc: ) to avoid target to map the entire matrix h_matrix[dev][:]
     {
       for (int i = 0; i < N; ++i)
@@ -78,7 +77,7 @@ int test_device() {
   OMPVV_INFOMSG("initial device: %d", omp_get_initial_device());
   OMPVV_INFOMSG("default device: %d", omp_get_default_device());
 
-  int sum[num_dev], errors = 0, isHost = 0;
+  int sum[num_dev], errors = 0;
   int h_matrix[num_dev][N];
 
   for (int dev = 0; dev < num_dev; ++dev) {
