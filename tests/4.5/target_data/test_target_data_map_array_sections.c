@@ -1,6 +1,7 @@
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "ompvv.h"
 
 #define N 1000
 
@@ -11,7 +12,7 @@ void init_3d(int a[N][2][2]);
 // Test for OpenMP 4.5 target data map with array section [lower:length]
 int test_lower_length_1d() {
   // array sections of the form a[lower:length] 
-  puts("test_lower_length_1d");
+  OMPVV_INFOMSG("test_lower_length_1d");
 
   int errors = 0, isHost = 0;
 
@@ -425,8 +426,10 @@ int test_lower_3d() {
 int main() {
 
   int errors = 0;
+  
+  OMPVV_TEST_OFFLOADING;
 
-  errors += test_lower_length_1d();
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_lower_length_1d());
   errors += test_lower_length_2d();
   errors += test_lower_length_3d();
   errors += test_length_1d();
