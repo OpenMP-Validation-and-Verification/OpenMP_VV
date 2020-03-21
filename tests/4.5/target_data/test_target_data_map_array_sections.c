@@ -1,4 +1,17 @@
-#include <omp.h>
+//===--- test_target_data_map_array_sections.c--------------------------------------===//
+//
+// OpenMP API Version 4.5 Nov 2015
+//
+// This test confirms functionality of the target data map 'from' clause for 1D,
+// 2D, and 3D arrarys that are allocated on the stack. Arrays are first initalized on 
+// the host, then allocated on the device and filled with integers, and finally they
+// are copied back to host and checked confirm that correct results return from the
+// device. For each type of array (1D, 2D, 3D), this test provides 3 functions to 
+// test data map clause. The 3 forms used for mapping are a[lower:length], a[:length],
+// and a[lower:].
+//
+////===-----------------------------------------------------------------------------===//
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "ompvv.h"
@@ -14,17 +27,15 @@ int test_lower_length_1d() {
   // array sections of the form a[lower:length] 
   OMPVV_INFOMSG("test_lower_length_1d");
 
-  int errors = 0, isHost = 0;
+  int errors = 0;
 
   int a1d[N];
   init_1d(a1d);
 
 #pragma omp target data map(from: a1d[1:N - 2])
   {
-#pragma omp target map(tofrom: isHost) \
- map(alloc: a1d[1:N - 2]) // to avoid default mapping tofrom
+#pragma omp target map(alloc: a1d[1:N - 2]) // to avoid default mapping tofrom
     {
-      isHost = omp_is_initial_device();
       for (int i = 1; i < N - 1; ++i)
         a1d[i] = 1;
     } // end target
@@ -32,16 +43,13 @@ int test_lower_length_1d() {
 
   // checking errors
   for (int i = 0; i < N; ++i) {
-    if (i == 0 || i == N - 1)
-      errors += a1d[i] == 0 ? 0 : 1;
-    else
-      errors += a1d[i] == 1 ? 0 : 1;
-  }
-
-  if (!errors)
-    printf("Test passed on %s\n", (isHost ? "host" : "device"));
-  else
-    printf("Test failed on %s\n", (isHost ? "host" : "device"));
+    if (i == 0 || i == N - 1){
+      OMPVV_TEST_AND_SET_VERBOSE(errors, (a1d[i] != 0));
+    }
+    else { 
+      OMPVV_TEST_AND_SET_VERBOSE(errors, (a1d[i] != 1)); 
+    }
+ }
 
   return errors;
 }
@@ -49,9 +57,9 @@ int test_lower_length_1d() {
 // Test for OpenMP 4.5 target data map with array 2d section [lower:length]
 int test_lower_length_2d() {
   // array sections of the form a[lower:length]
-  puts("test_lower_length_2d");
+  OMPVV_INFOMSG("test_lower_length_2d");
 
-  int errors = 0, isHost = 0;
+  int errors = 0;
 
   // stack
   int a2d[N][2];
@@ -61,10 +69,8 @@ int test_lower_length_2d() {
   // If a list item is an array section, it must specify contiguous storage.
 #pragma omp target data map(from: a2d[1:N - 2][0:2])
   {
-#pragma omp target map(tofrom: isHost) \
- map(alloc: a2d[1:N - 2][0:2]) // to avoid default mapping tofrom
+#pragma omp target map(alloc: a2d[1:N - 2][0:2]) // to avoid default mapping tofrom
     {
-      isHost = omp_is_initial_device();
       for (int i = 1; i < N - 1; ++i) {
         a2d[i][0] = 1;
         a2d[i][1] = 1;
@@ -74,16 +80,13 @@ int test_lower_length_2d() {
 
   // checking errors 
   for (int i = 0; i < N; ++i) {
-    if (i == 0 || i == N - 1)
-      errors += a2d[i][0] == 0 && a2d[i][1] == 0 ? 0 : 1;
-    else
-      errors += a2d[i][0] == 1 && a2d[i][1] == 1 ? 0 : 1;
+    if (i == 0 || i == N - 1){
+      OMPVV_TEST_AND_SET_VERBOSE(errors, a2d[i][0] != 0 && a2d[i][1] != 0);
+    } 
+    else {
+      OMPVV_TEST_AND_SET_VERBOSE(errors, a2d[i][0] != 1 && a2d[i][1] != 1);
+   }
   }
-
-  if (!errors)
-    printf("Test passed on %s\n", (isHost ? "host" : "device"));
-  else
-    printf("Test failed on %s\n", (isHost ? "host" : "device"));
 
   return errors;
 }
@@ -91,10 +94,10 @@ int test_lower_length_2d() {
 // Test for OpenMP 4.5 target data map with array 3d section [lower:length]
 int test_lower_length_3d() {
   // array sections of the form a[lower:length] 
-  puts("test_lower_length_3d");
+  OMPVV_INFOMSG("test_lower_length_3d");
   // If a list item is an array section, it must specify contiguous storage. 
 
-  int errors = 0, isHost = 0;
+  int errors = 0;
 
   // stack
   int a3d[N][2][2];
@@ -107,10 +110,8 @@ int test_lower_length_3d() {
 #pragma omp target data map(from: a3d[1:N - 2][0:2][0:2])  \
         map(from: a3d2[0:N][0:2][0:2])
   {
-#pragma omp target map(tofrom: isHost) \
- map(alloc: a3d[1:N - 2][0:2][0:2] ,a3d2[0:N][0:2][0:2]) // to avoid default mapping tofrom
+#pragma omp target map(alloc: a3d[1:N - 2][0:2][0:2] ,a3d2[0:N][0:2][0:2]) // to avoid default mapping tofrom
     {
-      isHost = omp_is_initial_device();
       for (int i = 0; i < N; ++i) {
         for (int j = 0; j < 2; ++j) {
           if (i > 0 && i < N - 1) {
@@ -128,19 +129,16 @@ int test_lower_length_3d() {
   for (int i = 0; i < N; ++i) {
     for (int j = 0; j < 2; ++j) {
       // a3d
-      if (i == 0 || i == N - 1)
-        errors += a3d[i][j][0] == 0 && a3d[i][j][1] == 0 ? 0 : 1;
-      else
-        errors += a3d[i][j][0] == 1 && a3d[i][j][1] == 1 ? 0 : 1;
+      if (i == 0 || i == N - 1) {
+        OMPVV_TEST_AND_SET_VERBOSE(errors, a3d[i][j][0] != 0 && a3d[i][j][1] != 0);
+      } 
+      else {
+        OMPVV_TEST_AND_SET_VERBOSE(errors, a3d[i][j][0] != 1 && a3d[i][j][1] != 1);
+      }
       // a3d2
-      errors += a3d2[i][j][0] == 1 && a3d2[i][j][1] == 1 ? 0 : 1;
+      OMPVV_TEST_AND_SET_VERBOSE(errors, a3d2[i][j][0] != 1 && a3d2[i][j][1] != 1);
     }
   }
-
-  if (!errors)
-    printf("Test passed on %s\n", (isHost ? "host" : "device"));
-  else
-    printf("Test failed on %s\n", (isHost ? "host" : "device"));
 
   return errors;
 }
@@ -148,9 +146,9 @@ int test_lower_length_3d() {
 // Test for OpenMP 4.5 target data map with array 1d section [:length]
 int test_length_1d() {
   // array sections of the form a[:length]
-  puts("test_length_1d");
+  OMPVV_INFOMSG("test_length_1d");
 
-  int errors = 0, isHost = 0;
+  int errors = 0;
 
   int a1d[N];
   init_1d(a1d);
@@ -159,10 +157,8 @@ int test_length_1d() {
   // When the lower-bound is absent it defaults to 0.
 #pragma omp target data map(from: a1d[:N - 2]) 
   {
-#pragma omp target map(tofrom: isHost) \
- 	map(alloc: a1d[:N - 2]) // to avoid default mapping tofrom
+#pragma omp target map(alloc: a1d[:N - 2]) // to avoid default mapping tofrom
     {
-      isHost = omp_is_initial_device();
       for (int i = 0; i < N - 2; ++i)
         a1d[i] = 1;
     } // end target
@@ -170,16 +166,11 @@ int test_length_1d() {
 
   // checking errors
   for (int i = 0; i < N - 2; ++i)
-    errors += a1d[i] == 1 ? 0 : 1;
+    OMPVV_TEST_AND_SET_VERBOSE(errors, a1d[i] != 1);
   // N-2
-  errors += a1d[N - 2] == 0 ? 0 : 1;
+  OMPVV_TEST_AND_SET_VERBOSE(errors, a1d[N - 2] != 0);
   // N-1
-  errors += a1d[N - 1] == 0 ? 0 : 1;
-
-  if (!errors)
-    printf("Test passed on %s\n", (isHost ? "host" : "device"));
-  else
-    printf("Test failed on %s\n", (isHost ? "host" : "device"));
+  OMPVV_TEST_AND_SET_VERBOSE(errors, a1d[N - 1] != 0);
 
   return errors;
 }
@@ -187,9 +178,9 @@ int test_length_1d() {
 // Test for OpenMP 4.5 target data map with array 2d section [:length]
 int test_length_2d() {
   // array sections of the form a[:length]
-  puts("test_length_2d");
+  OMPVV_INFOMSG("test_length_2d");
 
-  int errors = 0, isHost = 0;
+  int errors = 0;
 
   int a2d[N][2];
   init_2d(a2d);
@@ -200,10 +191,8 @@ int test_length_2d() {
   // If a list item is an array section, it must specify contiguous storage.
 #pragma omp target data map(from: a2d[:N - 2][:2])
   {
-#pragma omp target map(tofrom: isHost) \
- 	map(alloc: a2d[:N - 2][:2]) // To avoid default mapping tofrom
+#pragma omp target map(alloc: a2d[:N - 2][:2]) // To avoid default mapping tofrom
     {
-      isHost = omp_is_initial_device();
       for (int i = 0; i < N - 2; ++i) {
         a2d[i][0] = 1;
         a2d[i][1] = 1;
@@ -213,14 +202,9 @@ int test_length_2d() {
 
   // checking errors
   for (int i = 0; i < N - 2; ++i)
-    errors += a2d[i][0] == 1 && a2d[i][1] == 1 ? 0 : 1;
-  errors += a2d[N - 2][0] == 0 && a2d[N - 2][1] == 0 ? 0 : 1;
-  errors += a2d[N - 1][0] == 0 && a2d[N - 1][1] == 0 ? 0 : 1;
-
-  if (!errors)
-    printf("Test passed on %s\n", (isHost ? "host" : "device"));
-  else
-    printf("Test failed on %s\n", (isHost ? "host" : "device"));
+    OMPVV_TEST_AND_SET_VERBOSE(errors, a2d[i][0] != 1 && a2d[i][1] != 1);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, a2d[N - 2][0] != 0 && a2d[N - 2][1] != 0);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, a2d[N - 1][0] != 0 && a2d[N - 1][1] != 0);
 
   return errors;
 }
@@ -228,9 +212,9 @@ int test_length_2d() {
 // Test for OpenMP 4.5 target data map with array 3d section [:length]
 int test_length_3d() {
   // array sections of the form a[:length]
-  puts("test_length_3d");
+  OMPVV_INFOMSG("test_length_3d");
 
-  int errors = 0, isHost = 0;
+  int errors = 0;
 
   int a3d[N][2][2];
   init_3d(a3d);
@@ -244,10 +228,8 @@ int test_length_3d() {
 #pragma omp target data map(from: a3d[:N - 2][:2][:2])   \
         map(from: a3d2[:N][:2][:2])
   {
-#pragma omp target map(tofrom: isHost) \
-        map(alloc: a3d[:N - 2][:2][:2], a3d2[:N][:2][:2]) // To avoid default mapping tofrom
+#pragma omp target map(alloc: a3d[:N - 2][:2][:2], a3d2[:N][:2][:2]) // To avoid default mapping tofrom
     {
-      isHost = omp_is_initial_device();
       for (int i = 0; i < N; ++i) {
         for (int j = 0; j < 2; ++j) {
           if (i < N - 2) {
@@ -264,19 +246,15 @@ int test_length_3d() {
   // checking errors
   for (int i = 0; i < N; ++i) {
     for (int j = 0; j < 2; ++j) {
-      if (i >= N - 2)
-        errors += a3d[i][j][0] == 0 && a3d[i][j][1] == 0 ? 0 : 1;
-      else
-        errors += a3d[i][j][0] == 1 && a3d[i][j][1] == 1 ? 0 : 1;
+      if (i >= N - 2) {
+        OMPVV_TEST_AND_SET_VERBOSE(errors, a3d[i][j][0] != 0 && a3d[i][j][1] != 0);
+      } 
+      else  
+        OMPVV_TEST_AND_SET_VERBOSE(errors, a3d[i][j][0] != 1 && a3d[i][j][1] != 1)
       // a3d2
-      errors += a3d2[i][j][0] == 1 && a3d2[i][j][1] == 1 ? 0 : 1;
+      OMPVV_TEST_AND_SET_VERBOSE(errors, a3d2[i][j][0] != 1 && a3d2[i][j][1] != 1);
     }
   }
-
-  if (!errors)
-    printf("Test passed on %s\n", (isHost ? "host" : "device"));
-  else
-    printf("Test failed on %s\n", (isHost ? "host" : "device"));
 
   return errors;
 }
@@ -284,9 +262,9 @@ int test_length_3d() {
 // Test for OpenMP 4.5 target data map with array 1d section [lower:]
 int test_lower_1d() {
   // array sections of the form a[lower:]
-  puts("test_lower_1d");
+  OMPVV_INFOMSG("test_lower_1d");
 
-  int errors = 0, isHost = 0;
+  int errors = 0;
 
   int a1d[N];
   init_1d(a1d);
@@ -296,10 +274,8 @@ int test_lower_1d() {
   // dimension minus the lower-bound.
 #pragma omp target data map(from: a1d[1:])
   {
-#pragma omp target map(tofrom: isHost) \
-	map(alloc: a1d[1:]) // To avoid default mapping tofrom
+#pragma omp target map(alloc: a1d[1:]) // To avoid default mapping tofrom
     {
-      isHost = omp_is_initial_device();
       for (int i = 1; i < N; ++i)
         a1d[i] = 1;
     } // end target
@@ -307,16 +283,12 @@ int test_lower_1d() {
 
   // checking errors 
   for (int i = 0; i < N; ++i) {
-    if (i == 0)
-      errors += a1d[i] == 0 ? 0 : 1;
+    if (i == 0) {
+      OMPVV_TEST_AND_SET_VERBOSE(errors, a1d[i] != 0);
+    }
     else
-      errors += a1d[i] == 1 ? 0 : 1;
+      OMPVV_TEST_AND_SET_VERBOSE(errors, a1d[i] != 1);
   }
-
-  if (!errors)
-    printf("Test passed on %s\n", (isHost ? "host" : "device"));
-  else
-    printf("Test failed on %s\n", (isHost ? "host" : "device"));
 
   return errors;
 }
@@ -324,9 +296,9 @@ int test_lower_1d() {
 // Test for OpenMP 4.5 target data map with array 2d section [lower:]
 int test_lower_2d() {
   // array sections of the form a[lower:] 
-  puts("test_lower_2d");
+  OMPVV_INFOMSG("test_lower_2d");
 
-  int errors = 0, isHost = 0;
+  int errors = 0;
 
   int a2d[N][2];
   init_2d(a2d);
@@ -338,10 +310,8 @@ int test_lower_2d() {
   // If a list item is an array section, it must specify contiguous storage.
 #pragma omp target data map(from: a2d[1:][0:])
   {
-#pragma omp target map(tofrom: isHost) \
-	map(alloc: a2d[1:][0:]) // To avoid default mapping tofrom
+#pragma omp target map(alloc: a2d[1:][0:]) // To avoid default mapping tofrom
     {
-      isHost = omp_is_initial_device();
       for (int i = 1; i < N; ++i) {
         a2d[i][0] = 1;
         a2d[i][1] = 1;
@@ -351,16 +321,12 @@ int test_lower_2d() {
 
   // checking errors 
   for (int i = 0; i < N; ++i) {
-    if (i == 0)
-      errors += a2d[i][0] == 0 && a2d[i][1] == 0 ? 0 : 1;
+    if (i == 0) {
+      OMPVV_TEST_AND_SET_VERBOSE(errors, a2d[i][0] != 0 && a2d[i][1] != 0);
+    }
     else
-      errors += a2d[i][0] == 1 && a2d[i][1] == 1 ? 0 : 1;
+      OMPVV_TEST_AND_SET_VERBOSE(errors, a2d[i][0] != 1 && a2d[i][1] != 1)
   }
-
-  if (!errors)
-    printf("Test passed on %s\n", (isHost ? "host" : "device"));
-  else
-    printf("Test failed on %s\n", (isHost ? "host" : "device"));
 
   return errors;
 }
@@ -368,9 +334,9 @@ int test_lower_2d() {
 // Test for OpenMP 4.5 target data map with array 3d section [lower:]
 int test_lower_3d() {
   // array sections of the form a[lower:] 
-  puts("test_lower_3d");
+  OMPVV_INFOMSG("test_lower_3d");
 
-  int errors = 0, isHost = 0;
+  int errors = 0;
 
   int a3d[N][2][2];
   init_3d(a3d);
@@ -385,10 +351,8 @@ int test_lower_3d() {
 #pragma omp target data map(from: a3d[1:][0:][0:])   \
         map(from: a3d2[0:][0:][0:])
   {
-#pragma omp target map(tofrom: isHost) \
-	map(alloc: a3d[1:][0:][0:], a3d2[0:][0:][0:]) // To avoid default mapping tofrom
+#pragma omp target map(alloc: a3d[1:][0:][0:], a3d2[0:][0:][0:]) // To avoid default mapping tofrom
     {
-      isHost = omp_is_initial_device();
       for (int i = 0; i < N; ++i) {
         for (int j = 0; j < 2; ++j) {
           if (i > 0) {
@@ -406,19 +370,15 @@ int test_lower_3d() {
   for (int i = 0; i < N; ++i) {
     for (int j = 0; j < 2; ++j) {
       // a3d
-      if (i == 0)
-        errors += a3d[i][j][0] == 0 && a3d[i][j][1] == 0 ? 0 : 1;
-      else
-        errors += a3d[i][j][0] == 1 && a3d[i][j][1] == 1 ? 0 : 1;
-      // a3d2
-      errors += a3d2[i][j][0] == 1 && a3d2[i][j][1] == 1 ? 0 : 1;
+      if (i == 0) {
+        OMPVV_TEST_AND_SET_VERBOSE(errors, a3d[i][j][0] != 0 && a3d[i][j][1] != 0);
+      } 
+      else {
+        OMPVV_TEST_AND_SET_VERBOSE(errors, a3d[i][j][0] != 1 && a3d[i][j][1] != 1);
+      }// a3d2
+      OMPVV_TEST_AND_SET_VERBOSE(errors, a3d2[i][j][0] != 1 && a3d2[i][j][1] != 1);
     }
   }
-
-  if (!errors)
-    printf("Test passed on %s\n", (isHost ? "host" : "device"));
-  else
-    printf("Test failed on %s\n", (isHost ? "host" : "device"));
 
   return errors;
 }
@@ -426,20 +386,20 @@ int test_lower_3d() {
 int main() {
 
   int errors = 0;
-  
+   
   OMPVV_TEST_OFFLOADING;
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_lower_length_1d());
-  errors += test_lower_length_2d();
-  errors += test_lower_length_3d();
-  errors += test_length_1d();
-  errors += test_length_2d();
-  errors += test_length_3d();
-  errors += test_lower_1d();
-  errors += test_lower_2d();
-  errors += test_lower_3d();
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_lower_length_2d());
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_lower_length_3d());
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_length_1d());
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_length_2d());
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_length_3d());
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_lower_1d());
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_lower_2d());
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_lower_3d());
 
-  return errors;
+  OMPVV_REPORT_AND_RETURN(errors);
 }
 
 void init_1d(int* a) {
