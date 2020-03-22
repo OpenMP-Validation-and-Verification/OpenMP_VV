@@ -1,4 +1,4 @@
-//===---- test_target_enter_exit_data_if.c - check the if clause of target data ------===//
+//===---- test_target_enter_exit_data_if.c --------------------------------===//
 // 
 // OpenMP API Version 4.5 Nov 2015
 // 
@@ -20,6 +20,7 @@
 
 #include <omp.h>
 #include <stdio.h>
+#include "ompvv.h"
 
 #define SIZE_THRESHOLD 512
 
@@ -28,7 +29,7 @@ int main() {
   int a[1024];
   int b[1024];
   int c[1024];
-  int size, i = 0, errors[2] = {0,0}, isHost = -1, isOffloading = 0;
+  int size, i = 0, errors[2] = {0,0}, isHost = -1;
 
   // a and b array initialization
   for (i = 0; i < 1024; i++) {
@@ -37,10 +38,13 @@ int main() {
   }
 
   // We test for offloading
-#pragma omp target map(from: isOffloading)
-  {
-    isOffloading = !omp_is_initial_device();
-  }
+  int isOffloading; 
+  OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
+ 
+  if (!isOffloading)
+  OMPVV_WARNING("It is not possible to test conditional data transfers "
+                 "if the environment is shared or offloading is off. Not testing "
+                 "anything"); 
 
   // check multiple sizes. 
   for (size = 256; size <= 1024; size += 256) {
@@ -82,17 +86,17 @@ int main() {
         }
       } //end-else 
     }
-    //puts("");
   } // end-for size
 
-  if (!errors[0] && !errors[1])
-    printf("Test passed with offloading %s\n", (isOffloading ? "enabled" : "disabled"));
-  else if (errors[0]==0 && errors[1]!=0)
-         printf("Test failed on host with offloading %s.\n", (isOffloading ? "enabled" : "disabled"));
-       else if (errors[0]!=0 && errors[1]==0)
-              printf("Test failed on device with offloading %s.\n", (isOffloading ? "enabled" : "disabled"));
-            else if (errors[0]!=0 && errors[1]!=0)
-              printf("Test failed on host and device with offloading %s.\n", (isOffloading ? "enabled" : "disabled"));
+  if (!errors[0] && !errors[1]) {
+    OMPVV_INFOMSG("Test passed with offloading %s", (isOffloading ? "enabled" : "disabled"));
+  } else if (errors[0]==0 && errors[1]!=0) {
+      OMPVV_ERROR("Test failed on host with offloading %s.", (isOffloading ? "enabled" : "disabled"));
+    } else if (errors[0]!=0 && errors[1]==0) {
+        OMPVV_ERROR("Test failed on device with offloading %s.", (isOffloading ? "enabled" : "disabled"));
+      } else if (errors[0]!=0 && errors[1]!=0) {
+              OMPVV_ERROR("Test failed on host and device with offloading %s.", (isOffloading ? "enabled" : "disabled"));
+        }
 
-  return (errors[0] && errors[1]);
+   OMPVV_REPORT_AND_RETURN((errors[0] && errors[1]));
 }
