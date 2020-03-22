@@ -51,7 +51,7 @@ int main() {
   int is_offloading;
   OMPVV_TEST_AND_SET_OFFLOADING(is_offloading); 
   
-  if (!isOffloading)
+  if (!is_offloading)
   OMPVV_WARNING("It is not possible to test conditional data transfers "
                  "if the environment is shared or offloading is off. Not testing "
                  "anything");
