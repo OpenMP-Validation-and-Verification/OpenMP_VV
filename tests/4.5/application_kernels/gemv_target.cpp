@@ -1,9 +1,9 @@
 //===-- gemv_target.cpp - General Matrix Vector Multiplication target -------===!
-// 
+//
 // OpenMP API Version 4.5 Nov 2015
 //
 // Taken from the suggestions of the QMCPack team. This test has a simple
-// target region that performs a GEMV 
+// target region that performs a GEMV
 //!===----------------------------------------------------------------------===!
 #include <chrono>
 #include <string>
