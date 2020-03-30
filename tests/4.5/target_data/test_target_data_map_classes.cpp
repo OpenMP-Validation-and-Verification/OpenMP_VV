@@ -1,5 +1,19 @@
+//===---- test_target_data_map_classes.cpp -----------------------------------------------===//
+// 
+// OpenMP API Version 4.5 Nov 2015
+// 
+// This test checks the mapping of c++ objects on both the stack and heap. The 'new'
+// operater is utilized in the case where memory allocation is on heap. Objects are first 
+// initalized on the host and then mapped to device. Inside the target region, the object's 
+// array data member, which was also mapped to device, is modified through the device array
+// pointer. After target region, we swap back to the host array pointer to verify that the 
+// host array was properly updated.
+//
+//===-------------------------------------------------------------------------------------===//
+
 #include <iostream>
 #include <omp.h>
+#include "ompvv.h"
 
 using namespace std;
 
@@ -22,7 +36,7 @@ public:
 // Test for OpenMP 4.5 target data mapping objects in the heap
 int test_map_tofrom_class_heap() {
 
-  cout << "test_map_tofrom_class_heap" << endl;
+  OMPVV_INFOMSG("test_map_tofrom_class_heap");
 
   int sum = 0, errors = 0, isHost = 0;
 
@@ -33,10 +47,8 @@ int test_map_tofrom_class_heap() {
   // pointers are not translated automatically
 #pragma omp target data map(from: array[0:N]) map(tofrom: obj[0:1])
   {
-#pragma omp target map(tofrom: isHost)
+#pragma omp target
     {
-      isHost = omp_is_initial_device();
-      
       // assign device array ptr to device obj 
       int *tmp_h_array = obj->h_array;
       obj->h_array = array;
@@ -56,11 +68,7 @@ int test_map_tofrom_class_heap() {
   for (int i = 0; i < N; ++i)
     sum += obj->h_array[i];
 
-  errors = (N != sum) || (N != obj->sum);
-  if (!errors)
-    cout << "Test passed on " << (isHost ? "host" : "device") << endl;
-  else
-    cout << "Test failed on " << (isHost ? "host" : "device") << ": sum=" << sum << ", N=" << N << endl;
+  OMPVV_TEST_AND_SET_VERBOSE(errors, (N != sum) || (N != obj->sum));
 
   delete obj;
   delete[] array;
@@ -71,9 +79,9 @@ int test_map_tofrom_class_heap() {
 // Test for OpenMP 4.5 target data mapping objects on the stack
 int test_map_tofrom_class_stack() {
 
-  cout << "test_map_tofrom_class_stack" << endl;
+  OMPVV_INFOMSG("test_map_tofrom_class_stack");
 
-  int sum = 0, errors = 0, isHost = 0;
+  int sum = 0, errors = 0;
 
   int array[N];
   A obj(array, N);
@@ -82,10 +90,8 @@ int test_map_tofrom_class_stack() {
   // pointers are not translated automatically
 #pragma omp target data map(from: array[0:N]) map(tofrom: obj)
   {
-#pragma omp target map(tofrom: isHost)
+#pragma omp target
     {
-      isHost = omp_is_initial_device();
-      
       // assign device array ptr to device obj 
       int *tmp_h_array = obj.h_array;
       obj.h_array = array;
@@ -105,11 +111,7 @@ int test_map_tofrom_class_stack() {
   for (int i = 0; i < N; ++i)
     sum += obj.h_array[i];
 
-  errors = (N != sum) || (N != obj.sum);
-  if (!errors)
-    cout << "Test passed on " << (isHost ? "host" : "device") << endl;
-  else
-    cout << "Test failed on " << (isHost ? "host" : "device") << ": sum=" << sum << ", N=" << N << endl;
+  OMPVV_TEST_AND_SET_VERBOSE(errors, (N != sum) || (N != obj.sum));
 
   return errors;
 }
@@ -117,9 +119,11 @@ int test_map_tofrom_class_stack() {
 int main() {
 
   int errors = 0;
+  
+  OMPVV_TEST_OFFLOADING;
+  
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_map_tofrom_class_heap());
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_map_tofrom_class_stack());
 
-  errors += test_map_tofrom_class_heap();
-  errors += test_map_tofrom_class_stack();
-
-  return errors;
+  OMPVV_REPORT_AND_RETURN(errors);
 }
