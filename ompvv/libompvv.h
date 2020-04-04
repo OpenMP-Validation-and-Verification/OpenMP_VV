@@ -4,4 +4,9 @@
 //
 //===----------------------------------------------------------------------===//
 
+#ifndef _LIBOMPVV_H_
+#define _LIBOMPVV_H_
+
 int offload_test(void);
+
+#endif

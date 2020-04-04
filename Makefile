@@ -235,13 +235,37 @@ ifdef NO_OFFLOADING
 endif
 
 ##################################################
+# OMPVV static library
+##################################################
+
+OMPVVLIB=
+OMPVVLIB_DEP=
+ifdef LINK_OMPVV_LIB
+	OMPVVLIB=-L$(CURDIR)/ompvv -lompvv
+	OMPVVLIB_DEP=$(CURDIR)/ompvv/libompvv.a
+endif
+
+$(BINDIR)/libompvv.o: $(CURDIR)/ompvv/libompvv.c $(BINDIR)
+	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC)
+	$(call log_section_header,"COMPILE CC="${CCOMPILE},$(SYSTEM),$<,$(CC) $(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(C_VERSION)),$(notdir $(@:.o=.log)))
+	-$(QUIET)$(call loadModules,$(C_COMPILER_MODULE)) $(CCOMPILE) $(VERBOSE_MODE) $(DTHREADS) $(DTEAMS) $(HTHREADS) $< -c -o $(BINDIR)/$(notdir $@) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
+		&& echo "PASS" > $(LOGTEMPFILE) \
+		|| echo "FAIL" > $(LOGTEMPFILE))
+	-$(call log_section_footer,"COMPILE CC="${CCOMPILE},$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.o=.log)))
+	-@$(if $(LOG), rm $(LOGTEMPFILE))
+
+$(CURDIR)/ompvv/libompvv.a: $(BINDIR)/libompvv.o
+	ar -rc $(CURDIR)/ompvv/libompvv.a $(BINDIR)/libompvv.o
+	@ranlib $(CURDIR)/ompvv/libompvv.a
+
+##################################################
 # Compilation rules
 ##################################################
 # c files rule
-%.c.o: %.c $(BINDIR) $(LOGDIR)
+%.c.o: %.c $(BINDIR) $(LOGDIR) $(OMPVVLIB_DEP)
 	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC)
 	$(call log_section_header,"COMPILE CC="${CCOMPILE},$(SYSTEM),$<,$(CC) $(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(C_VERSION)),$(notdir $(@:.o=.log)))
-	-$(QUIET)$(call loadModules,$(C_COMPILER_MODULE)) $(CCOMPILE) $(VERBOSE_MODE) $(DTHREADS) $(DTEAMS) $(HTHREADS) $< -o $(BINDIR)/$(notdir $@) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
+	-$(QUIET)$(call loadModules,$(C_COMPILER_MODULE)) $(CCOMPILE) $(VERBOSE_MODE) $(DTHREADS) $(DTEAMS) $(HTHREADS) $< -o $(BINDIR)/$(notdir $@) $(OMPVVLIB) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
 		|| echo "FAIL" > $(LOGTEMPFILE))
 	-$(call log_section_footer,"COMPILE CC="${CCOMPILE},$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.o=.log)))
@@ -452,6 +476,7 @@ help:
 	@echo "  MODULE_LOAD=1             Before compiling or running, module load is called"
 	@echo "  ADD_BATCH_SCHED=1         Add the jsrun command before the execution of the running script to send it to a compute node"
 	@echo "  NO_OFFLOADING=1           Turn off offloading"
+	@echo "  LINK_OMPVV_LIB=1          Link the OMPVV static library (found in sollve_vv/ompvv)"
 	@echo "  SOURCES=file or exp       Specify the source file(s) that you want to apply the rule to. You can use wildchars to select a subset of tests"
 	@echo "  OMP_VERSION=[e.g. 4.5]    This specifies which version of the specs we are targeting. This version should have its folder in tests/[version]"
 	@echo "                            default value is 4.5"

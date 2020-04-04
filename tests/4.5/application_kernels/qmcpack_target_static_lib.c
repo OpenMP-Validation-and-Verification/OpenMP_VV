@@ -11,11 +11,15 @@
 
 #include <omp.h>
 #include <stdio.h>
-#include "libtargettest.h"
+#include "ompvv.h"
+#include "libompvv.h"
 
 int main() {
-  int errors = 0;
-  int result = offload_test();
+  OMPVV_TEST_OFFLOADING;
 
-  printf("Result: %d\n", result);
+  int errors = 0;
+
+  OMPVV_TEST_AND_SET_VERBOSE(errors, offload_test() != 1);
+
+  OMPVV_REPORT_AND_RETURN(errors);
 }
