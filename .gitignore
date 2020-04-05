@@ -2,6 +2,7 @@ bin
 logs
 results_report
 ompvv/*.mod
+ompvv/*.a
 results.json
 results.csv
 recent_online_report_tags
