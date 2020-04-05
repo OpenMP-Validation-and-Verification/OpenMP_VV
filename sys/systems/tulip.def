@@ -20,9 +20,9 @@ ifeq ($(CC), gcc)
   C_VERSION = gcc -dumpversion
 endif
 
-# CRAY compiler
+# CRAY compiler (AMD)
 ifeq ($(CC), cc)
-  C_COMPILER_MODULE = PrgEnv-cray; module switch cce cce/10.0.0.374-classic; module load craype-x86-naples; module load craype-accel-amd-gfx906
+  C_COMPILER_MODULE = PrgEnv-cray; module load cce; module load craype-x86-naples; module load craype-accel-amd-gfx906; module load rocm/3.1.0
   C_VERSION = cc --version 2>&1 | grep -oh 'clang version [0-9.]*'| grep -oh 'version .*' | sed "s/version/cray/g"
 endif
 

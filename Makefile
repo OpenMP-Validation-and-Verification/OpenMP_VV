@@ -449,6 +449,7 @@ help:
 	@echo "  LOG_ALL=1                 Enables dump of the make process output, errors, and binary execution outputs into logs.txt"
 	@echo "  SYSTEM=sys_name           Includes the definitions for the requires modules and batch schedulers in the different systems"
 	@echo "                            This definitions must be in sys/SYSTEM.def. (Do not include the .def extension)"
+	@echo "  DEVICE_TYPE=dev_name      Specifies device type being used, either nvidia or amd, to change compiler flags as needed."
 	@echo "  MODULE_LOAD=1             Before compiling or running, module load is called"
 	@echo "  ADD_BATCH_SCHED=1         Add the jsrun command before the execution of the running script to send it to a compute node"
 	@echo "  NO_OFFLOADING=1           Turn off offloading"

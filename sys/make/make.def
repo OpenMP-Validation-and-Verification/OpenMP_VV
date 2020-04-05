@@ -67,11 +67,20 @@ CC?=none
 CPP?=none
 FC?=none
 
-# CRAY compiler
-ifeq ($(CC), cc)
-  CFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
-  CLINK = cc
-  CLINKFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
+ifeq ($(DEVICE_TYPE), amd)
+  # CRAY compiler (AMD)
+  ifeq ($(CC), cc)
+    CFLAGS += -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx906
+    CLINK = cc
+    CLINKFLAGS += -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx906
+  endif
+else
+  # CRAY compiler (NVIDIA)
+  ifeq ($(CC), cc)
+    CFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
+    CLINK = cc
+    CLINKFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
+  endif
 endif
 
 # GCC compiler
