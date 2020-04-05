@@ -38,9 +38,9 @@ ifeq ($(CXX), g++)
 endif
 
 
-# CRAY compiler
+# CRAY compiler (AMD)
 ifeq ($(CXX), c++)
-  CXX_COMPILER_MODULE = cdt/19.11 PrgEnv-cray; module switch cce cce/9.1.0;module load craype-x86-skylake; module unload cray-libsci; module load cudatoolkit craype-accel-nvidia70
+  CXX_COMPILER_MODULE = PrgEnv-cray; module load cce; module load craype-x86-naples; module load craype-accel-amd-gfx906; module load rocm/3.1.0
   CXX_VERSION = CC --version 2>&1 | grep -oh 'clang version [0-9.]*'| grep -oh 'version .*' | sed "s/version/cray/g"
 endif
 
@@ -57,6 +57,6 @@ endif
 
 # CRAY compiler
 ifeq ($(CXX), ftn)
-  F_COMPILER_MODULE = cdt/19.11 PrgEnv-cray; module switch cce cce/9.1.0;module load craype-x86-skylake; module unload cray-libsci; module load cudatoolkit craype-accel-nvidia70
+  F_COMPILER_MODULE = PrgEnv-cray; module load cce; module load craype-x86-naples; module load craype-accel-amd-gfx906; module load rocm/3.1.0
   F_VERSION = ftn --version 2>&1 | grep -oh 'clang version [0-9.]*'| grep -oh 'version .*' | sed "s/version/cray/g"
 endif
