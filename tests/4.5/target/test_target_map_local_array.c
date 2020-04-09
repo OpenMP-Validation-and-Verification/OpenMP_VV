@@ -1,33 +1,39 @@
-//===--- test_target_map_array.c - test mapping an array to the device ------===//
+//===--- test_target_map_local_array.c --------------------------------------===//
 // 
 // OpenMP API Version 4.5 Nov 2015
 //
 // This test will check if an array that is declared and initialized in the host, 
-// can be copied over the device, updated there, and then copied back. 
-//
+// can be copied over the device, updated there, and then copied back. If this test 
+// runs on the host, we will warn that array is not allocated on any device.
 ////===----------------------------------------------------------------------===//
 
 #include <omp.h>
 #include <stdio.h>
+#include "ompvv.h"
 
-#define N 1000
+#define N 10000
 
 int main() {
+  //define compute array locally
   int compute_array[N];
-  int sum = 0, result = 0;
-  int i, isHost = -1;
+  int sum = 0, errors = 0, result = 0;
+  int i;
 
   // Host initialization of the array 
   for (i = 0; i < N; i++) 
     compute_array[i] = 0;
 
-#pragma omp target map(from: compute_array) map(tofrom: isHost)
+  int isOffloading;
+
+  OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
+
+  OMPVV_WARNING_IF(!isOffloading, "This test is running on host, array is not allocated on device");
+
+#pragma omp target map(tofrom: compute_array[0:N])
   {
-    // Record where the computation was executed
-    isHost = omp_is_initial_device();
-	
-	  // Updating the compute_array
-    for (i = 0; i < N; i++)
+  	
+  // Updating the compute_array
+  for (i = 0; i < N; i++)
       compute_array[i] = i;
    
   } // end target
@@ -37,13 +43,9 @@ int main() {
     sum = sum + compute_array[i];    
     result += i;
   }
+  
+  OMPVV_TEST_AND_SET_VERBOSE(errors, result != sum);
 
-  if (result != sum) {
-    printf("Test failed on %s\n",isHost ? "host":"device");
-    return 1;
-  }
-  else {
-    printf("Test passed on %s\n",isHost? "host":"device");
-    return 0;
-  }
+  OMPVV_REPORT_AND_RETURN(errors);
+
 }

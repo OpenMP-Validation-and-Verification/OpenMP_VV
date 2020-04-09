@@ -1,7 +1,22 @@
+//===---test_target_enter_exit_data_depend.c --------------------------------===//
+// 
+// OpenMP API Version 4.5 Nov 2015
+// 
+// This test checks functionality of target enter data and target exit data 
+// to depend 'in' and 'out' using two separate functions. The first function 
+// test_async_between_task_target() mixes host-based tasks with target-based
+// tasks, while the second function test_async_between_target() is testing 
+// for target enter exit data to depend 'in' and 'out' respectively, while also
+// checking that a nowait clause can be used to ensure asynchronous behavior.
+//
+//===------------------------------------------------------------------------===//
+
+
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include "ompvv.h"
 
 #define N 1000
 
@@ -12,10 +27,9 @@
  * 3. Mix target-based tasks with host tasks.
  */
 int test_async_between_task_target() {
-    puts("test_async_between_task_target");
+  OMPVV_INFOMSG("test_async_between_task_target");
 
   int errors = 0;
-  bool isHost = true;
   double sum = 0.0;
   double* h_array = (double *) malloc(N * sizeof(double));
   double* in_1 = (double *) malloc(N * sizeof(double));
@@ -42,11 +56,10 @@ int test_async_between_task_target() {
 
   // target task to compute on the device
   // adding redundant depends on in_1 + in_2 to make the test work if compiled for the host
-#pragma omp task shared (isHost, h_array, in_1, in_2) depend(inout: h_array) depend(in: in_1) depend(in: in_2)
+#pragma omp task shared (h_array, in_1, in_2) depend(inout: h_array) depend(in: in_1) depend(in: in_2)
   {
-#pragma omp target map(tofrom: isHost) 
+#pragma omp target  
     {
-      isHost = omp_is_initial_device();
       for (int i = 0; i < N; ++i) {
         h_array[i] = in_1[i]*in_2[i];
       }
@@ -68,11 +81,6 @@ int test_async_between_task_target() {
 
   errors = 2.0*N != sum;
   
-  if (!errors)
-    printf("Test passed on %s\n", (isHost ? "host" : "device"));
-  else
-    printf("Test failed on %s: sum = %g\n", (isHost ? "host" : "device"), sum);
-
   return errors;
 }
 
@@ -83,10 +91,9 @@ int test_async_between_task_target() {
  * 3. use nowait for async
  */
 int test_async_between_target() {
-  puts("test_async_between_target");
+  OMPVV_INFOMSG("test_async_between_target");
 
   int errors = 0;
-  bool isHost = true;
   int sum = 0;
   int* h_array = (int *) malloc(N * sizeof(int));
   int val = 2;
@@ -96,9 +103,8 @@ int test_async_between_target() {
 
 #pragma omp target enter data map(to: val) depend(out: val) 
 
-#pragma omp target map(tofrom: isHost) depend(inout: h_array) depend(in: val) 
+#pragma omp target depend(inout: h_array) depend(in: val) 
   {
-    isHost = omp_is_initial_device();
     for (int i = 0; i < N; ++i) {
       h_array[i] = val;
     }
@@ -115,20 +121,19 @@ int test_async_between_target() {
   }
   errors = 2*N != sum;
 
-  if (!errors)
-    printf("Test passed on %s\n", (isHost ? "host" : "device"));
-  else
-    printf("Test failed on %s: sum = %d\n", (isHost ? "host" : "device"), sum);
-
   return errors;
 }
 
 int main(){
   int errors = 0;
+ 
+  // We test for offloading
+  int is_offloading;
+  OMPVV_TEST_AND_SET_OFFLOADING(is_offloading);
+  
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_async_between_target());
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_async_between_task_target());
 
-  errors += test_async_between_target();
-  errors += test_async_between_task_target();
-
-  return errors;
+  OMPVV_REPORT_AND_RETURN(errors);
 }
 

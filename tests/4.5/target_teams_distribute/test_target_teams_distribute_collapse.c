@@ -46,7 +46,7 @@ int test_collapse1() {
     for (int y = 0; y < ARRAY_SIZE+1; ++y) {
       OMPVV_TEST_AND_SET(errors, ((temp_total - b[x][y]) != 0));
       if (y != ARRAY_SIZE) {
-	temp_total = temp_total + a[x][y];
+        temp_total = temp_total + a[x][y];
       }
     }
   }
@@ -66,8 +66,8 @@ int test_collapse2() {
     for (int y = 0; y < ARRAY_SIZE; ++y) {
       b[x][y][0] = 0;
       for (int z = 0; z < ARRAY_SIZE; ++z) {
-	a[x][y][z] = x + y + z;
-	b[x][y][z+1] = 0;
+        a[x][y][z] = x + y + z;
+        b[x][y][z+1] = 0;
       }
     }
   }
@@ -76,10 +76,10 @@ int test_collapse2() {
   for (int x = 0; x < ARRAY_SIZE; ++x) {
     for (int y = 0; y < ARRAY_SIZE; ++y) {
       for (int z = 0; z < ARRAY_SIZE; ++z) {
-	if (omp_get_team_num() == 0) {
-	  num_teams = omp_get_num_teams();
-	}
-	b[x][y][z + 1] = b[x][y][z] + a[x][y][z];
+        if (omp_get_team_num() == 0) {
+          num_teams = omp_get_num_teams();
+        }
+        b[x][y][z + 1] = b[x][y][z] + a[x][y][z];
       }
     }
   }
@@ -89,10 +89,10 @@ int test_collapse2() {
     for (int y = 0; y < ARRAY_SIZE; ++y) {
       temp_total = 0;
       for (int z = 0; z < ARRAY_SIZE + 1; ++z) {
-	OMPVV_TEST_AND_SET(errors, ((temp_total - b[x][y][z]) != 0));
-	if (z != ARRAY_SIZE) {
-	  temp_total = temp_total + a[x][y][z];
-	}
+        OMPVV_TEST_AND_SET(errors, ((temp_total - b[x][y][z]) != 0));
+        if (z != ARRAY_SIZE) {
+          temp_total = temp_total + a[x][y][z];
+        }
       }
     }
   }
@@ -105,8 +105,13 @@ int test_collapse2() {
 }
 
 int main() {
+  
+  //Check for offloading
+  OMPVV_TEST_OFFLOADING;  
+
   int errors = 0;
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_collapse1() != 0);
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_collapse2() != 0);
   OMPVV_REPORT_AND_RETURN(errors);
+
 }

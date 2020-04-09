@@ -47,7 +47,7 @@ int main() {
     }
 
     OMPVV_TEST_AND_SET(errors, num_threads > default_threads / 2);
-    OMPVV_WARNING_IF(num_threads < default_threads / 2, "Test limited to fewer threads than were indicated. Still spec-conformant.");
+    OMPVV_WARNING_IF(num_threads < default_threads / 2, "Test was provided fewer threads than the thread_limit clause indicated. Still spec-conformant.");
 
   }
 

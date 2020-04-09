@@ -44,7 +44,7 @@ CONTAINS
 
     OMPVV_WARNING_IF(default_threads .eq. 1, "Test operated with one thread. Cannot test thread_limit clause.")
     OMPVV_TEST_AND_SET(errors, default_threads .lt. 1)
-for sure,
+
     IF (default_threads .gt. 0) THEN
        !$omp target teams distribute map(from: num_threads) &
        !$omp& thread_limit(default_threads / 2)
@@ -55,7 +55,7 @@ for sure,
        END DO
 
        OMPVV_TEST_AND_SET(errors, num_threads .gt. default_threads / 2)
-       OMPVV_WARNING_IF(num_threads .lt. default_threads / 2, "Test limited to fewer threads than were indicated.")
+       OMPVV_WARNING_IF(num_threads .lt. default_threads / 2, "Test provided fewer threads than clause indicated.")
     END IF
 
     test_threads = errors
