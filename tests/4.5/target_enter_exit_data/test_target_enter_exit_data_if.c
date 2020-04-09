@@ -24,12 +24,11 @@
 
 #define SIZE_THRESHOLD 512
 
-// Test for OpenMP 4.5 target data with if
 int main() {
   int a[1024];
   int b[1024];
   int c[1024];
-  int size, i = 0, errors[2] = {0,0}, isHost = -1;
+  int size, i = 0, errors[2] = {0,0}, isOffloading = 0;
 
   // a and b array initialization
   for (i = 0; i < 1024; i++) {
@@ -38,11 +37,9 @@ int main() {
   }
 
   // We test for offloading
-  int isOffloading; 
   OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
  
-  if (!isOffloading)
-  OMPVV_WARNING("It is not possible to test conditional data transfers "
+  OMPVV_WARNING_IF(!isOffloading, "It is not possible to test conditional data transfers "
                  "if the environment is shared or offloading is off. Not testing "
                  "anything"); 
 
@@ -55,9 +52,10 @@ int main() {
 #pragma omp target enter data if(size > SIZE_THRESHOLD) map(to: size) map(to: c[0:size])
            
 #pragma omp target if(size > SIZE_THRESHOLD)  \
-        map(to: a[0:size], b[0:size])  map(tofrom: isHost) map(to: c[0:size]) //Mapping c again will not be required in OpenMP 4.5.
+        map(to: a[0:size], b[0:size]) map(to: c[0:size]) //Mapping c again will not be required in OpenMP 4.5.
 									     // Refer to https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83295
 {
+        int isHost = -1;
         isHost = omp_is_initial_device();
         int alpha = (isHost ? 0 : 1);
         int j = 0;
