@@ -39,7 +39,7 @@ int main() {
   OMPVV_TEST_AND_SET(errors, default_threads <= 0);
 
   if (default_threads > 0) {
-#pragma omp target teams distribute thread_limit(default_threads / 2) map(from: default_threads)
+#pragma omp target teams distribute thread_limit(default_threads / 2) map(from: num_threads)
     for (int x = 0; x < N; ++x) {
       if (omp_get_team_num() == 0) {
         num_threads = omp_get_thread_limit();
