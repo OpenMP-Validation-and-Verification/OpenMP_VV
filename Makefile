@@ -238,12 +238,8 @@ endif
 # OMPVV static library
 ##################################################
 
-OMPVVLIB=
-OMPVVLIB_DEP=
-ifdef LINK_OMPVV_LIB
-	OMPVVLIB=-L$(CURDIR)/ompvv -lompvv
-	OMPVVLIB_DEP=$(CURDIR)/ompvv/libompvv.a
-endif
+OMPVVLIB=-L$(CURDIR)/ompvv -lompvv
+OMPVVLIB_DEP=$(CURDIR)/ompvv/libompvv.a
 
 $(BINDIR)/libompvv.o: $(CURDIR)/ompvv/libompvv.c $(BINDIR)
 	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC)
@@ -476,7 +472,6 @@ help:
 	@echo "  MODULE_LOAD=1             Before compiling or running, module load is called"
 	@echo "  ADD_BATCH_SCHED=1         Add the jsrun command before the execution of the running script to send it to a compute node"
 	@echo "  NO_OFFLOADING=1           Turn off offloading"
-	@echo "  LINK_OMPVV_LIB=1          Link the OMPVV static library (found in sollve_vv/ompvv)"
 	@echo "  NUM_THREADS_HOST=n        Specify n, requested number of threads for tests that use num_threads() on host constructs"
 	@echo "  NUM_THREADS_DEVICE=n      Specify n, requested number of threads for tests that use num_threads() on device constructs"
 	@echo "  NUM_TEAMS_DEVICE=n        Specify n, requested number of threads for tests that use num_teams() on device constructs"
