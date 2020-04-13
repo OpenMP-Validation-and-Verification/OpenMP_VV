@@ -2,6 +2,9 @@
 //
 // OpenMP API Version 4.5 Nov 2015
 //
+//This is a QMCPACK specific test that looks at math library support 
+//from within the target region. The array is initialized to FP_ZERO
+//and subsequently pow math function is invoked form the target region.
 //
 ////===----------------------------------------------------------------------===//
 
@@ -23,7 +26,7 @@ int test_math_lib_inside_target() {
   
   // Array initialization
   for (int i = 0; i < N; ++i) {
-    array[i] = 0.99;
+    array[i] = FP_ZERO;
   }
 
 #pragma omp target map(tofrom: array[0:N]) 
