@@ -102,12 +102,12 @@ CONTAINS
     !$omp map(alloc: a(1:N), b(1:N), c(1:N), d(1:N)) num_teams(10)
     DO x = 1, N
        num_teams(x) = omp_get_num_teams()
-       d(x) = a(x) + b(x) + c(x) + privatized_array(MOD(x, 10)) + privatized
+       d(x) = a(x) + b(x) + c(x) + privatized_array(MOD(x, 10)+1) + privatized
     END DO
     !$omp end target data
 
     DO x = 1, N
-       IF (d(x) .ne. 2 + 3*x + MOD(x, 10)) THEN
+       IF (d(x) .ne. 2 + 3*x + MOD(x, 10)+1) THEN
           errors = errors + 1
        END IF
        OMPVV_WARNING_IF(num_teams(x) .eq. 1, "Did not create enough teams to check for potential data races.")
