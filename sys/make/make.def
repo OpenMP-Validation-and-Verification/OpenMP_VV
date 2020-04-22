@@ -261,6 +261,23 @@ ifeq ($(FC), $(filter $(FC), xlf xlf_r))
   FLINKFLAGS += -O3 -qsmp=omp $(FOFFLOADING)
 endif
 
+# CRAY compilers
+ifeq ($(DEVICE_TYPE), amd)
+  # CRAY compiler (AMD)
+  ifeq ($(CXX), CC)
+    CXXFLAGS += -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx906
+    CXXLINK = cc
+    CXXLINKFLAGS += -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx906
+  endif
+else
+  # CRAY compiler (NVIDIA)
+  ifeq ($(CXX), CC)
+    CXXFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
+    CXXLINK = cc
+    CXXLINKFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
+  endif
+endif
+
 #---------------------------------------------------------------------------
 # These macros are passed to the linker
 #---------------------------------------------------------------------------
