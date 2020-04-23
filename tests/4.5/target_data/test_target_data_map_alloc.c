@@ -28,7 +28,13 @@ int test_map_alloc() {
   // the device address returned by omp_target_alloc
   // section 3.5.1 omp_target_alloc. OpenMP API Version 4.5 Nov 2015
   int *d_sum = (int *)omp_target_alloc(sizeof(int), omp_get_default_device());
-  
+
+  if (d_sum == NULL) {
+    errors = 1;
+    OMPVV_ERROR("omp_target_alloc returns NULL, this test is running on host, cannot properly test mapping of variables to device.");
+    return errors;
+  }
+
 #pragma omp target data map(alloc: h_array_h[0:N])
   {
 #pragma omp target is_device_ptr(d_sum)
