@@ -1,19 +1,19 @@
 //===---- test_target_data_if.c - check the if clause of target data ------===//
-// 
+//
 // OpenMP API Version 4.5 Nov 2015
-// 
-// The if clause determines if the section should be executed in the host or 
-// the device. There are three things to test here: 
+//
+// The if clause determines if the section should be executed in the host or
+// the device. There are three things to test here:
 // (a) with offloading when 'if' clause evaluates to true then code
-// be executed on the device 
+// be executed on the device
 // (b) with offloading when 'if' clause evaluates to false then code should
 // be executed on the host
 // (c) without offloading all the code should be executed on the device
 // The if clause is evaluated on runtime which means that variables could
-// determine this behavior. We use a SIZE_THRESHOLD variable to check if we 
-// should execute on the device or the host. Before starting the test we 
+// determine this behavior. We use a SIZE_THRESHOLD variable to check if we
+// should execute on the device or the host. Before starting the test we
 // sample offloading to see if it was enabled or not. If the code is executed
-// in the device, the result should be c[i] = a[i] + b[i] = i + 1. 
+// in the device, the result should be c[i] = a[i] + b[i] = i + 1.
 // If the code is executed on the host the result should be c[i] = -1
 //
 //===----------------------------------------------------------------------===//
@@ -21,7 +21,7 @@
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "ompvv.h" 
+#include "ompvv.h"
 
 #define SIZE 1024
 #define SIZE_THRESHOLD 512
@@ -38,7 +38,7 @@ int test_target_data_map_if_nested (int isOffloading){
     b[i] = i;
   }
 
-  // check multiple sizes. 
+  // check multiple sizes.
   for (map_size = 256; map_size <= SIZE; map_size += 256) {
     // C initialization
     for (i = 0; i < map_size; i++) {
@@ -46,7 +46,7 @@ int test_target_data_map_if_nested (int isOffloading){
     }
 #pragma omp target data if(map_size > SIZE_THRESHOLD) map(to: map_size)  \
         map(tofrom: c[0:map_size])                                       \
-        map(to: a[0:map_size], b[0:map_size]) 
+        map(to: a[0:map_size], b[0:map_size])
     {
 #pragma omp target if(map_size > SIZE_THRESHOLD) map(tofrom: isHost) \
         map (alloc: a[0:map_size], b[0:map_size], c[0:map_size]) // avoid default mapping
@@ -62,7 +62,7 @@ int test_target_data_map_if_nested (int isOffloading){
       } // end target
     }//end-target data
 
-    // checking results 
+    // checking results
     for (i = 0; i < map_size; i++) {
       if (isOffloading && map_size > SIZE_THRESHOLD) {
         // Should have executed on the device
@@ -73,7 +73,7 @@ int test_target_data_map_if_nested (int isOffloading){
         // Should have executed in the host
         // with or without offloading
         OMPVV_TEST_AND_SET(errors[1], (c[i] != 0));
-      } //end-else 
+      } //end-else
     }
   } // end-for map_size
 
@@ -86,7 +86,7 @@ int test_target_data_map_if_nested (int isOffloading){
   } else if (errors[0]!=0 && errors[1]!=0) {
     OMPVV_ERROR("Test nested if failed on host and device with offloading %s.", (isOffloading ? "enabled" : "disabled"));
   }
-  
+
   return errors[0] + errors[1];
 }
 
@@ -95,11 +95,8 @@ int test_target_data_map_if_simple(int isOffloading){
   int b[SIZE];
   int c[SIZE];
   int map_size, i = 0, errors[3] = {0,0,0}, isHost = -1;
-  int isSharedEnv = 0;
 
-  OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(isSharedEnv);
-
-  // check multiple sizes. 
+  // check multiple sizes.
   for (map_size = 256; map_size <= SIZE; map_size += 256) {
     // a, b, and c array initialization
     for (i = 0; i < SIZE; i++) {
@@ -109,7 +106,7 @@ int test_target_data_map_if_simple(int isOffloading){
     }
 #pragma omp target data if(map_size > SIZE_THRESHOLD) map(to: map_size)  \
         map(tofrom: c[0:map_size])                             \
-        map(to: a[0:map_size], b[0:map_size]) 
+        map(to: a[0:map_size], b[0:map_size])
     {
 #pragma omp target map(tofrom: isHost) \
         map (alloc: a[0:map_size], b[0:map_size], c[0:map_size]) // avoid default mapping
@@ -117,7 +114,7 @@ int test_target_data_map_if_simple(int isOffloading){
         isHost = omp_is_initial_device();
         int j = 0;
         for (j = 0; j < map_size; j++) {
-          // This should be equal to SIZE, if target data 
+          // This should be equal to SIZE, if target data
           // mapped the arrays a and b, otherwise it is
           // unknown but it is not used either
           c[j] += (a[j] + b[j] + 1);
@@ -126,26 +123,26 @@ int test_target_data_map_if_simple(int isOffloading){
         }
       } // end target
 
-      // Check that the target region did not exec in the 
+      // Check that the target region did not exec in the
       // host as the if should only affect the target data
       if (isOffloading) {
         OMPVV_TEST_AND_SET_VERBOSE(errors[0], isHost);
       }
     }//end-target data
 
-    // checking results 
+    // checking results
     for (i = 0; i < map_size; i++) {
-      if (map_size > SIZE_THRESHOLD || isSharedEnv || !isOffloading) {
+      if (map_size > SIZE_THRESHOLD || !isOffloading) {
         // Should have executed in the device if offloading is enabled
         // If offloading is not enabled or the system is a shared env
         // between device and host, then the value will modify the original
-        // elements of c. 
+        // elements of c.
         OMPVV_TEST_AND_SET(errors[1], (c[i] != SIZE)); //error when executed on the device
       } else {
         // Should have executed in the host
         // with or without offloading
         OMPVV_TEST_AND_SET(errors[2], (c[i] != -1));
-      } //end-else 
+      } //end-else
     }
   } // end-for map_size
 
@@ -162,13 +159,13 @@ int test_target_data_map_if_simple(int isOffloading){
   } else if (errors[1]!=0 && errors[2]!=0) {
     OMPVV_ERROR("Test failed for if(true) and if(false) with offloading %s.", (isOffloading ? "enabled" : "disabled"));
   }
-  
+
   return errors[0] + errors[1] + errors[2];
 }
 
 // Test for OpenMP 4.5 target data with if
 int main() {
-  int isOffloading = 0; 
+  int isOffloading = 0;
   int errors = 0;
   OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
   OMPVV_WARNING_IF(!isOffloading, "Offloading is off, tests will be inconclusive. No way to tests if");

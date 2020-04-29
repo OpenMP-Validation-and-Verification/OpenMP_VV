@@ -1,10 +1,10 @@
 !===--test_target_data_map_components_to.F90 - derived data type map to -===!
-! 
+!
 ! OpenMP API Version 4.5 Nov 2015
 !
 ! This test check for the to mapping of components in both regular
 ! variables and arrays
-! 
+!
 !!===----------------------------------------------------------------------===!
 #include "ompvv.F90"
 
@@ -17,10 +17,9 @@
         implicit none
         INTEGER :: err_bf, err_af, i
         INTEGER, TARGET :: justATarget
-        LOGICAL :: isSharedEnv
-        CHARACTER(len=400) :: auxMessage 
+        CHARACTER(len=400) :: auxMessage
         ! Defining a component for the test
-        TYPE :: testingType 
+        TYPE :: testingType
           INTEGER, POINTER :: myPtr
           INTEGER :: myInt
           CHARACTER(len=100) :: myStr
@@ -31,19 +30,14 @@
         TYPE(testingType) :: cpyStruct
         TYPE(testingType), dimension(10) :: myStructArr
         TYPE(testingType), dimension(10) :: cpyStructArr
-        
+
         OMPVV_TEST_OFFLOADING
-        OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(isSharedEnv)
-        WRITE(auxMessage, *) "Shared data environment will cause &
-          &this test to not check if the data is not copied back when& 
-          & using the to map modifier"
-        OMPVV_WARNING_IF(isSharedEnv, auxMessage)
-        
+
         OMPVV_TEST_VERBOSE(test_map_derived_type_to() .ne. 0)
 
         OMPVV_REPORT_AND_RETURN()
 
-        CONTAINS 
+        CONTAINS
           ! Default mapping
           INTEGER FUNCTION test_map_derived_type_to()
 
@@ -63,8 +57,8 @@
             cpyStruct%myReal = 0.0
             cpyStruct%myArr(:) = 0
             cpyStruct%myPtr => justATarget
-            
-            DO i = 1, 10 
+
+            DO i = 1, 10
               myStructArr(i)%myInt = 5
               myStructArr(i)%myStr = "there"
               myStructArr(i)%myReal = 4.4
@@ -87,7 +81,7 @@
                 cpyStruct%myReal = myStruct%myReal
                 cpyStruct%myArr(:) = myStruct%myArr(:)
 
-                DO i = 1, 10 
+                DO i = 1, 10
                   cpyStructArr(i)%myInt = myStructArr(i)%myInt
                   cpyStructArr(i)%myStr = myStructArr(i)%myStr
                   cpyStructArr(i)%myReal = myStructArr(i)%myReal
@@ -95,20 +89,17 @@
                 END DO
 
                 ! Modifying it to check if it is copied back
-                ! only if it is not shared environment
-                IF (.NOT. isSharedEnv) THEN
-                  myStruct%myInt = 0
-                  myStruct%myStr = "f"
-                  myStruct%myReal = 0.0
-                  myStruct%myArr(:) = 0
-  
-                  DO i = 1, 10 
-                    myStructArr(i)%myInt = 0
-                    myStructArr(i)%myStr = "f"
-                    myStructArr(i)%myReal = 0.0
-                    myStructArr(i)%myArr(1:N) = 0
-                  END DO
-                END IF
+                myStruct%myInt = 0
+                myStruct%myStr = "f"
+                myStruct%myReal = 0.0
+                myStruct%myArr(:) = 0
+
+                DO i = 1, 10
+                   myStructArr(i)%myInt = 0
+                   myStructArr(i)%myStr = "f"
+                   myStructArr(i)%myReal = 0.0
+                   myStructArr(i)%myArr(1:N) = 0
+                END DO
               !$omp end target
             !$omp end target data
 
@@ -120,7 +111,7 @@
             OMPVV_TEST_VERBOSE(ANY(cpyStruct%myArr /= 10))
             OMPVV_TEST_VERBOSE(.NOT. ASSOCIATED(cpyStruct%myPtr, justATarget))
 
-            DO i = 1, 10 
+            DO i = 1, 10
               OMPVV_TEST_VERBOSE(cpyStructArr(i)%myInt /= 5)
               OMPVV_TEST_VERBOSE(cpyStructArr(i)%myStr .NE. 'there')
               OMPVV_TEST_VERBOSE(ABS(cpyStructArr(i)%myReal - 4.4) .GT. 0.0001)
@@ -135,7 +126,7 @@
             OMPVV_TEST_VERBOSE(ANY(myStruct%myArr /= 10))
             OMPVV_TEST_VERBOSE(.NOT. ASSOCIATED(myStruct%myPtr, justATarget))
 
-            DO i = 1, 10 
+            DO i = 1, 10
               OMPVV_TEST_VERBOSE(myStructArr(i)%myInt /= 5)
               OMPVV_TEST_VERBOSE(myStructArr(i)%myStr .NE. 'there')
               OMPVV_TEST_VERBOSE(ABS(myStructArr(i)%myReal - 4.4) .GT. 0.0001)
@@ -148,4 +139,3 @@
 
           END FUNCTION test_map_derived_type_to
       END PROGRAM test_target_data_map_components_to
-
