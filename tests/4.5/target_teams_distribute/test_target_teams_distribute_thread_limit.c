@@ -4,7 +4,7 @@
 //
 // This test uses the num_threads clause on a target teams distribute directive to
 // indicate a requested number of threads to execute the teams distribute region.
-// The specification indicates that the number of threads that are given can be any
+// The specifications indicate that the number of threads that are given can be any
 // number that is equal to or less than the indicated value. We first run a
 // target teams distribute region without the clause to see what the default
 // number of threads is, and then we use a value that is less than that in the
@@ -39,7 +39,7 @@ int main() {
   OMPVV_TEST_AND_SET(errors, default_threads <= 0);
 
   if (default_threads > 0) {
-#pragma omp target teams distribute thread_limit(default_threads / 2) map(from: default_threads)
+#pragma omp target teams distribute thread_limit(default_threads / 2) map(from: num_threads)
     for (int x = 0; x < N; ++x) {
       if (omp_get_team_num() == 0) {
         num_threads = omp_get_thread_limit();
