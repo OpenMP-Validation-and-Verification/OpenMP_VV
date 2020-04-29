@@ -33,15 +33,14 @@ int main() {
       compute_array[i][j] = 0;
 
 
-  omp_set_num_threads(4);
-  real_num_threads = omp_get_num_threads();  
+    
 
-#pragma omp target map(tofrom:compute_array) private(p_val)
+#pragma omp target map(tofrom:compute_array, real_num_threads) private(p_val)
 {
-#pragma omp parallel
+#pragma omp parallel private(p_val,i) num_threads(4)
   {
     p_val = omp_get_thread_num();
-#pragma omp for
+    real_num_threads = omp_get_num_threads();
     for (i = 0; i < N; i++)
       compute_array[p_val][i] += p_val;
   } // end parallel
