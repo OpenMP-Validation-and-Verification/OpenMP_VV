@@ -29,7 +29,7 @@ CONTAINS
   INTEGER FUNCTION test_bitor()
     INTEGER,DIMENSION(N) :: a
     REAL(8),DIMENSION(N, 32):: randoms
-    INTEGER:: result, host_result, x, y, z, errors, itr_count
+    INTEGER:: result, host_result, x, y, errors, itr_count
     LOGICAL:: tested_true, tested_false
     REAL(8):: true_margin
     errors = 0
@@ -48,9 +48,9 @@ CONTAINS
        result = 0
        DO x = 1, N
           a(x) = 0
-          DO z = 1, 32
+          DO y = 1, 32
              IF (randoms(x, y) .gt. true_margin) THEN
-                a(x) = a(x) + (2**z)
+                a(x) = a(x) + (2**y)
                 tested_true = .TRUE.
              ELSE
                 tested_false = .TRUE.
