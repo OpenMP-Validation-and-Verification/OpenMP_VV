@@ -40,22 +40,19 @@ int main() {
 {
   int fp_val = omp_get_thread_num();
   int p_val=0;
-
   real_num_threads = omp_get_num_threads();  
 
-#pragma omp target map(tofrom:compute_array) firstprivate(fp_val) private(p_val)
+#pragma omp target map(tofrom:compute_array[fp_val][0:N]) firstprivate(fp_val) private(p_val)
   {
     p_val = fp_val;
-
     for (i = 0; i < N; i++)
-      compute_array[p_val][i] = 100;
+      compute_array[p_val][i] += p_val;
   } // end target
 }//end parallel
 
   for (i = 0; i < real_num_threads; i++){ 
     for (j = 0; j < N; j++){
-      OMPVV_TEST_AND_SET_VERBOSE(errors, (compute_array[i][j] != 100));
-      OMPVV_ERROR_IF(compute_array[i][j] != 100, "compute_array[%d][%d] = %d\n",i,j,compute_array[i][j]);
+      OMPVV_TEST_AND_SET_VERBOSE(errors, (compute_array[i][j] != i));
     }
   }//end for
   
