@@ -27,7 +27,7 @@ int main() {
     num_threads[x] = -99;
   }
 
-#pragma omp teams num_teams(3) thread_limit(N)
+#pragma omp teams num_teams(N) thread_limit(N)
 {
     num_teams[omp_get_team_num()] = omp_get_num_teams();
     num_threads[omp_get_team_num()]= omp_get_num_threads();
