@@ -28,11 +28,10 @@ int main() {
   }
 
 #pragma omp teams num_teams(N) thread_limit(N)
-{
+  {
     num_teams[omp_get_team_num()] = omp_get_num_teams();
     num_threads[omp_get_team_num()]= omp_get_num_threads();
-
-}
+  }
 
   if (num_teams[0] == 1) {
     OMPVV_WARNING("Test operated with one team. num_teams requested were %d.", N);
