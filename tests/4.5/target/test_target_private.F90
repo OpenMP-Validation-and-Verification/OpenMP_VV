@@ -52,7 +52,6 @@
             & host is 1. Test is inconclusive"
             OMPVV_WARNING_IF(actualThreadCnt <= 1, messageHelper)
 
-            !OMPVV_TEST_VERBOSE(ANY(compute_array(:,1:actualThreadCnt) /= 101))
             DO j=1,actualThreadCnt
               DO i=1, N
                 OMPVV_TEST_AND_SET_VERBOSE(errors, compute_array(i,j) .ne. j)
