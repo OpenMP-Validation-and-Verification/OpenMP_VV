@@ -23,27 +23,25 @@
 
         CONTAINS 
           INTEGER FUNCTION test_target_private_clause()
-            INTEGER :: compute_array(NUM_THREADS, N)
+            INTEGER :: compute_array(N,NUM_THREADS)
             INTEGER :: actualThreadCnt = 0
-            INTEGER :: p_val, fp_val
+            INTEGER :: errors, i, j, p_val, fp_val
             CHARACTER(len=400) :: messageHelper
            
             compute_array(:,:) = 0
-          
+            errors = 0
+
             CALL omp_set_num_threads(NUM_THREADS)
 
             !$omp parallel private(p_val, fp_val) shared(actualThreadCnt)
-              fp_val = omp_get_thread_num() + 2
-              p_val = omp_get_thread_num() + 1
-              actualThreadCnt = omp_get_num_threads()
-              !$omp target map(tofrom:compute_array) map(to:fp_val) private(p_val)
-                p_val = fp_val - 1
-                compute_array(p_val,:) = 100
-                p_val = p_val + 99
-              !$omp end target
-              IF (p_val == omp_get_thread_num() + 1) THEN
-                compute_array(p_val,:) = compute_array(p_val,:) + 1
+              fp_val = omp_get_thread_num() + 1
+              IF (omp_get_thread_num() == 0) THEN
+                actualThreadCnt = omp_get_num_threads()
               END IF
+              !$omp target map(tofrom:compute_array(:,fp_val)) map(to:fp_val) private(p_val)
+                p_val = fp_val 
+                compute_array(:,p_val) = p_val
+              !$omp end target
             !$omp end parallel 
           
             WRITE(messageHelper, '(A,I0,A,I0)') "Test ran with ", &
@@ -54,9 +52,17 @@
             & host is 1. Test is inconclusive"
             OMPVV_WARNING_IF(actualThreadCnt <= 1, messageHelper)
 
-            OMPVV_TEST_VERBOSE(ANY(compute_array(:,1:actualThreadCnt) /= 101))
-
-            OMPVV_GET_ERRORS(test_target_private_clause)
+            !OMPVV_TEST_VERBOSE(ANY(compute_array(:,1:actualThreadCnt) /= 101))
+            DO j=1,actualThreadCnt
+              DO i=1, N
+                OMPVV_TEST_AND_SET_VERBOSE(errors, compute_array(i,j) .ne. j)
+                IF (compute_array(i,j) .ne. j) THEN
+                  print *,compute_array(i,j)
+                END IF
+              END DO
+            END DO
+ 
+          test_target_private_clause = errors
 
           END FUNCTION test_target_private_clause
       END PROGRAM test_target_private
