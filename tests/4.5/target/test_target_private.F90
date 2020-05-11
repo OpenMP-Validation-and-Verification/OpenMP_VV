@@ -55,9 +55,6 @@
             DO j=1,actualThreadCnt
               DO i=1, N
                 OMPVV_TEST_AND_SET_VERBOSE(errors, compute_array(i,j) .ne. j)
-                IF (compute_array(i,j) .ne. j) THEN
-                  print *,compute_array(i,j)
-                END IF
               END DO
             END DO
  
