@@ -100,7 +100,7 @@ CONTAINS
 
     !$omp target data map(from: d(1:N), num_teams(1:N)) &
     !$omp& map(to: a(1:N), b(1:N), c(1:N))
-    !$omp target teams distribute default(firstprivate) &
+    !$omp target teams distribute default(firstprivate) shared(d) &
     !$omp& map(alloc: a(1:N), b(1:N), c(1:N), d(1:N)) num_teams(OMPVV_NUM_TEAMS_DEVICE)
     DO x = 1, N
        num_teams(x) = omp_get_num_teams()
