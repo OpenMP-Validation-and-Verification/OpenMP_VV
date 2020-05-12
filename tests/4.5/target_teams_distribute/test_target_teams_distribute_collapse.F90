@@ -91,7 +91,7 @@
             END DO
 
             !$omp target teams distribute map(to: a(1:N, 1:N, 1:N)) &
-            !$omp& map(from: b(1:N, 1:N, 1:N+1)) collapse(2)
+            !$omp& map(tofrom: b(1:N, 1:N, 1:N+1)) collapse(2)
             DO x = 1, N
               DO y = 1, N
                 DO z = 1, N
