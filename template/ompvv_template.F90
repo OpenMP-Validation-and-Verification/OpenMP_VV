@@ -1,4 +1,4 @@
-!===------FILE_NAME.F90 ------------------ Test title ---------------------===//
+!===------FILE_NAME.F90 ---------------------------------------------------===//
 ! 
 ! OpenMP API Version 4.5 Nov 2015
 ! 
@@ -15,7 +15,6 @@
         CHARACTER(len=500):: myTmpChar
         INTEGER:: errors
 
-        OMPVV_TEST_OFFLOADING
         OMPVV_TEST_OFFLOADING
 
         OMPVV_INFOMSG("This is an OMPVV_INFOMSG")
@@ -36,8 +35,6 @@
         OMPVV_ERROR_IF(myTrueVar,"This is an OMPVV_ERROR_IF(.true.)")
         OMPVV_ERROR_IF(myFalseVar,"This should not show up")
         OMPVV_ERROR_IF(1==1,"This is an OMPVV_ERROR_IF 1==1")
-
-        OMPVV_TEST_SHARED_ENVIRONMENT
 
         WRITE(myTmpChar,*) "errors is internally handle, but you can &
         & obtain and set  the value with these functions"
