@@ -1,7 +1,7 @@
 //===--- test_target_data_pointer_swap.c------------------------------------===//
 //
 // OpenMP API Version 4.5 Nov 2015
-// 
+//
 // This test swaps two pointers' values inside a target data region, testing
 // that the map clauses are applied to their original list items. The address
 // used at the entrance to the data region should be the same used at the exit
@@ -20,11 +20,10 @@ int test_pointer_swap() {
   int* a = (int *) malloc(N * sizeof(int));
   int* b = (int *) malloc(N * sizeof(int));
   int* temp;
-  int is_offloading, is_shared_env;
+  int is_offloading;
   int errors = 0;
 
   OMPVV_TEST_AND_SET_OFFLOADING(is_offloading);
-  OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(is_shared_env);
 
   for (int x = 0; x < N; ++x) {
     a[x] = x;
@@ -44,7 +43,7 @@ int test_pointer_swap() {
 
   for (int x = 0; x < N; ++x) {
     OMPVV_TEST_AND_SET(errors, b[x] != x);
-    if (is_offloading && !is_shared_env) {
+    if (is_offloading) {
       OMPVV_TEST_AND_SET(errors, a[x] != 0);
     } else {
       OMPVV_TEST_AND_SET(errors, a[x] != 2*x);

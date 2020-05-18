@@ -1,9 +1,9 @@
 !===---- test_target_data_map_to_array_sections.F90 - mapping array sections ---===//
-! 
+!
 ! OpenMP API Version 4.5 Nov 2015
-! 
+!
 ! Testing array sections mapping to. This tests must cover dynamically allocated
-! arrays, 1D, 2D and 3D arrays. As well as sections mapping 
+! arrays, 1D, 2D and 3D arrays. As well as sections mapping
 !
 !===-------------------------------------------------------------------------===//
 #include "ompvv.F90"
@@ -15,11 +15,10 @@
         USE ompvv_lib
         USE omp_lib
         implicit none
-        LOGICAL :: isOffloading, isSharedEnv
+        LOGICAL :: isOffloading
         INTEGER :: i,j
-        
+
         OMPVV_TEST_AND_SET_OFFLOADING(isOffloading)
-        OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(isSharedEnv)
         OMPVV_TEST_VERBOSE(test_array_sections_pointer_1D() .NE. 0)
         OMPVV_TEST_VERBOSE(test_array_sections_pointer_2D() .NE. 0)
         OMPVV_TEST_VERBOSE(test_array_sections_pointer_3D() .NE. 0)
@@ -30,7 +29,7 @@
         OMPVV_REPORT_AND_RETURN()
 
 
-        CONTAINS 
+        CONTAINS
           ! Testing pointer array sections 1D
           INTEGER FUNCTION test_array_sections_pointer_1D()
             INTEGER, ALLOCATABLE, DIMENSION(:) :: my1DPtr
@@ -72,14 +71,14 @@
               !$omp end target
 
             !$omp end target data
-            
-            testVal = (N-19)*10 + & 
+
+            testVal = (N-19)*10 + &
             &         (N-9)*10 + &
             &         (N-10)*10
             OMPVV_TEST_AND_SET_VERBOSE(errors, SUM(myTmpArray) /= testVal)
 
-            !testing that the array is just copied to and not from 
-            IF (.NOT. isSharedEnv .AND. isOffloading) THEN
+            !testing that the array is just copied to and not from
+            IF (isOffloading) THEN
               OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my1DPtr(10:N-10) /= 10))
               OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my1DPtr2(10:) /= 10))
               OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my1DPtr3(:N-10) /= 10))
@@ -121,7 +120,7 @@
               !$omp target data map(to: my2DPtr(10:N-10, i)) &
               !$omp map(to: my2DPtr2(10:, i), my2DPtr3(:N-10, i)) &
               !$omp map(tofrom: myTmpArray)
-  
+
                 !$omp target map(alloc: my2DPtr(10:N-10, i)) &
                 !$omp map(alloc: my2DPtr2(10:, i), my2DPtr3(:N-10, i)) &
                 !$omp map(tofrom: myTmpArray)
@@ -143,13 +142,13 @@
               !$omp end target data
             END DO
 
-            testVal = N*(N-19)*10 + & 
+            testVal = N*(N-19)*10 + &
             &         N*(N-9)*10 + &
             &         N*(N-10)*10
             OMPVV_TEST_AND_SET_VERBOSE(errors, SUM(myTmpArray) /= testVal)
-           
-            !testing that the array is just copied to and not from 
-            IF (.NOT. isSharedEnv .AND. isOffloading) THEN
+
+            !testing that the array is just copied to and not from
+            IF (isOffloading) THEN
               OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my2DPtr(:,:) /= 10))
               OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my2DPtr2(:,:) /= 10))
               OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my2DPtr3(:,:) /= 10))
@@ -214,13 +213,13 @@
               END DO
             END DO
 
-            testVal = N*N*(N-19)*10 + & 
+            testVal = N*N*(N-19)*10 + &
             &         N*N*(N-9)*10 + &
             &         N*N*(N-10)*10
             OMPVV_TEST_AND_SET_VERBOSE(errors, SUM(myTmpArray) /= testVal)
-           
-            !testing that the array is just copied to and not from 
-            IF (.NOT. isSharedEnv .AND. isOffloading) THEN
+
+            !testing that the array is just copied to and not from
+            IF (isOffloading) THEN
               OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my3DPtr(:,:,:) /= 10))
               OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my3DPtr2(:,:,:) /= 10))
               OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my3DPtr3(:,:,:) /= 10))
@@ -274,15 +273,15 @@
               !$omp end target
 
             !$omp end target data
-            
+
             ! Counting all the areas, the sum should be:
-            testVal = (N-19)*10 + & 
+            testVal = (N-19)*10 + &
             &         (N-9)*10 + &
             &         (N-10)*10
             OMPVV_TEST_AND_SET_VERBOSE(errors, SUM(myTmpArray) /= testVal)
-           
-            !testing that the array is just copied to and not from 
-            IF (.NOT. isSharedEnv .AND. isOffloading) THEN
+
+            !testing that the array is just copied to and not from
+            IF (isOffloading) THEN
               OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my1DArray /= 10))
               OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my1DArray2 /= 10))
               OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my1DArray3 /= 10))
@@ -313,7 +312,7 @@
               !$omp target data map(to: my2DArray(10:N-10, i)) &
               !$omp map(to: my2DArray2(10:, i), my2DArray3(:N-10, i)) &
               !$omp map(tofrom: myTmpArray)
-  
+
                 !$omp target map(alloc: my2DArray(10:N-10, i)) &
                 !$omp map(alloc: my2DArray2(10:, i), my2DArray3(:N-10, i)) &
                 !$omp map(tofrom: myTmpArray)
@@ -335,13 +334,13 @@
               !$omp end target data
             END DO
 
-            testVal = N*(N-19)*10 + & 
+            testVal = N*(N-19)*10 + &
             &         N*(N-9)*10 + &
             &         N*(N-10)*10
             OMPVV_TEST_AND_SET_VERBOSE(errors, SUM(myTmpArray) /= testVal)
-           
-            !testing that the array is just copied to and not from 
-            IF (.NOT. isSharedEnv .AND. isOffloading) THEN
+
+            !testing that the array is just copied to and not from
+            IF (isOffloading) THEN
               OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my2DArray(:,:) /= 10))
               OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my2DArray2(:,:) /= 10))
               OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my2DArray3(:,:) /= 10))
@@ -399,13 +398,13 @@
             END DO
 
             OMPVV_INFOMSG("test array sections pointer 3D")
-            testVal = N*N*(N-19)*10 + & 
+            testVal = N*N*(N-19)*10 + &
             &         N*N*(N-9)*10 + &
             &         N*N*(N-10)*10
             OMPVV_TEST_AND_SET_VERBOSE(errors, SUM(myTmpArray) /= testVal)
-           
-            !testing that the array is just copied to and not from 
-            IF (.NOT. isSharedEnv .AND. isOffloading) THEN
+
+            !testing that the array is just copied to and not from
+            IF (isOffloading) THEN
               OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my3DArray(:,:,:) /= 10))
               OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my3DArray2(:,:,:) /= 10))
               OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my3DArray3(:,:,:) /= 10))
@@ -414,4 +413,3 @@
             test_array_sections_3D = errors
           END FUNCTION test_array_sections_3D
       END PROGRAM
-
