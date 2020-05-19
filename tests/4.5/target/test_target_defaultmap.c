@@ -1,3 +1,17 @@
+//===----- test_target_defaultmap.c --------------------------------------------------===//
+// 
+// OpenMP API Version 4.5 Nov 2015
+//
+// This test is made up of two functions that both check that the default mapping of 
+// scalars to the device is tofrom. The first function test_default_map_on actively 
+// specifies default mapping to be tofrom, while the function test_default_map_off
+// implicity specifies default mapping. Both functions initalize scalars on host, and
+// then change the value of the scalars on the device within the target region. The
+// scalar values are checked after target region to ensure they were correctly mapped 
+// back to host. The five basic data types in C are used as scalars.
+//
+////===-------------------------------------------------------------------------------===//
+
 #include <assert.h>
 #include <omp.h>
 #include <stdio.h>

@@ -1,3 +1,15 @@
+//===----- test_target_depends.c -----------------------------------------------------===//
+// 
+// OpenMP API Version 4.5 Nov 2015
+//
+// This test checks functionality of the depend clause with various dependence types
+// and map-type-modifiers. Two arrays are initalized on the host and updated within
+// several target regions that all utilize the depend clause with varying specified
+// dependence types. At the end, array values are verified on the host to ensure that 
+// synchronization did not result in data races and values were mapped back to device.
+//
+////===-------------------------------------------------------------------------------===//
+
 #include <assert.h>
 #include <omp.h>
 #include <stdio.h>
@@ -18,7 +30,6 @@ int test_all_dependencies() {
     dep_2[i] = 0;
   }
 
-  // Map the same array to multiple devices. initialize with device number
 #pragma omp target depend(out: dep_1) map(tofrom: dep_1[0:N])
   {
     for (int i = 0; i < N; i++) {
