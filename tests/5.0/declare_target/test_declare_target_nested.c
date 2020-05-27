@@ -2,7 +2,11 @@
 //
 // OpenMP API Version 5.0 Nov 2018
 //
-//
+// Test of declare target on a host function that calls another host
+// function. According to 5.0 specification, the inner function, while not
+// explicitly declared on the target, should be treated as if it was. The
+// declared functions increment the passed-in value and return it. They are
+// tested in a simple target region and the result is mapped out and checked.
 //
 //===----------------------------------------------------------------------===//
 
