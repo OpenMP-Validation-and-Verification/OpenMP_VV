@@ -32,9 +32,6 @@ int test_requires() {
 
     x = (int *) omp_alloc(N*sizeof(int), x_alloc);
 
-    // Error if x is not 64-byte aligned (address should be divisible by 64)
-    OMPVV_TEST_AND_SET_VERBOSE(errors, ((intptr_t)(x)%64 != 0));
-
 #pragma omp parallel for simd simdlen(16) aligned(x: 64)
     for (int i = 0; i < N; i++) {
       x[i] = i;
