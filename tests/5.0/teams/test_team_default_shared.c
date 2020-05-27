@@ -41,22 +41,7 @@ int main() {
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, (share != num_teams));
 
-  share = 5;
-
-#pragma omp teams distribute default(shared) num_teams(OMPVV_NUM_TEAMS_DEVICE)
-  {
-    for (int x = 0; x < N; ++x) {
-      a[x] = a[x] + share;
-    }
-  }
-
-  for (int x = 0; x < N; ++x) {
-    OMPVV_TEST_AND_SET_VERBOSE(errors, (a[x] - 5 != x));
-    if (a[x] - 5 != x) {
-      break;
-    }
-  }
-
+  
   OMPVV_WARNING_IF(num_teams == 1, "Test operated on one team, results of default shared test are inconclusive.");
 
   OMPVV_REPORT_AND_RETURN(errors);
