@@ -138,7 +138,11 @@ endif
 
 ifeq "$(SOURCES)" ""
 # Getting all the source files in the project
+ifdef LINK_OMPVV_LIB
 SOURCES_C := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -name *.c)
+else
+SOURCES_C := $(shell find $(CURDIR)/tests/$(OMP_VERSION) ! -name qmcpack_target_static_lib.c -name *.c)
+endif
 SOURCES_CPP := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -name *.cpp)
 SOURCES_F := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -name "*.F90" -o -name "*.F95" -o -name "*.F03" -o -name "*.F" -o -name "*.FOR" | grep -v "ompvv.F90")
 
@@ -238,8 +242,12 @@ endif
 # OMPVV static library
 ##################################################
 
-OMPVVLIB=-L$(CURDIR)/ompvv -lompvv
-OMPVVLIB_DEP=$(CURDIR)/ompvv/libompvv.a
+OMPVVLIB=
+OMPVVLIB_DEP=
+ifdef LINK_OMPVV_LIB
+	OMPVVLIB=-L$(CURDIR)/ompvv -lompvv
+	OMPVVLIB_DEP=$(CURDIR)/ompvv/libompvv.a
+endif
 
 $(BINDIR)/libompvv.o: $(CURDIR)/ompvv/libompvv.c $(BINDIR)
 	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC)
@@ -472,6 +480,7 @@ help:
 	@echo "  MODULE_LOAD=1             Before compiling or running, module load is called"
 	@echo "  ADD_BATCH_SCHED=1         Add the jsrun command before the execution of the running script to send it to a compute node"
 	@echo "  NO_OFFLOADING=1           Turn off offloading"
+	@echo "  LINK_OMPVV_LIB=1          Link the OMPVV static library (in ompvv folder) and run the static lib test"
 	@echo "  NUM_THREADS_HOST=n        Specify n, requested number of threads for tests that use num_threads() on host constructs"
 	@echo "  NUM_THREADS_DEVICE=n      Specify n, requested number of threads for tests that use num_threads() on device constructs"
 	@echo "  NUM_TEAMS_DEVICE=n        Specify n, requested number of threads for tests that use num_teams() on device constructs"
