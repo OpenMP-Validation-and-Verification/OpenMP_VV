@@ -45,8 +45,8 @@ int test_target_teams_distribute_parallel_for_private() {
   {
 #pragma omp target teams distribute parallel for private(privatized) num_threads(OMPVV_NUM_THREADS_DEVICE) num_teams(OMPVV_NUM_TEAMS_DEVICE)
     for (j = 0; j < SIZE_N; ++j) {
-      num_teams[i] = omp_get_num_teams();
-      num_threads[i] = omp_get_num_threads();
+      num_teams[j] = omp_get_num_teams();
+      num_threads[j] = omp_get_num_threads();
 
       privatized = 0;
       for (i = 0; i < a[j] + b[j]; ++i) {
