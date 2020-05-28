@@ -42,7 +42,7 @@ int test_target_teams_distribute_parallel_for_firstprivate() {
   // check multiple sizes. 
 #pragma omp target data map(to: a[0:SIZE_N], b[0:SIZE_N], c[0:SIZE_N])
   {
-#pragma omp target teams distribute parallel for firstprivate(privatized, firstized) num_teams(10) num_threads(256)
+#pragma omp target teams distribute parallel for firstprivate(privatized, firstized, i) num_teams(10) num_threads(256)
       for (j = 0; j < SIZE_N; ++j) {
         reported_num_teams[j] = omp_get_num_teams();
         reported_num_threads[j] = omp_get_num_threads();
