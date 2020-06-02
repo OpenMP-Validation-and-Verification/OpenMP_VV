@@ -17,8 +17,6 @@ PROGRAM test_target_teams_distribute_device
   USE ompvv_lib
   USE omp_lib
   implicit none
-  INTEGER :: errors
-  errors = 0
 
   OMPVV_TEST_OFFLOADING
 
