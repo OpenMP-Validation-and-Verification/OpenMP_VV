@@ -242,12 +242,8 @@ endif
 # OMPVV static library
 ##################################################
 
-OMPVVLIB=
-OMPVVLIB_DEP=
-ifdef LINK_OMPVV_LIB
-	OMPVVLIB=-L$(CURDIR)/ompvv -lompvv
-	OMPVVLIB_DEP=$(CURDIR)/ompvv/libompvv.a
-endif
+OMPVVLIB=-L$(CURDIR)/ompvv -lompvv
+OMPVVLIB_DEP=$(CURDIR)/ompvv/libompvv.a
 
 $(BINDIR)/libompvv.o: $(CURDIR)/ompvv/libompvv.c $(BINDIR)
 	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC)
@@ -266,7 +262,17 @@ $(CURDIR)/ompvv/libompvv.a: $(BINDIR)/libompvv.o
 # Compilation rules
 ##################################################
 # c files rule
-%.c.o: %.c $(BINDIR) $(LOGDIR) $(OMPVVLIB_DEP)
+%.c.o: %.c $(BINDIR) $(LOGDIR)
+	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC)
+	$(call log_section_header,"COMPILE CC="${CCOMPILE},$(SYSTEM),$<,$(CC) $(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(C_VERSION)),$(notdir $(@:.o=.log)))
+	-$(QUIET)$(call loadModules,$(C_COMPILER_MODULE)) $(CCOMPILE) $(VERBOSE_MODE) $(DTHREADS) $(DTEAMS) $(HTHREADS) $< -o $(BINDIR)/$(notdir $@) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
+		&& echo "PASS" > $(LOGTEMPFILE) \
+		|| echo "FAIL" > $(LOGTEMPFILE))
+	-$(call log_section_footer,"COMPILE CC="${CCOMPILE},$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.o=.log)))
+	-@$(if $(LOG), rm $(LOGTEMPFILE))
+
+# Special rule for test that needs OMPVV lib
+$(CURDIR)/tests/4.5/application_kernels/qmcpack_target_static_lib.c.o: $(CURDIR)/tests/4.5/application_kernels/qmcpack_target_static_lib.c $(BINDIR) $(LOGDIR) $(OMPVVLIB_DEP)
 	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC)
 	$(call log_section_header,"COMPILE CC="${CCOMPILE},$(SYSTEM),$<,$(CC) $(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(C_VERSION)),$(notdir $(@:.o=.log)))
 	-$(QUIET)$(call loadModules,$(C_COMPILER_MODULE)) $(CCOMPILE) $(VERBOSE_MODE) $(DTHREADS) $(DTEAMS) $(HTHREADS) $< -o $(BINDIR)/$(notdir $@) $(OMPVVLIB) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
