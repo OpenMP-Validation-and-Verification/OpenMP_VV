@@ -63,8 +63,8 @@ int main () {
   //initalize arrays on host
   for (i = 0; i < N; i++) {
     a[i] = i;
-    b[i] = 2i;
-    c[i] = 3i;
+    b[i] = 2*i;
+    c[i] = 3*i;
   }
 
   #pragma omp target update to(a,b,c) //update values on device (5.0 examples pp.172)
