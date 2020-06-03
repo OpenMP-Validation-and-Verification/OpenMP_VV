@@ -49,7 +49,7 @@ int main() {
   OMPVV_TEST_AND_SET(errors, host_data != 300);
 
   for (int i = 0; i < N; ++i) {
-    OMPVV_TEST_AND_SET(errors, host_array[i] != i+14);
+    OMPVV_TEST_AND_SET(errors, host_array[i] != i+15);
   }
 
   
