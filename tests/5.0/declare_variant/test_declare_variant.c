@@ -31,7 +31,7 @@ void fn(int *arr) {              // base for use on the host in sequence
 void p_fn(int *arr) {            // variant for use on host in parallel
 #pragma omp for
   for (int i = 0; i < N; i++) {
-    arr[i] = i;
+    arr[i] = i + 1;
   }
 }
 
@@ -39,7 +39,7 @@ void p_fn(int *arr) {            // variant for use on host in parallel
 void t_fn(int *arr) {            // variant for use on target
 #pragma omp distribute
   for (int i = 0; i < N; i++) {
-    arr[i] = i;
+    arr[i] = i + 2;
   }
 }
 
@@ -68,7 +68,7 @@ int main() {
   }
 
   for (int i = 0; i < N; i++) {
-    OMPVV_TEST_AND_SET_VERBOSE(errors, a[i] != i || b[i] != i || c[i] != i);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, a[i] != i || b[i] != (i + 1) || c[i] != (i + 2));
   }
 
   OMPVV_REPORT_AND_RETURN(errors);
