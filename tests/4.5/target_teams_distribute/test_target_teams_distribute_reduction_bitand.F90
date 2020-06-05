@@ -17,8 +17,6 @@ PROGRAM test_target_teams_distribute_device
   USE ompvv_lib
   USE omp_lib
   implicit none
-  INTEGER :: errors
-  errors = 0
 
   OMPVV_TEST_OFFLOADING
 
@@ -33,6 +31,7 @@ CONTAINS
     LOGICAL:: tested_true, tested_false
     REAL(8):: false_margin
     result = 0
+    errors = 0
 
     tested_true = .FALSE.
     tested_false = .FALSE.
