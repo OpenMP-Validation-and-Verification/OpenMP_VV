@@ -17,7 +17,7 @@
 #include <stdlib.h>
 #include "ompvv.h"
 
-#define N 1000
+#define N 100
 
 int main() {
   int errors = 0;
@@ -27,25 +27,25 @@ int main() {
   array_device = (int *)malloc(N*sizeof(int));
   array_host = (int *)malloc(N*sizeof(int));
 
-  for (int i = 0; i < N; ++i)
-    array_host[i] = i;
-  
+  for (int i = 0; i < N; ++i){
+    array_device[i] = i;
+    array_host[i] = 0;
+  }
   OMPVV_TEST_OFFLOADING;
 
-#pragma omp target data map(tofrom: array_device[0:N]) use_device_ptr(array_device)
+#pragma omp target data map(to: array_device[0:N]) use_device_ptr(array_device)
     {
 #pragma omp target is_device_ptr(array_device) map(tofrom: array_host[0:N])
       {
         for (int i = 0; i < N; ++i) {
-          array_device[i] = i;
-          array_host[i] += array_device[i];
+          array_host[i] += *(array_device + i);
         } 
       } // end target
     } // end target data
 
   // checking results
   for (int i = 0; i < N; ++i) {
-    OMPVV_TEST_AND_SET(errors, array_host[i] != 2*i);
+    OMPVV_TEST_AND_SET(errors, array_host[i] != i);
   }
 
   free(array_device);
