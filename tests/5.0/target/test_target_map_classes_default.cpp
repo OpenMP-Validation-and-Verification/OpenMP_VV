@@ -1,16 +1,21 @@
 //===--test_target_map_classes_default.c - test a class default mapping -----===//
 // 
-// OpenMP API Version 4.5 Nov 2015
+// OpenMP API Version 5.0 Nov 2018
 // 
 // This test focuses on the mapping of classes into the device. There are 2 
 // definition of clases. A, and B. A contains an array and its size, while B
-// has an static double and a virtual method. This test consist of 2 parts
-// explicit default mapping of the array and static variable mapping. The
-// explicit test has a map clause that does not use a map-type-modifier for
-// the array. It should be mapped as tofrom. (OpenMP 4.5 requires that it is
-// not mapped as member variable, hence, a pointer to it used.)
-// The static variable mapping test if an static variable will be copied
-// and map over to the device.
+// has an static double and a virtual method. This test consist of 4 parts
+// explicit default mapping of the array, implicit default mapping of the array,
+// static variable mapping, virtual method mapping. The explicit test has a map
+// clause that does not use a map-type-modifier for the array. It should be 
+// mapped as tofrom. The implicit test does not use a map clause but writes to
+// the array. This should do the mapping automatically, and use the tofrom
+// modifier. The static variable mapping test if an static variable will be copied
+// and map over to the device. Finally, the virtual method test should access
+// the method from the device. (See TODO note)
+//
+// TODO: Add virtual once supported by compilers
+// 
 //
 ////===----------------------------------------------------------------------===//
 
@@ -34,15 +39,19 @@ public:
   }
 
   void modifyExplicit() {
-    int * theArray = this->h_array;
-    int theSize = size;
-    // It is not possible to do this-> since it is an
-    // expression and it is not supported by 4.5
-#pragma omp target map(theArray[0:N]) map(theSize) 
+#pragma omp target map(this->h_array[0:N]) map(size) 
     {
-      for (int i = 0; i < theSize; ++i)
-          theArray[i] += 1;
+      for (int i = 0; i < size; ++i)
+          h_array[i] += 1;
     } // end target
+  }
+
+  void modifyImplicit() {
+#pragma omp target // implicit map(tofrom: this->h_array) map(firstprivate: this->size)
+    {
+      for (int i = 0; i < size; ++i)
+          h_array[i] += 1;
+    } // end target 
   }
 
   int* getArray() {
@@ -74,6 +83,28 @@ int test_explicit() {
   A *obj = new A(N);
 
   obj->modifyExplicit();
+
+  // checking results
+  int* h_array = obj->getArray();
+  for (int i = 0; i < N; ++i)
+    sum += h_array[i];
+
+  OMPVV_TEST_AND_SET_VERBOSE(errors, N != sum);
+
+  delete obj;
+
+  return errors;
+}
+
+int test_implicit() {
+
+  OMPVV_INFOMSG("Test implicit mapping");
+
+  int sum = 0, errors = 0;
+
+  A *obj = new A(N);
+
+  obj->modifyImplicit();
 
   // checking results
   int* h_array = obj->getArray();
@@ -129,6 +160,7 @@ int main() {
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_static_method() != 0);
   OMPVV_TEST_AND_SET_VERBOSE(errors,  test_static() != 0);
   OMPVV_TEST_AND_SET_VERBOSE(errors,  test_explicit() != 0);
+  OMPVV_TEST_AND_SET_VERBOSE(errors,  test_implicit() != 0);
 
   OMPVV_REPORT_AND_RETURN(errors);
 }
