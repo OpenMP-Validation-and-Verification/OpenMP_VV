@@ -16,41 +16,34 @@
 #include <stdlib.h>
 #include "ompvv.h"
 
-#define N 1000
 
 int main() {
   int errors = 0;
-  int host_data = 0, host_array[N];
-  int device_data = 14;
+  int device_data = 14, host_data=0;
 
-
-  for(int i = 0; i < N; i++)
-    host_array[i] = i;
-  
   OMPVV_TEST_OFFLOADING;
 
 #pragma omp target data map(to: device_data) use_device_addr(device_data)
     {
-#pragma omp target map(tofrom: host_data, host_array)
-      {
         int *dev_ptr;
-
-        device_data++;
         dev_ptr = &device_data;
-        host_data = *dev_ptr * 20;
-
-        for(int i = 0; i < N; i++)
-          host_array[i] += *dev_ptr;
+#pragma omp target map(to:device_data) map(tofrom: errors) map(from: host_data)
+      {
+          if(&device_data != dev_ptr)
+            errors++;
         
       } // end target
+
+#pragma omp target map(from: host_data)
+      {
+        host_data = *dev_ptr;
+      }
+
     } // end target data
 
-  // checking results
-  OMPVV_TEST_AND_SET(errors, host_data != 300);
 
-  for (int i = 0; i < N; ++i) {
-    OMPVV_TEST_AND_SET(errors, host_array[i] != i+15);
-  }
+  // checking results
+  OMPVV_TEST_AND_SET(errors, host_data != 14);
 
   
   OMPVV_REPORT_AND_RETURN(errors);
