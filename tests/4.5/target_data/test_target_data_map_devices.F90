@@ -15,12 +15,11 @@
         USE ompvv_lib
         USE omp_lib
         implicit none
-        LOGICAL :: isOffloading, isSharedEnv
+        LOGICAL :: isOffloading
         INTEGER :: i, j, num_dev
         CHARACTER(len=500) :: msgHelper
 
         OMPVV_TEST_AND_SET_OFFLOADING(isOffloading)
-        OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(isSharedEnv)
 
         ! Reporting the number of devices
         num_dev = omp_get_num_devices()
@@ -31,10 +30,6 @@
         WRITE(msgHelper, *) "The number of devices is 1, this test &
         &is inconclussive"
         OMPVV_WARNING_IF(num_dev == 1, msgHelper)
-
-        WRITE(msgHelper,*) "Using shared data environment. This test &
-        &has some limitations"
-        OMPVV_WARNING_IF(isSharedEnv, msgHelper)
 
         !starting the tests
         ! Warning for the number of devices
@@ -78,7 +73,7 @@
                     ! When on other devices different to the 
                     ! default device of the target data region
                     ! this operation would not be reflected on the host
-                    IF (.NOT. isSharedEnv .OR. devComp == devData) THEN
+                    IF (devComp == devData) THEN
                       anArray(1:N) = anArray(1:N) + 1
                     END IF
 
@@ -120,7 +115,7 @@
                   !$omp target map(alloc: anArray(1:N)) &
                   !$omp device(dev_comp)
                     ! Increase only in the current tested device
-                    IF (.NOT. isSharedEnv .OR. dev_comp == dev_data) THEN
+                    IF (dev_comp == dev_data) THEN
                       ! This should not affect result as it should happen in
                       ! other devices
                       anArray(1:N) = anArray(1:N) + 1
@@ -136,4 +131,3 @@
 
           END FUNCTION test_device_clause
       END PROGRAM test_target_data_devices
-
