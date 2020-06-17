@@ -20,15 +20,15 @@
 #define N 1024
 
 #pragma omp declare target
-int a[N], b[N] c[N]; // implicit map 3 variables 
+int a[N], b[N], c[N]; // implicit map 3 variables 
   #pragma omp declare target
      int test_target();
   #pragma omp end declare target
 #pragma omp end declare target
 
-int test_target() { //function in declare target statement
-
-  int i; 
+int errors = 0;
+int i = 0;
+int test_target() { //function in declare target statement 
 
 //change values on device
 #pragma omp parallel for 
@@ -49,6 +49,7 @@ int test_target() { //function in declare target statement
 } 
 
 int test_wrapper() { //wrapper for declare target function
+  
   #pragma omp target 
   {
     test_target();
@@ -57,8 +58,6 @@ int test_wrapper() { //wrapper for declare target function
 }
 
 int main () {
-
-  int errors = 0;
   
   //initalize arrays on host
   for (i = 0; i < N; i++) {
