@@ -78,7 +78,7 @@ int to_from_before_delete(){
     member.d[i] = i;
   }
 
-#pragma omp target map (tofrom: scalar, c, member) map (from: x, y, z) map (delete: scalar, a, member)
+#pragma omp target map (tofrom: scalar, c, member) map (from: x, y, z) map (delete: scalar, c, member)
   {
     x = scalar;
     z += member.var;
