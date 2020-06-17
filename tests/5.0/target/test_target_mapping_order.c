@@ -85,7 +85,47 @@ int to_before_alloc() {
   
   return errors; 
 }
+/*
+int to_from_before_delete(){
 
+  int x, y, z, i;
+  int scalar = 70;
+  int a[N];
+  int sum;
+
+  struct {
+    int var;
+    int b[N];
+  } member;
+
+  member.var = 1;
+
+  for (i = 0; i < N; i++) { 
+    a[i] = i;
+    sum += i;
+    member.b[i] = i;
+  }
+
+#pragma omp target map (tofrom: scalar, a, member) map (from: x, y, z) //(delete: scalar, a, member)
+  {
+    x = scalar;
+    z += member.var;
+
+    for (i = 0; i < N; i++) {
+      y += a[i];
+      z += member.b[i];
+    }
+  }	 
+  
+  OMPVV_TEST_AND_SET_VERBOSE(errors, x != 70);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, y != sum);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, z != (sum + 1));
+
+  return errors;
+
+}
+*/
+ 
 int main () {
   
   int errors = 0;
@@ -93,6 +133,7 @@ int main () {
   OMPVV_TEST_OFFLOADING;
   OMPVV_TEST_AND_SET_VERBOSE(errors, to_before_delete());
   OMPVV_TEST_AND_SET_VERBOSE(errors, to_before_alloc());
+ // OMPVV_TEST_AND_SET_VERBOSE(errors, to_from_before_delete());
   OMPVV_REPORT_AND_RETURN(errors);
 
 }
