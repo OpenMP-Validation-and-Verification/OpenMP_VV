@@ -58,6 +58,59 @@ int to_before_delete () {
 
 } 
 
+int to_from_before_delete(){
+
+  int x, y, z, i;
+  int scalar = 30;
+  int c[N];
+  int sum;
+
+  struct {
+    int var;
+    int d[N];
+  } member;
+
+  member.var = 1;
+
+  for (i = 0; i < N; i++) { 
+    c[i] = i;
+    sum += i;
+    member.d[i] = i;
+  }
+
+#pragma omp target map (tofrom: scalar, c, member) map (from: x, y, z) //map (delete: scalar, a, member)
+  {
+    x = scalar;
+    z += member.var;
+
+    for (i = 0; i < N; i++) {
+      y += c[i];
+      z += member.d[i];
+    }
+  }	 
+  
+  OMPVV_TEST_AND_SET_VERBOSE(errors, x != 30);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, y != sum);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, z != (sum + 1));
+
+  return errors;
+
+}
+
+ 
+int main () {
+  
+  int errors = 0;
+  
+  OMPVV_TEST_OFFLOADING;
+  OMPVV_TEST_AND_SET_VERBOSE(errors, to_before_delete());
+  //OMPVV_TEST_AND_SET_VERBOSE(errors, to_before_alloc());
+  OMPVV_TEST_AND_SET_VERBOSE(errors, to_from_before_delete());
+  OMPVV_REPORT_AND_RETURN(errors);
+}
+
+
+/*
 int to_before_alloc() {
 
   int i;
@@ -76,7 +129,7 @@ int to_before_alloc() {
     member.b[i] = i;
   }
 
-#pragma omp target map (alloc: scalar, a, member) (to: scalar, a, member) 
+#pragma omp target  map (alloc: scalar, a, member) map(to: scalar, a, member) 
   {
     if (scalar != 80 || a[1] != 2 || member.var != 1 || member.b[1] != 2) {
       errors++;
@@ -85,55 +138,4 @@ int to_before_alloc() {
   
   return errors; 
 }
-/*
-int to_from_before_delete(){
-
-  int x, y, z, i;
-  int scalar = 70;
-  int a[N];
-  int sum;
-
-  struct {
-    int var;
-    int b[N];
-  } member;
-
-  member.var = 1;
-
-  for (i = 0; i < N; i++) { 
-    a[i] = i;
-    sum += i;
-    member.b[i] = i;
-  }
-
-#pragma omp target map (tofrom: scalar, a, member) map (from: x, y, z) //(delete: scalar, a, member)
-  {
-    x = scalar;
-    z += member.var;
-
-    for (i = 0; i < N; i++) {
-      y += a[i];
-      z += member.b[i];
-    }
-  }	 
-  
-  OMPVV_TEST_AND_SET_VERBOSE(errors, x != 70);
-  OMPVV_TEST_AND_SET_VERBOSE(errors, y != sum);
-  OMPVV_TEST_AND_SET_VERBOSE(errors, z != (sum + 1));
-
-  return errors;
-
-}
 */
- 
-int main () {
-  
-  int errors = 0;
-  
-  OMPVV_TEST_OFFLOADING;
-  OMPVV_TEST_AND_SET_VERBOSE(errors, to_before_delete());
-  OMPVV_TEST_AND_SET_VERBOSE(errors, to_before_alloc());
- // OMPVV_TEST_AND_SET_VERBOSE(errors, to_from_before_delete());
-  OMPVV_REPORT_AND_RETURN(errors);
-
-}
