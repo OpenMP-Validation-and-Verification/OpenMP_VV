@@ -39,7 +39,7 @@ int to_before_delete () {
     member.b[i] = i;
   }
 
-#pragma omp target map (to: scalar, a, member) map (from: x, y, z) //(delete: scalar, a, member)
+#pragma omp target map (to: scalar, a, member) map (from: x, y, z) map(delete: scalar, a, member)
   {
     x = scalar;
     z += member.var;
@@ -78,7 +78,7 @@ int to_from_before_delete(){
     member.d[i] = i;
   }
 
-#pragma omp target map (tofrom: scalar, c, member) map (from: x, y, z) //map (delete: scalar, a, member)
+#pragma omp target map (tofrom: scalar, c, member) map (from: x, y, z) map (delete: scalar, a, member)
   {
     x = scalar;
     z += member.var;
@@ -89,7 +89,7 @@ int to_from_before_delete(){
     }
   }	 
   
-  OMPVV_TEST_AND_SET_VERBOSE(errors, x != 30);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, x != 20);
   OMPVV_TEST_AND_SET_VERBOSE(errors, y != sum);
   OMPVV_TEST_AND_SET_VERBOSE(errors, z != (sum + 1));
 
