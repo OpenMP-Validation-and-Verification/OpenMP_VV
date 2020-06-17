@@ -33,6 +33,7 @@ CONTAINS
     LOGICAL:: tested_true, tested_false
     REAL(8):: false_margin
     result = 0
+    errors = 0
 
     tested_true = .FALSE.
     tested_false = .FALSE.
