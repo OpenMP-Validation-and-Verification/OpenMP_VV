@@ -27,14 +27,14 @@ int main() {
     {
         int *dev_ptr;
         dev_ptr = &device_data;
-#pragma omp target map(to:device_data) map(tofrom: errors) map(from: host_data)
+#pragma omp target map(to:device_data) map(tofrom: errors) map(from: host_data) is_device_ptr(dev_ptr)
       {
           if(&device_data != dev_ptr)
             errors++;
         
       } // end target
 
-#pragma omp target map(from: host_data)
+#pragma omp target map(from: host_data) is_device_ptr(dev_ptr)
       {
         host_data = *dev_ptr;
       }
