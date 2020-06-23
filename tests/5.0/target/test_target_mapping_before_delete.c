@@ -1,4 +1,4 @@
-//===--- test_target_mapping_order.c---------------------------------------------------------===//
+//===--- test_target_mapping_before_delete.c ------------------------------------------------===//
 //
 // OpenMP API Version 5.0 Nov 2018
 //
@@ -7,7 +7,7 @@
 // on the same construct.
 //
 // For a given construct, the effect of a map clause with the to, from, or tofrom map-type
-// is ordered before the effect of a map clause with the alloc, release, or delete map-type.
+// is ordered before the effect of a map clause with the delete map-type.
 ////===--------------------------------------------------------------------------------------===//
 
 #include <omp.h>
@@ -104,38 +104,7 @@ int main () {
   
   OMPVV_TEST_OFFLOADING;
   OMPVV_TEST_AND_SET_VERBOSE(errors, to_before_delete());
-  //OMPVV_TEST_AND_SET_VERBOSE(errors, to_before_alloc());
   OMPVV_TEST_AND_SET_VERBOSE(errors, to_from_before_delete());
   OMPVV_REPORT_AND_RETURN(errors);
 }
 
-
-/*
-int to_before_alloc() {
-
-  int i;
-  int scalar = 80;
-  int a[N];
-
-  struct {
-  int var;
-  int b[N];
-  } member; 
-
-  member.var = 1;
-  
-  for (i = 0; i < N; i++) { 
-    a[i] = i;
-    member.b[i] = i;
-  }
-
-#pragma omp target  map (alloc: scalar, a, member) map(to: scalar, a, member) 
-  {
-    if (scalar != 80 || a[1] != 2 || member.var != 1 || member.b[1] != 2) {
-      errors++;
-    }
-  }	 
-  
-  return errors; 
-}
-*/
