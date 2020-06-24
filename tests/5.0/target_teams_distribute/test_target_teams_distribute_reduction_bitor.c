@@ -15,6 +15,7 @@
 #include <math.h>
 
 #define N 1024
+#define THRESHOLD 2014
 
 int test_bitor() {
   int a[N];
@@ -26,7 +27,7 @@ int test_bitor() {
   int num_attempts = 0;
   srand(1);
 
-  while ((!have_true || !have_false) && (num_attempts < N)) {
+  while ((!have_true || !have_false) && (num_attempts < THRESHOLD)) {
     have_true = 0;
     have_false = 0;
     for (int x = 0; x < N; ++x) {
