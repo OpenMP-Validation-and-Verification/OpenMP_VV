@@ -1,4 +1,4 @@
-//===---test_requires_unified_shared_memory.c -------------------------------===//
+//===---test_requires_unified_shared_memory_omp_target_alloc.c --------------===//
 //
 // OpenMP API Version 5.0 Nov 2018
 // 

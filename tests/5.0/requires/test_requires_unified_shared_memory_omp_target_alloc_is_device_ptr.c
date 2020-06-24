@@ -1,4 +1,4 @@
-//===---test_requires_unified_shared_memory.c -------------------------------===//
+//===---test_requires_unified_shared_memory_omp_target_alloc_is_device_ptr.c -===//
 //
 // OpenMP API Version 5.0 Nov 2018
 // 
@@ -29,7 +29,7 @@ int unified_shared_memory_target_alloc() {
 #pragma omp target is_device_ptr(anArray)
   {
     for (int i = 0; i < N; i++) {
-      anArray[i] = 0;
+      anArray[i] = i;
     }
   }
   for (int i = 0; i < N; i++) {
