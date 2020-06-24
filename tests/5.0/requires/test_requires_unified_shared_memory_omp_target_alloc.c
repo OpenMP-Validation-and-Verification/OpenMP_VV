@@ -29,7 +29,7 @@ int unified_shared_memory_target_alloc() {
 #pragma omp target 
   {
     for (int i = 0; i < N; i++) {
-      anArray[i] = 0;
+      anArray[i] = i;
     }
   }
   for (int i = 0; i < N; i++) {
