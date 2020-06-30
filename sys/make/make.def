@@ -222,7 +222,7 @@ endif
 #---------------------------------------------------------------------------
 # FORTRAN compilers
 #---------------------------------------------------------------------------
-FCOMPILERS?="gfortran, xlf"
+FCOMPILERS?="gfortran, xlf, ftn"
 F_VERSION?= echo "version unknown"
 
 # GCC compiler
@@ -245,6 +245,17 @@ ifeq ($(FC), $(filter $(FC), xlf xlf_r))
   FLINK = xlc
   FLINKFLAGS += -O3 -qsmp=omp $(FOFFLOADING)
 endif
+
+# Cray compiler
+ifeq ($(FC), ftn)
+  FOFFLOADING = -h omp
+  F_NO_OFFLOADING = 
+  FFLAGS += -O3 $(FOFFLOADING)  -J./ompvv
+  FLINK = gcc
+  FLINKFLAGS += -O3 $(FOFFLOADING)
+  F_VERSION = echo "$(ftn --version 2>&1 | grep -oh 'Cray Fortran : Version [0-9.]*' | grep -oh 'Version .*' | sed "s/Version/cray-classic/g")"
+endif
+
 #---------------------------------------------------------------------------
 # These macros are passed to the linker
 #---------------------------------------------------------------------------

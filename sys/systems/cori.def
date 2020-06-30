@@ -12,7 +12,7 @@ CUDA_MODULE ?=
 #---------------------------------------------------------------------------
 # C compilers
 #---------------------------------------------------------------------------
-CCOMPILERS="clang, gcc, cc, cc-classic"
+CCOMPILERS="clang, gcc, cc"
 
 # GCC compiler
 ifeq ($(CC), gcc)
@@ -27,10 +27,10 @@ ifeq ($(CC), cc)
 endif
 
 # CRAY classic compiler
-ifeq ($(CC), cc-classic)
-  C_COMPILER_MODULE = cdt/19.11 PrgEnv-cray; module switch cce cce/9.1.3-classic; module load craype-x86-skylake; module unload cray-libsci; module load cudatoolkit craype-accel-nvidia70
-  C_VERSION = cc --version 2>&1 | grep -oh 'Cray cc : Version [0-9.]*' | grep -oh 'Version .*' | sed "s/Version/cray-classic/g"
-endif
+#ifeq ($(CC), cc)
+#  C_COMPILER_MODULE = cdt/19.11 PrgEnv-cray; module switch cce cce/9.1.3-classic; module load craype-x86-skylake; module unload cray-libsci; module load cudatoolkit craype-accel-nvidia70
+#  C_VERSION = cc --version 2>&1 | grep -oh 'Cray cc : Version [0-9.]*' | grep -oh 'Version .*' | sed "s/Version/cray-classic/g"
+#endif
 
 # Clang compiler
 ifeq ($(CC), clang)
@@ -57,10 +57,10 @@ ifeq ($(CXX), CC)
 endif
 
 # CRAY classic compiler
-ifeq ($(CC), CC-classic)
-  C_COMPILER_MODULE = cdt/19.11 PrgEnv-cray; module switch cce cce/9.1.3-classic; module load craype-x86-skylake; module unload cray-libsci; module load cudatoolkit craype-accel-nvidia70
-  C_VERSION = CC --version 2>&1 | grep -oh 'Cray C++ : Version [0-9.]*' | grep -oh 'Version .*' | sed "s/Version/cray-classic/g"
-endif
+#ifeq ($(CC), CC)
+#  CXX_COMPILER_MODULE = cdt/19.11 PrgEnv-cray; module switch cce cce/9.1.3-classic; module load craype-x86-skylake; module unload cray-libsci; module load cudatoolkit craype-accel-nvidia70
+#  CXX_VERSION = CC --version 2>&1 | grep -oh 'Cray C++ : Version [0-9.]*' | grep -oh 'Version .*' | sed "s/Version/cray-classic/g"
+#endif
 
 
 # Clang compiler
@@ -72,7 +72,7 @@ endif
 #---------------------------------------------------------------------------
 # FORTRAN Compilers
 #---------------------------------------------------------------------------
-FCOMPILERS="gfortran"
+FCOMPILERS="gfortran, ftn"
 
 # GCC compiler
 ifeq ($(FC), gfortran)
@@ -82,7 +82,7 @@ endif
 
 # CRAY classic compiler
 ifeq ($(FC), ftn)
-  C_COMPILER_MODULE = cdt/19.11 PrgEnv-cray; module switch cce cce/9.1.3-classic; module load craype-x86-skylake; module unload cray-libsci; module load cudatoolkit craype-accel-nvidia70
-  C_VERSION = ftn --version 2>&1 | grep -oh 'Cray Fortran : Version [0-9.]*' | grep -oh 'Version .*' | sed "s/Version/cray-classic/g"
+  F_COMPILER_MODULE = cdt/19.11 PrgEnv-cray; module switch cce cce/9.1.3-classic; module load craype-x86-skylake; module unload cray-libsci; module load cudatoolkit craype-accel-nvidia70
+  F_VERSION = ftn --version 2>&1 | grep -oh 'Cray Fortran : Version [0-9.]*' | grep -oh 'Version .*' | sed "s/Version/cray-classic/g"
 endif
 
