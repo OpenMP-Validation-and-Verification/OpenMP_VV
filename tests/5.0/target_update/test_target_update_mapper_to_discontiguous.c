@@ -2,8 +2,12 @@
 //
 // OpenMP API Version 4.5 Nov 2015
 //
-// from([mapper(mapper-identifier):]locator-list) : check for array sections
-// with discontiguous storage
+// This test seeks to ensure that target update with motion-clause "to" can properly
+// map data to the device by specifying a user-defined mapper. Additionally, the test
+// checks a new addition to target update in OpenMP 5.0 that states "List items in the
+// to or from clauses may include array sections with stride expressions." 
+//
+// Adopted from OpenMP 5.0 Example target_mapper.1.c
 //===------------------------------------------------------------------------===//
 
 #include <omp.h>
@@ -21,7 +25,7 @@ typedef struct newvec {
 int i;
 int errors;
 
-#pragma omp declare mapper(new_id : newvec_t v) map(v, v.data[0:v.len])
+#pragma omp declare mapper(newvec_t v) map(v, v.data[0:v.len])
 
 int main() {
   
@@ -37,7 +41,9 @@ int main() {
     s.data[i] = i;
   }
 
-#pragma omp target update to (mapper(new_id))
+//#pragma omp target update to (mapper(new_id))
+
+#pragma omp target update to(mapper(v))
 
 #pragma omp target 
 {
@@ -48,7 +54,7 @@ int main() {
   } 
 } //end target
 
-  
   OMPVV_REPORT_AND_RETURN(errors);
   
 }
+
