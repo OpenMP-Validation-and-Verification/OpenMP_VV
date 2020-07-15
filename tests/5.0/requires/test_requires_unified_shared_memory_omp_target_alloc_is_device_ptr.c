@@ -63,7 +63,7 @@ int unified_shared_memory_target_alloc() {
     if (errors) break;
   }
 
-  free(anArray);
+  omp_target_free(anArray, omp_get_default_device());
   return errors;
 }
 int main() {
