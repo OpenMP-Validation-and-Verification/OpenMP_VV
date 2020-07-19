@@ -3,7 +3,7 @@ name: Test request
 about: Idea for a test to be implemented
 title: ''
 labels: new test
-assignees: josemonsalve2
+assignees: tmh97, jhdavis8
 
 ---
 

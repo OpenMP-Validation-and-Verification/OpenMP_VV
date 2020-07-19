@@ -1,9 +1,9 @@
 !===---- test_target_data_map_from_array_sections.F90 - mapping array sections ---===//
-! 
+!
 ! OpenMP API Version 4.5 Nov 2015
-! 
+!
 ! Testing array sections mapping from. This tests must cover dynamically allocated
-! arrays, 1D, 2D and 3D arrays. As well as sections mapping 
+! arrays, 1D, 2D and 3D arrays. As well as sections mapping
 !
 !===-------------------------------------------------------------------------===//
 #include "ompvv.F90"
@@ -15,12 +15,11 @@
         USE ompvv_lib
         USE omp_lib
         implicit none
-        LOGICAL :: isOffloading, isSharedEnv
+        LOGICAL :: isOffloading
         INTEGER :: i,j
         CHARACTER(len=500) :: msgHelper
-        
+
         OMPVV_TEST_AND_SET_OFFLOADING(isOffloading)
-        OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(isSharedEnv)
         OMPVV_TEST_VERBOSE(test_array_sections_pointer_1D() .NE. 0)
         OMPVV_TEST_VERBOSE(test_array_sections_pointer_2D() .NE. 0)
         OMPVV_TEST_VERBOSE(test_array_sections_pointer_3D() .NE. 0)
@@ -30,8 +29,7 @@
 
         OMPVV_REPORT_AND_RETURN()
 
-
-        CONTAINS 
+        CONTAINS
           ! Testing pointer array sections 1D
           INTEGER FUNCTION test_array_sections_pointer_1D()
             INTEGER, ALLOCATABLE, DIMENSION(:) :: my1DPtr
@@ -61,7 +59,7 @@
               !$omp target map(alloc: my1DPtr(10:N-10)) &
               !$omp map(alloc: my1DPtr2(10:), my1DPtr3(:N-10)) &
               !$omp map(tofrom: myTmpArray)
-                ! This should result in garbage writes to myTmpArray. 
+                ! This should result in garbage writes to myTmpArray.
                 ! Since the arrays are not copied to, they should not
                 ! have the value of the host.
                 myTmpArray(10:N-10) = myTmpArray(10:N-10) + &
@@ -69,7 +67,7 @@
                 myTmpArray(10:) = myTmpArray(10:) + my1DPtr2(10:)
                 myTmpArray(:N-10) = myTmpArray(:N-10) + my1DPtr3(:N-10)
 
-                ! Asign a value to the region and 
+                ! Asign a value to the region and
                 ! checking for this value on the host
                 my1DPtr(10:N-10) = 0
                 my1DPtr2(10:) = 0
@@ -77,10 +75,10 @@
               !$omp end target
 
             !$omp end target data
-            
+
             !testing that the array is just copied from and not to
-            IF (.NOT. isSharedEnv .AND. isOffloading) THEN
-              testVal = (N-19)*10 + & 
+            IF (isOffloading) THEN
+              testVal = (N-19)*10 + &
               &         (N-9)*10 + &
               &         (N-10)*10
               ! Since the data should not have been copied over the device
@@ -130,11 +128,11 @@
               !$omp target data map(from: my2DPtr(10:N-10, i)) &
               !$omp map(from: my2DPtr2(10:, i), my2DPtr3(:N-10, i)) &
               !$omp map(tofrom: myTmpArray)
-  
+
                 !$omp target map(alloc: my2DPtr(10:N-10, i)) &
                 !$omp map(alloc: my2DPtr2(10:, i), my2DPtr3(:N-10, i)) &
                 !$omp map(tofrom: myTmpArray)
-                  ! This should result in garbage writes to myTmpArray. 
+                  ! This should result in garbage writes to myTmpArray.
                   ! Since the arrays are not copied to, they should not
                   ! have the value of the host.
                   myTmpArray(10:N-10, i) = &
@@ -146,7 +144,7 @@
                   myTmpArray(:N-10, i) = &
                   &    myTmpArray(:N-10, i) + &
                   &    my2DPtr3(:N-10, i)
-                  ! Asign a value to the region and 
+                  ! Asign a value to the region and
                   ! checking for this value on the host
                   my2DPtr(10:N-10, i) = 0
                   my2DPtr2(10:, i) = 0
@@ -156,15 +154,15 @@
             END DO
 
             !testing that the array is just copied from and not to
-            IF (.NOT. isSharedEnv .AND. isOffloading) THEN
-              testVal = N*(N-19)*10 + & 
+            IF (isOffloading) THEN
+              testVal = N*(N-19)*10 + &
               &         N*(N-9)*10 + &
               &         N*(N-10)*10
               WRITE(msgHelper,*) "When using map from, the arrays might &
               & have been moved to the deice as well."
               OMPVV_WARNING_IF(SUM(myTmpArray) == testVal, msgHelper)
             END IF
-           
+
             OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my2DPtr(10:N-10,:) /= 0))
             OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my2DPtr2(10:,:) /= 0))
             OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my2DPtr3(:N-10,:) /= 0))
@@ -209,7 +207,7 @@
                   !$omp target map(alloc: my3DPtr(10:N-10, i, j)) &
                   !$omp map(alloc: my3DPtr2(10:, i, j), my3DPtr3(:N-10, i, j)) &
                   !$omp map(tofrom: myTmpArray)
-                    ! This should result in garbage writes to myTmpArray. 
+                    ! This should result in garbage writes to myTmpArray.
                     ! Since the arrays are not copied to, they should not
                     ! have the value of the host.
                     myTmpArray(10:N-10, i, j) = &
@@ -222,7 +220,7 @@
                     &    myTmpArray(:N-10, i, j) + &
                     &    my3DPtr3(:N-10, i, j)
 
-                    ! Asign a value to the region and 
+                    ! Asign a value to the region and
                     ! checking for this value on the host
                     my3DPtr(10:N-10, i, j) = 0
                     my3DPtr2(10:, i, j) = 0
@@ -234,15 +232,15 @@
 
 
             !testing that the array is just copied from and not to
-            IF (.NOT. isSharedEnv .AND. isOffloading) THEN
-              testVal = N*N*(N-19)*10 + & 
+            IF (isOffloading) THEN
+              testVal = N*N*(N-19)*10 + &
               &         N*N*(N-9)*10 + &
               &         N*N*(N-10)*10
               WRITE(msgHelper,*) "When using map from, the arrays might &
               & have been moved to the deice as well."
               OMPVV_WARNING_IF(SUM(myTmpArray) == testVal, msgHelper)
             END IF
-           
+
             OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my3DPtr(10:N-10,:,:) /= 0))
             OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my3DPtr2(10:,:,:) /= 0))
             OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my3DPtr3(:N-10,:,:) /= 0))
@@ -278,7 +276,7 @@
               !$omp target map(alloc: my1DArray(10:N-10)) &
               !$omp map(alloc: my1DArray2(10:), my1DArray3(:N-10)) &
               !$omp map(tofrom: myTmpArray)
-                ! This should result in garbage writes to myTmpArray. 
+                ! This should result in garbage writes to myTmpArray.
                 ! Since the arrays are not copied to, they should not
                 ! have the value of the host.
                 myTmpArray(10:N-10) = &
@@ -290,7 +288,7 @@
                 myTmpArray(:N-10) = &
                 &    myTmpArray(:N-10) + &
                 &    my1DArray3(:N-10)
-                ! Asign a value to the region and 
+                ! Asign a value to the region and
                 ! checking for this value on the host
                 my1DArray(10:N-10) = 0
                 my1DArray2(10:) = 0
@@ -298,17 +296,17 @@
               !$omp end target
 
             !$omp end target data
-            
+
             !testing that the array is just copied from and not to
-            IF (.NOT. isSharedEnv .AND. isOffloading) THEN
-              testVal = (N-19)*10 + & 
+            IF (isOffloading) THEN
+              testVal = (N-19)*10 + &
               &         (N-9)*10 + &
               &         (N-10)*10
               WRITE(msgHelper,*) "When using map from, the arrays might &
               & have been moved to the deice as well."
               OMPVV_WARNING_IF(SUM(myTmpArray) == testVal, msgHelper)
             END IF
-           
+
             OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my1DArray(10:N-10) /= 0))
             OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my1DArray2(10:) /= 0))
             OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my1DArray3(:N-10) /= 0))
@@ -338,11 +336,11 @@
               !$omp target data map(from: my2DArray(10:N-10, i)) &
               !$omp map(from: my2DArray2(10:, i), my2DArray3(:N-10, i)) &
               !$omp map(tofrom: myTmpArray)
-  
+
                 !$omp target map(alloc: my2DArray(10:N-10, i)) &
                 !$omp map(alloc: my2DArray2(10:, i), my2DArray3(:N-10, i)) &
                 !$omp map(tofrom: myTmpArray)
-                  ! This should result in garbage writes to myTmpArray. 
+                  ! This should result in garbage writes to myTmpArray.
                   ! Since the arrays are not copied to, they should not
                   ! have the value of the host.
                   myTmpArray(10:N-10, i) = &
@@ -354,7 +352,7 @@
                   myTmpArray(:N-10, i) = &
                   &    myTmpArray(:N-10, i) + &
                   &    my2DArray3(:N-10, i)
-                  ! Asign a value to the region and 
+                  ! Asign a value to the region and
                   ! checking for this value on the host
                   my2DArray(10:N-10, i) = 0
                   my2DArray2(10:, i) = 0
@@ -364,15 +362,15 @@
             END DO
 
             !testing that the array is just copied from and not to
-            IF (.NOT. isSharedEnv .AND. isOffloading) THEN
-              testVal = N*(N-19)*10 + & 
+            IF (isOffloading) THEN
+              testVal = N*(N-19)*10 + &
               &         N*(N-9)*10 + &
               &         N*(N-10)*10
               WRITE(msgHelper,*) "When using map from, the arrays might &
               & have been moved to the deice as well."
               OMPVV_WARNING_IF(SUM(myTmpArray) == testVal, msgHelper)
             END IF
-           
+
             OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my2DArray(10:N-10,:) /= 0))
             OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my2DArray2(10:,:) /= 0))
             OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my2DArray3(:N-10,:) /= 0))
@@ -409,7 +407,7 @@
                   !$omp target map(alloc: my3DArray(10:N-10, i, j)) &
                   !$omp map(alloc: my3DArray2(10:, i, j), my3DArray3(:N-10, i, j)) &
                   !$omp map(tofrom: myTmpArray)
-                    ! This should result in garbage writes to myTmpArray. 
+                    ! This should result in garbage writes to myTmpArray.
                     ! Since the arrays are not copied to, they should not
                     ! have the value of the host.
                     myTmpArray(10:N-10, i, j) = &
@@ -421,7 +419,7 @@
                     myTmpArray(:N-10, i, j) = &
                     &    myTmpArray(:N-10, i, j) + &
                     &    my3DArray3(:N-10, i, j)
-                    ! Asign a value to the region and 
+                    ! Asign a value to the region and
                     ! checking for this value on the host
                     my3DArray(10:N-10, i, j) = 0
                     my3DArray2(10:, i, j) = 0
@@ -431,17 +429,17 @@
               END DO
             END DO
 
-            !testing that the array is just copied to and not from 
-            IF (.NOT. isSharedEnv .AND. isOffloading) THEN
+            !testing that the array is just copied to and not from
+            IF (isOffloading) THEN
               OMPVV_INFOMSG("test array sections pointer 3D")
-              testVal = N*N*(N-19)*10 + & 
+              testVal = N*N*(N-19)*10 + &
               &         N*N*(N-9)*10 + &
               &         N*N*(N-10)*10
               WRITE(msgHelper,*) "When using map from, the arrays might &
               & have been moved to the deice as well."
               OMPVV_WARNING_IF(SUM(myTmpArray) == testVal, msgHelper)
             END IF
-           
+
             OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my3DArray(10:N-10,:,:) /= 0))
             OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my3DArray2(10:,:,:) /= 0))
             OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my3DArray3(:N-10,:,:) /= 0))
@@ -449,4 +447,3 @@
             test_array_sections_3D = errors
           END FUNCTION test_array_sections_3D
       END PROGRAM
-

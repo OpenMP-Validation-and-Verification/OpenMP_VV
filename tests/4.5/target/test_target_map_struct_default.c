@@ -53,6 +53,7 @@ int test_map_struct() {
       }
     }
   } // end target
+  
   // checking results
   OMPVV_TEST_AND_SET_VERBOSE(errors, (single.a != 1)); 
   for (int i = 0; i < N; ++i)
@@ -106,6 +107,7 @@ int test_map_typedef() {
       }
     }
   } // end target
+  
   // checking results
   OMPVV_TEST_AND_SET_VERBOSE(errors, (single.a != 1)); 
   for (int i = 0; i < N; ++i)
@@ -123,12 +125,18 @@ int test_map_typedef() {
 
 
 int main () {
-
+  
+  int errors = 0;
   //Check that offloading is enabled
   int is_offloading;
   OMPVV_TEST_AND_SET_OFFLOADING(is_offloading);
- 
-  int errors = 0;
+  
+  if (!is_offloading) {
+    OMPVV_ERROR("Mapping to device cannot be properly testing is offloading is not enabled");
+    errors ++;
+    OMPVV_REPORT_AND_RETURN(errors);
+  }
+  
   errors += test_map_struct();
   errors += test_map_typedef();
   OMPVV_REPORT_AND_RETURN(errors);
