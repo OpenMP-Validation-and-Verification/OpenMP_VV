@@ -71,16 +71,16 @@ FC?=none
 ifeq ($(DEVICE_TYPE), amd)
   # CRAY compiler (AMD)
   ifeq ($(CC), cc)
-    CFLAGS += -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx906
+    CFLAGS += -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa
     CLINK = cc
-    CLINKFLAGS += -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx906
+    CLINKFLAGS += -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa
   endif
-else
+else ifeq ($(DEVICE_TYPE), nvidia)
   # CRAY compiler (NVIDIA)
   ifeq ($(CC), cc)
-    CFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
+    CFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target
     CLINK = cc
-    CLINKFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
+    CLINKFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target
   endif
 endif
 
