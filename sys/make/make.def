@@ -67,11 +67,21 @@ CC?=none
 CPP?=none
 FC?=none
 
-# CRAY compiler
-ifeq ($(CC), cc)
-  CFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
-  CLINK = cc
-  CLINKFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
+# CRAY compilers
+ifeq ($(DEVICE_TYPE), amd)
+  # CRAY compiler (AMD)
+  ifeq ($(CC), cc)
+    CFLAGS += -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa
+    CLINK = cc
+    CLINKFLAGS += -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa
+  endif
+else ifeq ($(DEVICE_TYPE), nvidia)
+  # CRAY compiler (NVIDIA)
+  ifeq ($(CC), cc)
+    CFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target
+    CLINK = cc
+    CLINKFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target
+  endif
 endif
 
 # GCC compiler
@@ -146,11 +156,21 @@ endif
 CXXCOMPILERS?="clang++, g++, xlc++"
 CXX_VERSION?= echo "version unknown"
 
-# CRAY compiler
-ifeq ($(CXX), CC)
-  CXXFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
-  CXXLINK = cc
-  CXXLINKFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
+# CRAY compilers
+ifeq ($(DEVICE_TYPE), amd)
+  # CRAY compiler (AMD)
+  ifeq ($(CXX), CC)
+    CXXFLAGS += -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx906
+    CXXLINK = cc
+    CXXLINKFLAGS += -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx906
+  endif
+else
+  # CRAY compiler (NVIDIA)
+  ifeq ($(CXX), CC)
+    CXXFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
+    CXXLINK = cc
+    CXXLINKFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
+  endif
 endif
 
 # GCC compiler
@@ -245,6 +265,24 @@ ifeq ($(FC), $(filter $(FC), xlf xlf_r))
   FLINK = xlc
   FLINKFLAGS += -O3 -qsmp=omp $(FOFFLOADING)
 endif
+
+# CRAY compilers
+ifeq ($(DEVICE_TYPE), amd)
+  # CRAY compiler (AMD)
+  ifeq ($(FC), ftn)
+    FFLAGS += -fopenmp -J./ompvv
+    FLINK = cc
+    FLINKFLAGS += -fopenmp
+  endif
+else
+  # CRAY compiler (NVIDIA)
+  ifeq ($(FC), ftn)
+    FFLAGS += -fopenmp -J./ompvv
+    FLINK = cc
+    FLINKFLAGS += -fopenmp
+  endif
+endif
+
 #---------------------------------------------------------------------------
 # These macros are passed to the linker
 #---------------------------------------------------------------------------
