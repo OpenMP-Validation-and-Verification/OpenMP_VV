@@ -27,7 +27,7 @@ int errors;
 
 #pragma omp declare mapper(newvec_t v) map(v, v.data[0:v.len])
 
-int main() {
+int target_update_to_mapper() {
   
   OMPVV_TEST_OFFLOADING;
 
@@ -52,7 +52,17 @@ int main() {
   } 
 } //end target
 
-  OMPVV_REPORT_AND_RETURN(errors);
+  return errors;
   
 }
 
+int main() {
+  
+  OMPVV_TEST_OFFlOADING;
+  
+  int errors = 0;
+  OMPVV_TEST_AND_SET_VERBOSE(errors, target_update_to_mapper());
+
+  OMPVV_REPORT_AND_RETURN(errors);
+
+}
