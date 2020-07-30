@@ -56,7 +56,7 @@ int main() {
     }
   }
 
-#pragma omp teams distribute num_teams(4) default(none) shared(share, b, num_teams) defaultmap(tofrom:scalar)
+#pragma omp teams distribute num_teams(4) default(none) shared(share, b, num_teams)
     for (int x = 0; x < N; ++x) {
 #pragma omp atomic update
       share = share + b[x];
