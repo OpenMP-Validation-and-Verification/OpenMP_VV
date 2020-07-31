@@ -42,6 +42,7 @@ void t_fn(int *arr) {            // variant for use on target
     arr[i] = i + 2;
   }
 }
+#pragma omp end declare target
 
 int main() {
   OMPVV_TEST_OFFLOADING;
