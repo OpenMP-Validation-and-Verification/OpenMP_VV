@@ -18,6 +18,8 @@
 #include <stdlib.h>
 #include "ompvv.h"
 
+#pragma omp requires dynamic_allocators
+
 #define N 1024
 
 int test_requires() {
@@ -26,7 +28,7 @@ int test_requires() {
 #pragma omp target map(from: errors)
   {
     int* x;
-    omp_memspace_t x_memspace = omp_default_mem_space;
+    omp_memspace_handle_t x_memspace = omp_default_mem_space;
     omp_alloctrait_t x_traits[1] = {omp_atk_alignment, 64};
     omp_allocator_handle_t x_alloc = omp_init_allocator(x_memspace, 1, x_traits);
 
@@ -52,8 +54,6 @@ int main() {
   OMPVV_TEST_OFFLOADING;
 
   int errors = 0;
-
-  #pragma omp requires dynamic_allocators
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_requires() != 0);
 
