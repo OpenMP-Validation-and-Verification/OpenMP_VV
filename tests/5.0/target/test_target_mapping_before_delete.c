@@ -89,7 +89,7 @@ int to_from_before_delete(){
     }
   }	 
   
-  OMPVV_TEST_AND_SET_VERBOSE(errors, x != 20);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, x != 30);
   OMPVV_TEST_AND_SET_VERBOSE(errors, y != sum);
   OMPVV_TEST_AND_SET_VERBOSE(errors, z != (sum + 1));
 
