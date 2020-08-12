@@ -1,4 +1,4 @@
-//===--- test_teams_default_none.c------------------------------------------===//
+//===--- test_teams_distribute_default_none.c -------------------------------===//
 //
 // OpenMP API Version 5.0 Nov 2018
 //
