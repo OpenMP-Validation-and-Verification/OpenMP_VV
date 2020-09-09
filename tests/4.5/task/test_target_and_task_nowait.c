@@ -20,18 +20,21 @@ int test_target_and_task_nowait() {
 
 #pragma omp target map(tofrom: a, sum) depend(out: a) nowait
   {
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < N; i++) {
        sum++;
+    }
     a += 1;
   }
 
 #pragma omp task depend(in: a) shared(a,errors)
   {
-     if(a != 1)
+     if(a != 1) {
        errors += 1; 
+     }
   }
-  if (sum != 10000) 
+  if (sum != N) {
     errors++;
+  }
   return(errors);
 }
 
