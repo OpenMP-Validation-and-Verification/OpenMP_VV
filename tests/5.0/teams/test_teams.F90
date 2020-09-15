@@ -1,0 +1,67 @@
+!===--- test_teams.F90 -----------------------------------------------------===//
+!
+! OpenMP API Version 5.0 Nov 2018
+!
+! This test uses the teams directive on host and verifies the 
+! requested number of teams with requested number of threads were
+! created.
+!
+!//===----------------------------------------------------------------------===//
+
+#include "ompvv.F90"
+
+#define N 4
+#define K 2
+
+PROGRAM test_teams
+  USE iso_fortran_env
+  USE ompvv_lib
+  USE omp_lib
+  implicit none
+
+  OMPVV_TEST_OFFLOADING
+
+  OMPVV_TEST_VERBOSE(teams() .ne. 0)
+
+  OMPVV_REPORT_AND_RETURN()
+
+CONTAINS
+  INTEGER FUNCTION teams()
+    CHARACTER(len=300):: infoMsg
+    INTEGER,DIMENSION(N):: num_teams, num_threads a, b
+    INTEGER,DIMENSION(K):: errors
+    INTEGER:: x
+    errors[2] = {0,0}
+
+    DO x = 1, N
+      num_teams(x) = -99
+      num_threads(x) = -99
+    END DO
+
+    !$omp teams num_teams(N) thread_limit(N)
+    num_teams(omp_get_team_num()) = omp_get_num_teams()
+    num_threads(omp_get_team_num()) = omp_get_num_threads()
+
+    OMPVV_WARNING_IF(num_teams(0) .eq. 1, "Test operated with one team,
+num_teams
+requested is inconsistent with this result")
+
+    OMPVV_ERROR_IF(num_teams(0) .le. 1, "omp_get_num_teams() reported a
+value
+less than one.")
+
+    OMPVV_WARNING_IF(num_threads(0) .eq. 1, "Team 0 reported only 1
+thread. This
+is inconsistent with the thread limit that has been set.")
+
+    DO x = 1, num_teams(0)
+      IF (num_teams(x) .ne. num_teams(x-1))
+        errors(0) = errors(0) + 1
+      IF (num_threads(x) .ne. num_threads(x-1))
+        errors(1) = errors(1) + 1
+    END DO
+
+  teams = errors
+END PROGRAM  test_teams 
+
+
