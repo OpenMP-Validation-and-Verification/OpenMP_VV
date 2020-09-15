@@ -21,13 +21,13 @@
 
 #pragma omp declare target
 int a[N], b[N], c[N]; // implicit map 3 variables 
+int errors = 0;
+int i = 0;
   #pragma omp declare target
      int test_target();
   #pragma omp end declare target
 #pragma omp end declare target
 
-int errors = 0;
-int i = 0;
 int test_target() { //function in declare target statement 
 
 //change values on device
@@ -39,7 +39,7 @@ int test_target() { //function in declare target statement
     c[i] = 15;
   }
 }
-  //confirm updated values on host
+
   for (i = 0; i < N; i++) {
     if ( a[i] != 5 || b[i] != 10 || c[i] != 15) {
       errors++;  
@@ -54,6 +54,7 @@ int test_wrapper() { //wrapper for declare target function
   {
     test_target();
   }
+  #pragma omp target update from(errors)
   return errors;
 }
 
