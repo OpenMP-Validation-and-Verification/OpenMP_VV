@@ -11,7 +11,6 @@
 
 #include <omp.h>
 #include <algorithm>
-#include <chrono>
 #include <cstdlib>
 #include <iostream>
 #include <thread>
@@ -22,7 +21,7 @@ int test_task_depend_iterator() {
   int ptr[] = {0, 4, 5, 6, 7, 8, 9, 10, 11}, cols[] = {1, 2, 3, 4, 5, 5, 6, 6, 7, 7, 8};
   std::vector<int> threadOrder;
   bool threadOrderError = false;
-#pragma omp parallel num_threads(4)
+#pragma omp parallel num_threads(OMPVV_NUM_THREADS_HOST)
   {
 #pragma omp single
     {
@@ -34,7 +33,6 @@ int test_task_depend_iterator() {
           {
             threadOrder.push_back(i);
           } // end critical section
-          std::this_thread::sleep_for(std::chrono::milliseconds(100));
         } // end task depend
       }
     } // end single
