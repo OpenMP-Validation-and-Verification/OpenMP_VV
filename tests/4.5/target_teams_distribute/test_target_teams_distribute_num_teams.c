@@ -53,7 +53,7 @@ int main() {
     OMPVV_ERROR("Test returned num_teams <= 0.");
     errors = 1;
   } else {
-#pragma omp target teams distribute num_teams(default_num_teams - 1) map(to: a[0:N], b[0:N]) \
+#pragma omp target teams distribute num_teams(default_num_teams / 2) map(to: a[0:N], b[0:N]) \
   map(from: c[0:N], num_teams[0:N])
     for (int x = 0; x < N; ++x) {
       num_teams[x] = omp_get_num_teams();
@@ -62,17 +62,17 @@ int main() {
 
     for (int i = 1; i < N; ++i) {
       if (num_teams[i] != num_teams[i - 1]) {
-	errors += 1;
-	OMPVV_ERROR("omp_get_num_teams returned an inconsistent number of teams between iterations.");
-	break;
+        errors += 1;
+        OMPVV_ERROR("omp_get_num_teams returned an inconsistent number of teams between iterations.");
+        break;
       }
     }
 
-    if (num_teams[0] > default_num_teams - 1) {
+    if (num_teams[0] > default_num_teams / 2) {
       errors += 1;
       OMPVV_ERROR("Test ran on more teams than requested.");
       return errors;
-    } else if (num_teams[0] < default_num_teams - 1) {
+    } else if (num_teams[0] < default_num_teams / 2) {
       OMPVV_WARNING("Test ran on less teams than requested. This is still spec-conformant.");
     } else {
       OMPVV_INFOMSG("Test passed with offloading %s", (isOffloading ? "enabled" : "disabled"));

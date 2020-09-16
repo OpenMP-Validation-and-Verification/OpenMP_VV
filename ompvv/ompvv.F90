@@ -1,7 +1,7 @@
 !===------ ompvv.F90 ------------------ OMPVV HEADER FILE FORTRAN --------===//
-! 
+!
 ! Header file for OMP Validation and verification test suite
-! 
+!
 !===----------------------------------------------------------------------===//
 #define __LINENUMBER__ __LINE__
 !#define __FILENAME__ __FILE__(INDEX(__FILE__,"/", back=.true.)+1:)
@@ -46,6 +46,19 @@
 ! END IF VERBOSE_MODE
 #endif
 
+! Macros to provide thread and team nums if they are not specified
+#ifndef OMPVV_NUM_THREADS_DEVICE
+#define OMPVV_NUM_THREADS_DEVICE 128
+#endif
+
+#ifndef OMPVV_NUM_TEAMS_DEVICE
+#define OMPVV_NUM_TEAMS_DEVICE 8
+#endif
+
+#ifndef OMPVV_NUM_THREADS_HOST
+#define OMPVV_NUM_THREADS_HOST 8
+#endif
+
 ! Macro for checking if offloading is enabled or not
 #define OMPVV_TEST_OFFLOADING call test_offloading(__FILENAME__, __LINE__)
 
@@ -72,11 +85,11 @@
 #define OMPVV_SET_ERRORS(err) call set_errors(err)
 
 ! Macro for correct exit code
-#define OMPVV_RETURN(err) CALL EXIT(MERGE(EXIT_SUCCESS, EXIT_FAILURE, err == 0))
+#define OMPVV_RETURN(err) if( err .ne. 0) stop EXIT_FAILURE
 
-#define OMPVV_REPORT_AND_RETURN() CALL EXIT(MERGE(EXIT_SUCCESS, EXIT_FAILURE,  report_and_set_errors(__FILENAME__) == 0))
+#define OMPVV_REPORT_AND_RETURN() if( report_and_set_errors(__FILENAME__) .ne. 0) stop EXIT_FAILURE
 
-! Macro to report warning if it is a shared environment 
+! Macro to report warning if it is a shared environment
 #define OMPVV_TEST_SHARED_ENVIRONMENT call test_shared_environment(__FILENAME__, __LINE__)
 
 ! Macro to report warning if it is a shared environment and set a variable for further use
@@ -90,13 +103,13 @@ module ompvv_lib
     LOGICAL, PRIVATE :: ompvv_isHost
     INTEGER, PRIVATE :: ompvv_errors = 0
     LOGICAL, PRIVATE :: ompvv_sharedEnv
-  contains 
+  contains
     function clean_fn(fn)
       CHARACTER(len = *) :: fn
       CHARACTER(len = 400) :: clean_fn
       INTEGER :: ln, fn_cut_point
 
-      ! Avoid unused variables warning 
+      ! Avoid unused variables warning
       fn_cut_point = SCAN(fn, "/", .TRUE.)
       IF (fn_cut_point .GT. 0) THEN
         clean_fn = TRIM(fn(fn_cut_point + 1:))
@@ -110,7 +123,7 @@ module ompvv_lib
       ompvv_isHost = .false.
 !$omp target map(from:ompvv_isHost)
       ompvv_isHost = omp_is_initial_device()
-!$omp end target 
+!$omp end target
     end subroutine test_offloading_probe
 
     ! test offloading prints if offloading is enabled or not
@@ -119,9 +132,9 @@ module ompvv_lib
       CHARACTER(len=500) :: clean
       INTEGER :: ln
 
-      ! Avoid unused variables warning 
+      ! Avoid unused variables warning
       clean = TRIM(clean_fn(fn))
-      
+
       IF (.FALSE.) THEN
         ln = ln
       END IF
@@ -132,11 +145,11 @@ module ompvv_lib
       ELSE
         OMPVV_INFOMSG_HELPER("Test is running on device",clean ,ln)
       END IF
-    end subroutine test_offloading  
+    end subroutine test_offloading
 
     ! This function check if offloading is enabled and return true or false
     function test_and_set_offloading(fn , ln)
-      CHARACTER(len=*) :: fn 
+      CHARACTER(len=*) :: fn
       INTEGER :: ln
       LOGICAL :: test_and_set_offloading
 
@@ -152,13 +165,13 @@ module ompvv_lib
 
       ! Avoid unused variables warning
       IF (.FALSE.) THEN
-        fn = fn 
+        fn = fn
         ln = ln
-      END IF 
-      
+      END IF
+
       IF (condition) ompvv_errors = ompvv_errors + 1
     end subroutine test_error
-    
+
     ! Function to test an error condition and report it to the user
     subroutine test_error_verbose(condition, conditionStr, fn, ln)
       LOGICAL, INTENT(IN) :: condition
@@ -172,7 +185,7 @@ module ompvv_lib
       ! Avoid unused variables warning
       IF (.FALSE.) THEN
         ln = ln
-      END IF 
+      END IF
       ! cleaning condition % causes to fail. replace with '.'
       condition_clean_pos = SCAN(clean_conditionStr, "%")
       DO WHILE (condition_clean_pos /= 0)
@@ -180,12 +193,12 @@ module ompvv_lib
         condition_clean_pos = SCAN(clean_conditionStr , "%")
       END DO
       clean_conditionStr = " Condition "//TRIM(clean_conditionStr)//" failed "
-      
-      IF (condition) then 
+
+      IF (condition) then
         ompvv_errors = ompvv_errors + 1
         OMPVV_ERROR_HELPER(clean_conditionStr, clean, ln)
 !        OMPVV_ERROR_HELPER(" Condition failed ", fn, ln)
-      END IF 
+      END IF
     end subroutine test_error_verbose
 
     ! Function to test an error condition and return the current value of ompvv_errors
@@ -203,7 +216,7 @@ module ompvv_lib
 
     ! Function to test an error condition, return the current value of ompvv_errors
     ! and report the current value to the user STDIO
-    function test_and_set_verbose(condition, conditionStr, fn, ln) 
+    function test_and_set_verbose(condition, conditionStr, fn, ln)
       LOGICAL, INTENT(IN) :: condition
       CHARACTER(len=*) :: conditionStr
       CHARACTER(len=*) :: fn
@@ -227,16 +240,16 @@ module ompvv_lib
       WRITE(message2dis, '(A,I0)') "The value of errors is ", ompvv_errors
       message2dis = TRIM(message2dis)
 
-      IF (ompvv_errors /= 0) then 
+      IF (ompvv_errors /= 0) THEN
         OMPVV_INFOMSG(message2dis)
-        IF (ompvv_isHost) THEN 
+        IF (ompvv_isHost) THEN
           WRITE(*,OMPVV_HEADER_RESULT_FMT) TRIM(clean), "failed", "host"
         ELSE
           WRITE(*,OMPVV_HEADER_RESULT_FMT) TRIM(clean), "failed", "device"
         END IF
       ELSE
         OMPVV_INFOMSG("Test ran with no errors")
-        IF (ompvv_isHost) THEN 
+        IF (ompvv_isHost) THEN
           WRITE(*,OMPVV_HEADER_RESULT_FMT) TRIM(clean), "passed", "host"
         ELSE
           WRITE(*,OMPVV_HEADER_RESULT_FMT) TRIM(clean), "passed", "device"
@@ -253,13 +266,13 @@ module ompvv_lib
 
       report_and_set_errors = ompvv_errors
     end function report_and_set_errors
-    
+
     function get_errors()
       INTEGER :: get_errors
 
       get_errors = ompvv_errors
     end function get_errors
-    
+
     subroutine set_errors(err)
       INTEGER :: err
 

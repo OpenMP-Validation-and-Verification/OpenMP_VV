@@ -3,10 +3,10 @@ SHELL=/bin/bash -o pipefail
 # When using make alone show the help message
 .DEFAULT_GOAL:=help
 
-#################################################
+###################################################
 # OpenMP Versions. This is to support multiple
 # versions of the standard in the same testsuite
-#################################################
+###################################################
 OMP_VERSION?=4.5
 TEST_FOLDER_EXISTS=$(shell if [ -d tests/$(OMP_VERSION) ]; then echo "exist";fi)
 ifeq "$(TEST_FOLDER_EXISTS)" ""
@@ -14,10 +14,10 @@ ifeq "$(TEST_FOLDER_EXISTS)" ""
 endif
 
 
-##################################################
+###################################################
 # System specific varibles can be specified
 # in the system files sys/system/###.def
-#################################################
+###################################################
 ifdef OMPVV_SYSTEM
 	SYSTEM = ${OMPVV_SYSTEM}
 else
@@ -27,16 +27,16 @@ endif
 
 include sys/make/make.def
 
-##################################################
+###################################################
 # It is possible to annotate a set of results with
 # a LOG_NOTE which will be added to the log header
 # files
-#################################################
+###################################################
 LOG_NOTE?="none"
 
-##################################################
+###################################################
 # Verbose & Log
-#################################################
+###################################################
 QUIET:=@
 ifdef VERBOSE
   QUIET:=
@@ -75,10 +75,10 @@ REPORT_ONLINE_CONNECTION=$(CURDIR)/sys/scripts/onlineConnection.py
 
 ##################################################
 # Source files
-#################################################
+##################################################
 
 ifneq "$(SOURCES_C)$(SOURCES_CPP)$(SOURCES_F)$(TESTS_TO_RUN)" ""
-$(error The SOURCES_C SOURCES_CPP SOURCES_F and TESTS_TO_RUN flags where depreciated. Use SOURCES instead)
+$(error The SOURCES_C SOURCES_CPP SOURCES_F and TESTS_TO_RUN flags were depreciated. Use SOURCES instead)
 endif
 
 ifneq "$(SOURCES)" ""
@@ -138,7 +138,11 @@ endif
 
 ifeq "$(SOURCES)" ""
 # Getting all the source files in the project
+ifdef LINK_OMPVV_LIB
 SOURCES_C := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -name *.c)
+else
+SOURCES_C := $(shell find $(CURDIR)/tests/$(OMP_VERSION) ! -name qmcpack_target_static_lib.c -name *.c)
+endif
 SOURCES_CPP := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -name *.cpp)
 SOURCES_F := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -name "*.F90" -o -name "*.F95" -o -name "*.F03" -o -name "*.F" -o -name "*.FOR" | grep -v "ompvv.F90")
 
@@ -203,7 +207,7 @@ compile: MessageDisplay $(COMP_DEP)
 
 ##################################################
 # FOR RUNNING TESTS ONLY
-#################################################
+##################################################
 
 .PHONY: run
 run: $(RUN_TESTS)
@@ -222,7 +226,7 @@ endif
 ifneq "$(FC)" "none"
 	@echo "FC = $(FC) $(shell $(call loadModules,$(F_COMPILER_MODULE),"shut up") ${F_VERSION})"
 endif
-	$(if $(MODULE_LOAD), @echo "C_MODULE = "$(C_COMPILER_MODULE); echo "CXX_MODULE = "$(CXX_COMPILER_MODULE); echo "F_MODULE = "$(F_COMPILER_MODULE),)
+	$(if $(MODULE_LOAD), @echo "C_MODULE = "$(subst ;,\;,$(C_COMPILER_MODULE)); echo "CXX_MODULE = "$(subst ;,\;,${CXX_COMPILER_MODULE}); echo "F_MODULE = "$(subst ;,\;,${F_COMPILER_MODULE}),)
 
 ##################################################
 # Turn off offloading
@@ -235,13 +239,43 @@ ifdef NO_OFFLOADING
 endif
 
 ##################################################
+# OMPVV static library
+##################################################
+
+OMPVVLIB=-L$(CURDIR)/ompvv -lompvv
+OMPVVLIB_DEP=$(CURDIR)/ompvv/libompvv.a
+
+$(BINDIR)/libompvv.o: $(CURDIR)/ompvv/libompvv.c $(BINDIR)
+	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC)
+	$(call log_section_header,"COMPILE CC="${CCOMPILE},$(SYSTEM),$<,$(CC) $(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(C_VERSION)),$(notdir $(@:.o=.log)))
+	-$(QUIET)$(call loadModules,$(C_COMPILER_MODULE)) $(CCOMPILE) $(VERBOSE_MODE) $(DTHREADS) $(DTEAMS) $(HTHREADS) $< -c -o $(BINDIR)/$(notdir $@) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
+		&& echo "PASS" > $(LOGTEMPFILE) \
+		|| echo "FAIL" > $(LOGTEMPFILE))
+	-$(call log_section_footer,"COMPILE CC="${CCOMPILE},$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.o=.log)))
+	-@$(if $(LOG), rm $(LOGTEMPFILE))
+
+$(CURDIR)/ompvv/libompvv.a: $(BINDIR)/libompvv.o
+	ar -rc $(CURDIR)/ompvv/libompvv.a $(BINDIR)/libompvv.o
+	@ranlib $(CURDIR)/ompvv/libompvv.a
+
+##################################################
 # Compilation rules
 ##################################################
 # c files rule
 %.c.o: %.c $(BINDIR) $(LOGDIR)
 	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC)
 	$(call log_section_header,"COMPILE CC="${CCOMPILE},$(SYSTEM),$<,$(CC) $(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(C_VERSION)),$(notdir $(@:.o=.log)))
-	-$(QUIET)$(call loadModules,$(C_COMPILER_MODULE)) $(CCOMPILE) $(VERBOSE_MODE) $< -o $(BINDIR)/$(notdir $@) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
+	-$(QUIET)$(call loadModules,$(C_COMPILER_MODULE)) $(CCOMPILE) $(VERBOSE_MODE) $(DTHREADS) $(DTEAMS) $(HTHREADS) $< -o $(BINDIR)/$(notdir $@) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
+		&& echo "PASS" > $(LOGTEMPFILE) \
+		|| echo "FAIL" > $(LOGTEMPFILE))
+	-$(call log_section_footer,"COMPILE CC="${CCOMPILE},$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.o=.log)))
+	-@$(if $(LOG), rm $(LOGTEMPFILE))
+
+# Special rule for test that needs OMPVV lib
+$(CURDIR)/tests/4.5/application_kernels/qmcpack_target_static_lib.c.o: $(CURDIR)/tests/4.5/application_kernels/qmcpack_target_static_lib.c $(BINDIR) $(LOGDIR) $(OMPVVLIB_DEP)
+	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC)
+	$(call log_section_header,"COMPILE CC="${CCOMPILE},$(SYSTEM),$<,$(CC) $(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(C_VERSION)),$(notdir $(@:.o=.log)))
+	-$(QUIET)$(call loadModules,$(C_COMPILER_MODULE)) $(CCOMPILE) $(VERBOSE_MODE) $(DTHREADS) $(DTEAMS) $(HTHREADS) $< -o $(BINDIR)/$(notdir $@) $(OMPVVLIB) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
 		|| echo "FAIL" > $(LOGTEMPFILE))
 	-$(call log_section_footer,"COMPILE CC="${CCOMPILE},$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.o=.log)))
@@ -251,7 +285,7 @@ endif
 %.cpp.o: %.cpp $(BINDIR) $(LOGDIR)
 	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC)
 	$(call log_section_header,"COMPILE CPP="${CXXCOMPILE},$(SYSTEM),$<,$(CXX) $(shell $(call loadModules,$(CXX_COMPILER_MODULE),"shut up") $(CXX_VERSION)),$(notdir $(@:.o=.log)))
-	-$(QUIET)$(call loadModules,$(CXX_COMPILER_MODULE)) $(CXXCOMPILE) $(VERBOSE_MODE) $< -o $(BINDIR)/$(notdir $@) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
+	-$(QUIET)$(call loadModules,$(CXX_COMPILER_MODULE)) $(CXXCOMPILE) $(VERBOSE_MODE) $(DTHREADS) $(DTEAMS) $(HTHREADS) $< -o $(BINDIR)/$(notdir $@) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
 		|| echo "FAIL" > $(LOGTEMPFILE))
 	-$(call log_section_footer,"COMPILE",$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.o=.log)))
@@ -261,7 +295,7 @@ endif
 %.FOR.o: % $(BINDIR) $(LOGDIR) clear_fortran_mod
 	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC)
 	$(call log_section_header,"COMPILE F="${FCOMPILE},$(SYSTEM),$<,$(FC) $(shell $(call loadModules,$(F_COMPILER_MODULE),"shut up") $(F_VERSION)),$(notdir $(@:.FOR.o=.log)))
-	-$(QUIET)$(call loadModules,$(F_COMPILER_MODULE)) $(FCOMPILE) $(VERBOSE_MODE) $< -o $(BINDIR)/$(notdir $(@:.FOR.o=.o)) $(if $(LOG),$(RECORD)$(notdir $(@:.FOR.o=.log))\
+	-$(QUIET)$(call loadModules,$(F_COMPILER_MODULE)) $(FCOMPILE) $(VERBOSE_MODE) $(DTHREADS) $(DTEAMS) $(HTHREADS) $< -o $(BINDIR)/$(notdir $(@:.FOR.o=.o)) $(if $(LOG),$(RECORD)$(notdir $(@:.FOR.o=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
 		|| echo "FAIL" > $(LOGTEMPFILE))
 	-$(call log_section_footer,"COMPILE",$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.FOR.o=.log)))
@@ -358,7 +392,7 @@ report_json: $(RESULTS_JSON_OUTPUT_FILE)
 	@echo " === REPORT DONE === "
 
 .PHONY: report_summary
-report_summary: 
+report_summary:
 	@$(RESULTS_ANALYZER) -r -f summary $(LOGDIRNAME)/*
 
 .PHONY: report_html
@@ -449,9 +483,14 @@ help:
 	@echo "  LOG_ALL=1                 Enables dump of the make process output, errors, and binary execution outputs into logs.txt"
 	@echo "  SYSTEM=sys_name           Includes the definitions for the requires modules and batch schedulers in the different systems"
 	@echo "                            This definitions must be in sys/SYSTEM.def. (Do not include the .def extension)"
+	@echo "  DEVICE_TYPE=dev_name      Specifies device type being used, either nvidia or amd, to change compiler flags as needed."
 	@echo "  MODULE_LOAD=1             Before compiling or running, module load is called"
 	@echo "  ADD_BATCH_SCHED=1         Add the jsrun command before the execution of the running script to send it to a compute node"
 	@echo "  NO_OFFLOADING=1           Turn off offloading"
+	@echo "  LINK_OMPVV_LIB=1          Link the OMPVV static library (in ompvv folder) and run the static lib test"
+	@echo "  NUM_THREADS_HOST=n        Specify n, requested number of threads for tests that use num_threads() on host constructs"
+	@echo "  NUM_THREADS_DEVICE=n      Specify n, requested number of threads for tests that use num_threads() on device constructs"
+	@echo "  NUM_TEAMS_DEVICE=n        Specify n, requested number of threads for tests that use num_teams() on device constructs"
 	@echo "  SOURCES=file or exp       Specify the source file(s) that you want to apply the rule to. You can use wildchars to select a subset of tests"
 	@echo "  OMP_VERSION=[e.g. 4.5]    This specifies which version of the specs we are targeting. This version should have its folder in tests/[version]"
 	@echo "                            default value is 4.5"

@@ -20,6 +20,6 @@ implicit none
     print*, "Target region executed on the device"
   END IF
 
-  CALL EXIT(errors)
+  if( errors .ne. 0 ) stop 1
 
 END PROGRAM offloading_success

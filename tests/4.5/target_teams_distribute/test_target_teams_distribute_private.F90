@@ -29,8 +29,9 @@
       CONTAINS
         INTEGER FUNCTION test_private()
           INTEGER,DIMENSION(N):: a, b, c, d
-          INTEGER:: privatized, errors, x, y
+          INTEGER:: privatized, errors, x, y, num_teams
           errors = 0
+          num_teams = -1
 
           DO x = 1, N
             a(x) = 1
@@ -40,8 +41,12 @@
           END DO
 
           !$omp target teams distribute private(privatized) map(to: a(1:N), &
-          !$omp& b(1:N), c(1:N)) map(from: d(1:N))
+          !$omp& b(1:N), c(1:N)) map(from: d(1:N)) map(tofrom: num_teams) &
+          !$omp& num_teams(OMPVV_NUM_TEAMS_DEVICE)
           DO x = 1, N
+            IF (omp_get_team_num() .eq. 0) THEN
+              num_teams = omp_get_num_teams()
+            END IF
             privatized = 0
             DO y = 1, a(x) + b(x)
               privatized = privatized + 1
@@ -52,6 +57,9 @@
           DO x = 1, N
             OMPVV_TEST_AND_SET(errors, (d(x) .ne. (1 + x) * 2 * x))
           END DO
+
+          OMPVV_WARNING_IF(num_teams .eq. 1, "Test ran with one team. Results of private test are inconclusive.")
+          OMPVV_TEST_AND_SET_VERBOSE(errors, num_teams .lt. 1)
 
           test_private = errors
         END FUNCTION test_private
