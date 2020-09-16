@@ -22,7 +22,7 @@ PROGRAM test_target_private
 
 CONTAINS
   INTEGER FUNCTION test_target_private_clause()
-    INTEGER :: compute_array(N,OMPVV_NUM_THREADS_DEVICE)
+    INTEGER :: compute_array(N,OMPVV_NUM_THREADS_HOST)
     INTEGER :: actualThreadCnt = 0
     INTEGER :: errors, i, j, p_val, fp_val
     CHARACTER(len=400) :: messageHelper
@@ -30,7 +30,7 @@ CONTAINS
     compute_array(:,:) = 0
     errors = 0
 
-    CALL omp_set_num_threads(OMPVV_NUM_THREADS_DEVICE)
+    CALL omp_set_num_threads(OMPVV_NUM_THREADS_HOST)
 
     !$omp parallel private(p_val, fp_val) shared(actualThreadCnt)
     fp_val = omp_get_thread_num() + 1

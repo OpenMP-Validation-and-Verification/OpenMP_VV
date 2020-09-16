@@ -25,7 +25,7 @@ PROGRAM test_target_firstprivate
 
 CONTAINS
   INTEGER FUNCTION test_target_firstprivate_clause()
-    INTEGER :: compute_array(N,OMPVV_NUM_THREADS_DEVICE)
+    INTEGER :: compute_array(N,OMPVV_NUM_THREADS_HOST)
     INTEGER :: p_val
     INTEGER :: actualThreadCnt = 0
     CHARACTER(len=400) :: messageHelper
@@ -34,7 +34,7 @@ CONTAINS
 
     compute_array(:,:) = 0
 
-    call omp_set_num_threads(OMPVV_NUM_THREADS_DEVICE)
+    call omp_set_num_threads(OMPVV_NUM_THREADS_HOST)
     !$omp parallel private(p_val) shared(actualThreadCnt)
     ! each p_val is private to a thread
     p_val = omp_get_thread_num() + 1

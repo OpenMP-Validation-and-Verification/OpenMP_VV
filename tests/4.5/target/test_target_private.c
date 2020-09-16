@@ -21,7 +21,7 @@
 
 int main() {
 
-  int compute_array[OMPVV_NUM_THREADS_DEVICE][N];
+  int compute_array[OMPVV_NUM_THREADS_HOST][N];
   int errors = 0;
   int i, j;
   int real_num_threads;
@@ -30,13 +30,13 @@ int main() {
   int is_offloading;
   OMPVV_TEST_AND_SET_OFFLOADING(is_offloading);
 
-  for (i = 0; i < 4; i++) {
+  for (i = 0; i < OMPVV_NUM_THREADS_HOST; i++) {
     for (j = 0; j < N; j++) {
       compute_array[i][j] = 0;
     }
   }
 
-  omp_set_num_threads(OMPVV_NUM_THREADS_DEVICE);
+  omp_set_num_threads(OMPVV_NUM_THREADS_HOST);
 #pragma omp parallel
   {
     int fp_val = omp_get_thread_num();
