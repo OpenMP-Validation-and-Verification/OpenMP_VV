@@ -4,13 +4,10 @@
 !
 ! The description of the map clause was modified to clarify the mapping
 ! order when multiple map-types are specified for a variable or
-! structure
-! members of a variable on the same construct.
+! structure members of a variable on the same construct.
 !
-! For a given construct, the effect of a map clause with the to, from,
-! or 
-! tofrom map-type is ordered before the effect of a map clause with the
-! delete
+! For a given construct, the effect of a map clause with the to, from, or 
+! tofrom map-type is ordered before the effect of a map clause with the delete
 ! map-type.
 !
 !===-------------------------------------------------------------------------===//
@@ -30,7 +27,7 @@ PROGRAM test_target_mapping_before_alloc
 
    OMPVV_TEST_VERBOSE(to_before_delete() .ne. 0)
 
-   OMPVV_TEST_VERBOSE(to_from_before_delete() .ne. 0
+   OMPVV_TEST_VERBOSE(to_from_before_delete() .ne. 0)
 
 
 CONTAINS
@@ -71,8 +68,8 @@ CONTAINS
          summation = summation + 1
       END DO
 
-      !$omp target map (tofrom: scalar, c) map (from: x, y, z) &
-                   (delete: scalar, c)
+      !$omp target map(tofrom: scalar, c) map(from: x, y, z) &
+      !$omp& map(delete: scalar, c)
 
       x = scalar
 

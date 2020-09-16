@@ -11,6 +11,7 @@
 ! or tofrom map-type is ordered before the effect of a map clause with 
 ! the alloc map-type.
 !
+! @!to-do add struct
 !===-------------------------------------------------------------------------===//
 #include "ompvv.F90"
 
@@ -21,8 +22,6 @@ PROGRAM test_target_mapping_before_alloc
   USE ompvv_lib
   USE omp_lib
   implicit none
-  INTEGER :: errors
-  errors = 0
 
   OMPVV_TEST_OFFLOADING
 
@@ -30,11 +29,10 @@ PROGRAM test_target_mapping_before_alloc
 
   OMPVV_REPORT_AND_RETURN()
 
-
 CONTAINS
   INTEGER FUNCTION to_before_alloc()
-    INTEGER,DIMENSION(N):: a,
-    INTEGER:: x, scalar
+    INTEGER,DIMENSION(N):: a
+    INTEGER:: x, scalar, errors
     errors = 0
     scalar = 80
 
@@ -42,15 +40,11 @@ CONTAINS
       a(x) = x
     END DO
 
-    !$omp target map (alloc: scalar, a) map (to: scalar a)
-    IF (scalar.ne.80 .or. a(1).ne.2)
+    !$omp target map(alloc:scalar, a) map(to: scalar, a) 
+    IF (scalar.ne.80 .or. a(1).ne.2) THEN
       errors = errors + 1
     END IF
 
-    test_before_alloc = errors
+    to_before_alloc = errors
   END FUNCTION to_before_alloc
-END PROGRAM test_target_mapping_before_alloc 
-
-
-
-! GO BACK AND ADD STRUCTURE ! 
+END PROGRAM test_target_mapping_before_alloc
