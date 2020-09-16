@@ -19,9 +19,11 @@ int main() {
 
   OMPVV_TEST_OFFLOADING;
 
-  for (i=0; i<OMPVV_NUM_THREADS_HOST; i++)
-    for (j=0; j<N; j++)
+  for (i=0; i<OMPVV_NUM_THREADS_HOST; i++) {
+    for (j=0; j<N; j++) {
       compute_array[i][j] = 0;
+    }
+  }
 
   omp_set_num_threads(OMPVV_NUM_THREADS_HOST);
 #pragma omp parallel private(i)
