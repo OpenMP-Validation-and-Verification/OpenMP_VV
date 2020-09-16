@@ -30,12 +30,12 @@ CONTAINS
   INTEGER FUNCTION inner_fn(a)
     INTEGER:: a
     inner_fn(a) = 1 + a
-  END FUNCTION inner_fn(a)
+  END FUNCTION inner_fn
 
   INTEGER FUNCTION outer_fn(a)
     INTEGER:: a
     out_fn(a) = 1 + inner_fn(a)
-  END FUNCTION outer_fn(a)
+  END FUNCTION outer_fn
 
   INTEGER FUNCTION test_declared_functions() 
     CHARACTER(len=300):: infoMsg
@@ -49,4 +49,5 @@ CONTAINS
     OMPVV_TEST_AND_SET_VERBOSE(errors, outcome .ne. 2)
 
     test_declared_functions = errors
-  END FUNCTION test_declare_target_nested_functions  
+  END FUNCTION test_declared_functions
+END PROGRAM test_declare_target_nested_functions 
