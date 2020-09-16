@@ -15,6 +15,7 @@
 #include <math.h>
 
 #define N 1024
+#define THRESHOLD 2014
 
 int test_bitor() {
   int a[N];

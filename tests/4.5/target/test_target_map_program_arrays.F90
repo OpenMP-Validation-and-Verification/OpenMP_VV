@@ -1,5 +1,5 @@
 !===--test_target_map_program_array.F90 ----mapping of arrays in programs--===!
-! 
+!
 ! OpenMP API Version 4.5 Nov 2015
 !
 ! Testing the mapping of arrays that are created inside program
@@ -9,19 +9,17 @@
 #include "ompvv.F90"
 
 #define N 100
-      
+
       PROGRAM test_target_map_program_array
         USE iso_fortran_env
         USE ompvv_lib
         USE omp_lib
         implicit none
-        LOGICAL :: isSharedEnv
         INTEGER :: array_1d(N)
         INTEGER :: array_2d(N,N)
         INTEGER :: array_3d(N,N,N)
-        
+
         OMPVV_TEST_OFFLOADING
-        OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(isSharedEnv)
         OMPVV_TEST_VERBOSE(test_program_map_to_array() .ne. 0)
         OMPVV_TEST_VERBOSE(test_program_map_from_array() .ne. 0)
         OMPVV_TEST_VERBOSE(test_program_map_tofrom_array() .ne. 0)
@@ -29,7 +27,7 @@
         OMPVV_REPORT_AND_RETURN()
 
 
-        CONTAINS 
+        CONTAINS
           ! Function to tests the map (to:...)
           INTEGER FUNCTION  test_program_map_to_array()
             INTEGER :: helper_array_1d(N)
@@ -38,7 +36,7 @@
             INTEGER :: err_before, err_after
 
             OMPVV_GET_ERRORS(err_before)
-            
+
             OMPVV_INFOMSG("testing map(to...) of array in program")
 
             array_1d(:) = 10
@@ -63,13 +61,9 @@
             OMPVV_TEST_VERBOSE(ANY(helper_array_3d /= 10))
 
             ! check that it did not copy back
-            IF (.not. isSharedEnv) THEN
-              OMPVV_TEST_VERBOSE(ANY(array_1d /= 10))
-              OMPVV_TEST_VERBOSE(ANY(array_2d /= 10))
-              OMPVV_TEST_VERBOSE(ANY(array_3d /= 10))
-            ELSE
-              OMPVV_WARNING("Part of test ommited: shared data env")
-            END IF
+            OMPVV_TEST_VERBOSE(ANY(array_1d /= 10))
+            OMPVV_TEST_VERBOSE(ANY(array_2d /= 10))
+            OMPVV_TEST_VERBOSE(ANY(array_3d /= 10))
 
             OMPVV_GET_ERRORS(err_after)
 
@@ -85,7 +79,7 @@
             CHARACTER(len=400) :: msgHelper
 
             OMPVV_GET_ERRORS(err_before)
-            
+
             OMPVV_INFOMSG("testing map(from...) of array in program")
 
             array_1d(:) = 999
@@ -106,13 +100,11 @@
             !$omp end target
 
             ! Checking that data is not copied to the device
-            IF (.not. isSharedEnv) THEN
-              WRITE(msgHelper, *) "Array seemed to have been copied to &
-                & the device when using the from modifier."
-              OMPVV_WARNING_IF(ALL(helper_array_1d == 999), msgHelper)
-              OMPVV_WARNING_IF(ALL(helper_array_2d == 999), msgHelper)
-              OMPVV_WARNING_IF(ALL(helper_array_3d == 999), msgHelper)
-            END IF
+            WRITE(msgHelper, *) "Array seemed to have been copied to &
+              & the device when using the from modifier."
+            OMPVV_WARNING_IF(ALL(helper_array_1d == 999), msgHelper)
+            OMPVV_WARNING_IF(ALL(helper_array_2d == 999), msgHelper)
+            OMPVV_WARNING_IF(ALL(helper_array_3d == 999), msgHelper)
 
             OMPVV_TEST_VERBOSE(ANY(array_1d /= 20))
             OMPVV_TEST_VERBOSE(ANY(array_2d /= 20))
@@ -131,7 +123,7 @@
             INTEGER :: err_before, err_after
 
             OMPVV_GET_ERRORS(err_before)
-            
+
             OMPVV_INFOMSG("testing map(tofrom...) of array in program")
 
             array_1d(:) = 10
@@ -156,7 +148,7 @@
             OMPVV_TEST_VERBOSE(ANY(helper_array_2d /= 10))
             OMPVV_TEST_VERBOSE(ANY(helper_array_3d /= 10))
 
-            ! Testing the from functionality 
+            ! Testing the from functionality
             OMPVV_TEST_VERBOSE(ANY(array_1d /= 20))
             OMPVV_TEST_VERBOSE(ANY(array_2d /= 20))
             OMPVV_TEST_VERBOSE(ANY(array_3d /= 20))
@@ -167,4 +159,3 @@
 
           END FUNCTION test_program_map_tofrom_array
       END PROGRAM test_target_map_program_array
-

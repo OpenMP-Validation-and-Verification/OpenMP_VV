@@ -1,4 +1,4 @@
-//===------ FILE_NAME.c ------------------ Test title ---------------------===//
+//===------ FILE_NAME.c ---------------------------------------------------===//
 // 
 // OpenMP API Version 4.5 Nov 2015
 // 
@@ -37,8 +37,6 @@ int main() {
   OMPVV_ERROR("THIS IS IS AN EXAMPLE OF AN ERROR WITH PARAMETERS (%d, %s, %f)", 3, "ompvv", 3.3);
   OMPVV_ERROR_IF(1==1, "THIS IS IS AN EXAMPLE OF AN ERROR_IF 1==1");
   OMPVV_ERROR_IF(1==0, "THIS IS IS AN EXAMPLE OF AN ERROR_IF 1==0 (THIS SHOULD NOT BE DISPLAYED)");
-
-  OMPVV_TEST_SHARED_ENVIRONMENT;
 
   int errors = 0;
   OMPVV_TEST_AND_SET(errors, 1!=0); // Condition to generate an error

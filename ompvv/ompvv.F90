@@ -85,9 +85,9 @@
 #define OMPVV_SET_ERRORS(err) call set_errors(err)
 
 ! Macro for correct exit code
-#define OMPVV_RETURN(err) CALL EXIT(MERGE(EXIT_SUCCESS, EXIT_FAILURE, err == 0))
+#define OMPVV_RETURN(err) if( err .ne. 0) stop EXIT_FAILURE
 
-#define OMPVV_REPORT_AND_RETURN() CALL EXIT(MERGE(EXIT_SUCCESS, EXIT_FAILURE,  report_and_set_errors(__FILENAME__) == 0))
+#define OMPVV_REPORT_AND_RETURN() if( report_and_set_errors(__FILENAME__) .ne. 0) stop EXIT_FAILURE
 
 ! Macro to report warning if it is a shared environment
 #define OMPVV_TEST_SHARED_ENVIRONMENT call test_shared_environment(__FILENAME__, __LINE__)

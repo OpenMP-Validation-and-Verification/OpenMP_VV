@@ -2,10 +2,10 @@
 //
 // OpenMP API Version 4.5 Nov 2015
 //
-//  DESCRIPTION:  
+//  DESCRIPTION:
 //    OpenMp Example - Matrix Multiply - C Version
 //    Demonstrates a matrix multiply using OpenMP. Threads share row iterations
-//  
+//
 //  Last modified by Jose M Monsalve Diaz, December 25, 2019
 //
 ////===----------------------------------------------------------------------===//
@@ -16,17 +16,17 @@
 #include <sys/time.h>
 #include "ompvv.h"
 
-#define rowA 100        
-#define colA 100        
-#define colB 100        
+#define rowA 100
+#define colA 100
+#define colB 100
 
-int main (int argc, char *argv[]) 
+int main (int argc, char *argv[])
 {
   OMPVV_TEST_OFFLOADING;
   int tid, nthreads, i, j, k;
-  int	*a = (int*) malloc(sizeof(int) * rowA * colA);           // matrix A to be multiplied
-  int	*b = (int*) malloc(sizeof(int) * colA * colB);           // matrix B to be multiplied 
-  int	*c = (int*) malloc(sizeof(int) * rowA * colB);           // result matrix C 
+  int *a = (int*) malloc(sizeof(int) * rowA * colA);           // matrix A to be multiplied
+  int *b = (int*) malloc(sizeof(int) * colA * colB);           // matrix B to be multiplied
+  int *c = (int*) malloc(sizeof(int) * rowA * colB);           // result matrix C
 
   // Initialize matrices
   for (i = 0; i < rowA; i++)
@@ -63,4 +63,3 @@ int main (int argc, char *argv[])
 
   OMPVV_REPORT_AND_RETURN(error);
 }
-
