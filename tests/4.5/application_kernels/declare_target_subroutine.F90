@@ -8,6 +8,11 @@
 ! https://github.com/LLNL/FGPU/, derived from the OpenMP 4.5 examples.
 ! Thanks to David Richards and Aaron Black for providing this test.
 !
+! Note that the use of an explicit interface differs from that implicit
+! interface shown in OpenMP 4.5 examples on page 116 (declare_target.2.f90).
+! This is because the test_declare function uses a deferred-shape array
+! argument. Thanks to Tobias Burnus for correcting this.
+!
 !===------------------------------------------------------------------------===//
 
 
@@ -22,8 +27,13 @@ PROGRAM declare_target_subroutine
   implicit none
   INTEGER,POINTER:: a(:)
   INTEGER:: x, sum
-  
-  !$omp declare target(test_declare)
+
+  INTERFACE
+     SUBROUTINE test_declare(a, sum)
+       INTEGER,POINTER,INTENT(in) :: a(:)
+       INTEGER,INTENT(inout):: sum
+     END SUBROUTINE test_declare
+  END INTERFACE
 
   sum = 0
 
