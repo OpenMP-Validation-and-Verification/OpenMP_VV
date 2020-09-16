@@ -42,8 +42,8 @@ CONTAINS
          summation = summation + 1
       END DO
 
-      !$omp target map (to: scalar, a) map (from: x, y) map (delete:
-      !scalar, a)
+      !$omp target map(to: scalar, a) map(from: x, y) map(delete: &
+      !$omp& scalar, a)
       x = scalar
 
       DO i = 1, N
