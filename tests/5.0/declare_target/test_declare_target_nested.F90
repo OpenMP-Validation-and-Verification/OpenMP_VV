@@ -1,4 +1,4 @@
-!===--- test_declare_target_nested.F90 -------------------------------------===//
+!===--- test_declare_target_nested_functions.F90 -------------------------------------===//
 !
 ! OpenMP API Version 5.0 Nov 2018
 !
@@ -15,7 +15,7 @@
 
 #define N 1024
 
-PROGRAM test_declare_target_nested
+PROGRAM test_declare_target_nested_functions
 
   USE iso_fortran_env
   USE ompvv_lib
@@ -49,4 +49,4 @@ CONTAINS
     OMPVV_TEST_AND_SET_VERBOSE(errors, outcome .ne. 2)
 
     test_declared_functions = errors
-  END FUNCTION test_declared_functions  
+  END FUNCTION test_declare_target_nested_functions  
