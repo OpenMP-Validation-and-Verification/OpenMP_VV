@@ -42,7 +42,7 @@ endef
 ##################################################
 
 # Check if we are working on a git folder
-OMPVV_IS_GIT=${shell git rev-parse --is-inside-work-tree}
+OMPVV_IS_GIT=${shell git rev-parse --is-inside-work-tree 2> /dev/null}
 ifeq ("${OMPVV_IS_GIT}", "true")
   OMPVV_GIT_COMMIT=${shell git log -n 1 --pretty=format:%h}
 else
