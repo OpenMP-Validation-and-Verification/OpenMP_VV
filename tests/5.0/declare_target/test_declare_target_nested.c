@@ -32,13 +32,12 @@ int test_target() { //function in declare target statement
 
 //change values on device
 #pragma omp parallel for 
-{
   for (i = 0; i < N; i++) {
     a[i] = 5;
     b[i] = 10;
     c[i] = 15;
   }
-}
+
   //confirm updated values on host
   for (i = 0; i < N; i++) {
     if ( a[i] != 5 || b[i] != 10 || c[i] != 15) {
