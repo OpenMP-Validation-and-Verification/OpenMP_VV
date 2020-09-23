@@ -26,7 +26,7 @@ PROGRAM test_declare_target_nested_functions
 
     OMPVV_TEST_OFFLOADING
 
-    !!$omp declare target to(outer_fn)
+    !$omp declare target to(outer_fn)
 
     OMPVV_TEST_VERBOSE(test_declared_functions() .ne. 0)
 
