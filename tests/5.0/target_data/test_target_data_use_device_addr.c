@@ -23,10 +23,13 @@ int main() {
 
   OMPVV_TEST_OFFLOADING;
 
-#pragma omp target data map(to: device_data) use_device_addr(device_data)
+#pragma omp target data map(to: device_data)
     {
         int *dev_ptr;
-        dev_ptr = &device_data;
+#pragma omp target data use_device_addr(device_data)
+      {
+          dev_ptr = &device_data;
+      }
 #pragma omp target map(to:device_data) map(tofrom: errors) map(from: host_data) is_device_ptr(dev_ptr)
       {
           if(&device_data != dev_ptr)
