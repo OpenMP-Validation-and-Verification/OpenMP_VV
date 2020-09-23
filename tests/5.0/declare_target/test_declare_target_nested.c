@@ -52,7 +52,13 @@ int test_wrapper() { //wrapper for declare target function
   {
     test_target();
   }
-  #pragma omp target update from(errors)
+  #pragma omp target update from(errors, a, b, c)
+  
+  for (i = 0; i < N; i++) { //check array values on host
+    if ( a[i] != 5 || b[i] != 10 || c[i] != 15) {
+      errors++;  
+    } 
+  }
   return errors;
 }
 
