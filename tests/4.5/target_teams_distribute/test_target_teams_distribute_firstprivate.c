@@ -44,22 +44,22 @@ int main() {
 #pragma omp target data map(from: d[0:N]) map(to: a[0:N], b[0:N], c[0:N])
   {
 #pragma omp target teams distribute firstprivate(privatized_array, privatized) \
-  map(alloc: a[0:N], b[0:N], c[0:N], d[0:N]) num_teams(10)
+  map(alloc: a[0:N], b[0:N], c[0:N], d[0:N]) num_teams(OMPVV_NUM_TEAMS_DEVICE)
     for (int x = 0; x < N; ++x) {
       num_teams[x] = omp_get_num_teams();
       for (int y = 0; y < a[x] + b[x]; ++y) {
-	privatized++;
-	for (int z = 0; z < 10; ++z) {
-	  privatized_array[z]++;
-	}
+        privatized++;
+        for (int z = 0; z < 10; ++z) {
+          privatized_array[z]++;
+        }
       }
       d[x] = c[x] * privatized;
       for (int z = 0; z < 10; ++z) {
-	d[x] += privatized_array[z];
+        d[x] += privatized_array[z];
       }
       privatized = 0;
       for (int z = 0; z < 10; ++z) {
-	privatized_array[z] = 0;
+        privatized_array[z] = 0;
       }
     }
   }
@@ -85,7 +85,7 @@ int main() {
 #pragma omp target data map(from: d[0:N]) map(to: a[0:N], b[0:N], c[0:N])
   {
 #pragma omp target teams distribute firstprivate(privatized_array, privatized) \
-  map(alloc: a[0:N], b[0:N], c[0:N], d[0:N]) num_teams(10)
+  map(alloc: a[0:N], b[0:N], c[0:N], d[0:N]) num_teams(OMPVV_NUM_TEAMS_DEVICE)
     for (int x = 0; x < N; ++x) {
       num_teams[x] = omp_get_num_teams();
       d[x] = a[x] + b[x] + c[x] + privatized_array[x%10] + privatized;

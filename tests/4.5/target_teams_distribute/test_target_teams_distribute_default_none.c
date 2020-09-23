@@ -38,7 +38,7 @@ int main() {
 
 #pragma omp target data map(from: d[0:N], num_teams) map(to: a[0:N], b[0:N], c[0:N])
   {
-#pragma omp target teams distribute default(none) shared(a, b, c, d, num_teams) private(x, privatized)
+#pragma omp target teams distribute default(none) shared(a, b, c, d, num_teams) private(x, privatized) num_teams(OMPVV_NUM_TEAMS_DEVICE)
     for (x = 0; x < N; ++x) {
       privatized = 0;
       for (int y = 0; y < a[x] + b[x]; ++y) {
@@ -62,7 +62,7 @@ int main() {
 
 #pragma omp target data map(from: num_teams) map(to: b[0:N])
   {
-#pragma omp target teams distribute default(none) private(x) shared(share, b, num_teams) defaultmap(tofrom:scalar)
+#pragma omp target teams distribute default(none) private(x) shared(share, b, num_teams) defaultmap(tofrom:scalar) num_teams(OMPVV_NUM_TEAMS_DEVICE)
     for (x = 0; x < N; ++x) {
 #pragma omp atomic update
       share = share + b[x];
