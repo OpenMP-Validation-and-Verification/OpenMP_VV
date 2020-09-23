@@ -41,7 +41,7 @@ int target_update_to_mapper() {
     s.data[i] = i;
   }
 
-#pragma omp target update to(mapper(v))
+#pragma omp target update to(s)
 
 #pragma omp target map(tofrom: errors)
 {
@@ -58,7 +58,7 @@ int target_update_to_mapper() {
 
 int main() {
   
-  OMPVV_TEST_OFFlOADING;
+  OMPVV_TEST_OFFLOADING;
   
   int errors = 0;
   OMPVV_TEST_AND_SET_VERBOSE(errors, target_update_to_mapper());
