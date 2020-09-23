@@ -27,10 +27,8 @@ PROGRAM test_teams_distribute_default_none
        & does not guarantee that the default(none) is enforced."
    OMPVV_WARNING(infoMessage)
 
-   OMPVV_TEST_VERBOSE(default_none1() .ne. 0)  !check read/write to
-private
-   OMPVV_TEST_VERBOSE(default_none2() .ne. 0)  !check atomic update of
-shared
+   OMPVV_TEST_VERBOSE(default_none1() .ne. 0)  !check read/write to private
+   OMPVV_TEST_VERBOSE(default_none2() .ne. 0)  !check atomic update of shared
    OMPVV_REPORT_AND_RETURN()
 
 CONTAINS
@@ -57,6 +55,7 @@ CONTAINS
        d(x) = c(x) * privatized
        IF (omp_get_team_num() .eq. 0) THEN
           num_teams = omp_get_num_teams()
+       END IF
     END DO
 
     OMPVV_WARNING_IF(num_teams .eq. 1, "The number of teams was 1. This
@@ -68,7 +67,7 @@ specification error but we could not guarantee parallelism of teams.")
     END DO
 
     default_none1 = errors
-  END FUNCTION default_none1()
+  END FUNCTION default_none1
 
   INTEGER FUNCTION default_none2()
      INTEGER :: b(N)
@@ -79,8 +78,9 @@ specification error but we could not guarantee parallelism of teams.")
      !$omp teams distribute num_teams(4) default(none)
      !shared(share,b,num_teams)
      DO x = 1, N
-        !$omp atomic 
+        !$omp atomic update 
         share = share + b(x)
+        !$omp end atomic
         IF (omp_get_team_num .eq. 0) THEN
            num_teams = omp_get_num_teams()
         END IF

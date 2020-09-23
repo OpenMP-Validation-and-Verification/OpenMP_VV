@@ -28,10 +28,11 @@ PROGRAM test_teams
 CONTAINS
   INTEGER FUNCTION teams()
     CHARACTER(len=300):: infoMsg
-    INTEGER,DIMENSION(N):: num_teams, num_threads a, b
+    INTEGER,DIMENSION(N):: num_teams, num_threads, a, b
     INTEGER,DIMENSION(K):: errors
     INTEGER:: x
-    errors[2] = {0,0}
+    errors(1) = 0
+    errors(2) = 0
 
     DO x = 1, N
       num_teams(x) = -99
@@ -42,26 +43,32 @@ CONTAINS
     num_teams(omp_get_team_num()) = omp_get_num_teams()
     num_threads(omp_get_team_num()) = omp_get_num_threads()
 
-    OMPVV_WARNING_IF(num_teams(0) .eq. 1, "Test operated with one team,
+    OMPVV_WARNING_IF(num_teams(1) .eq. 1, "Test operated with one team,
 num_teams
 requested is inconsistent with this result")
 
-    OMPVV_ERROR_IF(num_teams(0) .le. 1, "omp_get_num_teams() reported a
+    OMPVV_ERROR_IF(num_teams(1) .le. 1, "omp_get_num_teams() reported a
 value
 less than one.")
 
-    OMPVV_WARNING_IF(num_threads(0) .eq. 1, "Team 0 reported only 1
+    OMPVV_WARNING_IF(num_threads(1) .eq. 1, "Team 0 reported only 1
 thread. This
 is inconsistent with the thread limit that has been set.")
 
-    DO x = 1, num_teams(0)
+    OMPVV_ERROR_IF(num_threads(1) .le. 1, "omp_get_num_threads() reported a value
+below one.")
+
+    DO x = 2, num_teams(1)
       IF (num_teams(x) .ne. num_teams(x-1))
-        errors(0) = errors(0) + 1
-      IF (num_threads(x) .ne. num_threads(x-1))
         errors(1) = errors(1) + 1
+      END IF
+      IF (num_threads(x) .ne. num_threads(x-1))
+        errors(2) = errors(2) + 1
+      END IF
     END DO
 
-  teams = errors
-END PROGRAM  test_teams 
+  teams = errors(1) + errors(2)
+  END FUNCTION teams
+END PROGRAM test_teams 
 
 

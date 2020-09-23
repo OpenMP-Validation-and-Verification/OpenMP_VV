@@ -23,42 +23,42 @@
 
 #define N 1024
 
-PROGRAM test_teams_distribute_default_shared
+PROGRAM test_team_default_shared
 
   USE iso_fortran_env
   USE ompvv_lib
   USE omp_lib
   implicit none
 
-  OMPVV_TEST_VERBOSE(test_default_shared() .ne. 0)
+  OMPVV_TEST_VERBOSE(test_teams() .ne. 0)
 
   OMPVV_REPORT_AND_RETURN()
 
 CONTAINS
-  INTEGER FUNCTION test_default_shared()
-  CHARACTER(len=300):: infoMsg
+  INTEGER FUNCTION test_teams()
   INTEGER,DIMENSION(N):: a
-  INTEGER:: share, errors, num_teams
+  INTEGER:: x, share, errors, num_teams
   errors = 0
-  share = 0 !can I do this on above line? multiple variable declarations
-in F90?
+  share = 0 
 
   DO x = 1, N
-    a[x] = x
+    a(x) = x
   END DO
 
-  !$omp target teams distribute default(shared) 
-  !$omp& num_teams(OMPVV_NUM_TEAMS_DEVICE)
-  DO x = 1, omp_get_num_teams
-    IF (omp_get_num_teams() .eq. 0) THEN
+  !$omp target teams distribute default(shared) num_teams(OMPVV_NUM_TEAMS_DEVICE)
+  DO x = 1, omp_get_num_teams()
+    IF (omp_get_team_num() .eq. 0) THEN
       num_teams = omp_get_num_teams();
     END IF
+  END DO
 
   !$omp atomic 
   share = share + 1
+  !$omp end atomic
 
   OMPVV_WARNING_IF(num_teams .eq. 1, "Test operated on one team, results
 of default shared test are inconclusive.");
 
-  test_default_shared = errors
-END PROGRAM test_target_teams_distribute_default_shared
+  test_teams = errors
+  END FUNCTION test_teams
+END PROGRAM test_team_default_shared
