@@ -17,37 +17,44 @@
 
 PROGRAM test_declare_target_nested_functions
 
-  USE iso_fortran_env
-  USE ompvv_lib
-  USE omp_lib
-  implicit none
+    USE iso_fortran_env
+    USE ompvv_lib
+    USE omp_lib
+    implicit none
+    INTEGER :: errors
+    errors = 0 
 
-  OMPVV_TEST_VERBOSE(test_default_functions .ne. 0)
+    OMPVV_TEST_OFFLOADING
 
-  OMPVV_REPORT_AND_RETURN()
+    !!$omp declare target to(outer_fn)
 
-CONTAINS
-  INTEGER FUNCTION inner_fn(a)
-    INTEGER:: a
-    inner_fn(a) = 1 + a
-  END FUNCTION inner_fn
+    OMPVV_TEST_VERBOSE(test_declared_functions() .ne. 0)
 
-  INTEGER FUNCTION outer_fn(a)
-    INTEGER:: a
-    out_fn(a) = 1 + inner_fn(a)
-  END FUNCTION outer_fn
+    OMPVV_REPORT_AND_RETURN()
 
-  INTEGER FUNCTION test_declared_functions() 
-    CHARACTER(len=300):: infoMsg
-    INTEGER:: outcome, errors
-    errors = 0
-    outcome = 0
+CONTAINS  
+    INTEGER FUNCTION inner_fn(a)
+      INTEGER:: a
+      inner_fn = 1 + a
+    END FUNCTION inner_fn
 
-    !$omp target map (tofrom: outcome)
-    outcome = outer_fn(outcome)
+    INTEGER FUNCTION outer_fn(a)
+      INTEGER:: a
+      outer_fn = 1 + inner_fn(a)
+    END FUNCTION outer_fn
+    
+    INTEGER FUNCTION test_declared_functions() 
+      INTEGER:: outcome, errors
+      errors = 0
+      outcome = 0
 
-    OMPVV_TEST_AND_SET_VERBOSE(errors, outcome .ne. 2)
+      !$omp target map (tofrom: outcome)
+      outcome = outer_fn(outcome)
+      !$omp end target
+    
+      OMPVV_TEST_AND_SET_VERBOSE(errors, outcome .ne. 2)
 
-    test_declared_functions = errors
-  END FUNCTION test_declared_functions
+      test_declared_functions = errors
+    END FUNCTION test_declared_functions
+
 END PROGRAM test_declare_target_nested_functions 
