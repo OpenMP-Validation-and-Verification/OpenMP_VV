@@ -35,7 +35,7 @@ int main() {
     d[x] = 0;
   }
 
-#pragma omp teams distribute num_teams(4) default(none) shared(a, b, c, d, num_teams) private(privatized)
+#pragma omp teams distribute num_teams(OMPVV_NUM_TEAMS_DEVICE) default(none) shared(a, b, c, d, num_teams) private(privatized)
     for (int x = 0; x < N; ++x) {
       privatized = 0;
       for (int y = 0; y < a[x] + b[x]; ++y) {
@@ -56,7 +56,7 @@ int main() {
     }
   }
 
-#pragma omp teams distribute num_teams(4) default(none) shared(share, b, num_teams)
+#pragma omp teams distribute num_teams(OMPVV_NUM_TEAMS_DEVICE) default(none) shared(share, b, num_teams)
     for (int x = 0; x < N; ++x) {
 #pragma omp atomic update
       share = share + b[x];
