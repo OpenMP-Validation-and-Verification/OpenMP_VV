@@ -31,8 +31,8 @@ int test_target_teams_distribute_parallel_for_num_teams() {
     for (i = 0; i < SIZE_N; i++) {
       num_teams[i] = -1;
     }
-#pragma omp target teams distribute parallel for\
-        map(tofrom: num_teams) num_teams(tested_num_teams[nt])
+#pragma omp target teams distribute parallel for          \
+  map(tofrom: num_teams) num_teams(tested_num_teams[nt])
     for (i = 0; i < SIZE_N; i++) {
       num_teams[i] = omp_get_num_teams();
     }
