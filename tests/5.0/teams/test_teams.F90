@@ -14,6 +14,7 @@
 #define K 2
 
 PROGRAM test_teams
+ 
   USE iso_fortran_env
   USE ompvv_lib
   USE omp_lib
@@ -26,7 +27,7 @@ PROGRAM test_teams
   OMPVV_REPORT_AND_RETURN()
 
 CONTAINS
-  INTEGER FUNCTION teams()
+    INTEGER FUNCTION teams()
     CHARACTER(len=300):: infoMsg
     INTEGER,DIMENSION(N):: num_teams, num_threads, a, b
     INTEGER,DIMENSION(K):: errors
@@ -59,16 +60,16 @@ is inconsistent with the thread limit that has been set.")
 below one.")
 
     DO x = 2, num_teams(1)
-      IF (num_teams(x) .ne. num_teams(x-1))
+      IF (num_teams(x) .ne. num_teams(x-1)) THEN
         errors(1) = errors(1) + 1
       END IF
-      IF (num_threads(x) .ne. num_threads(x-1))
+      IF (num_threads(x) .ne. num_threads(x-1)) THEN
         errors(2) = errors(2) + 1
       END IF
     END DO
 
-  teams = errors(1) + errors(2)
-  END FUNCTION teams
+    teams = errors(1) + errors(2)
+    END FUNCTION teams
 END PROGRAM test_teams 
 
 

@@ -45,8 +45,7 @@ CONTAINS
        d(x) = 0
     END DO
 
-    !$omp teams distribute num_teams(4) default(none)&
-    !$omp& shared(a,b,c,d,num_teams) private(privatized)
+    !$omp teams distribute num_teams(4) default(none) shared(a,b,c,d,num_teams) private(privatized)
     DO x = 1, N
        privatized = 0
        DO y = 1, a(x) + b(x)
@@ -75,13 +74,12 @@ specification error but we could not guarantee parallelism of teams.")
      errors = 0
      share = 0
 
-     !$omp teams distribute num_teams(4) default(none)
-     !shared(share,b,num_teams)
+     !$omp teams distribute num_teams(4) default(none) shared(share,b,num_teams)
      DO x = 1, N
         !$omp atomic update 
         share = share + b(x)
         !$omp end atomic
-        IF (omp_get_team_num .eq. 0) THEN
+        IF (omp_get_team_num() .eq. 0) THEN
            num_teams = omp_get_num_teams()
         END IF
      END DO
