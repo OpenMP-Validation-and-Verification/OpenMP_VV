@@ -99,7 +99,7 @@
 
              ! This is not part of the test but it is necessary for garbage
              ! collection
-             !$omp target exit data map(delete: a(1:s), b(1:s)) 
+             !$omp target exit data if(s > THRESHOLD) map(delete: a(1:s), b(1:s)) 
 
            END DO ! s
 
