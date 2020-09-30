@@ -40,7 +40,9 @@ int test_target_teams_distribute_parallel_for_devices() {
     // check multiple devices 
 #pragma omp target teams distribute parallel for device(dev) map(tofrom: isHost)
     for (i = 0; i < SIZE_N; i++) {
-      isHost[dev] = omp_is_initial_device();// Checking if running on a device
+      if (omp_get_team_num() == 0 && omp_get_thread_num() == 0) {
+        isHost[dev] = omp_is_initial_device();// Checking if running on a device
+      }
       a[i] += dev;
     }
   }
