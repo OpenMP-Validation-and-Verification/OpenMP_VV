@@ -2,10 +2,10 @@
 //
 // OpenMP API Version 5.0 Nov 2018
 //
-// Adapted from OpenMP examples acquire_release.2.c
-// When the atomic read operation on thread 1 reads a non-zero value from y,
-// this results in a release/acquire synchronization that in turn implies that
-// the assignment to x on thread 0 happens before the read of x on thread 1.
+// This test checks that the atomic construct can be used within the target
+// teams distribute parallel for construct with simd to avoid a race
+// condition in updating a shared variable, whose value is checked after
+// updating.
 //
 ////===----------------------------------------------------------------------===//
 #include <assert.h>
