@@ -30,6 +30,8 @@ PROGRAM test_team_default_shared
   USE omp_lib
   implicit none
 
+  OMPVV_TEST_OFFLOADING
+ 
   OMPVV_TEST_VERBOSE(test_teams() .ne. 0)
 
   OMPVV_REPORT_AND_RETURN()
