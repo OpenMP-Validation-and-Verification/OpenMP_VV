@@ -47,7 +47,8 @@
             !Collapse is only for one loop.  Second loop should be sequential
 
             !$omp target teams distribute map(to: a(1:N, 1:N)) map(tofrom: &
-            !$omp& b(1:N, 1:N+1)) map(from: num_teams) collapse(1)
+            !$omp& b(1:N, 1:N+1)) map(from: num_teams) collapse(1) &
+            !$omp& num_teams(OMPVV_NUM_TEAMS_DEVICE)
             DO x = 1, N
               DO y = 1, N
                 b(x, y + 1) = b(x, y) + a(x, y)
@@ -91,7 +92,8 @@
             END DO
 
             !$omp target teams distribute map(to: a(1:N, 1:N, 1:N)) &
-            !$omp& map(tofrom: b(1:N, 1:N, 1:N+1)) collapse(2)
+            !$omp& map(tofrom: b(1:N, 1:N, 1:N+1)) collapse(2) &
+            !$omp& num_teams(OMPVV_NUM_TEAMS_DEVICE)
             DO x = 1, N
               DO y = 1, N
                 DO z = 1, N

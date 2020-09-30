@@ -45,7 +45,7 @@ CONTAINS
 
     !$omp target data map(from: d(1:N)) map(to: a(1:N), b(1:N), c(1:N))
     !$omp target teams distribute default(none) shared(a, b, c, d) &
-    !$omp& private(x, y, privatized)
+    !$omp& private(x, y, privatized) num_teams(OMPVV_NUM_TEAMS_DEVICE)
     DO x = 1, N
        privatized = 0
        DO y = 1, a(x) + b(x)
@@ -74,7 +74,7 @@ CONTAINS
 
     !$omp target data map(to: a(1:N)) map(tofrom: share)
     !$omp target teams distribute default(none) private(x) &
-    !$omp& shared(share, a) defaultmap(tofrom:scalar)
+    !$omp& shared(share, a) defaultmap(tofrom:scalar) num_teams(OMPVV_NUM_TEAMS_DEVICE)
     DO x = 1, N
        !$omp atomic
        share = share + a(x)

@@ -120,7 +120,7 @@ _Pragma("omp target map (from: _ompvv_isOffloadingOn) map(to: _ompvv_isSharedEnv
 
 // Macros to provide thread and team nums if they are not specified
 #ifndef OMPVV_NUM_THREADS_DEVICE
-  #define OMPVV_NUM_THREADS_DEVICE 128
+  #define OMPVV_NUM_THREADS_DEVICE 8
 #endif
 
 #ifndef OMPVV_NUM_TEAMS_DEVICE
