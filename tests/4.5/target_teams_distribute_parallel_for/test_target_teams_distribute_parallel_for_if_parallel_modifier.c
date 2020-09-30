@@ -48,12 +48,12 @@ void checkPreconditions() {
   // Get the init_num_threads for host and device. If it is 1, then we 
   // cannot test the if parallel 
   // See section 2.5.1 of the ref manual
-#pragma omp target teams distribute parallel for num_threads(10)
+#pragma omp target teams distribute parallel for num_threads(OMPVV_NUM_THREADS_DEVICE)
   for (i = 0; i < SIZE_N; i++) {
     init_num_threads_dev[i] = omp_get_num_threads();
   }
 
-#pragma omp parallel for num_threads(10)
+#pragma omp parallel for num_threads(OMPVV_NUM_THREADS_DEVICE)
   for (i = 0; i < SIZE_N; i++) {
     init_num_threads_host[i] = omp_get_num_threads();
   }
@@ -102,7 +102,7 @@ int test_target_teams_distribute_if_parallel_modifier() {
   // warning if the number of threads is 1 when the condition evaluates to true. 
   for (attempt = 0; attempt < NUM_ATTEMPTS; ++attempt) {
 #pragma omp target teams distribute parallel for if(parallel: attempt >= ATTEMPT_THRESHOLD)\
-    map(tofrom: a, warning) num_threads(10)
+    map(tofrom: a, warning) num_threads(OMPVV_NUM_THREADS_DEVICE)
     for (i = 0; i < SIZE_N; i++) {
       if (omp_is_initial_device())
         a[i] += 10; // This +10 should not happen
