@@ -22,11 +22,12 @@ PROGRAM test_declare_target_nested_functions
     USE omp_lib
     implicit none
     INTEGER :: errors
-    errors = 0 
-
-    OMPVV_TEST_OFFLOADING
-
+    
     !$omp declare target to(outer_fn)
+    
+    errors = 0 
+     
+    OMPVV_TEST_OFFLOADING
 
     OMPVV_TEST_VERBOSE(test_declared_functions() .ne. 0)
 
@@ -35,11 +36,19 @@ PROGRAM test_declare_target_nested_functions
 CONTAINS  
     INTEGER FUNCTION inner_fn(a)
       INTEGER:: a
-      inner_fn = 1 + a
+      
+      OMPVV_ERROR_IF(omp_is_initial_device(), "Target region executed on host&
+      & instead of device, test fails on the host")
+     
+       inner_fn = 1 + a
     END FUNCTION inner_fn
 
     INTEGER FUNCTION outer_fn(a)
       INTEGER:: a
+      
+      OMPVV_ERROR_IF(omp_is_initial_device(), "Target region executed on host&
+      & instead of device, test fails on the host")
+
       outer_fn = 1 + inner_fn(a)
     END FUNCTION outer_fn
     
