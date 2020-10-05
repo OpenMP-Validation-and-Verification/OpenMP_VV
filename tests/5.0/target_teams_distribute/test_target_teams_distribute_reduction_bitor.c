@@ -23,7 +23,7 @@ int test_bitor() {
   double true_margin = pow(exp(1), log(.5)/N);
   int errors = 0;
   int num_teams[N];
-  int have_true, have_false;
+  int have_true = 0, have_false = 0;
   int num_attempts = 0;
   srand(1);
 
