@@ -22,9 +22,9 @@ int test_or() {
   double true_margin = pow(exp(1), log(.5)/N);   // See the 'and' operator test for
   int errors = 0;                                // an explanation of this math.
   int num_teams[N];
-  int tested_true;
-  int tested_false;
-  int itr_count;
+  int tested_true = 0;
+  int tested_false = 0;
+  int itr_count = 0;
   srand(1);
 
   while ((!tested_true || !tested_false) && (itr_count < THRESHOLD)) {
