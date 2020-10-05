@@ -45,7 +45,7 @@ CONTAINS
        d(x) = 0
     END DO
 
-    !$omp teams distribute num_teams(4) default(none) shared(a,b,c,d,num_teams) private(privatized)
+    !$omp teams distribute num_teams(OMPVV_NUM_TEAMS_DEVICE) default(none) shared(a,b,c,d,num_teams) private(privatized)
     DO x = 1, N
        privatized = 0
        DO y = 1, a(x) + b(x)
@@ -62,7 +62,7 @@ is not a
 specification error but we could not guarantee parallelism of teams.")
 
     DO x = 1, N
-       OMPVV_TEST_AND_SET(errors, (d(x) .ne. (1 + x)*2*x)) !Add EXIT?
+       OMPVV_TEST_AND_SET(errors, (d(x) .ne. (1 + x)*2*x))
     END DO
 
     default_none1 = errors
@@ -85,8 +85,7 @@ specification error but we could not guarantee parallelism of teams.")
      END DO
 
      OMPVV_WARNING_IF(num_teams .eq. 1, "The number of teams was 1. This
-is not a
-specification error but we could not guarantee parallelism of teams.")
+is not a specification error but we could not guarantee parallelism of teams.")
 
      DO x = 1, N
         share = share - x;
