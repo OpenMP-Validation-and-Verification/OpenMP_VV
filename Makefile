@@ -139,11 +139,11 @@ endif
 ifeq "$(SOURCES)" ""
 # Getting all the source files in the project
 ifdef LINK_OMPVV_LIB
-SOURCES_C := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -name *.c)
+SOURCES_C := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -name "*.c")
 else
-SOURCES_C := $(shell find $(CURDIR)/tests/$(OMP_VERSION) ! -name qmcpack_target_static_lib.c -name *.c)
+SOURCES_C := $(shell find $(CURDIR)/tests/$(OMP_VERSION) ! -name qmcpack_target_static_lib.c -name "*.c")
 endif
-SOURCES_CPP := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -name *.cpp)
+SOURCES_CPP := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -name "*.cpp")
 SOURCES_F := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -name "*.F90" -o -name "*.F95" -o -name "*.F03" -o -name "*.F" -o -name "*.FOR" | grep -v "ompvv.F90")
 
 # Find all the binary files that have been previously compiled

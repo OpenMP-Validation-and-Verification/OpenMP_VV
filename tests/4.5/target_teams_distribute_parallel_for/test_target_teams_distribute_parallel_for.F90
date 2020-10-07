@@ -36,7 +36,8 @@
             OMPVV_INFOMSG("target_teams_distribute_parallel_for")
             OMPVV_GET_ERRORS(errors_bf)
 
-            !$omp target teams distribute parallel do map(from:num_teams, num_threads)
+            !$omp target teams distribute parallel do map(from:num_teams, num_threads) &
+            !$omp& num_teams(OMPVV_NUM_TEAMS_DEVICE) num_threads(OMPVV_NUM_THREADS_DEVICE)
             DO i = 1, ARRAY_SIZE, 1
               !$omp atomic write 
               num_teams = omp_get_num_teams()
