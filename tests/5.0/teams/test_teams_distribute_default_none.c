@@ -1,4 +1,4 @@
-//===--- test_teams_default_none.c------------------------------------------===//
+//===--- test_teams_distribute_default_none.c----------------------------------===//
 //
 // OpenMP API Version 5.0 Nov 2018
 //
@@ -6,7 +6,7 @@
 // The test aims to validate that all values will not have default data sharing
 // attributes.
 //
-////===----------------------------------------------------------------------===//
+////===------------------------------------------------------------------------===//
 
 #include <omp.h>
 #include <stdio.h>
