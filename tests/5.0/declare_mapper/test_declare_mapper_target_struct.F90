@@ -30,6 +30,7 @@ PROGRAM main
     USE omp_lib
     implicit none
     INTEGER :: errors
+    
     errors = 0 
 
     OMPVV_TEST_OFFLOADING
@@ -48,7 +49,10 @@ CONTAINS
         allocate(s%data(N))
         s%data(1:N) = 0.0d0
         s%len = N
-        s%data = [(i, i=1, s%len)] 
+
+        !$omp target
+        CALL init(s) 
+        !$omp end target 
 
         DO i=1, N
             IF (s%data(i) .ne. i) THEN
@@ -59,3 +63,10 @@ CONTAINS
         test_declare_mapper = errors
     END FUNCTION test_declare_mapper
 END PROGRAM main
+
+SUBROUTINE init(s)
+    use my_struct
+    type(newvec) :: s
+
+    s%data = [(i, i = 1, s%len)]
+END SUBROUTINE
