@@ -26,7 +26,7 @@ int test_target_teams_distribute_parallel_for_simd_atomic() {
     x += 1;
   }
 
-  OMPVV_TEST_AND_SET_VERBOSE(errors, x != N)
+  OMPVV_TEST_AND_SET_VERBOSE(errors, x != N);
 
   return errors;
 }
@@ -34,6 +34,8 @@ int test_target_teams_distribute_parallel_for_simd_atomic() {
 
 int main() {
   int errors = 0;
+  OMPVV_TEST_OFFLOADING;
+
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_target_teams_distribute_parallel_for_simd_atomic());
 
   OMPVV_REPORT_AND_RETURN(errors);
