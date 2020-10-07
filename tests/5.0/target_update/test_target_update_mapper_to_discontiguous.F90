@@ -60,7 +60,7 @@ CONTAINS
         END DO
         !$omp end target
 
-        test_target_update_mapper() = errors
+        test_target_update_mapper = errors
 
     END FUNCTION test_target_update_mapper
 END PROGRAM main
