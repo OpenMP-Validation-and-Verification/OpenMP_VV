@@ -32,6 +32,7 @@ int test_target_and_task_nowait() {
        errors += 1; 
      }
   }
+  #pragma omp taskwait
   if (sum != N) {
     errors++;
   }
