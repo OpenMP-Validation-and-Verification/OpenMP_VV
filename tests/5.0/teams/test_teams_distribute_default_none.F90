@@ -69,15 +69,19 @@ specification error but we could not guarantee parallelism of teams.")
   END FUNCTION default_none1
 
   INTEGER FUNCTION default_none2()
-     INTEGER :: b(N)
+     INTEGER :: g(N)
      INTEGER :: share, x, num_teams, errors
      errors = 0
      share = 0
 
-     !$omp teams distribute num_teams(4) default(none) shared(share,b,num_teams)
+     DO x = 1, N
+        g(x) = x
+     END DO
+
+     !$omp teams distribute num_teams(OMPVV_NUM_TEAMS_DEVICE) default(none) shared(share,g,num_teams)
      DO x = 1, N
         !$omp atomic update 
-        share = share + b(x)
+        share = share + g(x)
         !$omp end atomic
         IF (omp_get_team_num() .eq. 0) THEN
            num_teams = omp_get_num_teams()

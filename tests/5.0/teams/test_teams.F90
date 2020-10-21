@@ -29,22 +29,26 @@ PROGRAM test_teams
 CONTAINS
     INTEGER FUNCTION teams()
     CHARACTER(len=300):: infoMsg
-    INTEGER,DIMENSION(N):: num_teams, num_threads, a, b
+    INTEGER,DIMENSION(OMPVV_NUM_TEAMS_DEVICE):: num_teams 
+    INTEGER,DIMENSION(OMPVV_NUM_THREADS_DEVICE):: num_threads
     INTEGER,DIMENSION(K):: errors
     INTEGER:: x
     errors(1) = 0
     errors(2) = 0
 
-    DO x = 1, N
+    DO x = 1, OMPVV_NUM_TEAMS_DEVICE
       num_teams(x) = -99
+    END DO
+
+    DO x = 1, OMPVV_NUM_THREADS_DEVICE
       num_threads(x) = -99
     END DO
 
     !$omp teams num_teams(OMPVV_NUM_TEAMS_DEVICE) thread_limit(OMPVV_NUM_THREADS_DEVICE)
     num_teams(omp_get_team_num()) = omp_get_num_teams()
     num_threads(omp_get_team_num()) = omp_get_num_threads()
-    !$omp end teams
-     
+    !$omp end teams 
+    
     OMPVV_WARNING_IF(num_teams(1) .eq. 1, "Test operated with one team,
 num_teams requested is inconsistent with this result")
 
