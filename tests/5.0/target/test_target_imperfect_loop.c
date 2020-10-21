@@ -15,44 +15,42 @@
 #include <stdlib.h>
 #include "ompvv.h"
 
-#define N 1000
+#define N 10
 
 int test_target_imperfect_loop() {
   OMPVV_INFOMSG("test_target_imperfect_loop");
 
-  double data[N][N];
+  int data1[N], data2[N][N];
+  int errors = 0;
 
 
   for( int i = 0; i < N; i++){
+    data1[i] = 0;
     for(int j = 0; j < N; j++){
-      data[i][j] = 0.0;
+      data2[i][j] = 0;
     }
   }
 
 
-#pragma omp target map(tofrom: data)
+#pragma omp target map(tofrom: data1, data2)
   {
 #pragma omp parallel for collapse(2)
-    {
       for( int i = 0; i < N; i++){
-        data[i][i] = 10*i;
+        data1[i] += i;
         for(int j = 0; j < N; j++){
-          data[i][j] += i + j;
+          data2[i][j] += i + j;
         }
       }
-    }
   }
-
-  int sum = 0.0;
 
   for( int i=0;i<N;i++){
+    OMPVV_TEST_AND_SET(errors,data1[i] != i);
+    printf("data1[%d] = %d \n", i, data1[i]);
     for(int j=0;j<N;j++){
-      sum += data[i][j] - (i+j);
+      OMPVV_TEST_AND_SET(errors,data2[i][j] != (i+j));
+ //     printf("data2[%d][%d] = %d \n", i, j, data2[i][j]);
     }
   }
-
-
-  OMPVV_TEST_AND_SET(errors,sum!=(N*(N-1)*5));
 
   return errors;
 }
