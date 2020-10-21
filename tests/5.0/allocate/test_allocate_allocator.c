@@ -19,7 +19,7 @@
 
 #define N 1024
 
-int test_requires() {
+int test_allocate_allocator() {
   int errors = 0;
 
   int* x;
@@ -51,7 +51,7 @@ int main() {
 
   int errors = 0;
 
-  OMPVV_TEST_AND_SET_VERBOSE(errors, test_requires() != 0);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_allocate_allocator() != 0);
 
   OMPVV_REPORT_AND_RETURN(errors);
 }
