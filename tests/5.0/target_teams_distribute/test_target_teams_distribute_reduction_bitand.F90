@@ -79,8 +79,8 @@ CONTAINS
        itr_count = itr_count + 1
     END DO
 
-    OMPVV_TEST_AND_SET_VERBOSE(.NOT. tested_true, "Did not test true case")
-    OMPVV_TEST_AND_SET_VERBOSE(.NOT. tested_false, "Did not test false case")
+    OMPVV_WARNING_IF(.NOT. tested_true, "Did not test true case")
+    OMPVV_WARNING_IF(.NOT. tested_false, "Did not test false case")
 
     test_bitand = errors
   END FUNCTION test_bitand

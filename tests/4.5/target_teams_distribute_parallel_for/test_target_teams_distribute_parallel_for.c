@@ -36,7 +36,7 @@ int test_target_teams_distribute_parallel_for() {
   }
 
 
-#pragma omp target teams distribute parallel for map(from:num_teams, num_threads)
+#pragma omp target teams distribute parallel for map(from:num_teams, num_threads) num_teams(OMPVV_NUM_TEAMS_DEVICE) num_threads(OMPVV_NUM_THREADS_DEVICE)
   for (i = 0; i < ARRAY_SIZE; ++i) {
 #pragma omp atomic write
     num_teams = omp_get_num_teams();

@@ -139,11 +139,11 @@ endif
 ifeq "$(SOURCES)" ""
 # Getting all the source files in the project
 ifdef LINK_OMPVV_LIB
-SOURCES_C := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -name *.c)
+SOURCES_C := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -name "*.c")
 else
-SOURCES_C := $(shell find $(CURDIR)/tests/$(OMP_VERSION) ! -name qmcpack_target_static_lib.c -name *.c)
+SOURCES_C := $(shell find $(CURDIR)/tests/$(OMP_VERSION) ! -name qmcpack_target_static_lib.c -name "*.c")
 endif
-SOURCES_CPP := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -name *.cpp)
+SOURCES_CPP := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -name "*.cpp")
 SOURCES_F := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -name "*.F90" -o -name "*.F95" -o -name "*.F03" -o -name "*.F" -o -name "*.FOR" | grep -v "ompvv.F90")
 
 # Find all the binary files that have been previously compiled
@@ -483,6 +483,7 @@ help:
 	@echo "  LOG_ALL=1                 Enables dump of the make process output, errors, and binary execution outputs into logs.txt"
 	@echo "  SYSTEM=sys_name           Includes the definitions for the requires modules and batch schedulers in the different systems"
 	@echo "                            This definitions must be in sys/SYSTEM.def. (Do not include the .def extension)"
+	@echo "  DEVICE_TYPE=dev_name      Specifies device type being used, either nvidia or amd, to change compiler flags as needed."
 	@echo "  MODULE_LOAD=1             Before compiling or running, module load is called"
 	@echo "  ADD_BATCH_SCHED=1         Add the jsrun command before the execution of the running script to send it to a compute node"
 	@echo "  NO_OFFLOADING=1           Turn off offloading"

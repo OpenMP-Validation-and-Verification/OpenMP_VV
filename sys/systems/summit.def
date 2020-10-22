@@ -16,21 +16,28 @@ CCOMPILERS="clang, gcc, xlc"
 
 # GCC compiler
 ifeq ($(CC), gcc)
-  C_COMPILER_MODULE = gcc/8.1.1
+  C_COMPILER_MODULE = gcc/10.2.0
   C_VERSION = gcc -dumpversion
 endif
 
 # IBM XL compiler
 ifeq ($(CC), xlc)
-  C_COMPILER_MODULE = xl/16.1.1-3
-  C_VERSION = xlc -qversion | grep "Version: .*$$" | sed "s/Version: //g"
+  C_COMPILER_MODULE = xl/16.1.1-8
+  C_VERSION = xlc -qversion | grep "Version: .*" | sed "s/Version: //g"
 endif
 
 # Clang compiler
+# ifeq ($(CC), clang)
+#   C_COMPILER_MODULE = llvm/1.0-20190225
+#   C_VERSION = clang -v 2>&1 | grep -oh "clang version [0-9.]*"| grep -oh "version .*" | sed "s/.*/& CORAL/"
+# endif
+
+# Clang compiler
 ifeq ($(CC), clang)
-  C_COMPILER_MODULE = llvm/1.0-20180531
-  C_VERSION = clang -v 2>&1 | grep -oh 'clang version [0-9.]*'| grep -oh 'version .*' | sed 's/.*/& CORAL/'
+  C_COMPILER_MODULE = llvm/11.0.0-rc1; module load cuda/10.1.243
+  C_VERSION = clang -v 2>&1 | grep -oh "clang version [0-9.]*" | grep -oh "version .*"
 endif
+
 
 #---------------------------------------------------------------------------
 # C++ compilers
@@ -39,20 +46,26 @@ CXXCOMPILERS="clang++, g++, xlc++"
 
 # GCC compiler
 ifeq ($(CXX), g++)
-  CXX_COMPILER_MODULE = gcc/8.1.1
+  CXX_COMPILER_MODULE = gcc/10.2.0
   CXX_VERSION = g++ -dumpversion
 endif
 
 # IBM XL compiler
 ifeq ($(CXX), xlc++)
-  CXX_COMPILER_MODULE =  xl/16.1.1-3
-  CXX_VERSION = xlc -qversion | grep "Version: .*$$" | sed "s/Version: //g"
+  CXX_COMPILER_MODULE =  xl/16.1.1-8
+  CXX_VERSION = xlc -qversion | grep "Version: .*" | sed "s/Version: //g"
 endif
 
 # Clang compiler
+# ifeq ($(CXX), clang)
+#   CXX_COMPILER_MODULE = llvm/1.0-20190225
+#   CXX_VERSION = clang -v 2>&1 | grep -oh "clang version [0-9.]*"| grep -oh "version .*" | sed "s/.*/& CORAL/"
+# endif
+
+# Clang compiler
 ifeq ($(CXX), clang++)
-  CXX_COMPILER_MODULE = llvm/1.0-20180531
-  CXX_VERSION = clang++ -v 2>&1 | grep -oh 'clang version [0-9.]*' | grep -oh 'version .*' | sed 's/.*/& CORAL/'
+  CXX_COMPILER_MODULE = llvm/11.0.0-rc1; module load cuda/10.1.243
+  CXX_VERSION = clang++ -v 2>&1 | grep -oh "clang version [0-9.]*" | grep -oh "version .*"
 endif
 
 #---------------------------------------------------------------------------
@@ -62,15 +75,14 @@ FCOMPILERS="gfortran, xlf"
 
 # GCC compiler
 ifeq ($(FC), gfortran)
-  F_COMPILER_MODULE = gcc/8.1.1
+  F_COMPILER_MODULE = gcc/10.2.0
   F_VERSION = gfortran -dumpversion
 endif
 
 # IBM XL compiler
-# Summitdev happens to have a wrapper that without it we cannot execute 
-# xlf with OMP 4.5 support. This wrapper is xlf_r
+# Summit happens to have a wrapper that we need in order to execute
+# xlf with OMP 4.5 support. This wrapper is xlf_r.
 ifeq ($(FC), $(filter $(FC), xlf xlf_r))
-  F_COMPILER_MODULE = xl/16.1.1-3 
-  F_VERSION = xlf -qversion | grep 'Version: .*$$' | sed 's/Version: //g' 
+  F_COMPILER_MODULE = xl/16.1.1-8
+  F_VERSION = xlf -qversion | grep "Version: .*" | sed "s/Version: //g"
 endif
-

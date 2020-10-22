@@ -41,7 +41,7 @@ CONTAINS
     END DO
 
     !$omp target teams distribute default(private) shared(a, &
-    !$omp& b, c, d)
+    !$omp& b, c, d) num_teams(OMPVV_NUM_TEAMS_DEVICE)
     DO x = 1, N
        privatized = 0
        DO y = 1, a(x) + b(x)

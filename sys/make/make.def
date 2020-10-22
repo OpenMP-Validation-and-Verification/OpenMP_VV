@@ -34,7 +34,7 @@
 # Loading modules
 ##################################################
 define loadModules
-       $(if $(MODULE_LOAD), module load $(1) $(CUDA_MODULE) $(if $(or $(QUIET), $(2)), > /dev/null 2> /dev/null,);,)
+  $(if $(MODULE_LOAD), module load $(CUDA_MODULE) $(1) $(if $(or $(QUIET), $(2)), > /dev/null 2> /dev/null,);,)
 endef
 
 ##################################################
@@ -42,7 +42,7 @@ endef
 ##################################################
 
 # Check if we are working on a git folder
-OMPVV_IS_GIT=${shell git rev-parse --is-inside-work-tree}
+OMPVV_IS_GIT=${shell git rev-parse --is-inside-work-tree 2> /dev/null}
 ifeq ("${OMPVV_IS_GIT}", "true")
   OMPVV_GIT_COMMIT=${shell git log -n 1 --pretty=format:%h}
 else
@@ -67,11 +67,21 @@ CC?=none
 CPP?=none
 FC?=none
 
-# CRAY compiler
-ifeq ($(CC), cc)
-  CFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
-  CLINK = cc
-  CLINKFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
+# CRAY compilers
+ifeq ($(DEVICE_TYPE), amd)
+  # CRAY compiler (AMD)
+  ifeq ($(CC), cc)
+    CFLAGS += -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa
+    CLINK = cc
+    CLINKFLAGS += -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa
+  endif
+else ifeq ($(DEVICE_TYPE), nvidia)
+  # CRAY compiler (NVIDIA)
+  ifeq ($(CC), cc)
+    CFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target
+    CLINK = cc
+    CLINKFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target
+  endif
 endif
 
 # GCC compiler
@@ -81,7 +91,7 @@ ifeq ($(CC), gcc)
   CFLAGS += -O3 -std=c99 -fopenmp $(COFFLOADING)
   CLINK = gcc
   CLINKFLAGS += -O3 -fopenmp $(COFFLOADING)
-  C_VERSION = echo "$(shell gcc --version | head -n 1 | sed 's/.* \([0-9]*\.[0-9]*\.[0-9]*\).*/\1/g')"
+  C_VERSION = echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") gcc --version | head -n 1 | sed 's/.* \([0-9]*\.[0-9]*\.[0-9]*\).*/\1/g')"
 endif
 
 # IBM XL compiler
@@ -102,13 +112,13 @@ ifeq ($(CC), clang)
   CFLAGS +=  -D__NO_MATH_INLINES -U__SSE2_MATH__ -U__SSE_MATH__
   CLINK = clang
   CLINKFLAGS += -lm -O3 -fopenmp $(COFFLOADING)
-  C_VERSION = echo "$(shell clang --version | head -n 1 | sed 's/clang version \([0-9]*\.[0-9]*\.[0-9]*\)/\1/g')"
+  C_VERSION = echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") clang --version | head -n 1 | sed 's/clang version \([0-9]*\.[0-9]*\.[0-9]*\)/\1/g')"
 endif
 
 # AOMP compiler
 ifeq ($(CC), aomp)
   $(warning "AOMP is still experimental. AOMP uses clang front end, make sure the clang aomp is selected")
-  INSTALLED_GPU  = $(shell $(call loadModules, $(C_COMPILER_MODULE)) mygpu -d gfx900 2> /dev/null)
+  INSTALLED_GPU  = $(shell $(call loadModules, $(C_COMPILER_MODULE),"shut up") mygpu -d gfx900 2> /dev/null)
   AOMP_GPU       ?= $(INSTALLED_GPU)
   AOMP_CPUTARGET ?= x86_64-pc-linux-gnu
   ifeq (sm_,$(findstring sm_,$(AOMP_GPU)))
@@ -146,11 +156,21 @@ endif
 CXXCOMPILERS?="clang++, g++, xlc++"
 CXX_VERSION?= echo "version unknown"
 
-# CRAY compiler
-ifeq ($(CXX), CC)
-  CXXFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
-  CXXLINK = cc
-  CXXLINKFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
+# CRAY compilers
+ifeq ($(DEVICE_TYPE), amd)
+  # CRAY compiler (AMD)
+  ifeq ($(CXX), CC)
+    CXXFLAGS += -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx906
+    CXXLINK = cc
+    CXXLINKFLAGS += -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx906
+  endif
+else
+  # CRAY compiler (NVIDIA)
+  ifeq ($(CXX), CC)
+    CXXFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
+    CXXLINK = cc
+    CXXLINKFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
+  endif
 endif
 
 # GCC compiler
@@ -160,7 +180,7 @@ ifeq ($(CXX), g++)
   CXXFLAGS += -std=c++11 -O3 -fopenmp $(CXXOFFLOADING)
   CXXLINK = g++
   CXXLINKFLAGS += -O3 -fopenmp $(CXXOFFLOADING)
-  CXX_VERSION = echo "$(shell g++ --version | head -n 1 | sed 's/.* \([0-9]*\.[0-9]*\.[0-9]*\).*/\1/g')"
+  CXX_VERSION = echo "$(shell $(call loadModules,$(CXX_COMPILER_MODULE),"shut up") g++ --version | head -n 1 | sed 's/.* \([0-9]*\.[0-9]*\.[0-9]*\).*/\1/g')"
 endif
 
 # IBM XL compiler
@@ -181,13 +201,13 @@ ifeq ($(CXX), clang++)
   CXXFLAGS +=  -D__NO_MATH_INLINES -U__SSE2_MATH__ -U__SSE_MATH__
   CXXLINK = clang++
   CXXLINKFLAGS += -lm -O3 -fopenmp $(CXXOFFLOADING)
-  CXX_VERSION = echo "$(shell clang++ --version | head -n 1 | sed 's/clang version \([0-9]*\.[0-9]*\.[0-9]*\)/\1/g')"
+  CXX_VERSION = echo "$(shell $(call loadModules,$(CXX_COMPILER_MODULE),"shut up") clang++ --version | head -n 1 | sed 's/clang version \([0-9]*\.[0-9]*\.[0-9]*\)/\1/g')"
 endif
 
 # AOMP compiler
 ifeq ($(CXX), aomp)
   $(warning "AOMP is still experimental. AOMP uses clang front end, make sure the clang aomp is selected")
-  INSTALLED_GPU  = $(shell $(call loadModules, $(C_COMPILER_MODULE)) mygpu -d gfx900 2> /dev/null)
+  INSTALLED_GPU  = $(shell $(call loadModules, $(C_COMPILER_MODULE),"shut up") mygpu -d gfx900 2> /dev/null)
   AOMP_GPU       ?= $(INSTALLED_GPU)
   AOMP_CPUTARGET ?= x86_64-pc-linux-gnu
   ifeq (sm_,$(findstring sm_,$(AOMP_GPU)))
@@ -232,7 +252,7 @@ ifeq ($(FC), gfortran)
   FFLAGS += -O3 -fopenmp $(FOFFLOADING) -ffree-line-length-none -J./ompvv
   FLINK = gcc
   FLINKFLAGS += -O3 -fopenmp $(FOFFLOADING)
-  F_VERSION = echo "$(shell gfortran --version | head -n 1 | sed 's/.* \([0-9]*\.[0-9]*\.[0-9]*\).*/\1/g')"
+  F_VERSION = echo "$(shell $(call loadModules,$(F_COMPILER_MODULE),"shut up") gfortran --version | head -n 1 | sed 's/.* \([0-9]*\.[0-9]*\.[0-9]*\).*/\1/g')"
 endif
 
 # IBM XLF compiler
@@ -247,13 +267,29 @@ ifeq ($(FC), $(filter $(FC), xlf xlf_r))
 endif
 
 # Cray compiler
-ifeq ($(FC), ftn)
-  FOFFLOADING = -h omp
-  F_NO_OFFLOADING = 
-  FFLAGS += -O3 $(FOFFLOADING)  -J./ompvv
-  FLINK = gcc
-  FLINKFLAGS += -O3 $(FOFFLOADING)
-  F_VERSION = echo "$(ftn --version 2>&1 | grep -oh 'Cray Fortran : Version [0-9.]*' | grep -oh 'Version .*' | sed "s/Version/cray-classic/g")"
+#ifeq ($(FC), ftn)
+#  FOFFLOADING = -h omp
+#  F_NO_OFFLOADING = 
+#  FFLAGS += -O3 $(FOFFLOADING)  -J./ompvv
+#  FLINK = gcc
+#  FLINKFLAGS += -O3 $(FOFFLOADING)
+#  F_VERSION = echo "$(ftn --version 2>&1 | grep -oh 'Cray Fortran : Version [0-9.]*' | grep -oh 'Version .*' | sed "s/Version/cray-classic/g")"
+
+# CRAY compilers
+ifeq ($(DEVICE_TYPE), amd)
+  # CRAY compiler (AMD)
+  ifeq ($(FC), ftn)
+    FFLAGS += -fopenmp -J./ompvv
+    FLINK = cc
+    FLINKFLAGS += -fopenmp
+  endif
+else
+  # CRAY compiler (NVIDIA)
+  ifeq ($(FC), ftn)
+    FFLAGS += -fopenmp -J./ompvv
+    FLINK = cc
+    FLINKFLAGS += -fopenmp
+  endif
 endif
 
 #---------------------------------------------------------------------------

@@ -61,7 +61,7 @@ int test_target_teams_distribute_if_target_modifier() {
   // greather than ATTEMPT_THRESHOLD
   for (attempt = 0; attempt < NUM_ATTEMPTS; ++attempt) {
 #pragma omp target teams distribute parallel for if(target: attempt >= ATTEMPT_THRESHOLD)\
-    map(tofrom: a) num_threads(10)
+    map(tofrom: a) num_threads(OMPVV_NUM_THREADS_DEVICE)
     for (i = 0; i < SIZE_N; i++) {
       warning[i] += (omp_get_num_threads() == 1) ? 1 : 0; // Ideally we should not change the number of threads at any point
       if (attempt >= ATTEMPT_THRESHOLD) {

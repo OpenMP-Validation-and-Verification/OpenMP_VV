@@ -22,7 +22,7 @@ int test_bitand() {
   double false_margin = pow(exp(1), log(.5)/N); // See the 'and' operator test for
   int errors = 0;                               // an exaplantion of this math.
   int num_teams[N];
-  int have_true, have_false;
+  int have_true = 0, have_false = 0;
   int num_attempts = 0;
   srand(1);
 

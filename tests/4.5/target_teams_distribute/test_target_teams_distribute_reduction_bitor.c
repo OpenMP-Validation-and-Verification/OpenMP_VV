@@ -24,7 +24,7 @@ int test_bitor() {
   int errors = 0;
   int num_teams[N];
   int num_attempts = 0;
-  int have_true, have_false;
+  int have_true = 0, have_false = 0;
   srand(1);
 
   while ((!have_true || !have_false) && (num_attempts < THRESHOLD)) {

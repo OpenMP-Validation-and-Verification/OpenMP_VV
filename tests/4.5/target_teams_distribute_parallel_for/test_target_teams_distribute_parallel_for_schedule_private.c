@@ -31,7 +31,7 @@ int test_target_teams_distribute_parallel_for_sched_private() {
   }
 
   // check multiple sizes. 
-#pragma omp target teams distribute parallel for firstprivate(firstprivatized) num_teams(8) num_threads(32) schedule(static,8)
+#pragma omp target teams distribute parallel for firstprivate(firstprivatized) num_teams(OMPVV_NUM_TEAMS_DEVICE) num_threads(OMPVV_NUM_THREADS_DEVICE) schedule(static,8)
     for (int j = 0; j < SIZE_N; ++j) {
       reported_num_teams[j] = omp_get_num_teams();
       reported_num_threads[j] = omp_get_num_threads();
