@@ -78,9 +78,9 @@ ifeq ($(DEVICE_TYPE), amd)
 else ifeq ($(DEVICE_TYPE), nvidia)
   # CRAY compiler (NVIDIA)
   ifeq ($(CC), cc)
-    CFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target
+    CFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
     CLINK = cc
-    CLINKFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target
+    CLINKFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
   endif
 endif
 
