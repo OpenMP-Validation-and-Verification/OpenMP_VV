@@ -2,10 +2,15 @@
 //
 // OpenMP API Version 5.0 Nov 2018
 //
-// The test maps a 2-D array to the device and uses the collapse clause on the nested 
-// parallel directive to update value of the array.
-// The value is verified on the host for correctness.
-// This test is adapted from the examples and provided by LLNL.   
+// The test maps two arrays to the device and uses the collapse clause on the work 
+// sharing loop construct enclosing two loops. Accorging to 5.0 Spec if more than 
+// one loop is associated with the worksharing-loop construct then the number of 
+// times that any intervening code between any two associated loops will be executed 
+// is unspecified but will be at least once per iteration of the loop enclosing the 
+// intervening code and at most once per iteration of the innermost loop associated 
+// with the construct.The value modified on the device(if oddloaded) and is verified 
+// on the host for correctness.
+// This test is a modified version of an example and provided by LLNL.   
 //
 ////===----------------------------------------------------------------------===//
 
@@ -44,11 +49,10 @@ int test_target_imperfect_loop() {
   }
 
   for( int i=0;i<N;i++){
-    OMPVV_TEST_AND_SET(errors,data1[i] != i);
-    printf("data1[%d] = %d \n", i, data1[i]);
+    OMPVV_TEST_AND_SET(errors,data1[i] < i);
+    OMPVV_TEST_AND_SET(errors,data1[i] > i * N);
     for(int j=0;j<N;j++){
       OMPVV_TEST_AND_SET(errors,data2[i][j] != (i+j));
- //     printf("data2[%d][%d] = %d \n", i, j, data2[i][j]);
     }
   }
 
