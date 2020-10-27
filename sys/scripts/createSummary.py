@@ -20,6 +20,7 @@ class testResult:
   testSystem = ""
   testComments = ""
   testGitCommit = ""
+  ompVersion = ""
 
   # Compiler results
   startingCompilerDate = ""
@@ -42,6 +43,7 @@ class testResult:
     compilerName = ""
     compilerCommand = ""
     testGitCommit = ""
+    ompVersion = ""
 
     # Compiler results
     startingCompilerDate = ""
@@ -57,13 +59,14 @@ class testResult:
     runtimePass = ""
     runtimeOutput = ""
 
-  def setTestParameters(self, newTestName, newTestPath=None, newCompilerName=None, newCompilerCommand=None, newTestCommit=None):
+  def setTestParameters(self, newTestName, newTestPath=None, newCompilerName=None, newCompilerCommand=None, newTestCommit=None, newOMPVersion=None):
     self.testName = newTestName
     runtimeOnly = (not newTestPath)
     if newTestPath:  self.testPath = newTestPath 
     if newCompilerName:  self.compilerName = newCompilerName 
     if newCompilerCommand:  self.compilerCommand = newCompilerCommand 
     if newTestCommit:  self.testGitCommit = newTestCommit 
+    if newOMPVersion:  self.ompVersion = newOMPVersion
 
   def setCompilerInit(self, newStartingCompilerDate, newSystem):
     self.startingCompilerDate = newStartingCompilerDate
@@ -97,8 +100,8 @@ class testResult:
 
   def convert2CSV(self):
     ''' Comma Separated Values printing '''
-    return '"%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s"' \
-           % (self.testSystem.replace('\n',''),self.testName.replace('\n',''), self.testPath.replace('\n',''),
+    return '"%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s"' \
+           % (self.testSystem.replace('\n',''),self.testName.replace('\n',''), self.testPath.replace('\n',''), self.ompVersion.replace('\n',''),
            self.compilerName.replace('\n',''), self.compilerCommand.replace('\n',''), self.startingCompilerDate.replace('\n',''),
            self.endingCompilerDate.replace('\n',''), self.compilerPass.replace('\n',''), self.compilerOutput.replace('\n',''),
            str(self.runtimeOnly), self.binaryPath.replace('\n',''), self.startingRuntimeDate.replace('\n',''),
@@ -113,6 +116,7 @@ class testResult:
         "Test system": self.testSystem,
         "Test comments": self.testComments,
         "Test gitCommit": self.testGitCommit,
+        "OMP version": self.ompVersion,
         "Runtime only": self.runtimeOnly,
         "Compiler name": self.compilerName,
         "Compiler result": self.compilerPass,
@@ -134,6 +138,7 @@ class testResult:
       testSystem = "%s"
       testComments = "%s"
       testGitCommit = "%s"
+      ompVersion = "%s"
       compilerName = "%s"
       compilerCommand = "%s"
 
@@ -151,7 +156,7 @@ class testResult:
       runtimePass = "%s"
       runtimeOutput = "%s"
     """ % (self.testName, self.testPath, self.testSystem, self.testComments, 
-           self.testGitCommit, self.compilerName,
+           self.testGitCommit, self.ompVersion, self.compilerName,
            self.compilerCommand, self.startingCompilerDate, 
            self.endingCompilerDate, self.compilerPass, self.compilerOutput,
            str(self.runtimeOnly), self.binaryPath, self.startingRuntimeDate, 
@@ -179,7 +184,7 @@ def parseFile(log_file):
           header_info = interpretHeader(line)
           if header_info["type"] == "COMPILE":
             # We are starting a compiler section
-            current_test.setTestParameters(header_info["testName"], header_info["file"], header_info["compiler"], header_info["compilerCommand"], header_info["gitCommit"])
+            current_test.setTestParameters(header_info["testName"], header_info["file"], header_info["compiler"], header_info["compilerCommand"], header_info["gitCommit"], header_info["ompVersion"])
             current_test.setCompilerInit(header_info["date"], header_info["system"])
             current_state = header_info["type"]
           elif header_info["type"] == "RUN":
@@ -193,7 +198,7 @@ def parseFile(log_file):
               # Get commit if it is run only information
               if (current_test.testGitCommit == ""):
                 current_test.testGitCommit = header_info["gitCommit"]
-              current_test.setTestParameters(header_info["testName"])
+              current_test.setTestParameters(header_info["testName"], newOMPVersion=header_info["ompVersion"])
             current_test.setRuntimeInit(header_info["file"], header_info["date"], header_info["system"])
             current_state = header_info["type"]
           elif header_info["type"] == "END":
@@ -238,20 +243,21 @@ def interpretHeader(header):
   returned_value = { "type": "", "date": ""}
   if isinstance(header, str):
     header_split = header.split("*-*-*")[1:] # first element always empty
-    # get the date 
+    # get the date, system, and commit id
     returned_value["date"] = header_split[2]
     returned_value["system"] = header_split[3]
     returned_value["gitCommit"] = header_split[6]
+    returned_value["ompVersion"] = header_split[7]
     if header_split[0].startswith("BEGIN"):
       if header_split[1].startswith('COMPILE'):
         # case when the header is a compiler header.
         # Example of a compiler line is:
-        #  *-*-*BEGIN*-*-*COMPILE CC=gcc -I./ompvv -O3 -std=c99 -fopenmp -foffload=-lm -lm*-*-*Tue Nov 26 17:46:58 EST 2019*-*-*summit*-*-*tests/4.5/offloading_success.c*-*-*gcc 8.1.1*-*-*463391f*-*-*
+        #  *-*-*BEGIN*-*-*COMPILE CC=gcc -I./ompvv -O3 -std=c99 -fopenmp -foffload=-lm -lm*-*-*Tue Nov 26 17:46:58 EST 2019*-*-*summit*-*-*tests/4.5/offloading_success.c*-*-*gcc 8.1.1*-*-*463391f*-*-*4.5*-*-*
 
         returned_value["type"] = "COMPILE"
         returned_value["file"] = header_split[4]
         returned_value["testName"] = os.path.basename(header_split[4])
-        
+
         # remove the "COMPILE " part
         compilation_info = header_split[1][8:]
         returned_value["compiler"] = header_split[5]
@@ -266,7 +272,7 @@ def interpretHeader(header):
       elif header_split[1].startswith('RUN'):
         # case when the header is a runtime header.
         # Example of a runtime line is:
-        # *-*-*BEGIN*-*-*RUN*-*-*Tue Nov 26 17:46:59 EST 2019*-*-*summit*-*-*bin/offloading_success.c*-*-*none*-*-*463391f*-*-* 
+        # *-*-*BEGIN*-*-*RUN*-*-*Tue Nov 26 17:46:59 EST 2019*-*-*summit*-*-*bin/offloading_success.c*-*-*none*-*-*463391f*-*-*4.5*-*-*
         returned_value["type"] = "RUN"
         returned_value["file"] = header_split[4]
         returned_value["testName"] = os.path.basename(header_split[4])
