@@ -57,9 +57,7 @@ CONTAINS
        END IF
     END DO
 
-    OMPVV_WARNING_IF(num_teams .eq. 1, "The number of teams was 1. This
-is not a
-specification error but we could not guarantee parallelism of teams.")
+    OMPVV_WARNING_IF(num_teams .eq. 1, "The number of teams was 1, is not a specification error but we could not guarantee parallelism of teams.")
 
     DO x = 1, N
        OMPVV_TEST_AND_SET(errors, (d(x) .ne. (1 + x)*2*x))
@@ -88,8 +86,7 @@ specification error but we could not guarantee parallelism of teams.")
         END IF
      END DO
 
-     OMPVV_WARNING_IF(num_teams .eq. 1, "The number of teams was 1. This
-is not a specification error but we could not guarantee parallelism of teams.")
+     OMPVV_WARNING_IF(num_teams .eq. 1, "The number of teams was 1. This is not a specification error but we could not guarantee parallelism of teams.")
 
      DO x = 1, N
         share = share - x;

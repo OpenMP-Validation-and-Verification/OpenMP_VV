@@ -49,17 +49,13 @@ CONTAINS
     num_threads(omp_get_team_num()) = omp_get_num_threads()
     !$omp end teams 
     
-    OMPVV_WARNING_IF(num_teams(1) .eq. 1, "Test operated with one team,
-num_teams requested is inconsistent with this result")
+    OMPVV_WARNING_IF(num_teams(1) .eq. 1, "Test operated with one team, num_teams requested is inconsistent with this result")
 
-    OMPVV_ERROR_IF(num_teams(1) .le. 1, "omp_get_num_teams() reported a
-value less than one.")
+    OMPVV_ERROR_IF(num_teams(1) .le. 1, "omp_get_num_teams() reported a value less than one.")
 
-    OMPVV_WARNING_IF(num_threads(1) .eq. 1, "Team 0 reported only 1
-thread. This is inconsistent with the thread limit that has been set.")
+    OMPVV_WARNING_IF(num_threads(1) .eq. 1, "Team 0 reported only 1 thread. This is inconsistent with the thread limit that has been set.")
 
-    OMPVV_ERROR_IF(num_threads(1) .le. 1, "omp_get_num_threads() reported a value
-below one.")
+    OMPVV_ERROR_IF(num_threads(1) .le. 1, "omp_get_num_threads() reported a value below one.")
 
     DO x = 2, num_teams(1)
       IF (num_teams(x) .ne. num_teams(x-1)) THEN

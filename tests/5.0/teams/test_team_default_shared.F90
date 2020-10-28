@@ -30,8 +30,6 @@ PROGRAM test_team_default_shared
   USE omp_lib
   implicit none
 
-  OMPVV_TEST_OFFLOADING
- 
   OMPVV_TEST_VERBOSE(test_teams() .ne. 0)
 
   OMPVV_REPORT_AND_RETURN()
@@ -58,8 +56,7 @@ CONTAINS
   share = share + 1
   !$omp end atomic
 
-  OMPVV_WARNING_IF(num_teams .eq. 1, "Test operated on one team, results
-of default shared test are inconclusive.");
+  OMPVV_WARNING_IF(num_teams .eq. 1, "Test operated on one team, results of default shared test are inconclusive.");
 
   test_teams = errors
   END FUNCTION test_teams
