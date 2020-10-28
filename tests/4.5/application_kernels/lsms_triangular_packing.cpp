@@ -30,7 +30,8 @@
 
 #include <complex>
 #include <cstdio>
-#include <ompvv.h>
+#include <omp.h>
+#include "ompvv.h"
 
 const int MR = 16;
 const int M = 256;
