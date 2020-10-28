@@ -243,7 +243,7 @@ def interpretHeader(header):
   returned_value = { "type": "", "date": ""}
   if isinstance(header, str):
     header_split = header.split("*-*-*")[1:] # first element always empty
-    # get the date, system, and commit id
+    # get the date, system, commit id, and OpenMP spec version
     returned_value["date"] = header_split[2]
     returned_value["system"] = header_split[3]
     returned_value["gitCommit"] = header_split[6]
