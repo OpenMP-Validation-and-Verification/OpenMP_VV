@@ -50,6 +50,8 @@
             OMPVV_TEST_VERBOSE(ANY(helper_array_3d /= 10))
 
             ! check that it did not copy back
+            ! Assumes that that the target region is neither
+            ! executed on the host nor with unified-shared memory
             OMPVV_TEST_VERBOSE(ANY(array_1d /= 10))
             OMPVV_TEST_VERBOSE(ANY(array_2d /= 10))
             OMPVV_TEST_VERBOSE(ANY(array_3d /= 10))
@@ -73,6 +75,9 @@
             CALL subroutine_from()
 
             ! Checking that data is not copied to the device
+            ! Assumes that that the target region is neither
+            ! executed on the host nor with unified-shared memory
+            ! Assumes additionally that an uninit array has not 999 for all elems
             WRITE(msgHelper, *) "Array seemed to have been copied to &
               & the device when using the from modifier."
             OMPVV_WARNING_IF(ALL(helper_array_1d == 999), msgHelper)
@@ -136,11 +141,12 @@
             !$omp target map(from: array_1d, array_2d, array_3d) &
             !$omp map(from: helper_array_1d, helper_array_2d) &
             !$omp map(from: helper_array_3d)
+              ! NOTE: array_1d/2d/3d is uninitialized,
+              ! unless distributed-shared memory or executed on the host
               helper_array_1d = array_1d
               helper_array_2d = array_2d
               helper_array_3d = array_3d
 
-              ! This value should not be copied back
               array_1d(:) = 20
               array_2d(:,:) = 20
               array_3d(:,:,:) = 20
@@ -154,7 +160,6 @@
               helper_array_2d = array_2d
               helper_array_3d = array_3d
 
-              ! This value should not be copied back
               array_1d(:) = 20
               array_2d(:,:) = 20
               array_3d(:,:,:) = 20
