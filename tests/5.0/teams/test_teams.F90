@@ -36,6 +36,7 @@ CONTAINS
     errors(1) = 0
     errors(2) = 0
 
+
     DO x = 1, OMPVV_NUM_TEAMS_DEVICE
       num_teams(x) = -99
     END DO
@@ -45,10 +46,10 @@ CONTAINS
     END DO
 
     !$omp teams num_teams(OMPVV_NUM_TEAMS_DEVICE) thread_limit(OMPVV_NUM_THREADS_DEVICE)
-    num_teams(omp_get_team_num()) = omp_get_num_teams()
-    num_threads(omp_get_team_num()) = omp_get_num_threads()
+    num_teams(omp_get_team_num() + 1) = omp_get_num_teams()
+    num_threads(omp_get_team_num() + 1) = omp_get_num_threads()
     !$omp end teams 
-    
+  
     OMPVV_WARNING_IF(num_teams(1) .eq. 1, "Test operated with one team, num_teams requested is inconsistent with this result")
 
     OMPVV_ERROR_IF(num_teams(1) .le. 1, "omp_get_num_teams() reported a value less than one.")
