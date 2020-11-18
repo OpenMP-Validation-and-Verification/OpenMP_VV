@@ -6,7 +6,7 @@
 // 5.0 example for allocators. The allocator testing first creates
 // an allocator, with 64-byte alignment and the default memory space,
 // then checks that 64-byte alignment is correct and that the memory can
-// be written to in the target region. The tests checks that the values
+// be written to in the parallel region. The tests checks that the values
 // were written correctly, and then frees the memory and deletes the
 // allocator.
 //
