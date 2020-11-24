@@ -23,7 +23,7 @@
 #define N 1024
 
 int test_callback(omp_event_handle_t event) {
-  omp_fulfill_event( event);
+  omp_fulfill_event(event);
   return 1;
 }
 
