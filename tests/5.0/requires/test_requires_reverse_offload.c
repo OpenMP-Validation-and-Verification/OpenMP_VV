@@ -22,10 +22,10 @@
 #pragma omp requires reverse_offload
 
 
-int host_function(int incorrect_value, int index, int errors) // int errors) 
+int host_function(int incorrect_value, int index, int errors)
 {     
-    printf(" Planned Error in offload: A[%d]=%d\n", index, incorrect_value);
-    printf("                Expecting: A[i] =i\n");
+    OMPVV_INFOMSG("Planned Error in offload: A[%d]=%d\n", index, incorrect_value);
+    OMPVV_INFOMSG("                Expecting: A[i] =i\n");
     if (!omp_is_initial_device())
         {
             errors++;
