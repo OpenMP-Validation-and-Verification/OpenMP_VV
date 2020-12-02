@@ -6,9 +6,9 @@
 // should not complete until its associated block and the event in the
 // detach clause is fulfilled with the omp_fulfill_event clause. This test
 // confirms that the task will not complete until these conditions are
-// met by placing a taskwait after the detached task. Variables are set
-// inside the task body and in the function that fulfills the event, and
-// their values are checked after the taskwait to ensure they are set as
+// met by placing a dependent task after the detached task. Variables are
+// set inside the task body and in the function that fulfills the event,
+// and their values are checked after the depend to ensure they are set as
 // expected. This test is based on the example of task detach presented
 // by Michael Klemm at the 2018 OpenMPCon.
 //
@@ -36,13 +36,15 @@ int test_task_detach() {
 #pragma omp parallel
 #pragma omp single
   {
-#pragma omp task detach(flag_event)
+#pragma omp task depend(out: y) detach(flag_event)
     {
       y++;
+    }
+#pragma omp task
+    {
       x = test_callback(flag_event);
     }
-#pragma omp taskwait
-#pragma omp task
+#pragma omp task depend(inout: y)
     {
       record_x = x;
       record_y = y;
@@ -54,9 +56,9 @@ int test_task_detach() {
   OMPVV_WARNING_IF(num_threads == 1, "Test ran with one thread, so the results are not conclusive");
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, record_x != 1);
-  OMPVV_ERROR_IF(record_x == 0, "Taskwait did not wait for associated event to be fulfilled");
-  OMPVV_ERROR_IF(record_y == 0, "Taskwait did not wait for task body to execute");
-  OMPVV_ERROR_IF(record_x == -1 || record_y == -1, "Recording variables were not set correctly.")
+  OMPVV_ERROR_IF(record_x == 0, "Depend did not wait for associated event to be fulfilled");
+  OMPVV_ERROR_IF(record_y == 0, "Depend did not wait for task body to execute");
+  OMPVV_ERROR_IF(record_x == -1 || record_y == -1, "Recording variables were not set correctly")
 
   return errors;
 }
