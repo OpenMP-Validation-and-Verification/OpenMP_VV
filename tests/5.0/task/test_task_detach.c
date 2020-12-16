@@ -42,10 +42,13 @@ int test_task_detach() {
     }
 #pragma omp task
     {
-      x = test_callback(flag_event);
+      x = 1;
+#pragma omp flush
+      test_callback(flag_event);
     }
 #pragma omp task depend(inout: y)
     {
+#pragma omp flush
       record_x = x;
       record_y = y;
       num_threads = omp_get_num_threads();
@@ -60,7 +63,7 @@ int test_task_detach() {
   OMPVV_ERROR_IF(record_y == 0, "Depend did not wait for task body to execute");
   OMPVV_ERROR_IF(record_x == -1 || record_y == -1, "Recording variables were not set correctly")
 
-  return errors;
+    return errors;
 }
 
 int main() {
