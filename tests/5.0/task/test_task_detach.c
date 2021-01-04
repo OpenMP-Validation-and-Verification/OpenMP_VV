@@ -59,11 +59,12 @@ int test_task_detach() {
   OMPVV_WARNING_IF(num_threads == 1, "Test ran with one thread, so the results are not conclusive");
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, record_x != 1);
-  OMPVV_ERROR_IF(record_x == 0, "Dependent task preceded callback, so detach did not work correctly.");
+  OMPVV_ERROR_IF(record_x == 0, "Dependent task preceded event-fulfilling task, so detach did not work correctly.");
   OMPVV_ERROR_IF(record_y == 0, "Dependent task preceded detached task body, so depend did not work correctly.");
-  OMPVV_ERROR_IF(record_x == -1 || record_y == -1, "Recording variables were not set correctly.")
+  OMPVV_ERROR_IF(record_x == -1, "Event-fulfilling task's recording variable was not set in the final task.");
+  OMPVV_ERROR_IF(record_x == -1, "Detached task's recording variable was not set in the final task.");
 
-    return errors;
+  return errors;
 }
 
 int main() {
