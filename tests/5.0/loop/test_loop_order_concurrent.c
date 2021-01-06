@@ -6,8 +6,10 @@
 // order(concurrent) clause is assumed to be present if it is not present, so
 // this test covers the standalone loop directive as well. The test creates a
 // parallel region with a loop construct nested within, and performs simple
-// operations on an int array which are then checked for correctness. Note
-// that the number of
+// operations on an int array which are then checked for correctness. The
+// number of threads is checked in the parallel region but after the loop
+// construct because runtime API calls are not permitted in loop directive
+// regions.
 //
 ////===----------------------------------------------------------------------===//
 #include <assert.h>
