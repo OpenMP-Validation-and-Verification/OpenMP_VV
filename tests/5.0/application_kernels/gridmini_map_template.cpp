@@ -17,8 +17,8 @@
 using namespace std;
 template <typename T>
 struct vec {
-  float v1;
-  float v2;
+  T v1;
+  T v2;
 };
 
 template <typename T> vec<T> mult(vec<T> x, vec<T> y){
