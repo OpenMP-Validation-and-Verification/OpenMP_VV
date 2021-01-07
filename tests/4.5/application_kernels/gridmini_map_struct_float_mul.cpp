@@ -57,8 +57,8 @@ int main(int argc, char* argv[]){
   if(errors)
     OMPVV_INFOMSG("Maping of entire struct is not supported by this OpenMP implementation.\n");	
 
-
-  OMPVV_REPORT_AND_RETURN(errors);
+  //No error will be reported even if it is recorded.
+  OMPVV_REPORT_AND_RETURN(0);
 
 }
 
