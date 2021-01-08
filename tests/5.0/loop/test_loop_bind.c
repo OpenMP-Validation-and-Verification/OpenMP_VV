@@ -105,14 +105,16 @@ int test_loop_bind_parallel() {
 int test_loop_bind_thread_teams() {
   OMPVV_INFOMSG("test_loop_bind_thread_teams");
   int errors = 0;
-  int x[N][N];
   int y[N];
   int z[N];
+  int result[N][N][OMPVV_NUM_TEAMS_DEVICE];
   int num_teams = -1;
 
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
-      x[i][j] = 1;
+      for (int k = 0; k < OMPVV_NUM_TEAMS_DEVICE; k++) {
+        result[i][j][k] = 1;
+      }
     }
     y[i] = i;
     z[i] = 2*i;
@@ -120,6 +122,12 @@ int test_loop_bind_thread_teams() {
 
 #pragma omp teams num_teams(OMPVV_NUM_TEAMS_DEVICE) thread_limit(OMPVV_NUM_THREADS_HOST)
   {
+    int x[N][N];
+    for (int i = 0; i < N; i++) {
+      for (int j = 0; j < N; j++) {
+        x[i][j] = 1;
+      }
+    }
 #pragma omp loop bind(thread)
     for (int i = 0; i < N; i++) {
       for (int j = 0; j < N; j++) {
@@ -129,11 +137,18 @@ int test_loop_bind_thread_teams() {
     if (omp_get_thread_num() == 0 && omp_get_team_num() == 0) {
       num_teams = omp_get_num_teams();
     }
+    for (int i = 0; i < N; i++) {
+      for (int j = 0; j < N; j++) {
+        result[i][j][omp_get_team_num()] = x[i][j];
+      }
+    }
   }
 
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
-      OMPVV_TEST_AND_SET_VERBOSE(errors, x[i][j] != (1 + num_teams*(y[i]*z[i])));
+      for (int k = 0; k < num_teams; k++) {
+        OMPVV_TEST_AND_SET_VERBOSE(errors, result[i][j][k] != (1 + (y[i]*z[i])));
+      }
     }
   }
 
@@ -147,35 +162,50 @@ int test_loop_bind_thread_teams() {
 int test_loop_bind_thread_parallel() {
   OMPVV_INFOMSG("test_loop_bind_thread_parallel");
   int errors = 0;
-  int x[N][N];
   int y[N];
   int z[N];
+  int result[N][N][OMPVV_NUM_THREADS_HOST];
   int num_threads = -1;
 
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
-      x[i][j] = 1;
+      for (int k = 0; k < OMPVV_NUM_THREADS_HOST; k++) {
+        result[i][j][k] = 1;
+      }
     }
     y[i] = i;
     z[i] = 2*i;
   }
 
-#pragma omp parallel num_threads(OMPVV_NUM_THREADS_HOST)
+#pragma omp parallel shared(result) num_threads(OMPVV_NUM_THREADS_HOST)
   {
+    int x[N][N];
+    for (int i = 0; i < N; i++) {
+      for (int j = 0; j < N; j++) {
+        x[i][j] = 1;
+      }
+    }
 #pragma omp loop bind(thread)
     for (int i = 0; i < N; i++) {
       for (int j = 0; j < N; j++) {
         x[i][j] += y[i]*z[i];
       }
     }
-    if (omp_get_thread_num() == 0 && omp_get_team_num() == 0) {
+    if (omp_get_thread_num() == 0) {
       num_threads = omp_get_num_threads();
+    }
+    for (int i = 0; i < N; i++) {
+      for (int j = 0; j < N; j++) {
+        result[i][j][omp_get_thread_num()] = x[i][j];
+      }
     }
   }
 
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
-      OMPVV_TEST_AND_SET_VERBOSE(errors, x[i][j] != (1 + num_threads*(y[i]*z[i])));
+      for (int k = 0; k < num_threads; k++) {
+        OMPVV_TEST_AND_SET_VERBOSE(errors, result[i][j][k] != (1 + (y[i]*z[i])));
+      }
     }
   }
 
