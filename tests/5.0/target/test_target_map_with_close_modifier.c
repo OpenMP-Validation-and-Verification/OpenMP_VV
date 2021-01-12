@@ -24,8 +24,8 @@ int test_close_modifier() {
   int a[N];
 
   struct {
-  int var;
-  int b[N];
+    int var;
+    int b[N];
   } member; 
 
   member.var = 1;
