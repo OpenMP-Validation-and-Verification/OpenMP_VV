@@ -40,7 +40,7 @@ int test_loop_order_concurrent() {
 #pragma omp parallel num_threads(OMPVV_NUM_THREADS_HOST) shared(total_wait_errors, x, y, z, num_threads)
   {
     int wait_errors = 0;
-#pragma omp loop
+#pragma omp loop order(concurrent)
     for (int i = 0; i < N; i++) {
       x[i] += y[i]*z[i];
     }
