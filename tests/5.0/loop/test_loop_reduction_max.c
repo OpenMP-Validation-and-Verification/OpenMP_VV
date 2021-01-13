@@ -50,13 +50,13 @@ int test_max() {
   }
 
   for (int x = 1; x < N; ++x) {
-    OMPVV_WARNING_IF(num_threads[x - 1] != num_threads[x], "Kernel reported differing numbers of threads.  Validity of testing of reduction clause cannot be guaranteed.");
+    OMPVV_WARNING_IF(num_threads[x - 1] != num_threads[x], "Test reported differing numbers of threads.  Validity of testing of reduction clause cannot be guaranteed.");
   }
   OMPVV_WARNING_IF(num_threads[0] == 1, "Test operated with one thread.  Reduction clause cannot be tested.");
   OMPVV_WARNING_IF(num_threads[0] <= 0, "Test reported invalid number of threads.  Validity of testing of reduction clause cannot be guaranteed.");
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, result != host_max);
-  OMPVV_ERROR_IF(host_max != result, "Max on device is %d but expected max from host is %d.", result, host_max);
+  OMPVV_ERROR_IF(host_max != result, "Max from loop directive is %d but expected max is %d.", result, host_max);
 
   return errors;
 }
