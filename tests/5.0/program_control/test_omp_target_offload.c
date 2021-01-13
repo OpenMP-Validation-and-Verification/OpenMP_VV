@@ -10,7 +10,7 @@
 // the program will terminate execution when a target construct is encountered and a target device
 // is not available or supported by the implementation. 
 // 
-// This tet was adopted from OpenMP 5.0 Examples Doc -> example target_offload_control.1.c 
+// This tet was adopted from OpenMP 5.0 Examples Doc -> target_offload_control.1.c 
 ////===--------------------------------------------------------------------------------------------===//
 
 #include <omp.h>
@@ -20,11 +20,12 @@
 #include <string.h>
 #include "ompvv.h"
 
+#define N 1028
+
 typedef enum offload_policy
 {MANDATORY, DISABLED, DEFAULT, UNKNOWN, NOTSET} offload_policy_t;
 
-offload_policy_t get_offload_policy()
-{
+offload_policy_t get_offload_policy() {
    char *env, *end;
    size_t n;
 
@@ -46,31 +47,53 @@ offload_policy_t get_offload_policy()
 int main() {
    int i, errors, isOffloading;
    int device_num, on_init_dev;
-  
+   int scalar;
+   int x[N];
+
    errors = 0;
-   
    OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
- 
    offload_policy_t policy = get_offload_policy();
-   
+
+   // check if OMP_TARGET_OFFLOAD is supported
    OMPVV_ERROR_IF(_OPENMP< 201811,"ERROR: OMP_TARGET_OFFLOAD NOT supported by VER. %d",_OPENMP );
    OMPVV_TEST_AND_SET_VERBOSE(errors, _OPENMP < 201811);
 
+   // initialize values on the host
+   scalar = 17;
    on_init_dev = 1;
+   for (i = 0; i < 0; i++) {
+      x[i] = 5;
+   }
 
-   #pragma omp target map(tofrom: on_init_dev)
-     on_init_dev=omp_is_initial_device();
+#pragma omp target map(tofrom: on_init_dev, scalar, x) 
+   {
+      on_init_dev=omp_is_initial_device();
+      scalar = scalar + 53;
+      for (i = 0; i < 0; i++) {
+         x[i] = i*2;
+      }
+   }
 
-   OMPVV_ERROR_IF(policy==DEFAULT && isOffloading == 1 && on_init_dev !=0, "Did not follow DEFAULT policy and executed target region on the host even though a device was available");
-   OMPVV_TEST_AND_SET(errors, policy==DEFAULT && isOffloading == 1 && on_init_dev != 0)
+   // check for updated values back on host      
+   OMPVV_TEST_AND_SET_VERBOSE(errors, scalar != 70);   
+   for (i = 0; i < 0; i++) {
+      OMPVV_TEST_AND_SET_VERBOSE(errors, x[i] != i*2);
+   }
+   
+   // check to see if execution followed specified policy
+   OMPVV_ERROR_IF(policy==DEFAULT && isOffloading == 1 && on_init_dev != 0, "Did not follow DEFAULT policy and executed target region on the host even though a device was available");
+   OMPVV_TEST_AND_SET(errors, policy==DEFAULT && isOffloading == 1 && on_init_dev != 0);
 
+   OMPVV_ERROR_IF(policy==DEFAULT && isOffloading == 0 && on_init_dev != 1, "Did not follow DEFAULT policy and executed target region on device even though offloading appears unavailable");
+   OMPVV_TEST_AND_SET(errors, policy==DEFAULT && isOffloading == 0 && on_init_dev != 1);
+ 
    OMPVV_ERROR_IF(policy==DISABLED && on_init_dev == 0, "Did not follow DISABLED policy and executed target region on device instead of executing on host");
    OMPVV_TEST_AND_SET(errors, policy==DISABLED && on_init_dev == 0);
-
+  
    OMPVV_ERROR_IF(policy==MANDATORY && isOffloading == 1 && on_init_dev != 0, "Did not follow MANDATORY, instead executed target region on host even though device was available");
-
+   OMPVV_TEST_AND_SET(errors, policy==MANDATORY && isOffloading == 1 && on_init_dev != 0);
+ 
    OMPVV_WARNING_IF(policy==UNKNOWN,"OMP_TARGET_OFFLOAD has an unknown value");
-
    OMPVV_WARNING_IF(policy==NOTSET, "OMP_TARGET_OFFLOAD has not been set");
 
    OMPVV_REPORT_AND_RETURN(errors);
