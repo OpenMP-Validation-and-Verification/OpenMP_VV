@@ -206,9 +206,9 @@ endif
 ifeq ($(CXX), icpx)
   CXXOFFLOADING = -fopenmp-targets=spir64
   CXX_NO_OFFLOADING =
-  CXXFLAGS += -lm -O3 -fiopenmp $(COFFLOADING) -D__STRICT_ANSI__
+  CXXFLAGS += -lm -O3 -fiopenmp $(CXXOFFLOADING) -D__STRICT_ANSI__
   CXXLINK = icpx
-  CXXLINKFLAGS += -lm -O3 -fiopenmp $(COFFLOADING)
+  CXXLINKFLAGS += -lm -O3 -fiopenmp $(CXXOFFLOADING)
   CXX_VERSION = echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") icpx -dumpversion)"
 endif
 
@@ -290,9 +290,9 @@ endif
 ifeq ($(FC), ifx)
   FOFFLOADING = -fopenmp-targets=spir64
   F_NO_OFFLOADING =
-  FFLAGS += -O3 -fiopenmp $(COFFLOADING)
+  FFLAGS += -O3 -fiopenmp $(FOFFLOADING)
   FLINK = ifx
-  FLINKFLAGS += -O3 -fiopenmp $(COFFLOADING)
+  FLINKFLAGS += -O3 -fiopenmp $(FOFFLOADING)
   F_VERSION = echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") ifx --version | grep 'ifx' | grep -oh '[0-9.]\+[a-zA-Z0-9. ]*')"
 endif
 
