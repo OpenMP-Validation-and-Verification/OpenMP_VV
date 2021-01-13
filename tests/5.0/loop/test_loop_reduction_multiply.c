@@ -48,11 +48,11 @@ int test_multiply() {
       host_result *= a[x + y];
     }
     OMPVV_TEST_AND_SET_VERBOSE(errors, host_result != result);
-    OMPVV_INFOMSG_IF(host_result != result, "Device result is %d and host result is %d.", result, host_result);
+    OMPVV_INFOMSG_IF(host_result != result, "Loop directive result is %d and expected result is %d.", result, host_result);
   }
 
   for (int x = 1; x < N; ++x) {
-    OMPVV_WARNING_IF(num_threads[x - 1] != num_threads[x], "Kernel reported differing numbers of threads.  Validity of testing of reduction clause cannot be guaranteed.");
+    OMPVV_WARNING_IF(num_threads[x - 1] != num_threads[x], "Test reported differing numbers of threads.  Validity of testing of reduction clause cannot be guaranteed.");
   }
   OMPVV_WARNING_IF(num_threads[0] == 1, "Test operated with one thread.  Reduction clause cannot be tested.");
   OMPVV_WARNING_IF(num_threads[0] <= 0, "Test reported invalid number of threads.  Validity of testing of reduction clause cannot be guaranteed.");
