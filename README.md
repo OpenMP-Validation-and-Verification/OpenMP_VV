@@ -4,9 +4,12 @@ We have recently moved from Bitbucket into Github. The old Bitbucket repository 
 
 # Welcome
 
-Welcome to our SOLLVE project!
+Welcome to SOLLVE V&V sub-project!
 
-For more information, publications, presentations and results, please check out our 
+For more information regarding the ECP SOLLVE project including publications, presentations and collaborators see
+[website](https://sollve.github.io).
+
+For more information, publications, presentations and results, please check out our SOLLVE V&V 
 [website](https://crpl.cis.udel.edu/ompvvsollve/).
 
-For documentation visit our [website](https://crpl.cis.udel.edu/ompvvsollve/documentation) or the [wiki](https://github.com/SOLLVE/sollve_vv/wiki).
+For documentation on how to get started with the V&V visit [website](https://crpl.cis.udel.edu/ompvvsollve/documentation) or the [wiki](https://github.com/SOLLVE/sollve_vv/wiki).
