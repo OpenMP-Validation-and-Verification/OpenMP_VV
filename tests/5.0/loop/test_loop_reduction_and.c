@@ -1,4 +1,4 @@
-//===--- test_loop_reduction_and.c ---------------------------------------------===//
+//===--- test_loop_reduction_and.c ------------------------------------------===//
 //
 // OpenMP API Version 5.0 Nov 2018
 //
@@ -58,14 +58,14 @@ int test_and() {
 
     if (itr_count == 0) {
       for (int x = 1; x < N; ++x) {
-        OMPVV_WARNING_IF(num_threads[x - 1] != num_threads[x], "Kernel reported differing numbers of threads.  Validity of testing of reduction clause cannot be guaranteed.");
+        OMPVV_WARNING_IF(num_threads[x - 1] != num_threads[x], "Test reported differing numbers of threads.  Validity of testing of reduction clause cannot be guaranteed.");
       }
       OMPVV_WARNING_IF(num_threads[0] == 1, "Test operated with one thread.  Reduction clause cannot be tested.");
       OMPVV_WARNING_IF(num_threads[0] <= 0, "Test reported invalid number of threads.  Validity of testing of reduction clause cannot be guaranteed.");
     }
 
     OMPVV_TEST_AND_SET_VERBOSE(errors, host_result != result);
-    OMPVV_ERROR_IF(host_result != result, "Result on device is %d but expected result from host is %d.", result, host_result);
+    OMPVV_ERROR_IF(host_result != result, "Actual result is %d but expected result is %d.", result, host_result);
 
     if (host_result) {
       tested_true = 1;
