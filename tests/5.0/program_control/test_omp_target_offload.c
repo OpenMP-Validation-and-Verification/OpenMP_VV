@@ -10,7 +10,7 @@
 // the program will terminate execution when a target construct is encountered and a target device
 // is not available or supported by the implementation. 
 // 
-// This tet was adopted from OpenMP 5.0 Examples Doc -> target_offload_control.1.c 
+// This test was adopted from OpenMP 5.0 Examples Doc -> target_offload_control.1.c 
 ////===--------------------------------------------------------------------------------------------===//
 
 #include <omp.h>
