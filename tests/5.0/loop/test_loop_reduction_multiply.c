@@ -1,10 +1,10 @@
-//===--- test_target_teams_distribute_reduction_multiply.c-------------------===//
+//===--- test_loop_reduction_multiply.c -------------------------------------===//
 //
-// OpenMP API Version 4.5 Nov 2015
+// OpenMP API Version 5.0 Nov 2018
 //
-// This test uses the reduction clause on a target teams distribute directive,
-// testing that the variable in the reduction clause is properly reduced using
-// the multiply operator.
+// This test uses the reduction clause on a loop directive, testing that the
+// variable in the reduction clause is properly reduced using the multiply
+// operator.
 //
 ////===----------------------------------------------------------------------===//
 
@@ -19,12 +19,12 @@
 int test_multiply() {
   int a[N];
   int errors = 0;
-  int num_teams[N];
+  int num_threads[N];
   srand(1);
 
   for (int x = 0; x < N; ++x) {
     a[x] = 1 + (int) rand() / (double) RAND_MAX;
-    num_teams[x] = -x;
+    num_threads[x] = -x;
   }
 
   int result = 1;
@@ -32,10 +32,16 @@ int test_multiply() {
 
   for (int x = 0; x < N; x = x + 16) {
     result = 1;
-#pragma omp target teams distribute reduction(*:result) defaultmap(tofrom:scalar)
-    for (int y = 0; y < 16; ++y) {
-      result *= a[x + y];
-      num_teams[x + y] = omp_get_num_teams();
+#pragma omp parallel num_threads(OMPVV_NUM_THREADS_HOST)
+    {
+#pragma omp loop reduction(*:result)
+      for (int y = 0; y < 16; ++y) {
+        result *= a[x + y];
+      }
+#pragma omp for
+      for (int y = 0; y < 16; ++y) {
+        num_threads[x + y] = omp_get_num_threads();
+      }
     }
     host_result = 1;
     for (int y = 0; y < 16; ++y) {
@@ -46,10 +52,10 @@ int test_multiply() {
   }
 
   for (int x = 1; x < N; ++x) {
-    OMPVV_WARNING_IF(num_teams[x - 1] != num_teams[x], "Kernel reported differing numbers of teams.  Validity of testing of reduction clause cannot be guaranteed.");
+    OMPVV_WARNING_IF(num_threads[x - 1] != num_threads[x], "Kernel reported differing numbers of threads.  Validity of testing of reduction clause cannot be guaranteed.");
   }
-  OMPVV_WARNING_IF(num_teams[0] == 1, "Test operated with one team.  Reduction clause cannot be tested.");
-  OMPVV_WARNING_IF(num_teams[0] <= 0, "Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guaranteed.");
+  OMPVV_WARNING_IF(num_threads[0] == 1, "Test operated with one thread.  Reduction clause cannot be tested.");
+  OMPVV_WARNING_IF(num_threads[0] <= 0, "Test reported invalid number of threads.  Validity of testing of reduction clause cannot be guaranteed.");
 
   return errors;
 }

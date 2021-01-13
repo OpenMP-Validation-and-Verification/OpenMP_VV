@@ -1,10 +1,10 @@
-//===--- test_target_teams_distribute_reduction_bitor.c----------------------===//
+//===--- test_loop_reduction_bitor.c ----------------------------------------===//
 //
-// OpenMP API Version 4.5 Nov 2015
+// OpenMP API Version 5.0 Nov 2018
 //
-// This test uses the reduction clause on a target teams distribute directive,
-// testing that the variable in the reduction clause is properly reduced using
-// the bitor operator.
+// This test uses the reduction clause on a loop directive, testing that the
+// variable in the reduction clause is properly reduced using the bitor
+// operator.
 //
 ////===----------------------------------------------------------------------===//
 
@@ -22,7 +22,7 @@ int test_bitor() {
   // See the 'and' operator test for an exaplantion of this math.
   double true_margin = pow(exp(1), log(.5)/N);
   int errors = 0;
-  int num_teams[N];
+  int num_threads[N];
   int num_attempts = 0;
   int have_true = 0, have_false = 0;
   srand(1);
@@ -39,7 +39,7 @@ int test_bitor() {
           have_false = 1;
         }
       }
-      num_teams[x] = -x;
+      num_threads[x] = -x;
     }
     num_attempts++;
   }
@@ -49,10 +49,16 @@ int test_bitor() {
 
   unsigned int b = 0;
 
-#pragma omp target teams distribute reduction(|:b) defaultmap(tofrom:scalar)
-  for (int x = 0; x < N; ++x) {
-    num_teams[x] = omp_get_num_teams();
-    b = b | a[x];
+#pragma omp parallel num_threads(OMPVV_NUM_THREADS_HOST)
+  {
+#pragma omp loop reduction(|:b)
+    for (int x = 0; x < N; ++x) {
+      b = b | a[x];
+    }
+#pragma omp for
+    for (int x = 0; x < N; ++x) {
+      num_threads[x] = omp_get_num_threads();
+    }
   }
 
   unsigned int host_b = 0;
@@ -62,10 +68,10 @@ int test_bitor() {
   }
 
   for (int x = 1; x < N; ++x) {
-    OMPVV_WARNING_IF(num_teams[x - 1] != num_teams[x], "Kernel reported differing numbers of teams.  Validity of testing of reduction clause cannot be guaranteed.");
+    OMPVV_WARNING_IF(num_threads[x - 1] != num_threads[x], "Kernel reported differing numbers of threads.  Validity of testing of reduction clause cannot be guaranteed.");
   }
-  OMPVV_WARNING_IF(num_teams[0] == 1, "Test operated with one team.  Reduction clause cannot be tested.");
-  OMPVV_WARNING_IF(num_teams[0] <= 0, "Test reported invalid number of teams.  Validity of testing of reduction clause cannot be guaranteed.");
+  OMPVV_WARNING_IF(num_threads[0] == 1, "Test operated with one thread.  Reduction clause cannot be tested.");
+  OMPVV_WARNING_IF(num_threads[0] <= 0, "Test reported invalid number of threads.  Validity of testing of reduction clause cannot be guaranteed.");
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, b != host_b);
   OMPVV_ERROR_IF(host_b != b, "Bit on device is %d but expected bit from host is %d.", b, host_b);
