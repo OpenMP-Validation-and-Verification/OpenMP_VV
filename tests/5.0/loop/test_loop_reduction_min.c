@@ -51,13 +51,13 @@ int test_min() {
   }
 
   for (int x = 1; x < N; ++x) {
-    OMPVV_WARNING_IF(num_threads[x - 1] != num_threads[x], "Kernel reported differing numbers of threads.  Validity of testing of reduction clause cannot be guaranteed.");
+    OMPVV_WARNING_IF(num_threads[x - 1] != num_threads[x], "Test reported differing numbers of threads.  Validity of testing of reduction clause cannot be guaranteed.");
   }
   OMPVV_WARNING_IF(num_threads[0] == 1, "Test operated with one thread.  Reduction clause cannot be tested.");
   OMPVV_WARNING_IF(num_threads[0] <= 0, "Test reported invalid number of threads.  Validity of testing of reduction clause cannot be guaranteed.");
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, host_min != result);
-  OMPVV_ERROR_IF(host_min != result, "Min on device is %d but expected min from host is %d.", result, host_min);
+  OMPVV_ERROR_IF(host_min != result, "Min from loop directive is %d but expected min is %d.", result, host_min);
 
   return errors;
 }
