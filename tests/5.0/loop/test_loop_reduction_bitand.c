@@ -82,8 +82,6 @@ int test_bitand() {
 }
 
 int main() {
-  OMPVV_TEST_OFFLOADING;
-
   int total_errors = 0;
 
   OMPVV_TEST_AND_SET_VERBOSE(total_errors, test_bitand() != 0);
