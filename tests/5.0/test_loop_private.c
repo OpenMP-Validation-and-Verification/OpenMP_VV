@@ -19,8 +19,6 @@
 #define SIZE 1024
 
 int main() {
-  int isOffloading = 0;
-  OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
   int a[SIZE];
   int b[SIZE];
   int c[SIZE];
