@@ -38,7 +38,7 @@ int test_one_loop_level() {
     }
   }
 
-  OMPVV_TEST_AND_SET_VERBOSE(lp_errors, x >= SIZE || x < 0);
+  OMPVV_TEST_AND_SET_VERBOSE(lp_errors, x > SIZE || x < 0);
   OMPVV_ERROR_IF(lp_errors, "Loop iteration variable in loop construct ended with invalid value.");
 
   for (x = 0; x < SIZE; ++x) {
