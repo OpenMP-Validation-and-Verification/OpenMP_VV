@@ -38,7 +38,7 @@ int test_one_loop_level() {
     }
   }
 
-  OMPVV_TEST_AND_SET_VERBOSE(lp_errors, x > SIZE || x < 0);
+  OMPVV_TEST_AND_SET_VERBOSE(lp_errors, x != SIZE);
   OMPVV_ERROR_IF(lp_errors, "Loop iteration variable in loop construct ended with invalid value.");
 
   for (x = 0; x < SIZE; ++x) {
@@ -66,7 +66,7 @@ int test_two_loop_levels() {
 
 #pragma omp parallel num_threads(OMPVV_NUM_THREADS_HOST)
   {
-#pragma omp loop lastprivate(x)
+#pragma omp loop lastprivate(x, y)
     for (x = 0; x < SIZE; ++x) {
       for (y = 0; y < SIZE; ++y) {
         a[x][y] += b[x][y];
@@ -74,8 +74,8 @@ int test_two_loop_levels() {
     }
   }
 
-  OMPVV_TEST_AND_SET_VERBOSE(lp_errors_x, x > SIZE || x < 0);
-  OMPVV_TEST_AND_SET_VERBOSE(lp_errors_y, y > SIZE || y < 0);
+  OMPVV_TEST_AND_SET_VERBOSE(lp_errors_x, x != SIZE);
+  OMPVV_TEST_AND_SET_VERBOSE(lp_errors_y, y != SIZE);
   OMPVV_ERROR_IF(lp_errors_x, "Outer loop iteration variable in loop directive with collapse ended with invalid value.");
   OMPVV_ERROR_IF(lp_errors_y, "Inner loop iteration variable in loop directive with collapse ended with invalid value.");
 
