@@ -66,7 +66,7 @@ int test_two_loop_levels() {
 
 #pragma omp parallel num_threads(OMPVV_NUM_THREADS_HOST)
   {
-#pragma omp loop lastprivate(x, y)
+#pragma omp loop lastprivate(x, y) collapse(2)
     for (x = 0; x < SIZE; ++x) {
       for (y = 0; y < SIZE; ++y) {
         a[x][y] += b[x][y];
