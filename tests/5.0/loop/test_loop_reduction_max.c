@@ -62,8 +62,6 @@ int test_max() {
 }
 
 int main() {
-  OMPVV_TEST_OFFLOADING;
-
   int total_errors = 0;
 
   OMPVV_TEST_AND_SET_VERBOSE(total_errors, test_max() != 0);
