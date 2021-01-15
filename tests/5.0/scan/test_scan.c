@@ -2,11 +2,11 @@
 //
 // OpenMP API Version 5.0 Nov 2018
 //
-// This test checks the parallel for directive with the order(concurrent)
-// The test performs simple operations on an int array which are then
-// checked for correctness. The specification indicates only that iterations
-// in the loop may be executed concurrently, so no particular order or lack
-// thereof can be required by this test.
+// This test checks the scan directive with both the inclusive and exclusive
+// clause, as well as the parallel for simd directive with the
+// reduction(inscan) clause. The test peforms the scan operation with the add
+// operator and then checks the results against an expected result from a
+// sequentially-computed prefix sum.
 //
 ////===----------------------------------------------------------------------===//
 #include <assert.h>
