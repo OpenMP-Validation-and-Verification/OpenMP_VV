@@ -42,7 +42,7 @@ int test_defaultmap_with_firstprivate() {
       new_struct.S[i] = 0;
    }
 
-   #pragma omp target defaultmap(firstprivate) map(from:ptr)
+   #pragma omp target defaultmap(firstprivate) 
    {
       scalar = 17;    
       A[0] = 5; A[1] = 5;
