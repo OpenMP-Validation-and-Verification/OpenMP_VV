@@ -4,7 +4,8 @@
 //
 // This test uses the collapse clause with the loop directive and tests that
 // for loops out of the scope of the collapsed loops are not parallelized.
-// This test tests using one and two collapsed loops.
+// This test tests using one and two collapsed loops. This test checks these
+// features in an offloading (target) context.
 //
 ////===----------------------------------------------------------------------===//
 
@@ -33,7 +34,7 @@ int test_collapse1() {
     }
   }
 
-#pragma omp parallel num_threads(OMPVV_NUM_THREADS_DEVICE)
+#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE) map(tofrom: a, b)
   {
 #pragma omp loop collapse(1)
     for (int x = 0; x < N; ++x) {
@@ -75,7 +76,7 @@ int test_collapse2() {
     }
   }
 
-#pragma omp parallel num_threads(OMPVV_NUM_THREADS_DEVICE)
+#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE) map(tofrom: a, b, num_threads)
   {
     if (omp_get_thread_num() == 0) {
       num_threads = omp_get_num_threads();
@@ -111,6 +112,10 @@ int test_collapse2() {
 }
 
 int main() {
+
+  //Check for offloading
+  OMPVV_TEST_OFFLOADING;
+
   int errors = 0;
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_collapse1() != 0);
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_collapse2() != 0);
