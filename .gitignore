@@ -5,5 +5,6 @@ ompvv/*.mod
 ompvv/*.a
 results.json
 results.csv
-recent_online_report_tags
+recent_REPORT_ONLINE_tags
+sys/scripts/API/__pycache__/
 *~
