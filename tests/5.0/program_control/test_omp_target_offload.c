@@ -54,10 +54,6 @@ int main() {
    OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
    offload_policy_t policy = get_offload_policy();
 
-   // check if OMP_TARGET_OFFLOAD is supported
-   OMPVV_ERROR_IF(_OPENMP< 201811,"ERROR: OMP_TARGET_OFFLOAD NOT supported by VER. %d",_OPENMP );
-   OMPVV_TEST_AND_SET_VERBOSE(errors, _OPENMP < 201811);
-
    // initialize values on the host
    scalar = 17;
    on_init_dev = 1;
