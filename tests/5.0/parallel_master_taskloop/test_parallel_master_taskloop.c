@@ -1,4 +1,4 @@
-//===--- test_parallel_parallel_master_taskloop.c -------------------------------===//
+//===--- test_parallel_master_taskloop.c -------------------------------===//
 //
 // OpenMP API Version 5.0 Nov 2018
 //
