@@ -1,4 +1,4 @@
-//===------ test_parallel_for_allocate.c ----------------------------------===//
+//===--- test_parallel_for_allocate.c -------------------------------------===//
 //
 // OpenMP API Version 5.0 Nov 2018
 //
@@ -22,7 +22,6 @@
 
 int test_parallel_for_allocate() {
   int errors = 0;
-
   int* x;
   int result[N][N];
   omp_memspace_handle_t x_memspace = omp_default_mem_space;
@@ -32,14 +31,16 @@ int test_parallel_for_allocate() {
 #pragma omp parallel for allocate(x_alloc: x) private(x) shared(result) num_threads(OMPVV_NUM_THREADS_HOST)
   for (int i = 0; i < N; i++) {
     x = (int *) malloc(N*sizeof(int));
+    if (x != NULL) {
 #pragma omp simd simdlen(16) aligned(x: 64)
-    for (int j = 0; j < N; j++) {
-      x[j] = j*i;
+      for (int j = 0; j < N; j++) {
+        x[j] = j*i;
+      }
+      for (int j = 0; j < N; j++) {
+        result[i][j] = x[j];
+      }
+      free(x);
     }
-    for (int j = 0; j < N; j++) {
-      result[i][j] = x[j];
-    }
-    free(x);
   }
 
   for (int i = 0; i < N; i++) {
