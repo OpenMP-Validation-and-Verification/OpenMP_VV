@@ -14,8 +14,8 @@
 
 #define N 1024
 
-int test_parallel_parallel_master_taskloop() {
-  OMPVV_INFOMSG("test_parallel_parallel_master_taskloop");
+int test_parallel_master_taskloop() {
+  OMPVV_INFOMSG("test_parallel_master_taskloop");
   int errors = 0;
   int num_threads = -1;
   int x[N];
@@ -50,7 +50,7 @@ int test_parallel_parallel_master_taskloop() {
 int main() {
   int errors = 0;
 
-  OMPVV_TEST_AND_SET_VERBOSE(errors, test_parallel_parallel_master_taskloop());
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_parallel_master_taskloop());
 
   OMPVV_REPORT_AND_RETURN(errors);
 }
