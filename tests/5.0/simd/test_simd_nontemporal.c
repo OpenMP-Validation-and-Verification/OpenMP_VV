@@ -27,12 +27,16 @@ int test_simd_nontemporal() {
    }   
 
    #pragma simd nontemporal (a, b, c)
-      for (i = 0; i < N; i++) {
+      for (i = 0; i < N; i += 100) {
          a[i] = b[i] * c[i];
       }   
 
    for (i = 0; i < N; i++) {
-      OMPVV_TEST_AND_SET(errors, a[i] != (b[i] * c[i]));
+      if (i % 100 == 0) { 
+         OMPVV_TEST_AND_SET(errors, a[i] != (b[i] * c[i]));
+      } else { 
+	 OMPVV_TEST_AND_SET(errors, a[i] != 10);
+      }
    }   
 
    return errors;
