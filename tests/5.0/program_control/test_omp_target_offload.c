@@ -89,8 +89,8 @@ int main() {
    OMPVV_ERROR_IF(policy==MANDATORY && isOffloading == 1 && on_init_dev != 0, "Did not follow MANDATORY, instead executed target region on host even though device was available");
    OMPVV_TEST_AND_SET(errors, policy==MANDATORY && isOffloading == 1 && on_init_dev != 0);
  
-   OMPVV_WARNING_IF(policy==UNKNOWN,"OMP_TARGET_OFFLOAD has an unknown value");
-   OMPVV_WARNING_IF(policy==NOTSET, "OMP_TARGET_OFFLOAD has not been set");
+   OMPVV_ERROR_IF(policy==UNKNOWN,"OMP_TARGET_OFFLOAD has an unknown value");
+   OMPVV_ERROR_IF(policy==NOTSET, "OMP_TARGET_OFFLOAD has not been set");
 
    OMPVV_REPORT_AND_RETURN(errors);
 }
