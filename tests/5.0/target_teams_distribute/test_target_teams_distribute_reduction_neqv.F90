@@ -54,7 +54,7 @@ CONTAINS
           result = a(x) .neqv. result
        END DO
 
-       OMPVV_TEST_AND_SET_VERBOSE(errors, result .ne. host_result)
+       OMPVV_TEST_AND_SET_VERBOSE(errors, result .neqv. host_result)
     END DO
 
     test_neqv = errors

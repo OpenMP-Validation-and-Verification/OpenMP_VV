@@ -4,7 +4,8 @@
 //
 //  This test checks for the use of the is_device_ptr() clause on an array that 
 //  is allocated with the omp_target_alloc() API call. If this test runs on the
-//  host, we will warn that we won't be allocating on any device
+//  host, we will warn that we won't be allocating on any device and the test 
+//  will fail.
 //
 ////===-------------------------------------------------------------------------===//
 
@@ -18,6 +19,8 @@
 #define N 10000
 
 int main() {
+  
+
   int isOffloading;
   OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
   
@@ -26,8 +29,15 @@ int main() {
   int errors = 0;
   int *array_device = NULL;
   int *array_host = NULL;
+  
 
   array_device = (int *) omp_target_alloc(N*sizeof(int), omp_get_default_device());
+  if (array_device == NULL) {
+    errors = 1; 
+    OMPVV_ERROR("Array device is null: cannot allocate memory on device, is_device_ptr() cannot be properly tested");
+    OMPVV_REPORT_AND_RETURN(errors);
+  } 
+ 
   array_host = (int *) malloc(N*sizeof(int));
 
   for (int i = 0; i < N; ++i) {

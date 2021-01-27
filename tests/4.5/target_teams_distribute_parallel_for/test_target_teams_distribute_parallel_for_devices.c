@@ -38,9 +38,11 @@ int test_target_teams_distribute_parallel_for_devices() {
 
   for (dev = 0; dev < num_dev; ++dev) {
     // check multiple devices 
-#pragma omp target teams distribute parallel for device(dev) map(from: isHost)
+#pragma omp target teams distribute parallel for device(dev) map(tofrom: isHost)
     for (i = 0; i < SIZE_N; i++) {
-      isHost[dev] = omp_is_initial_device();// Checking if running on a device
+      if (omp_get_team_num() == 0 && omp_get_thread_num() == 0) {
+        isHost[dev] = omp_is_initial_device();// Checking if running on a device
+      }
       a[i] += dev;
     }
   }
@@ -48,7 +50,7 @@ int test_target_teams_distribute_parallel_for_devices() {
   for (dev = 0; dev < num_dev; ++dev) {
 #pragma omp target exit data map(from: a[0:SIZE_N]) device(dev)
     OMPVV_INFOMSG("Device %d ran on the %s", dev, isHost[dev] ? "host" : "device");
-    OMPVV_TEST_AND_SET(errors, isHost[dev]);
+    OMPVV_TEST_AND_SET(errors, isHost[dev] && dev != omp_get_initial_device());
     for (i = 0; i < SIZE_N; i++) {
       OMPVV_TEST_AND_SET(errors, a[i] != 1 + dev);
     }

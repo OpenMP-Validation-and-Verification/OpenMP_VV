@@ -33,7 +33,7 @@ int test_collapse1() {
     }
   }
 
-#pragma omp target teams distribute map(to: a[0:ARRAY_SIZE][0:ARRAY_SIZE]) map(tofrom: b[0:ARRAY_SIZE][0:ARRAY_SIZE+1]) collapse(1)
+#pragma omp target teams distribute map(to: a[0:ARRAY_SIZE][0:ARRAY_SIZE]) map(tofrom: b[0:ARRAY_SIZE][0:ARRAY_SIZE+1]) collapse(1) num_teams(OMPVV_NUM_TEAMS_DEVICE)
   for (int x = 0; x < ARRAY_SIZE; ++x) {
     for (int y = 0; y < ARRAY_SIZE; ++y) {
       b[x][y + 1] = b[x][y] + a[x][y];
@@ -72,7 +72,7 @@ int test_collapse2() {
     }
   }
 
-#pragma omp target teams distribute map(to: a[0:ARRAY_SIZE][0:ARRAY_SIZE][0:ARRAY_SIZE]) map(tofrom: b[0:ARRAY_SIZE][0:ARRAY_SIZE][0:ARRAY_SIZE+1], num_teams) collapse(2)
+#pragma omp target teams distribute map(to: a[0:ARRAY_SIZE][0:ARRAY_SIZE][0:ARRAY_SIZE]) map(tofrom: b[0:ARRAY_SIZE][0:ARRAY_SIZE][0:ARRAY_SIZE+1], num_teams) collapse(2) num_teams(OMPVV_NUM_TEAMS_DEVICE)
   for (int x = 0; x < ARRAY_SIZE; ++x) {
     for (int y = 0; y < ARRAY_SIZE; ++y) {
       for (int z = 0; z < ARRAY_SIZE; ++z) {

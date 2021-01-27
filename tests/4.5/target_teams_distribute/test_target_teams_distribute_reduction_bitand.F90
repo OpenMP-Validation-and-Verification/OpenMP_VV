@@ -17,8 +17,6 @@ PROGRAM test_target_teams_distribute_device
   USE ompvv_lib
   USE omp_lib
   implicit none
-  INTEGER :: errors
-  errors = 0
 
   OMPVV_TEST_OFFLOADING
 
@@ -29,10 +27,11 @@ CONTAINS
   INTEGER FUNCTION test_bitand()
     INTEGER,DIMENSION(N):: a
     REAL(8),DIMENSION(N, 32):: randoms
-    INTEGER:: result, host_result, x, y, z, errors, itr_count
+    INTEGER:: result, host_result, x, y, errors, itr_count
     LOGICAL:: tested_true, tested_false
     REAL(8):: false_margin
     result = 0
+    errors = 0
 
     tested_true = .FALSE.
     tested_false = .FALSE.
@@ -46,9 +45,9 @@ CONTAINS
        CALL RANDOM_NUMBER(randoms)
        DO x = 1, N
           a(x) = 0
-          DO z = 1, 32
+          DO y = 1, 32
              IF (randoms(x, y) .lt. false_margin) THEN
-                a(x) = a(x) + (2**z)
+                a(x) = a(x) + (2**y)
                 tested_true = .TRUE.
              ELSE
                 tested_false = .TRUE.
@@ -58,9 +57,9 @@ CONTAINS
 
        result = 0
        host_result = 0
-       DO z = 1, 32
-          result = result + (2**z)
-          host_result = host_result + (2**z)
+       DO y = 1, 32
+          result = result + (2**y)
+          host_result = host_result + (2**y)
        END DO
 
        DO x = 1, N

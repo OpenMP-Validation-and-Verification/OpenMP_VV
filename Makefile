@@ -138,8 +138,12 @@ endif
 
 ifeq "$(SOURCES)" ""
 # Getting all the source files in the project
-SOURCES_C := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -name *.c)
-SOURCES_CPP := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -name *.cpp)
+ifdef LINK_OMPVV_LIB
+SOURCES_C := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -name "*.c")
+else
+SOURCES_C := $(shell find $(CURDIR)/tests/$(OMP_VERSION) ! -name qmcpack_target_static_lib.c -name "*.c")
+endif
+SOURCES_CPP := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -name "*.cpp")
 SOURCES_F := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -name "*.F90" -o -name "*.F95" -o -name "*.F03" -o -name "*.F" -o -name "*.FOR" | grep -v "ompvv.F90")
 
 # Find all the binary files that have been previously compiled
@@ -235,13 +239,43 @@ ifdef NO_OFFLOADING
 endif
 
 ##################################################
+# OMPVV static library
+##################################################
+
+OMPVVLIB=-L$(CURDIR)/ompvv -lompvv
+OMPVVLIB_DEP=$(CURDIR)/ompvv/libompvv.a
+
+$(BINDIR)/libompvv.o: $(CURDIR)/ompvv/libompvv.c $(BINDIR)
+	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC)
+	$(call log_section_header,"COMPILE CC="${CCOMPILE},$(SYSTEM),$<,$(CC) $(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(C_VERSION)),$(OMP_VERSION),$(notdir $(@:.o=.log)))
+	-$(QUIET)$(call loadModules,$(C_COMPILER_MODULE)) $(CCOMPILE) $(VERBOSE_MODE) $(DTHREADS) $(DTEAMS) $(HTHREADS) $< -c -o $(BINDIR)/$(notdir $@) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
+		&& echo "PASS" > $(LOGTEMPFILE) \
+		|| echo "FAIL" > $(LOGTEMPFILE))
+	-$(call log_section_footer,"COMPILE CC="${CCOMPILE},$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.o=.log)))
+	-@$(if $(LOG), rm $(LOGTEMPFILE))
+
+$(CURDIR)/ompvv/libompvv.a: $(BINDIR)/libompvv.o
+	ar -rc $(CURDIR)/ompvv/libompvv.a $(BINDIR)/libompvv.o
+	@ranlib $(CURDIR)/ompvv/libompvv.a
+
+##################################################
 # Compilation rules
 ##################################################
 # c files rule
 %.c.o: %.c $(BINDIR) $(LOGDIR)
 	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC)
-	$(call log_section_header,"COMPILE CC="${CCOMPILE},$(SYSTEM),$<,$(CC) $(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(C_VERSION)),$(notdir $(@:.o=.log)))
+	$(call log_section_header,"COMPILE CC="${CCOMPILE},$(SYSTEM),$<,$(CC) $(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(C_VERSION)),$(OMP_VERSION),$(notdir $(@:.o=.log)))
 	-$(QUIET)$(call loadModules,$(C_COMPILER_MODULE)) $(CCOMPILE) $(VERBOSE_MODE) $(DTHREADS) $(DTEAMS) $(HTHREADS) $< -o $(BINDIR)/$(notdir $@) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
+		&& echo "PASS" > $(LOGTEMPFILE) \
+		|| echo "FAIL" > $(LOGTEMPFILE))
+	-$(call log_section_footer,"COMPILE CC="${CCOMPILE},$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.o=.log)))
+	-@$(if $(LOG), rm $(LOGTEMPFILE))
+
+# Special rule for test that needs OMPVV lib
+$(CURDIR)/tests/4.5/application_kernels/qmcpack_target_static_lib.c.o: $(CURDIR)/tests/4.5/application_kernels/qmcpack_target_static_lib.c $(BINDIR) $(LOGDIR) $(OMPVVLIB_DEP)
+	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC)
+	$(call log_section_header,"COMPILE CC="${CCOMPILE},$(SYSTEM),$<,$(CC) $(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(C_VERSION)),$(OMP_VERSION),$(notdir $(@:.o=.log)))
+	-$(QUIET)$(call loadModules,$(C_COMPILER_MODULE)) $(CCOMPILE) $(VERBOSE_MODE) $(DTHREADS) $(DTEAMS) $(HTHREADS) $< -o $(BINDIR)/$(notdir $@) $(OMPVVLIB) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
 		|| echo "FAIL" > $(LOGTEMPFILE))
 	-$(call log_section_footer,"COMPILE CC="${CCOMPILE},$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.o=.log)))
@@ -250,7 +284,7 @@ endif
 # c++ files rule
 %.cpp.o: %.cpp $(BINDIR) $(LOGDIR)
 	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC)
-	$(call log_section_header,"COMPILE CPP="${CXXCOMPILE},$(SYSTEM),$<,$(CXX) $(shell $(call loadModules,$(CXX_COMPILER_MODULE),"shut up") $(CXX_VERSION)),$(notdir $(@:.o=.log)))
+	$(call log_section_header,"COMPILE CPP="${CXXCOMPILE},$(SYSTEM),$<,$(CXX) $(shell $(call loadModules,$(CXX_COMPILER_MODULE),"shut up") $(CXX_VERSION)),$(OMP_VERSION),$(notdir $(@:.o=.log)))
 	-$(QUIET)$(call loadModules,$(CXX_COMPILER_MODULE)) $(CXXCOMPILE) $(VERBOSE_MODE) $(DTHREADS) $(DTEAMS) $(HTHREADS) $< -o $(BINDIR)/$(notdir $@) $(if $(LOG),$(RECORD)$(notdir $(@:.o=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
 		|| echo "FAIL" > $(LOGTEMPFILE))
@@ -260,7 +294,7 @@ endif
 # fortran files rule
 %.FOR.o: % $(BINDIR) $(LOGDIR) clear_fortran_mod
 	@echo -e $(TXTYLW)"\n\n" compile: $< $(TXTNOC)
-	$(call log_section_header,"COMPILE F="${FCOMPILE},$(SYSTEM),$<,$(FC) $(shell $(call loadModules,$(F_COMPILER_MODULE),"shut up") $(F_VERSION)),$(notdir $(@:.FOR.o=.log)))
+	$(call log_section_header,"COMPILE F="${FCOMPILE},$(SYSTEM),$<,$(FC) $(shell $(call loadModules,$(F_COMPILER_MODULE),"shut up") $(F_VERSION)),$(OMP_VERSION),$(notdir $(@:.FOR.o=.log)))
 	-$(QUIET)$(call loadModules,$(F_COMPILER_MODULE)) $(FCOMPILE) $(VERBOSE_MODE) $(DTHREADS) $(DTEAMS) $(HTHREADS) $< -o $(BINDIR)/$(notdir $(@:.FOR.o=.o)) $(if $(LOG),$(RECORD)$(notdir $(@:.FOR.o=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
 		|| echo "FAIL" > $(LOGTEMPFILE))
@@ -273,7 +307,7 @@ endif
 ##################################################
 # run c app rule
 %.c.run: $(OBJS_C)
-	$(call log_section_header,"RUN",$(SYSTEM),$(@:.run=),$(LOG_NOTE),$(notdir $(@:.run=.log)))
+	$(call log_section_header,"RUN",$(SYSTEM),$(@:.run=),$(LOG_NOTE),$(OMP_VERSION),$(notdir $(@:.run=.log)))
 	@echo -e $(TXTGRN)"\n\n" running: $@ $(TXTNOC) $(if $(LOG), ${RECORD}$(notdir $(@:.run=.log)))
 	-$(call loadModules,$(C_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.run=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.run=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
@@ -283,7 +317,7 @@ endif
 
 # run c++ app rule
 %.cpp.run: $(OBJS_CPP)
-	$(call log_section_header,"RUN",$(SYSTEM),$(@:.run=),$(LOG_NOTE),$(notdir $(@:.run=.log)))
+	$(call log_section_header,"RUN",$(SYSTEM),$(@:.run=),$(LOG_NOTE),$(OMP_VERSION),$(notdir $(@:.run=.log)))
 	@echo -e $(TXTGRN)"\n\n" running: $@ $(TXTNOC) $(if $(LOG), ${RECORD}$(notdir $(@:.run=.log)))
 	-$(call loadModules,$(CXX_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.run=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.run=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
@@ -292,7 +326,7 @@ endif
 	-@$(if $(LOG), rm $(LOGTEMPFILE))
 # run c app rule
 %.FOR.run: $(OBJS_F)
-	$(call log_section_header,"RUN",$(SYSTEM),$(@:.FOR.run=),$(LOG_NOTE),$(notdir $(@:.FOR.run=.log)))
+	$(call log_section_header,"RUN",$(SYSTEM),$(@:.FOR.run=),$(LOG_NOTE),$(OMP_VERSION),$(notdir $(@:.FOR.run=.log)))
 	@echo -e $(TXTGRN)"\n\n" running: $@ $(TXTNOC) $(if $(LOG), ${RECORD}$(notdir $(@:.FOR.run=.log)))
 	-$(call loadModules,$(F_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.FOR.run=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.FOR.run=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
@@ -305,7 +339,7 @@ endif
 ##################################################
 # run c app rule
 %.c.runonly:
-	$(call log_section_header,"RUN",$(SYSTEM),$(@:.runonly=),$(LOG_NOTE),$(notdir $(@:.runonly=.log)))
+	$(call log_section_header,"RUN",$(SYSTEM),$(@:.runonly=),$(LOG_NOTE),$(OMP_VERSION),$(notdir $(@:.runonly=.log)))
 	@echo -e $(TXTGRN)"\n\n" running previously compiled: $@ $(TXTNOC) $(if $(LOG), ${RECORD}$(notdir $(@:.runonly=.log)))
 	-$(call loadModules,$(C_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.runonly=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.runonly=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
@@ -315,7 +349,7 @@ endif
 
 # run c++ app rule
 %.cpp.runonly:
-	$(call log_section_header,"RUN",$(SYSTEM),$(@:.runonly=),$(LOG_NOTE),$(notdir $(@:.runonly=.log)))
+	$(call log_section_header,"RUN",$(SYSTEM),$(@:.runonly=),$(LOG_NOTE),$(OMP_VERSION),$(notdir $(@:.runonly=.log)))
 	@echo -e $(TXTGRN)"\n\n" running previously compiled: $@ $(TXTNOC) $(if $(LOG), ${RECORD}$(notdir $(@:.runonly=.log)))
 	-$(call loadModules,$(CXX_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.runonly=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.runonly=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
@@ -324,7 +358,7 @@ endif
 	-@$(if $(LOG), rm $(LOGTEMPFILE))
 # run c app rule
 %.FOR.runonly:
-	$(call log_section_header,"RUN",$(SYSTEM),$(@:.FOR.runonly=),$(LOG_NOTE),$(notdir $(@:.FOR.runonly=.log)))
+	$(call log_section_header,"RUN",$(SYSTEM),$(@:.FOR.runonly=),$(LOG_NOTE),$(OMP_VERSION),$(notdir $(@:.FOR.runonly=.log)))
 	@echo -e $(TXTGRN)"\n\n" running previously compiled: $@ $(TXTNOC) $(if $(LOG), ${RECORD}$(notdir $(@:.FOR.runonly=.log)))
 	-$(call loadModules,$(F_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.FOR.runonly=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.FOR.runonly=.log))\
 		&& echo "PASS" > $(LOGTEMPFILE) \
@@ -453,6 +487,10 @@ help:
 	@echo "  MODULE_LOAD=1             Before compiling or running, module load is called"
 	@echo "  ADD_BATCH_SCHED=1         Add the jsrun command before the execution of the running script to send it to a compute node"
 	@echo "  NO_OFFLOADING=1           Turn off offloading"
+	@echo "  LINK_OMPVV_LIB=1          Link the OMPVV static library (in ompvv folder) and run the static lib test"
+	@echo "  NUM_THREADS_HOST=n        Specify n, requested number of threads for tests that use num_threads() on host constructs"
+	@echo "  NUM_THREADS_DEVICE=n      Specify n, requested number of threads for tests that use num_threads() on device constructs"
+	@echo "  NUM_TEAMS_DEVICE=n        Specify n, requested number of threads for tests that use num_teams() on device constructs"
 	@echo "  SOURCES=file or exp       Specify the source file(s) that you want to apply the rule to. You can use wildchars to select a subset of tests"
 	@echo "  OMP_VERSION=[e.g. 4.5]    This specifies which version of the specs we are targeting. This version should have its folder in tests/[version]"
 	@echo "                            default value is 4.5"

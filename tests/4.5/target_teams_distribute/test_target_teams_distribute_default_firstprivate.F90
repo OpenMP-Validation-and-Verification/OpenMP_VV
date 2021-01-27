@@ -46,9 +46,10 @@ CONTAINS
        privatized_array(x) = 0
     END DO
 
-    !$omp target data map(from: d(1:N)) map(to: a(1:N), b(1:N), c(1:N))
+    !$omp target data map(from: d(1:N), num_teams(1:N)) &
+    !$omp& map(to: a(1:N), b(1:N), c(1:N))
     !$omp target teams distribute default(firstprivate) &
-    !$omp& map(alloc: a(1:N), b(1:N), c(1:N), d(1:N)) num_teams(10)
+    !$omp& shared(a, b, c, d, num_teams) num_teams(OMPVV_NUM_TEAMS_DEVICE)
     DO x = 1, N
        num_teams(x) = omp_get_num_teams()
        DO y = 1, a(x) + b(x)
@@ -97,9 +98,10 @@ CONTAINS
        privatized_array(x) = x
     END DO
 
-    !$omp target data map(from: d(1:N)) map(to: a(1:N), b(1:N), c(1:N))
-    !$omp target teams distribute default(firstprivate) &
-    !$omp& map(alloc: a(1:N), b(1:N), c(1:N), d(1:N)) num_teams(10)
+    !$omp target data map(from: d(1:N), num_teams(1:N)) &
+    !$omp& map(to: a(1:N), b(1:N), c(1:N))
+    !$omp target teams distribute default(firstprivate) shared(d) &
+    !$omp& map(alloc: a(1:N), b(1:N), c(1:N), d(1:N)) num_teams(OMPVV_NUM_TEAMS_DEVICE)
     DO x = 1, N
        num_teams(x) = omp_get_num_teams()
        d(x) = a(x) + b(x) + c(x) + privatized_array(MOD(x, 10) + 1) + privatized

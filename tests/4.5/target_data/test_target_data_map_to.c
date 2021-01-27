@@ -45,6 +45,12 @@ int test_map_to() {
   int *d_array2 =
       (int *)omp_target_alloc(N*sizeof(int), omp_get_default_device());
 
+  if (d_array == NULL || d_array2 == NULL ) {
+    errors = 1;
+    OMPVV_ERROR("omp_target_alloc returns NULL, this test is running on host, cannot properly test mapping of variables to device.");
+    return errors;
+  }
+
 #pragma omp target data map(to: h_array_h[0:N])  \
         map(to: h_array_s[0:N]) 
   {

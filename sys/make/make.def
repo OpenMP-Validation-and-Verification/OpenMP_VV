@@ -34,7 +34,7 @@
 # Loading modules
 ##################################################
 define loadModules
-       $(if $(MODULE_LOAD), module load $(1) $(CUDA_MODULE) $(if $(or $(QUIET), $(2)), > /dev/null 2> /dev/null,);,)
+  $(if $(MODULE_LOAD), module load $(CUDA_MODULE) $(1) $(if $(or $(QUIET), $(2)), > /dev/null 2> /dev/null,);,)
 endef
 
 ##################################################
@@ -42,16 +42,16 @@ endef
 ##################################################
 
 # Check if we are working on a git folder
-OMPVV_IS_GIT=${shell git rev-parse --is-inside-work-tree}
+OMPVV_IS_GIT=${shell git rev-parse --is-inside-work-tree 2> /dev/null}
 ifeq ("${OMPVV_IS_GIT}", "true")
   OMPVV_GIT_COMMIT=${shell git log -n 1 --pretty=format:%h}
 else
   OMPVV_GIT_COMMIT=""
 endif
 
-# parameters (1) Action (2) System (3) Filename (4) other Info (compiler) (5) Log File
+# parameters (1) Action (2) System (3) Filename (4) other Info (compiler) (5) OMP spec version (6) Log File
 define log_section_header
-  -$(if $(LOG), @echo -e "*-*-*BEGIN*-*-*$(1)*-*-*$$(date)*-*-*$(2)*-*-*$(shell realpath --relative-to="$$(pwd)" $(3))*-*-*$(4)*-*-*$(OMPVV_GIT_COMMIT)*-*-*" >> $(LOGDIR)/$(5);,)
+  -$(if $(LOG), @echo -e "*-*-*BEGIN*-*-*$(1)*-*-*$$(date)*-*-*$(2)*-*-*$(shell realpath --relative-to="$$(pwd)" $(3))*-*-*$(4)*-*-*$(OMPVV_GIT_COMMIT)*-*-*$(5)*-*-*" >> $(LOGDIR)/$(6);,)
 endef
 
 # parameters (1) Action (2) System (3) Output status  (4) other Info (compiler) (5) Log File
@@ -61,7 +61,7 @@ endef
 #---------------------------------------------------------------------------
 # C compilers
 #---------------------------------------------------------------------------
-CCOMPILERS?="cc, clang, gcc, xlc"
+CCOMPILERS?="cc, clang, gcc, xlc, icx"
 C_VERSION?= echo "version unknown"
 CC?=none
 CPP?=none
@@ -71,16 +71,16 @@ FC?=none
 ifeq ($(DEVICE_TYPE), amd)
   # CRAY compiler (AMD)
   ifeq ($(CC), cc)
-    CFLAGS += -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx906
+    CFLAGS += -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa
     CLINK = cc
-    CLINKFLAGS += -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx906
+    CLINKFLAGS += -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa
   endif
-else
+else ifeq ($(DEVICE_TYPE), nvidia)
   # CRAY compiler (NVIDIA)
   ifeq ($(CC), cc)
-    CFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
+    CFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target
     CLINK = cc
-    CLINKFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
+    CLINKFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target
   endif
 endif
 
@@ -91,6 +91,7 @@ ifeq ($(CC), gcc)
   CFLAGS += -O3 -std=c99 -fopenmp $(COFFLOADING)
   CLINK = gcc
   CLINKFLAGS += -O3 -fopenmp $(COFFLOADING)
+  C_VERSION = echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") gcc --version | head -n 1 | sed 's/.* \([0-9]*\.[0-9]*\.[0-9]*\).*/\1/g')"
 endif
 
 # IBM XL compiler
@@ -102,6 +103,16 @@ ifeq ($(CC), xlc)
   CLINKFLAGS += -O3 -qsmp=omp $(COFFLOADING)
 endif
 
+# Intel ICX compiler
+ifeq ($(CC), icx)
+  COFFLOADING = -fopenmp-targets=spir64
+  C_NO_OFFLOADING =
+  CFLAGS += -lm -O3 -fiopenmp $(COFFLOADING) -D__STRICT_ANSI__
+  CLINK = icx
+  CLINKFLAGS += -lm -O3 -fiopenmp $(COFFLOADING)
+  C_VERSION = echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") icx -dumpversion)"
+endif
+
 # Clang compiler
 ifeq ($(CC), clang)
   COFFLOADING = -fopenmp-targets=nvptx64-nvidia-cuda
@@ -111,12 +122,13 @@ ifeq ($(CC), clang)
   CFLAGS +=  -D__NO_MATH_INLINES -U__SSE2_MATH__ -U__SSE_MATH__
   CLINK = clang
   CLINKFLAGS += -lm -O3 -fopenmp $(COFFLOADING)
+  C_VERSION = echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") clang --version | head -n 1 | sed 's/clang version \([0-9]*\.[0-9]*\.[0-9]*\)/\1/g')"
 endif
 
 # AOMP compiler
 ifeq ($(CC), aomp)
   $(warning "AOMP is still experimental. AOMP uses clang front end, make sure the clang aomp is selected")
-  INSTALLED_GPU  = $(shell $(call loadModules, $(C_COMPILER_MODULE)) mygpu -d gfx900 2> /dev/null)
+  INSTALLED_GPU  = $(shell $(call loadModules, $(C_COMPILER_MODULE),"shut up") mygpu -d gfx900 2> /dev/null)
   AOMP_GPU       ?= $(INSTALLED_GPU)
   AOMP_CPUTARGET ?= x86_64-pc-linux-gnu
   ifeq (sm_,$(findstring sm_,$(AOMP_GPU)))
@@ -151,7 +163,7 @@ endif
 #---------------------------------------------------------------------------
 # C++ compilers
 #---------------------------------------------------------------------------
-CXXCOMPILERS?="clang++, g++, xlc++"
+CXXCOMPILERS?="clang++, g++, xlc++, icpx"
 CXX_VERSION?= echo "version unknown"
 
 # CRAY compilers
@@ -178,6 +190,7 @@ ifeq ($(CXX), g++)
   CXXFLAGS += -std=c++11 -O3 -fopenmp $(CXXOFFLOADING)
   CXXLINK = g++
   CXXLINKFLAGS += -O3 -fopenmp $(CXXOFFLOADING)
+  CXX_VERSION = echo "$(shell $(call loadModules,$(CXX_COMPILER_MODULE),"shut up") g++ --version | head -n 1 | sed 's/.* \([0-9]*\.[0-9]*\.[0-9]*\).*/\1/g')"
 endif
 
 # IBM XL compiler
@@ -189,6 +202,16 @@ ifeq ($(CXX), xlc++)
   CXXLINKFLAGS += -O3 -qsmp=omp $(CXXOFFLOADING)
 endif
 
+# Intel ICPX compiler
+ifeq ($(CXX), icpx)
+  CXXOFFLOADING = -fopenmp-targets=spir64
+  CXX_NO_OFFLOADING =
+  CXXFLAGS += -lm -O3 -fiopenmp $(CXXOFFLOADING) -D__STRICT_ANSI__
+  CXXLINK = icpx
+  CXXLINKFLAGS += -lm -O3 -fiopenmp $(CXXOFFLOADING)
+  CXX_VERSION = echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") icpx -dumpversion)"
+endif
+
 # Clang compiler
 ifeq ($(CXX), clang++)
   CXXOFFLOADING = -fopenmp-targets=nvptx64-nvidia-cuda
@@ -198,12 +221,13 @@ ifeq ($(CXX), clang++)
   CXXFLAGS +=  -D__NO_MATH_INLINES -U__SSE2_MATH__ -U__SSE_MATH__
   CXXLINK = clang++
   CXXLINKFLAGS += -lm -O3 -fopenmp $(CXXOFFLOADING)
+  CXX_VERSION = echo "$(shell $(call loadModules,$(CXX_COMPILER_MODULE),"shut up") clang++ --version | head -n 1 | sed 's/clang version \([0-9]*\.[0-9]*\.[0-9]*\)/\1/g')"
 endif
 
 # AOMP compiler
 ifeq ($(CXX), aomp)
   $(warning "AOMP is still experimental. AOMP uses clang front end, make sure the clang aomp is selected")
-  INSTALLED_GPU  = $(shell $(call loadModules, $(C_COMPILER_MODULE)) mygpu -d gfx900 2> /dev/null)
+  INSTALLED_GPU  = $(shell $(call loadModules, $(C_COMPILER_MODULE),"shut up") mygpu -d gfx900 2> /dev/null)
   AOMP_GPU       ?= $(INSTALLED_GPU)
   AOMP_CPUTARGET ?= x86_64-pc-linux-gnu
   ifeq (sm_,$(findstring sm_,$(AOMP_GPU)))
@@ -238,7 +262,7 @@ endif
 #---------------------------------------------------------------------------
 # FORTRAN compilers
 #---------------------------------------------------------------------------
-FCOMPILERS?="gfortran, xlf"
+FCOMPILERS?="gfortran, xlf, ifx"
 F_VERSION?= echo "version unknown"
 
 # GCC compiler
@@ -248,6 +272,7 @@ ifeq ($(FC), gfortran)
   FFLAGS += -O3 -fopenmp $(FOFFLOADING) -ffree-line-length-none -J./ompvv
   FLINK = gcc
   FLINKFLAGS += -O3 -fopenmp $(FOFFLOADING)
+  F_VERSION = echo "$(shell $(call loadModules,$(F_COMPILER_MODULE),"shut up") gfortran --version | head -n 1 | sed 's/.* \([0-9]*\.[0-9]*\.[0-9]*\).*/\1/g')"
 endif
 
 # IBM XLF compiler
@@ -259,6 +284,16 @@ ifeq ($(FC), $(filter $(FC), xlf xlf_r))
   FFLAGS += -O3 -qsmp=omp $(FOFFLOADING) -qmoddir=./ompvv -DEXIT=EXIT_
   FLINK = xlc
   FLINKFLAGS += -O3 -qsmp=omp $(FOFFLOADING)
+endif
+
+# Intel IFX compiler
+ifeq ($(FC), ifx)
+  FOFFLOADING = -fopenmp-targets=spir64
+  F_NO_OFFLOADING =
+  FFLAGS += -O3 -fiopenmp $(FOFFLOADING)
+  FLINK = ifx
+  FLINKFLAGS += -O3 -fiopenmp $(FOFFLOADING)
+  F_VERSION = echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") ifx --version | grep 'ifx' | grep -oh '[0-9.]\+[a-zA-Z0-9. ]*')"
 endif
 
 # CRAY compilers

@@ -15,6 +15,7 @@
 #include <math.h>
 
 #define N 1024
+#define THRESHOLD 2014
 
 int test_bitor() {
   int a[N];
@@ -22,7 +23,7 @@ int test_bitor() {
   double true_margin = pow(exp(1), log(.5)/N);
   int errors = 0;
   int num_teams[N];
-  int have_true, have_false;
+  int have_true = 0, have_false = 0;
   int num_attempts = 0;
   srand(1);
 
@@ -48,7 +49,7 @@ int test_bitor() {
 
   unsigned int b = 0;
 
-#pragma omp target teams distribute reduction(|:b) map(to: a[0:N]) map(from: b, num_teams[0:N])
+#pragma omp target teams distribute reduction(|:b) map(to: a[0:N]) map(tofrom: b) map(from: num_teams[0:N])
   for (int x = 0; x < N; ++x) {
     num_teams[x] = omp_get_num_teams();
     b = b | a[x];
