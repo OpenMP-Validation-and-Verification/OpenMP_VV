@@ -21,7 +21,7 @@ int a[N], b[N], c[N];
 int errors = 0;
 int i = 0;
 
-#pragma omp begin declare target
+#pragma omp declare target
 #pragma omp declare target device_type(nohost)
 int update() { 
   #pragma omp parallel for 
