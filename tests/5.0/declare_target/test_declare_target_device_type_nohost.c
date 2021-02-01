@@ -22,9 +22,8 @@ int errors = 0;
 int i = 0;
 
 #pragma omp declare target
-#pragma omp declare target device_type(nohost)
-int update() { 
-  #pragma omp parallel for 
+#pragma omp declare target device_type(nohost) to(a,b,c,i)
+void update() { 
   for (i = 0; i < N; i++) {
     a[i] += 1;
     b[i] += 2;
@@ -35,7 +34,8 @@ int update() {
 
 int test_declare_target_device_type_host() { 
 
-  #pragma omp target map(tofrom: a,b,c) 
+  #pragma omp target update to(a,b,c)
+  #pragma omp target  
   {
     update();
 
@@ -45,8 +45,8 @@ int test_declare_target_device_type_host() {
       c[i] += 3 * i;
     }
   }
+  #pragma omp target update from (a,b,c)
   
-
   for (i = 0; i < N; i++) { //check array values on host
     if ( a[i] != 2 * i + 1 || b[i] != 4 * i + 2 || c[i] != 6 * i + 3 ) {
       errors++;

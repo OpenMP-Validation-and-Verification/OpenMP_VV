@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include "ompvv.h"
 
-#define N 8
+#define N 1024
 
 int a[N], b[N], c[N];  
 int errors = 0;
@@ -24,7 +24,6 @@ int i = 0;
 #pragma omp declare target
 #pragma omp declare target device_type(host) to(a, b, c, i)
 void update() { 
-  #pragma omp parallel for 
   for (i = 0; i < N; i++) {
     a[i] += 1;
     b[i] += 2;
@@ -37,7 +36,7 @@ int test_declare_target_device_type_host() {
 
 
   #pragma omp target update to(a,b,c)
-  #pragma omp target map(to:i)  
+  #pragma omp target   
   {
     for (i = 0; i < N; i++) {
       a[i] += i;
