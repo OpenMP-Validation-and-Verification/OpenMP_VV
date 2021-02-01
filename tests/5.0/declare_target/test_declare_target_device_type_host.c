@@ -37,7 +37,7 @@ int test_declare_target_device_type_host() {
 
 
   #pragma omp target update to(a,b,c)
-  #pragma omp target map(to:i) //map(tofrom: a,b,c) 
+  #pragma omp target map(to:i)  
   {
     for (i = 0; i < N; i++) {
       a[i] += i;
@@ -55,8 +55,6 @@ int test_declare_target_device_type_host() {
       errors++;
     }
    
-    printf("a[%d]:%d, b[%d]:%d, c[%d]:%d \n",i,a[i],i,b[i],i,c[i]);
-    printf("");
   }
   return errors;
 }
