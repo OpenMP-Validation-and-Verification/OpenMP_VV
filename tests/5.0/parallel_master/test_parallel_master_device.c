@@ -49,6 +49,7 @@ int test_parallel_master_device() {
 
   OMPVV_WARNING_IF(num_threads == 1, "Test ran with one thread, so parallelism of parallel master with taskloop can't be guaranteed.");
   OMPVV_ERROR_IF(num_threads < 1, "Test returned an invalid number of threads.");
+  OMPVV_TEST_AND_SET_VERBOSE(errors, num_threads < 1);
 
   return errors;
 }
