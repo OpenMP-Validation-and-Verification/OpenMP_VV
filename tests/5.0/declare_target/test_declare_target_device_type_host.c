@@ -15,15 +15,15 @@
 #include <stdlib.h>
 #include "ompvv.h"
 
-#define N 1024
+#define N 8
 
 int a[N], b[N], c[N];  
 int errors = 0;
 int i = 0;
 
-#pragma omp begin declare target
-#pragma omp declare target device_type(host)
-int update() { 
+#pragma omp declare target
+#pragma omp declare target device_type(host) to(a, b, c, i)
+void update() { 
   #pragma omp parallel for 
   for (i = 0; i < N; i++) {
     a[i] += 1;
@@ -35,7 +35,9 @@ int update() {
 
 int test_declare_target_device_type_host() { 
 
-  #pragma omp target map(tofrom: a,b,c) 
+
+  #pragma omp target update to(a,b,c)
+  #pragma omp target map(to:i) //map(tofrom: a,b,c) 
   {
     for (i = 0; i < N; i++) {
       a[i] += i;
@@ -43,16 +45,19 @@ int test_declare_target_device_type_host() {
       c[i] += 3 * i;
     }
   }
-  
+  #pragma omp target update from( a, b, c)
+
   //on host
   update();
 
   for (i = 0; i < N; i++) { //check array values on host
-    if ( a[i] != 2 * i + 1 || b[i] != 4 * i + 2 || c[i] != 6 * i + 3 ) {
+    if ( a[i] != i + 1 || b[i] != 2 * i + 2 || c[i] != 3 * i + 3 ) {
       errors++;
     }
+   
+    printf("a[%d]:%d, b[%d]:%d, c[%d]:%d \n",i,a[i],i,b[i],i,c[i]);
+    printf("");
   }
-  
   return errors;
 }
 
@@ -60,9 +65,9 @@ int main () {
   
   //initalize arrays on host
   for (i = 0; i < N; i++) {
-    a[i] = i;
-    b[i] = 2 * i;
-    c[i] = 3 * i;
+    a[i] = 0;
+    b[i] = 0;
+    c[i] = 0;
   }
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_declare_target_device_type_host());
