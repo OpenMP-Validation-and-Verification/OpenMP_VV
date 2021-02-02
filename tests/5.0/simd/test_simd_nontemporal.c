@@ -1,12 +1,13 @@
-//===--- test_simd_nontemporal.c ------------------------------------------------------------------------===//
+//===--- test_simd_nontemporal.c -----------------------------------------------------===//
 //
 // OpenMP API Version 5.0 Nov 2018
 //  
-// This test checks for support of the nontemporal clause on a simd construct. The nontemporal clause 
-// indicates that accesses to the storage location of list items have low temporal locality across the
-// iterations in which those storage locations are accessed. 
+// This test checks for support of the nontemporal clause on a simd construct. 
+// The nontemporal clause indicates that accesses to the storage location of list 
+// items have low temporal locality across the iterations in which those storage 
+// locations are accessed. 
 //  
-////===--------------------------------------------------------------------------------------------------===//
+////===-------------------------------------------------------------------------------===//
 
 #include <omp.h>
 #include <stdio.h>
