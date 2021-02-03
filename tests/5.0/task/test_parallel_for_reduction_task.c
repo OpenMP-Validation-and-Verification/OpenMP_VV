@@ -3,10 +3,8 @@
 // OpenMP API Version 5.0 Nov 2018
 //
 // This test checks the parallel for directive with the reduction clause and
-// task modifier. It performs simple array operations which are added to
-// reduction variables in two tasks, one with the in_reduction clause and the
-// other without. Only the in_reduction task should participate in the
-// reduction.
+// task modifier. It performs simple array operations which are added to the
+// reduction variable in an explicit task with the in_reduction clause.
 //
 ////===----------------------------------------------------------------------===//
 #include <assert.h>
@@ -35,8 +33,6 @@ int test_parallel_for_reduction_task() {
   for (int i = 0; i < N; i++) {
 #pragma omp task in_reduction(+: sum)
     sum += y[i]*z[i];
-#pragma omp task
-    sum += y[i]*z[i];        // These writes should not be included in the reduction
     if (omp_get_thread_num() == 0) {
       num_threads = omp_get_num_threads();
     }
