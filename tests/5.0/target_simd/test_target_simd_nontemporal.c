@@ -33,7 +33,7 @@ int test_simd_nontemporal() {
       }   
 
    for (i = 0; i < N; i++) {
-      if (i % 100 == 0) { 
+      if (i % STRIDE_LEN == 0) { 
          OMPVV_TEST_AND_SET(errors, a[i] != (b[i] * c[i]));
       } else { 
 	 OMPVV_TEST_AND_SET(errors, a[i] != 10);
