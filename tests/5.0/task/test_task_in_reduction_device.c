@@ -4,9 +4,8 @@
 //
 // This test checks the task directive with the `in_reduction` reduction
 // participation clause. It performs simple array operations which are added
-// to reduction variables in two tasks, one with the in_reduction clause and
-// the other without. Only the in_reduction task should participate in the
-// reduction. This test checks the above in a target context.
+// to a reduction variable in an explcit task with the in_reduction clause.
+// This test checks the above in a target context.
 //
 ////===----------------------------------------------------------------------===//
 #include <assert.h>
@@ -39,13 +38,6 @@ int test_task_in_reduction() {
       {
         for (int i = 0; i < N; i++) {
           sum += y[i]*z[i];
-        }
-      }
-#pragma omp task
-      {
-        for (int i = 0; i < N; i++) {
-          sum += y[i]*z[i];  // These writes to sum should not be included
-                             // in the reduction operation.
         }
       }
       num_threads = omp_get_num_threads();
