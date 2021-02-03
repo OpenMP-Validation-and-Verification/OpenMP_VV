@@ -48,14 +48,14 @@ void go(int turn, int a[], int b[], omp_depend_t *obj) {
    #pragma omp parallel num_threads(2)
    #pragma omp single 
    {
-      #pragma omp task depend(depobj *obj)
+      #pragma omp task depend(depobj: *obj)
       {      
          for (int i = 0; i < N; i++) {
               a[i] += 1;
          }
       }
       
-      #pragma omp task depend(in a[:n])
+      #pragma omp task depend(in: a[:N])
       { 
          for (int i = 0; i < N; i++) {
               OMPVV_TEST_AND_SET(errors, a[i]!=(i+turn));
