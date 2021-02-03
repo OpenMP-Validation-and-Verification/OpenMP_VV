@@ -1,13 +1,13 @@
-//===--- test_target_defaultmap_to_from_tofrom.c -----------------------------------------------------------===//
+//===--- test_target_defaultmap_to_from_tofrom.c ----------------------------===//
 //
 //  OpenMP API Version 5.0 Nov 2018
 //
-//  This test checks behavior of the defaultmap clause when the specified implicit-behavior  
-//  is to, from, and tofrom. The variable-categories avaiable for defaultmap are scalar, aggregate, 
+//  This test checks behavior of the defaultmap clause when the specified 
+//  implicit-behavior is to, from, and tofrom. The variable-categories 
+//  avaiable for defaultmap are scalar, aggregate, 
 //  and pointer.
 //
-//
-////===-------------------------------------------------------------------------------------------===//
+////===----------------------------------------------------------------------===//
 
 #include <omp.h>
 #include <stdio.h>
