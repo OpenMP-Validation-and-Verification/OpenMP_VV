@@ -67,6 +67,8 @@ int test_task_in_reduction() {
 
 
 int main() {
+  OMPVV_TEST_OFFLOADING;
+  
   int errors = 0;
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_task_in_reduction());
