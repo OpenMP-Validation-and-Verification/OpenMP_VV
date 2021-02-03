@@ -15,7 +15,7 @@
 #include "ompvv.h"
 
 #define N 1028
-
+#define STRIDE_LEN 100
 int test_simd_nontemporal() {
    int errors = 0;
    int i;
@@ -28,7 +28,7 @@ int test_simd_nontemporal() {
    }   
 
    #pragma simd target nontemporal (a, b, c)
-      for (i = 0; i < N; i += 100) {
+      for (i = 0; i < N; i += STRIDE_LEN) {
          a[i] = b[i] * c[i];
       }   
 
