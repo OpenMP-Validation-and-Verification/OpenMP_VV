@@ -37,7 +37,7 @@ int test_loop_order_concurrent_device() {
     z[i] = 2*(i + 1);
   }
 
-#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_HOST) map(tofrom: x[0:N], y[0:N], z[0:N], num_threads, total_wait_errors)
+#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE) map(tofrom: x[0:N], y[0:N], z[0:N], num_threads, total_wait_errors)
   {
     int wait_errors = 0;
 #pragma omp loop order(concurrent)
