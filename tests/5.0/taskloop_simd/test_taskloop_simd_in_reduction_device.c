@@ -30,7 +30,7 @@ int test_taskloop_simd_in_reduction() {
     z[i] = 2*(i + 1);
   }
 
-#pragma omp target parallel reduction(task, +: sum) num_threads(OMPVV_NUM_THREADS_DEVICE) shared(y, z, num_threads) defaultmap(tofrom)
+#pragma omp target parallel reduction(task, +: sum) num_threads(OMPVV_NUM_THREADS_DEVICE) shared(y, z, num_threads, sum) defaultmap(tofrom)
   {
 #pragma omp master
     {
