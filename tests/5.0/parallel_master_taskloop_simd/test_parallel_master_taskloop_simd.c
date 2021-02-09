@@ -18,7 +18,6 @@
 int test_parallel_master_taskloop() {
   OMPVV_INFOMSG("test_parallel_master_taskloop");
   int errors = 0;
-  int num_threads = -1;
   int x[N];
   int y[N];
   int z[N];
@@ -29,21 +28,16 @@ int test_parallel_master_taskloop() {
     z[i] = 2*(i + 1);
   }
 
-#pragma omp parallel master taskloop simd num_threads(OMPVV_NUM_THREADS_HOST) shared(x, y, z, num_threads)
+#pragma omp parallel master taskloop simd num_threads(OMPVV_NUM_THREADS_HOST) shared(x, y, z)
   for (int i = 0; i < N; i++) {
     x[i] += y[i]*z[i];
-    if (omp_get_thread_num() == 0) {
-      num_threads = omp_get_num_threads();
-    }
   }
 
   for (int i = 0; i < N; i++) {
     OMPVV_TEST_AND_SET_VERBOSE(errors, x[i] != 1 + (y[i]*z[i]));
   }
 
-  OMPVV_WARNING_IF(num_threads == 1, "Test ran with one thread, so parallelism of taskloop can't be guaranteed.");
-  OMPVV_ERROR_IF(num_threads < 1, "Test returned an invalid number of threads.");
-  OMPVV_TEST_AND_SET_VERBOSE(errors, num_threads < 1);
+  OMPVV_INFOMSG("This test does not guarantee parallelism of the tested clause.");
 
   return errors;
 }
