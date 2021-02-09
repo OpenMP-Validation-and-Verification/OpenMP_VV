@@ -31,7 +31,7 @@ int test_parallel_master_device() {
 
 #pragma omp target map(tofrom: x, y, z, num_threads)
   {
-#pragma omp parallel master num_threads(OMPVV_NUM_THREADS_HOST) shared(x, y, z, num_threads)
+#pragma omp parallel master num_threads(OMPVV_NUM_THREADS_DEVICE) shared(x, y, z, num_threads)
     {
 #pragma omp taskloop
       for (int i = 0; i < N; i++) {
