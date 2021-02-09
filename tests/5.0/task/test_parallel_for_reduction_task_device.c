@@ -32,7 +32,7 @@ int test_parallel_for_reduction_task() {
 
 #pragma target map(tofrom: sum, y, z, num_threads)
   {
-#pragma omp parallel for reduction(task, +: sum) num_threads(OMPVV_NUM_THREADS_HOST) shared(y, z, num_threads)
+#pragma omp parallel for reduction(task, +: sum) num_threads(OMPVV_NUM_THREADS_DEVICE) shared(y, z, num_threads)
     for (int i = 0; i < N; i++) {
 #pragma omp task in_reduction(+: sum)
       sum += y[i]*z[i];
