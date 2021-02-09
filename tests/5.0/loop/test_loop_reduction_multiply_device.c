@@ -32,7 +32,7 @@ int test_multiply() {
 
   for (int x = 0; x < N; x = x + 16) {
     result = 1;
-#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_HOST) map(tofrom: result, a, num_threads)
+#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE) map(tofrom: result, a, num_threads)
     {
 #pragma omp loop reduction(*:result)
       for (int y = 0; y < 16; ++y) {
