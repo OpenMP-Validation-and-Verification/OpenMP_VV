@@ -29,7 +29,7 @@ int test_master_taskloop_simd() {
     z[i] = 2*(i + 1);
   }
 
-#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_HOST) shared(x, y, z, num_threads) map(tofrom: x, y, z, num_threads)
+#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE) shared(x, y, z, num_threads) map(tofrom: x, y, z, num_threads)
   {
 #pragma omp master taskloop simd
     for (int i = 0; i < N; i++) {
