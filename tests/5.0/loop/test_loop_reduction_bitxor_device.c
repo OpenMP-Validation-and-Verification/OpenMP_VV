@@ -29,7 +29,7 @@ int test_bitxor() {
 
   unsigned int b = 0;
 
-#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_HOST) map(tofrom: a, b, num_threads)
+#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE) map(tofrom: a, b, num_threads)
   {
 #pragma omp loop reduction(^:b)
     for (int x = 0; x < N; ++x) {
