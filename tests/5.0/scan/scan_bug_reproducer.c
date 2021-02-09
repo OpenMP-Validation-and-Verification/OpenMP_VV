@@ -1,7 +1,6 @@
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "ompvv.h"
 
 #define N 1024
 
@@ -32,6 +31,12 @@ int main() {
       errors++;
     }
     expected_x = 0;
+  }
+
+  if (errors) {
+    printf("Test failed, total errors: %d.\n", errors);
+  } else {
+    printf("Test passed.\n");
   }
 
   return errors;
