@@ -31,7 +31,7 @@ int test_max() {
 
   int result = 0;
 
-#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_HOST) map(tofrom: result, a, b, num_threads)
+#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE) map(tofrom: result, a, b, num_threads)
   {
 #pragma omp loop reduction(max:result)
     for (int x = 0; x < N; ++x) {
