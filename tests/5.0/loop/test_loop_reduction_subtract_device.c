@@ -30,7 +30,7 @@ int test_subtraction() {
     num_threads[x] = -x;
   }
 
-#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_HOST) map(tofrom: total, a, b, num_threads)
+#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE) map(tofrom: total, a, b, num_threads)
   {
 #pragma omp loop reduction(-:total)
     for (int x = 0; x < N; ++x) {
