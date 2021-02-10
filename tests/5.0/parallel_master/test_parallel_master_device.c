@@ -29,7 +29,7 @@ int test_parallel_master_device() {
     z[i] = 2*(i + 1);
   }
 
-#pragma omp target map(tofrom: x, y, z, num_threads)
+#pragma omp target map(tofrom: x, num_threads) map(to: y, z)
   {
 #pragma omp parallel master num_threads(OMPVV_NUM_THREADS_DEVICE) shared(x, y, z, num_threads)
     {
@@ -37,9 +37,7 @@ int test_parallel_master_device() {
       for (int i = 0; i < N; i++) {
         x[i] += y[i]*z[i];
       }
-      if (omp_get_thread_num() == 0) {
-        num_threads = omp_get_num_threads();
-      }
+      num_threads = omp_get_num_threads();
     }
   }
 
