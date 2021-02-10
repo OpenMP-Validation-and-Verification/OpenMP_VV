@@ -37,7 +37,7 @@ int test_parallel_master_taskloop() {
     OMPVV_TEST_AND_SET_VERBOSE(errors, x[i] != 1 + (y[i]*z[i]));
   }
 
-  OMPVV_INFOMSG("This test does not guarantee parallelism of the tested clause.");
+  OMPVV_INFOMSG("This test does not guarantee thread parallelism of the clause.");
 
   return errors;
 }
