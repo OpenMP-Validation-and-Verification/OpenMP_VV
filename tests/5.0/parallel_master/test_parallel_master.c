@@ -34,9 +34,7 @@ int test_parallel_master() {
     for (int i = 0; i < N; i++) {
       x[i] += y[i]*z[i];
     }
-    if (omp_get_thread_num() == 0) {
-      num_threads = omp_get_num_threads();
-    }
+    num_threads = omp_get_num_threads();
   }
 
   for (int i = 0; i < N; i++) {
