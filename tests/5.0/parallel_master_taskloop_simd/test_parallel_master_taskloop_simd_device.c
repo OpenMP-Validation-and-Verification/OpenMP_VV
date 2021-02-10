@@ -28,7 +28,7 @@ int test_parallel_master_taskloop() {
     z[i] = 2*(i + 1);
   }
 
-#pragma omp target map(tofrom: x, y, z)
+#pragma omp target map(tofrom: x) map(to: y, z)
   {
 #pragma omp parallel master taskloop simd num_threads(OMPVV_NUM_THREADS_DEVICE) shared(x, y, z)
     for (int i = 0; i < N; i++) {
@@ -40,7 +40,7 @@ int test_parallel_master_taskloop() {
     OMPVV_TEST_AND_SET_VERBOSE(errors, x[i] != 1 + (y[i]*z[i]));
   }
 
-  OMPVV_INFOMSG("This test does not guarantee parallelism of the tested clause.");
+  OMPVV_INFOMSG("This test does not guarantee thread parallelism of the clause.");
 
   return errors;
 }
