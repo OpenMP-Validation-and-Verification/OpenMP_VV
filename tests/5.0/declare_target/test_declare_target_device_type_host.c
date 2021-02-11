@@ -16,13 +16,13 @@
 #include "ompvv.h"
 
 #define N 1024
-
-int a[N], b[N], c[N];  
 int errors = 0;
-int i = 0;
 
 #pragma omp declare target
-#pragma omp declare target device_type(host) to(a, b, c, i)
+int a[N], b[N], c[N];  
+int i = 0;
+#pragma omp end declare target
+
 void update() { 
   for (i = 0; i < N; i++) {
     a[i] += 1;
@@ -30,7 +30,8 @@ void update() {
     c[i] += 3;
   }
 }
-#pragma omp end declare target
+
+#pragma omp declare target to(update) device_type(host) 
 
 int test_declare_target_device_type_host() { 
 

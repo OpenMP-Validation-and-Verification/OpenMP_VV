@@ -16,13 +16,13 @@
 #include "ompvv.h"
 
 #define N 1024
-
-int a[N], b[N], c[N];  
 int errors = 0;
-int i = 0;
 
 #pragma omp declare target
-#pragma omp declare target device_type(nohost) to(a,b,c,i)
+int a[N], b[N], c[N];  
+int i = 0;
+#pragma omp end declare target
+
 void update() { 
   for (i = 0; i < N; i++) {
     a[i] += 1;
@@ -30,9 +30,10 @@ void update() {
     c[i] += 3;
   }
 }
-#pragma omp end declare target
 
-int test_declare_target_device_type_host() { 
+#pragma omp declare target to(update) device_type(nohost)
+
+int test_declare_target_device_type_nohost() { 
 
   #pragma omp target update to(a,b,c)
   #pragma omp target  
@@ -65,6 +66,6 @@ int main () {
     c[i] = 3 * i;
   }
 
-  OMPVV_TEST_AND_SET_VERBOSE(errors, test_declare_target_device_type_host());
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_declare_target_device_type_nohost());
   OMPVV_REPORT_AND_RETURN(errors);
 }  
