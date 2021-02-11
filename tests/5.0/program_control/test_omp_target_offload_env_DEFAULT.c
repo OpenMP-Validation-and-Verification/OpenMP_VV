@@ -53,7 +53,7 @@ offload_policy_t get_offload_policy() {
 
 int main() {
    int i, errors, isOffloading;
-   int device_num, on_init_dev;
+   int on_init_dev;
    int scalar;
    int x[N];
 
@@ -98,7 +98,7 @@ int main() {
  
    OMPVV_ERROR_IF(policy==NOTSET, "OMP_TARGET_OFFLOAD has not been set");
    OMPVV_ERROR_IF(policy==UNKNOWN,"OMP_TARGET_OFFLOAD has an unknown value '%s'", getenv("OMP_TARGET_OFFLOAD"));
-   OMPVV_ERROR_IF(policy!=NOTSET && policy!=EXPECTED_POLICY, "OMP_TARGET_OFFLOAD set to %s but expected %s", getenv("OMP_TARGET_OFFLOAD"), EXPECTED_POLICY);
+   OMPVV_ERROR_IF(policy!=NOTSET && policy!=EXPECTED_POLICY, "OMP_TARGET_OFFLOAD has unexpected value '%s'", getenv("OMP_TARGET_OFFLOAD"));
 
    OMPVV_REPORT_AND_RETURN(errors);
 }
