@@ -28,6 +28,7 @@ int main () {
 
    for (int i = 0; i < N; i++) {
       a[i] = i;
+      b[i] = 0;
    }
    
    #pragma omp depobj(obj) depend(inout: a)
@@ -37,8 +38,14 @@ int main () {
    #pragma omp depobj(obj) update(in)
 
    go(TURN2, a, b, &obj);
-  
+
+    
    #pragma omp depobj(obj) destroy
+   
+   for (int i = 0; i < N; i++) {
+      OMPVV_TEST_AND_SET_VERBOSE(errors, b[i] != 5);
+      OMPVV_TEST_AND_SET_VERBOSE(errors, a[i] != i+2);
+   }
  
    OMPVV_REPORT_AND_RETURN(errors);
 
@@ -57,9 +64,16 @@ void go(int turn, int a[], int b[], omp_depend_t *obj) {
       
       #pragma omp task depend(in: a[:N])
       { 
-         for (int i = 0; i < N; i++) {
-              OMPVV_TEST_AND_SET(errors, a[i]!=(i+turn));
-         }   
+         if (turn == TURN1) {
+            for (int i = 0; i < N; i++) {
+               OMPVV_TEST_AND_SET_VERBOSE(errors, a[i]!=(i+turn));
+            }
+         }  
+         if (turn == TURN2) {
+            for (int i = 0; i < N; i++) {
+               b[i] = 5;
+            }
+         }
       }
-   }
+   }   
 }
