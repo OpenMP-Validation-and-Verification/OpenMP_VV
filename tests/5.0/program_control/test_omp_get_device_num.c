@@ -37,7 +37,7 @@ int test_omp_get_dev_num(void) {
       c[i] = i;
    }
    
-   #pragma omp target map(from: target_device_num)
+   #pragma omp target map(from: target_device_num) map(to: b, c) map(tofrom: a)
    { 
       target_device_num = omp_get_device_num();
       for (int i = 0; i < N; i++) {
