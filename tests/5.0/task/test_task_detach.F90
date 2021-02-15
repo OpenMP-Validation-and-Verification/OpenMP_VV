@@ -35,8 +35,8 @@ PROGRAM test_task_detach
 
   CONTAINS
     INTEGER FUNCTION test_callback(event)
-      INTEGER(kind=omp_event_handle_t) :: event
-      omp_fulfill_event(event)
+      INTEGER(kind=omp_event_handle_kind) :: event
+      call omp_fulfill_event(event)
       test_callback = 1
       RETURN
     END FUNCTION test_callback
@@ -48,7 +48,8 @@ PROGRAM test_task_detach
       INTEGER :: num_threads = -1
       INTEGER :: record_x = -1
       INTEGER :: record_y = -1
-      INTEGER(kind=omp_event_handle_t) :: flag_event
+      INTEGER :: callback_result
+      INTEGER(kind=omp_event_handle_kind) :: flag_event
       CHARACTER(len=300) :: msgHelper
 
       !$omp parallel
@@ -61,7 +62,7 @@ PROGRAM test_task_detach
       !$omp task
       x = 1
       !$omp flush
-      test_callback(flag_event)
+      callback_result = test_callback(flag_event)
       !$omp end task
 
       !$omp task depend(inout: y)
@@ -75,6 +76,10 @@ PROGRAM test_task_detach
       !$omp end parallel
 
       OMPVV_ERROR_IF(num_threads .LT. 0, "Test ran with invalid number of teams")
+      OMPVV_TEST_AND_SET_VERBOSE(errors, num_threads .LT. 0)
+      
+      OMPVV_ERROR_IF(callback_result .NE. 1, "Event-fulfilling callback did not return")
+      OMPVV_TEST_AND_SET_VERBOSE(errors, callback_result .NE. 1)
 
       WRITE(msgHelper, *) "Test ran with one thread, &
            &so the results are not conclusive."
