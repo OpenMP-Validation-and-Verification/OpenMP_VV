@@ -48,7 +48,7 @@ PROGRAM test_task_detach
       INTEGER :: num_threads = -1
       INTEGER :: record_x = -1
       INTEGER :: record_y = -1
-      INTEGER :: callback_result
+      INTEGER :: callback_result = 0
       INTEGER(kind=omp_event_handle_kind) :: flag_event
       CHARACTER(len=300) :: msgHelper
 
