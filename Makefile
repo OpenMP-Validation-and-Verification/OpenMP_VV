@@ -309,9 +309,19 @@ $(CURDIR)/tests/4.5/application_kernels/qmcpack_target_static_lib.c.o: $(CURDIR)
 %.c.run: $(OBJS_C)
 	$(call log_section_header,"RUN",$(SYSTEM),$(@:.run=),$(LOG_NOTE),$(OMP_VERSION),$(notdir $(@:.run=.log)))
 	@echo -e $(TXTGRN)"\n\n" running: $@ $(TXTNOC) $(if $(LOG), ${RECORD}$(notdir $(@:.run=.log)))
-	-$(call loadModules,$(C_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.run=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.run=.log))\
-		&& echo "PASS" > $(LOGTEMPFILE) \
-		|| echo "FAIL" > $(LOGTEMPFILE))
+# If .../test_<envname>_env_<value>...
+	$(if $(findstring _env_,$@), \
+	  -$(call loadModules,$(C_COMPILER_MODULE)) \
+		 $(BSRUN)$(RUN_TEST) --env \
+		   $(shell echo "$@" | sed -e 's@.*/@@' -e 's@test_\(.*\)_env_.*@\1@' | tr 'a-z' 'A-Z') \
+		   $(shell echo "$@" | sed -e 's@.*/@@' -e 's@.*_env_\([^.]*\).*@\1@') \
+		   $(@:.run=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.run=.log)) \
+		 && echo "PASS" > $(LOGTEMPFILE) \
+		 || echo "FAIL" > $(LOGTEMPFILE)), \
+	 -$(call loadModules,$(C_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.run=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.run=.log))\
+		 && echo "PASS" > $(LOGTEMPFILE) \
+		 || echo "FAIL" > $(LOGTEMPFILE)) \
+	)
 	-$(call log_section_footer,"RUN",$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.run=.log)))
 	-@$(if $(LOG), rm $(LOGTEMPFILE))
 
@@ -324,7 +334,8 @@ $(CURDIR)/tests/4.5/application_kernels/qmcpack_target_static_lib.c.o: $(CURDIR)
 		|| echo "FAIL" > $(LOGTEMPFILE))
 	-$(call log_section_footer,"RUN",$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.run=.log)))
 	-@$(if $(LOG), rm $(LOGTEMPFILE))
-# run c app rule
+
+# run Fortran app rule
 %.FOR.run: $(OBJS_F)
 	$(call log_section_header,"RUN",$(SYSTEM),$(@:.FOR.run=),$(LOG_NOTE),$(OMP_VERSION),$(notdir $(@:.FOR.run=.log)))
 	@echo -e $(TXTGRN)"\n\n" running: $@ $(TXTNOC) $(if $(LOG), ${RECORD}$(notdir $(@:.FOR.run=.log)))
@@ -334,6 +345,7 @@ $(CURDIR)/tests/4.5/application_kernels/qmcpack_target_static_lib.c.o: $(CURDIR)
 	-$(call log_section_footer,"RUN",$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.FOR.run=.log)))
 	-@$(if $(LOG), rm $(LOGTEMPFILE))
 
+
 ##################################################
 # Running only no compile rules
 ##################################################
@@ -341,9 +353,19 @@ $(CURDIR)/tests/4.5/application_kernels/qmcpack_target_static_lib.c.o: $(CURDIR)
 %.c.runonly:
 	$(call log_section_header,"RUN",$(SYSTEM),$(@:.runonly=),$(LOG_NOTE),$(OMP_VERSION),$(notdir $(@:.runonly=.log)))
 	@echo -e $(TXTGRN)"\n\n" running previously compiled: $@ $(TXTNOC) $(if $(LOG), ${RECORD}$(notdir $(@:.runonly=.log)))
-	-$(call loadModules,$(C_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.runonly=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.runonly=.log))\
-		&& echo "PASS" > $(LOGTEMPFILE) \
-		|| echo "FAIL" > $(LOGTEMPFILE))
+# If .../test_<envname>_env_<value>...
+	$(if $(findstring _env_,$@), \
+	  $(call loadModules,$(C_COMPILER_MODULE)) \
+		 $(BSRUN)$(RUN_TEST) --env \
+		   $(shell echo "$@" | sed -e 's@.*/@@' -e 's@test_\(.*\)_env_.*@\1@' | tr 'a-z' 'A-Z') \
+		   $(shell echo "$@" | sed -e 's@.*/@@' -e 's@.*_env_\([^.]*\).*@\1@') \
+		   $(@:.runonly=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.runonly=.log))\
+		 && echo "PASS" > $(LOGTEMPFILE) \
+		 || echo "FAIL" > $(LOGTEMPFILE)) \
+	  $(call loadModules,$(C_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.runonly=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.runonly=.log))\
+		 && echo "PASS" > $(LOGTEMPFILE) \
+		 || echo "FAIL" > $(LOGTEMPFILE)) \
+	)
 	-$(call log_section_footer,"RUN",$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.runonly=.log)))
 	-@$(if $(LOG), rm $(LOGTEMPFILE))
 
@@ -356,7 +378,8 @@ $(CURDIR)/tests/4.5/application_kernels/qmcpack_target_static_lib.c.o: $(CURDIR)
 		|| echo "FAIL" > $(LOGTEMPFILE))
 	-$(call log_section_footer,"RUN",$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.runonly=.log)))
 	-@$(if $(LOG), rm $(LOGTEMPFILE))
-# run c app rule
+
+# run Fortran app rule
 %.FOR.runonly:
 	$(call log_section_header,"RUN",$(SYSTEM),$(@:.FOR.runonly=),$(LOG_NOTE),$(OMP_VERSION),$(notdir $(@:.FOR.runonly=.log)))
 	@echo -e $(TXTGRN)"\n\n" running previously compiled: $@ $(TXTNOC) $(if $(LOG), ${RECORD}$(notdir $(@:.FOR.runonly=.log)))

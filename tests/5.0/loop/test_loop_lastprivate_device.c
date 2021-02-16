@@ -1,4 +1,4 @@
-//===--- test_loop_lastprivate.c ----------------------------------------------===//
+//===--- test_loop_lastprivate_device.c ---------------------------------------===//
 //
 // OpenMP API Version 5.0 Nov 2018
 //
@@ -7,7 +7,8 @@
 // only contain loop iteration variables of loops associated with the loop
 // directive. This test checks that the loop iteration variables associated
 // with a loop directive and a loop directive with collapse(2) have valid
-// values after the parallel region containing the loop.
+// values after the parallel region containing the loop. This test checks the
+// above in a target context.
 //
 ////===------------------------------------------------------------------------===//
 
@@ -31,7 +32,7 @@ int test_one_loop_level() {
     b[x] = x;
   }
 
-#pragma omp parallel num_threads(OMPVV_NUM_THREADS_HOST)
+#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_HOST) map(tofrom: a, b, x)
   {
 #pragma omp loop lastprivate(x)
     for (x = 0; x < SIZE; ++x) {
@@ -65,7 +66,7 @@ int test_two_loop_levels() {
     }
   }
 
-#pragma omp parallel num_threads(OMPVV_NUM_THREADS_HOST)
+#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_HOST) map(tofrom: a, b, x, y)
   {
 #pragma omp loop lastprivate(x, y) collapse(2)
     for (x = 0; x < SIZE; ++x) {
@@ -90,6 +91,8 @@ int test_two_loop_levels() {
 }
 
 int main() {
+  OMPVV_TEST_OFFLOADING;
+
   int errors = 0;
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_one_loop_level());
