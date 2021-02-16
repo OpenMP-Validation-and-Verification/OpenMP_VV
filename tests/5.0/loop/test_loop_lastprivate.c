@@ -17,6 +17,7 @@
 #include "ompvv.h"
 
 #define SIZE 1024
+#define SIZE2 512
 
 int test_one_loop_level() {
   int a[SIZE];
@@ -49,8 +50,8 @@ int test_one_loop_level() {
 }
 
 int test_two_loop_levels() {
-  int a[SIZE][SIZE];
-  int b[SIZE][SIZE];
+  int a[SIZE][SIZE2];
+  int b[SIZE][SIZE2];
   int errors = 0;
   int lp_errors_x = 0;
   int lp_errors_y = 0;
@@ -58,7 +59,7 @@ int test_two_loop_levels() {
   int y = 0;
 
   for (x = 0; x < SIZE; ++x) {
-    for (y = 0; y < SIZE; ++y) {
+    for (y = 0; y < SIZE2; ++y) {
       a[x][y] = 1;
       b[x][y] = x + y;
     }
@@ -68,19 +69,19 @@ int test_two_loop_levels() {
   {
 #pragma omp loop lastprivate(x, y) collapse(2)
     for (x = 0; x < SIZE; ++x) {
-      for (y = 0; y < SIZE; ++y) {
+      for (y = 0; y < SIZE2; ++y) {
         a[x][y] += b[x][y];
       }
     }
   }
 
   OMPVV_TEST_AND_SET_VERBOSE(lp_errors_x, x != SIZE);
-  OMPVV_TEST_AND_SET_VERBOSE(lp_errors_y, y != SIZE);
+  OMPVV_TEST_AND_SET_VERBOSE(lp_errors_y, y != SIZE2);
   OMPVV_ERROR_IF(lp_errors_x, "Outer loop iteration variable in loop directive with collapse ended with invalid value.");
   OMPVV_ERROR_IF(lp_errors_y, "Inner loop iteration variable in loop directive with collapse ended with invalid value.");
 
   for (x = 0; x < SIZE; ++x) {
-    for (y = 0; y < SIZE; ++y) {
+    for (y = 0; y < SIZE2; ++y) {
       OMPVV_TEST_AND_SET_VERBOSE(errors, a[x][y] - b[x][y] != 1);
     }
   }

@@ -1,6 +1,6 @@
 //===---- test_target_teams_distribute_parallel_for_devices.c - combined consutrct -===//
 // 
-// OpenMP API Version 4.5 Nov 2015
+// OpenMP API Version 5.0 Nov 2018
 // 
 // Testing loop collapse with multiple loops. Trying to mimic lsms kernel.
 //===-------------------------------------------------------------------------------===//
