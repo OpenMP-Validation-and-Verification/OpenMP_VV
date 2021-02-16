@@ -22,7 +22,7 @@ endif
 
 # CRAY compiler
 ifeq ($(CC), cc)
-  C_COMPILER_MODULE = PrgEnv-cray; module load cdt/20.06; module load craype-x86-skylake; module load cuda/10.2.89; module load openmpi/4.0.3; module unload cray-libsci
+  C_COMPILER_MODULE = PrgEnv-cray; module load cdt; module load craype-x86-skylake; module switch cce cce/10.0.3; module load cuda/10.1.243; module load openmpi/4.0.3; module unload cray-libsci
   C_VERSION = cc --version 2>&1 | grep -oh 'clang version [0-9.]*'| grep -oh 'version .*' | sed "s/version/cray/g"
 endif
 
@@ -34,7 +34,7 @@ endif
 
 # Clang compiler
 ifeq ($(CC), clang)
-  C_COMPILER_MODULE = PrgEnv-llvm/11.0.0-git_20200409
+  C_COMPILER_MODULE = PrgEnv-llvm/12.0.0-git_20210117
   C_VERSION = clang -v 2>&1 | grep -oh 'clang version [0-9.]*'| grep -oh 'version .*' 
 endif
 
@@ -65,7 +65,7 @@ endif
 
 # Clang compiler
 ifeq ($(CXX), clang++)
-  CXX_COMPILER_MODULE = PrgEnv-llvm/10.0.0-git_20190828
+  CXX_COMPILER_MODULE = PrgEnv-llvm/12.0.0-git_20210117
   CXX_VERSION = clang++ -v 2>&1 | grep -oh 'clang version [0-9.]*' | grep -oh 'version .*' 
 endif
 
