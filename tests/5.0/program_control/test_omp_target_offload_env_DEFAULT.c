@@ -1,4 +1,4 @@
-//===--- test_omp_target_offload.c ----------------------------------------------------------------===//
+//===--- test_omp_target_offload_DEFAULT.c ---------------------------------------------------------===//
 //
 // OpenMP API Version 5.0 Nov 2018
 //
@@ -10,8 +10,15 @@
 // the program will terminate execution when a target construct is encountered and a target device
 // is not available or supported by the implementation. 
 // 
+// The actually checked variant is set by EXPECTED_POLICY; if not overridden DEFAULT is tested.
+// See also test_omp_target_offload_DISABLED.c and test_omp_target_offload_MANDATORY.c
+//
 // This test was adopted from OpenMP 5.0 Examples Doc -> target_offload_control.1.c 
 ////===--------------------------------------------------------------------------------------------===//
+
+#ifndef EXPECTED_POLICY
+#define EXPECTED_POLICY DEFAULT
+#endif
 
 #include <omp.h>
 #include <stdio.h>
@@ -46,7 +53,7 @@ offload_policy_t get_offload_policy() {
 
 int main() {
    int i, errors, isOffloading;
-   int device_num, on_init_dev;
+   int on_init_dev;
    int scalar;
    int x[N];
 
@@ -89,8 +96,9 @@ int main() {
    OMPVV_ERROR_IF(policy==MANDATORY && isOffloading == 1 && on_init_dev != 0, "Did not follow MANDATORY, instead executed target region on host even though device was available");
    OMPVV_TEST_AND_SET(errors, policy==MANDATORY && isOffloading == 1 && on_init_dev != 0);
  
-   OMPVV_ERROR_IF(policy==UNKNOWN,"OMP_TARGET_OFFLOAD has an unknown value");
    OMPVV_ERROR_IF(policy==NOTSET, "OMP_TARGET_OFFLOAD has not been set");
+   OMPVV_ERROR_IF(policy==UNKNOWN,"OMP_TARGET_OFFLOAD has an unknown value '%s'", getenv("OMP_TARGET_OFFLOAD"));
+   OMPVV_ERROR_IF(policy!=NOTSET && policy!=EXPECTED_POLICY, "OMP_TARGET_OFFLOAD has unexpected value '%s'", getenv("OMP_TARGET_OFFLOAD"));
 
    OMPVV_REPORT_AND_RETURN(errors);
 }

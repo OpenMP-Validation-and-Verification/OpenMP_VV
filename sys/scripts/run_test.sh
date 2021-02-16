@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-#  USAGE: ./run_test.sh <APP> <LOG>.
-#    <LOG>: if present then it will  output of the tests in LOG.
+#  USAGE: ./run_test.sh [--env name val ...] <APP> [<LOG>].
+#   --env name val: set environment variable name to the given value
+#    <LOG>: if present then it will output of the tests in LOG.
 
 export OMP_THREAD_LIMIT=$(lscpu -p | grep -c "^[0-9]")
 
@@ -25,6 +26,16 @@ function report ()
   fi
 }
 
+declare -a env_data
+while [[ "$1" = "--env" ]]; do
+  if [[ -z "$2" ]]; then
+    echo 'ERROR: Expected 'name val' arguments with --env' 1>&2
+    exit -1
+  fi
+  env_data+=("$2" "$3")
+  shift 3
+done
+
 if [ "$#" -lt "1" ]; then
   exit -1
 elif [ ! -f "$1" ]; then
@@ -35,7 +46,7 @@ elif [ ! -f "$1" ]; then
 fi
 
 app=$1
-output=`timeout 60s $app 2>&1`
+output=$(for ((idx=0; $idx < ${#env_data[*]}; idx=$((idx+2)))); do export "${env_data[$idx]}"="${env_data[$((idx+1))]}"; done; timeout 60s "$app" 2>&1)
 status=$?
 output=$(printf "$output" | uniq)
 
