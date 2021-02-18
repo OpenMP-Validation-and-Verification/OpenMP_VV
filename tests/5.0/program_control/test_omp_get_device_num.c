@@ -45,8 +45,8 @@ int test_omp_get_dev_num(void) {
       }
    }
 
-   OMPVV_TEST_AND_SET_VERBOSE(errors, target_device_num == original_device_num);
- 
+   OMPVV_WARNING_IF(target_device_num == original_device_num, "omp_get_device_num() returned the same device number as host, cannot guarantee that target region properly offloaded to device");
+   
    for (int i = 0; i < N; i++) {
       OMPVV_TEST_AND_SET_VERBOSE(errors, a[i] != i + 5);
    }
