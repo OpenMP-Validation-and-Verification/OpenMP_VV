@@ -8,7 +8,7 @@
 // loop directive as well. The test creates a parallel region with a loop
 // construct nested within, and performs simple operations on an int array
 // which are then checked for correctness. Additionally, since loop binds to
-// a parallel region the test checks that the threads all wait before
+// a parallel region, the test checks randomly that other threads wait before
 // proceeding out of the loop region. The number of threads is checked in the
 // parallel region but after the loop construct because runtime API calls are
 // not permitted in loop directive regions.
@@ -18,6 +18,7 @@
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "ompvv.h"
 
 #define N 1024
@@ -30,6 +31,7 @@ int test_loop_order_concurrent_device() {
   int y[N];
   int z[N];
   int num_threads = -1;
+  int rand_indexes[OMPVV_NUM_THREADS_DEVICE];
 
   for (int i = 0; i < N; i++) {
     x[i] = 1;
@@ -37,20 +39,20 @@ int test_loop_order_concurrent_device() {
     z[i] = 2*(i + 1);
   }
 
-#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE) map(tofrom: x[0:N], y[0:N], z[0:N], num_threads, total_wait_errors)
+  for (int i = 0; i < OMPVV_NUM_THREADS_DEVICE; i++) {
+    rand_indexes[i] = rand()%(N + 1);
+  }
+
+#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE) map(tofrom: x[0:N], num_threads, total_wait_errors) map(to: y[0:N], z[0:N])
   {
-    int wait_errors = 0;
 #pragma omp loop order(concurrent)
     for (int i = 0; i < N; i++) {
       x[i] += y[i]*z[i];
     }
-    for (int i = 0; i < N; i++) {
-      if (x[i] == 1) {
-        wait_errors++;
-      }
-    }
+    if (x[rand_indexes[omp_get_thread_num()]] == 1) {
 #pragma omp atomic update
-    total_wait_errors += wait_errors;
+      total_wait_errors++;
+    }
     if (omp_get_thread_num() == 0) {
       num_threads = omp_get_num_threads();
     }
@@ -73,6 +75,8 @@ int main() {
   OMPVV_TEST_OFFLOADING;
 
   int errors = 0;
+
+  srand(time(0));
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_loop_order_concurrent_device());
 
