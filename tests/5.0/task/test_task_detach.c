@@ -62,7 +62,7 @@ int test_task_detach() {
   OMPVV_ERROR_IF(record_x == 0, "Dependent task preceded event-fulfilling task, so detach did not work correctly.");
   OMPVV_ERROR_IF(record_y == 0, "Dependent task preceded detached task body, so depend did not work correctly.");
   OMPVV_ERROR_IF(record_x == -1, "Event-fulfilling task's recording variable was not set in the final task.");
-  OMPVV_ERROR_IF(record_x == -1, "Detached task's recording variable was not set in the final task.");
+  OMPVV_ERROR_IF(record_y == -1, "Detached task's recording variable was not set in the final task.");
 
   return errors;
 }
