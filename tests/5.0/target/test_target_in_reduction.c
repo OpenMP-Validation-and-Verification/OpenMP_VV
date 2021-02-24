@@ -5,7 +5,7 @@
 // This test checks task reductions for a target task resulting from a target
 // construct with the 'in_reduction' clause.
 //
-////===-------------------------------------------------------------------------------------===//
+////===---------------------------------------------------------------- ------------===//
 
 #include <stdlib.h>
 #include <stdio.h>
