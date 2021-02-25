@@ -29,6 +29,7 @@ endif
 # Clang compiler
 # ifeq ($(CC), clang)
 #   C_COMPILER_MODULE = llvm/1.0-20190225
+#   C_COMPILER_MODULE = cuda/10.1.243; module use /sw/summit/modulefiles/ums/stf010/Core; module load llvm/12.0.0-latest
 #   C_VERSION = clang -v 2>&1 | grep -oh "clang version [0-9.]*"| grep -oh "version .*" | sed "s/.*/& CORAL/"
 # endif
 
