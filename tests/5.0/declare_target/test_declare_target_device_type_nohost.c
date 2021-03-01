@@ -38,8 +38,10 @@ int test_declare_target_device_type_nohost() {
   #pragma omp target update to(a,b,c)
   #pragma omp target  
   {
-    update();
-
+    if (!omp_is_initial_device()){
+      update();
+    }
+    
     for (i = 0; i < N; i++) {
       a[i] += i;
       b[i] += 2 * i;
