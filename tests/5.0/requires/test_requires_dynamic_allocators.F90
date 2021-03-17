@@ -37,7 +37,7 @@ CONTAINS
     INTEGER,ALLOCATABLE:: x(:)
     INTEGER:: i
     INTEGER(omp_memspace_handle_kind):: x_memspace = omp_default_mem_space
-    type(omp_alloctrait):: x_traits(1) = omp_alloctrait(omp_atk_alignment,64)
+    type(omp_alloctrait):: x_traits(1) = [omp_alloctrait(omp_atk_alignment,64)]
     INTEGER(omp_allocator_handle_kind):: x_alloc
 
     !$omp target defaultmap(tofrom)
