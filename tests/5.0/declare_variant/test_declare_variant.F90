@@ -1,0 +1,94 @@
+!===--- test_declare_variant.F90 -------------------------------------------===//
+!
+! OpenMP API Version 5.0 Nov 2018
+!
+! This test uses the declare variant clause to create two variants of a
+! simple base function, one for use in a parallel region, and one for use
+! in a target region. The function sets each element of an array to its
+! index. Each variant is called on a separate array and the results are
+! checked.
+!
+!//===----------------------------------------------------------------------===//
+
+#include "ompvv.F90"
+
+#define N 1024
+
+MODULE variants
+  use omp_lib
+CONTAINS
+  SUBROUTINE fn(arr)
+    INTEGER,INTENT(inout) :: arr(N)
+    INTEGER :: i
+    !$omp declare variant(p_fn) match(construct = {parallel})
+    !$omp declare variant(t_fn) match(construct = {target})
+
+    DO i = 1, N
+       arr(i) = i
+    END DO
+  END SUBROUTINE fn
+
+  SUBROUTINE p_fn(arr)
+    INTEGER,INTENT(inout) :: arr(N)
+    INTEGER :: i
+
+    !$omp do
+    DO i = 1, N
+       arr(i) = i
+    END DO
+  END SUBROUTINE p_fn
+
+  SUBROUTINE t_fn(arr)
+    INTEGER,INTENT(inout) :: arr(N)
+    INTEGER :: i
+
+    !$omp distribute simd
+    DO i = 1, N
+       arr(i) = i
+    END DO
+  END SUBROUTINE t_fn
+END MODULE variants
+
+PROGRAM test_declare_variant
+  USE iso_fortran_env
+  USE ompvv_lib
+  USE omp_lib
+  USE variants
+  implicit none
+  OMPVV_TEST_OFFLOADING
+
+  OMPVV_TEST_VERBOSE(test_body() .ne. 0)
+
+  OMPVV_REPORT_AND_RETURN()
+
+CONTAINS
+  INTEGER FUNCTION test_body()
+    INTEGER :: errors, x
+    INTEGER,DIMENSION(N) :: a, b, c
+
+    DO x = 1, N
+       a(x) = 0
+       b(x) = 0
+       c(x) = 0
+    END DO
+
+    errors = 0
+
+    call fn(a)
+
+    !$omp parallel
+    call fn(b)
+    !$omp end parallel
+
+    !$omp target teams map(tofrom: c)
+    call fn(c)
+    !$omp end target teams
+
+    DO x = 1, N
+       OMPVV_TEST_AND_SET_VERBOSE(errors, a(x) .ne. x &
+            & .OR. b(x) .ne. x .OR. c(x) .ne. x)
+    END DO
+
+    test_body = errors
+  END FUNCTION test_body
+END PROGRAM test_declare_variant
