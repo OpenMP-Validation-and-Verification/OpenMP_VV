@@ -1,11 +1,11 @@
-//===--- test_target_in_reduction.c ------------------------------------------------===//
+//===--- test_target_in_reduction.c -----------------------------------------===//
 //
 // OpenMP API Version 5.0 Nov 2018
 //
 // This test checks task reductions for a target task resulting from a target
 // construct with the 'in_reduction' clause.
 //
-////===---------------------------------------------------------------- ------------===//
+////===----------------------------------------------------------------------===//
 
 #include <stdlib.h>
 #include <stdio.h>
