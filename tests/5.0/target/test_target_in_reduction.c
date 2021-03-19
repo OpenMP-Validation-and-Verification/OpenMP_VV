@@ -21,7 +21,7 @@ void compute_on_host(int *);
 
 int main ()
 {
-   int i;
+   int i, host_reduction_sum = 0, device_reduction_sum = 0;
    int sum = 0, total = 0, errors = 0;
    
    #pragma omp parallel master
@@ -35,14 +35,17 @@ int main ()
    }
    
    for (i = 0; i < N; i++) {
-      total += 2;
+      device_reduction_sum += 2;
+      host_reduction_sum += 1; 
    }
   
-   if (sum != total) {
-         errors++;
-   }
+   OMPVV_TEST_AND_SET_VERBOSE(errors, sum != (device_reduction_sum + host_reduction_sum));
 
-   OMPVV_ERROR_IF(sum != total, "Target task did not participate in the reduction"); 
+   OMPVV_TEST_AND_SET_VERBOSE(errors, sum == device_reduction_sum);
+   OMPVV_ERROR_IF(sum == device_reduction_sum, "Host task did not participate in the reduction");
+
+   OMPVV_TEST_AND_SET_VERBOSE(errors, sum == host_reduction_sum);
+   OMPVV_ERROR_IF(sum == host_reduction_sum, "Target task did not participate in the reduction");
 
    OMPVV_REPORT_AND_RETURN(errors);
 }
@@ -51,7 +54,7 @@ void compute_on_device(int *sum)
 {
    int i;
    for (i = 0; i < N; i++) {
-      *sum += 1; 
+      *sum += 2; 
    }
 }
 
