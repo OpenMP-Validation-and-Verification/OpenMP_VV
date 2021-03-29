@@ -26,8 +26,8 @@ int test_target_device_ancestor() {
     }
 
     OMPVV_TEST_AND_SET(errors, omp_get_num_devices() <= 0);
-    OMPVV_ERROR_IF(omp_get_num_devices() <= 0, "There are no target devices available, cannot properly "
-                                                 "test fallback to host");
+    OMPVV_ERROR_IF(omp_get_num_devices() <= 0, "Since no target devices were found, this test"
+                                                 "will be skipped.");
 
     if (omp_get_num_devices() > 0) {
 
@@ -63,8 +63,9 @@ int test_target_device_device_num() {
 
     
     OMPVV_TEST_AND_SET(errors, omp_get_num_devices() <= 0);
-    OMPVV_ERROR_IF(omp_get_num_devices() <= 0, "There are no target devices available, cannot properly test");         
-
+    OMPVV_ERROR_IF(omp_get_num_devices() <= 0, "Since no target devices were found, this test"
+                                                 "will be skipped");
+	
     if (omp_get_num_devices() > 0) {
          
         first_device_num = omp_get_num_devices() - 1;
