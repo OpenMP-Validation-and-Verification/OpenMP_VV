@@ -15,8 +15,9 @@
 
 int metadirective2() {
 
-   int i, device_num, errors, which_device;
+   int i, device_num, which_device;
    int a[N], total[N];
+   int errors = 0;
  
    for (int i = 0; i < N; i++) {
       a[i] = 0;  
@@ -52,6 +53,7 @@ int metadirective2() {
 int main () {
 
    int errors = 0;
+   
    OMPVV_TEST_OFFLOADING;
 
    OMPVV_TEST_AND_SET_VERBOSE(errors, metadirective2());

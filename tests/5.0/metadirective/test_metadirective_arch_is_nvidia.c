@@ -1,4 +1,4 @@
-//===---test_metadirective_is_nvidia.c -------------------------------------===//
+//===---test_metadirective_arch_is_nvidia.c --------------------------------===//
 //
 // OpenMP API Version 5.0 Nov 2018
 // 
@@ -6,19 +6,18 @@
 //
 ////===---------------------------------------------------------------------===//
 
-
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "ompvv.h"
 
-#define N 100
+#define N 1024
 
 int metadirective1() {
    
    int v1[N], v2[N], v3[N];
 
-   int which_device;
+   int target_device_num, host_device_num, default_device;
    int errors = 0;
 
    for(int i=0; i<N; i++) { 
@@ -26,19 +25,27 @@ int metadirective1() {
       v2[i] = -(i+1); 
    }
 
-   #pragma omp target map(to:v1,v2) map(from:v3) device(0)
-   #pragma omp metadirective \
+   host_device_num = omp_get_initial_device();
+
+   default_device = omp_get_default_device();
+
+   #pragma omp target map(to:v1,v2) map(from:v3, target_device_num) device(default_device)
+   {
+      #pragma omp metadirective \
                    when(   device={arch("nvptx")}: teams loop) \
                    default(                     parallel loop)
 
-      which_device = omp_is_initial_device(); 
+         target_device_num = omp_get_device_num(); 
 
-      for (int i = 0; i < N; i++) {
-         v3[i] = v1[i] * v2[i];
-      }
-
-   OMPVV_WARNING_IF(which_device != 0, "NVIDIA architecture appears to be unavailable, metadirective ran with the variant specified in the default clause");
-
+         for (int i = 0; i < N; i++) {
+            v3[i] = v1[i] * v2[i];
+         }
+   } 
+   
+   OMPVV_TEST_AND_SET(errors, host_device_num == target_device_num);
+   OMPVV_ERROR_IF(host_device_num == target_device_num, "Device number that executes target region is"
+                                  "the same as the device number on the host");
+ 
    for (int i = 0; i < N; i++) {
       OMPVV_TEST_AND_SET_VERBOSE(errors, v3[i] != v1[i] * v2[i]);
    }
