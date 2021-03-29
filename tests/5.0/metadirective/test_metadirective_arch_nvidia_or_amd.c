@@ -40,7 +40,8 @@ int metadirective2() {
          }
    }
 
-   OMPVV_WARNING_IF(which_device != 0, "NVIDIA and AMD architecture not available, ran on host");
+   OMPVV_TEST_AND_SET(errors, which device != 0);
+   OMPVV_ERROR_IF(which_device != 0, "NVIDIA and AMD architecture not available, ran on host");
 
    for (i = 0; i < N; i++) {
       OMPVV_TEST_AND_SET_VERBOSE(errors, a[i] != i); 
