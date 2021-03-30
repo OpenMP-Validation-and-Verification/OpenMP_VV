@@ -38,7 +38,6 @@ int metadirective2() {
       #pragma omp distribute parallel for
          for (i = 0; i < N; i++) {
             a[i] = i;
-            printf("value of a[%d] is:  %d\n", i, a[i]);
          }
    }
 
