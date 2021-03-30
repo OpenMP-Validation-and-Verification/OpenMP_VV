@@ -11,18 +11,19 @@
 #include <stdlib.h>
 #include "ompvv.h"
 
-#define N 100
+#define N 1024
+
+int errors = 0;
 
 int metadirective2() {
 
    int i, device_num, which_device;
    int a[N], total[N];
-   int errors = 0;
  
    for (int i = 0; i < N; i++) {
       a[i] = 0;  
    }
-
+   
    for (device_num = 0; device_num < omp_get_num_devices(); device_num++) {
       #pragma omp target device(device_num)
       #pragma omp metadirective \
@@ -37,10 +38,11 @@ int metadirective2() {
       #pragma omp distribute parallel for
          for (i = 0; i < N; i++) {
             a[i] = i;
+            printf("value of a[%d] is:  %d\n", i, a[i]);
          }
    }
 
-   OMPVV_TEST_AND_SET(errors, which device != 0);
+   OMPVV_TEST_AND_SET_VERBOSE(errors, which_device != 0);
    OMPVV_ERROR_IF(which_device != 0, "NVIDIA and AMD architecture not available, ran on host");
 
    for (i = 0; i < N; i++) {
@@ -53,8 +55,6 @@ int metadirective2() {
 
 int main () {
 
-   int errors = 0;
-   
    OMPVV_TEST_OFFLOADING;
 
    OMPVV_TEST_AND_SET_VERBOSE(errors, metadirective2());
