@@ -1,8 +1,8 @@
-//===--- test_taskloop_reduction.c ------------------------------------------===//
+//===--- test_taskloop_simd_reduction.c -------------------------------------===//
 //
 // OpenMP API Version 5.0 Nov 2018
 //
-// This test checks the taskloop directive with the reduction clause specified.
+// This test checks the taskloop simd combined directive with the reduction clause specified.
 //
 ////===----------------------------------------------------------------------===//
 
@@ -27,9 +27,9 @@ int test_taskloop_reduction() {
       b[i] = i * 2; 
    }
 
-#pragma omp parallel num_threads(OMPVV_NUM_THREADS_HOST) shared(a, b, num_threads, sum) 
+#pragma omp parallel reduction(tasnum_threads(OMPVV_NUM_THREADS_HOST) shared(a, b, num_threads, sum) 
 {
-   #pragma omp taskloop reduction(+:sum)
+   #pragma omp taskloop simd reduction(+:sum)
    for (int i = 0; i < N; i++) {
       #pragma omp atomic
       sum += a[i]*b[i]; 
@@ -37,15 +37,16 @@ int test_taskloop_reduction() {
    num_threads = omp_get_num_threads();
 
    #pragma omp single
-   #pragma omp taskloop reduction(+:sum)
+   #pragma omp taskloop simd reduction(+:sum)
    for (int i = 0; i < N; i++) {
       #pragma omp atomic
       sum++;
    }
+
 }
-   
+
    real_sum += N;
-   
+
    for (int j = 0; j < num_threads; j++) {
       for (int i = 0; i < N; i++) {
          real_sum += a[i]*b[i];
@@ -58,14 +59,15 @@ int test_taskloop_reduction() {
    OMPVV_ERROR_IF(num_threads < 1, "Test returned an invalid number of threads.");
    OMPVV_TEST_AND_SET_VERBOSE(errors, num_threads < 1);
 
+
    return errors;            
 }
 
 
 int main() {
- 
+
    int errors = 0;
-  
+
    OMPVV_TEST_AND_SET_VERBOSE(errors, test_taskloop_reduction());
 
    OMPVV_REPORT_AND_RETURN(errors);
