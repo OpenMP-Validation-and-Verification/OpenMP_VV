@@ -34,7 +34,7 @@ CONTAINS
 
     !$omp do
     DO i = 1, N
-       arr(i) = i
+       arr(i) = i + 1
     END DO
   END SUBROUTINE p_fn
 
@@ -44,7 +44,7 @@ CONTAINS
 
     !$omp distribute simd
     DO i = 1, N
-       arr(i) = i
+       arr(i) = i + 2
     END DO
   END SUBROUTINE t_fn
 END MODULE variants
@@ -63,7 +63,7 @@ PROGRAM test_declare_variant
 
 CONTAINS
   INTEGER FUNCTION test_body()
-    INTEGER :: errors, x
+    INTEGER :: default_errors, p_errors, t_errors, x
     INTEGER,DIMENSION(N) :: a, b, c
 
     DO x = 1, N
@@ -85,10 +85,15 @@ CONTAINS
     !$omp end target teams
 
     DO x = 1, N
-       OMPVV_TEST_AND_SET_VERBOSE(errors, a(x) .ne. x &
-            & .OR. b(x) .ne. x .OR. c(x) .ne. x)
+       OMPVV_TEST_AND_SET_VERBOSE(default_errors, a(x) .ne. x)
+       OMPVV_TEST_AND_SET_VERBOSE(p_errors, b(x) .ne. (x + 1))
+       OMPVV_TEST_AND_SET_VERBOSE(t_errors, c(x) .ne. (x + 2))
     END DO
 
-    test_body = errors
+    OMPVV_ERROR_IF(default_errors .ne. 0, "Did not use default variant of test function when expected.")
+    OMPVV_ERROR_IF(p_errors .ne. 0, "Did not use parallel variant of test function when expected.")
+    OMPVV_ERROR_IF(t_errors .ne. 0, "Did not use target variant of test function when expected.")
+
+    test_body = default_errors + p_errors + t_errors
   END FUNCTION test_body
 END PROGRAM test_declare_variant
