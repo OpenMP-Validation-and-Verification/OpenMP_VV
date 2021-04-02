@@ -1,17 +1,17 @@
-!//===------ test_requires_dynamic_allocators.F90 --------------------------===//
+!/===--- test_parallel_for_allocate.c -------------------------------------===//
 !
 ! OpenMP API Version 5.0 Nov 2018
 !
-! Tests the requires dynamic allocators clause by working with an OMP
-! allocator inside a target region. Allocators testing is based on the
+! Tests the parallel for directive with allocator clause, based on the
 ! OpenMP 5.0 example for allocators. The allocator testing first creates
 ! an allocator, with 64-byte alignment and the default memory space,
 ! then checks that 64-byte alignment is correct and that the memory can
-! be written to in the target region. The tests checks that the values
+! be written to in the parallel for region in private arrays set to
+! allocate with the created allocator. The tests checks that the values
 ! were written correctly, and then frees the memory and deletes the
 ! allocator.
 !
-!//===----------------------------------------------------------------------===//
+!/===----------------------------------------------------------------------===//
 
 #include "ompvv.F90"
 
