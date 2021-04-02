@@ -47,7 +47,9 @@ void t_fn(int *arr) {            // variant for use on target
 int main() {
   OMPVV_TEST_OFFLOADING;
 
-  int errors = 0;
+  int default_errors = 0;
+  int p_errors = 0;
+  int t_errors = 0;
   int a[N], b[N], c[N];
 
   for (int i = 0; i < N; i++) {
@@ -69,8 +71,14 @@ int main() {
   }
 
   for (int i = 0; i < N; i++) {
-    OMPVV_TEST_AND_SET_VERBOSE(errors, a[i] != i || b[i] != (i + 1) || c[i] != (i + 2));
+    OMPVV_TEST_AND_SET_VERBOSE(default_errors, a[i] != i);
+    OMPVV_TEST_AND_SET_VERBOSE(p_errors, b[i] != (i + 1));
+    OMPVV_TEST_AND_SET_VERBOSE(t_errors, c[i] != (i + 2));
   }
 
-  OMPVV_REPORT_AND_RETURN(errors);
+  OMPVV_ERROR_IF(default_errors, "Did not use default variant of test function when expected.");
+  OMPVV_ERROR_IF(p_errors, "Did not use parallel variant of test function when expected.");
+  OMPVV_ERROR_IF(t_errors, "Did not use target variant of test function when expected.");
+
+  OMPVV_REPORT_AND_RETURN(default_errors + p_errors + t_errors);
 }
