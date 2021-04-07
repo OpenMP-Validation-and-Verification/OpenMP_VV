@@ -54,7 +54,6 @@ PROGRAM array_reduce_v2
   implicit none
 
   OMPVV_TEST_OFFLOADING
-  OMPVV_TEST_SHARED_ENVIRONMENT
 
   OMPVV_TEST_VERBOSE(test_array_reduce() .ne. 0)
 
