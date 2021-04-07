@@ -1,17 +1,17 @@
-!===--- test_loop_order_concurrent.F90 -------------------------------------===//
+!===--- test_loop_order_concurrent_device.F90 ------------------------------===//
 !
 ! OpenMP API Version 5.0 Nov 2018
 !
-! This test checks the loop directive with the order(concurrent) clause.
-! The order(concurrent) clause is assumed to be present if it is not
-! present, so this test covers the standalone loop directive as well. The
-! test creates a parallel region with a loop construct nested within, and
-! performs simple operations on an int array which are then checked for
-! correctness. Additionally, since loop binds to a parallel region, the test
-! checks randomly that other threads wait before proceeding out of the loop
-! region. The number of threads is checked in the parallel region but after
-! the loop construct because runtime API calls are not permitted in loop
-! directive regions.
+! This test checks the loop directive with the order(concurrent) clause
+! on the device. The order(concurrent) clause is assumed to be present if
+! it is not present, so this test covers the standalone loop directive as
+! well. The test creates a parallel region with a loop construct nested
+! within, and performs simple operations on an int array which are then
+! checked for correctness. Additionally, since loop binds to a parallel
+! region, the test checks randomly that other threads wait before
+! proceeding out of the loop region. The number of threads is checked in
+! the parallel region but after the loop construct because runtime API
+! calls are not permitted in loop directive regions.
 !
 !//===----------------------------------------------------------------------===//
 
@@ -34,7 +34,7 @@ PROGRAM test_loop_order_concurrent
 CONTAINS
   INTEGER FUNCTION test_loop()
     INTEGER,DIMENSION(N):: a, b, c
-    INTEGER,DIMENSION(OMPVV_NUM_THREADS_HOST):: rand_indexes
+    INTEGER,DIMENSION(OMPVV_NUM_THREADS_DEVICE):: rand_indexes
     INTEGER:: errors, x, wait_errors, num_threads
     REAL:: curr_rand
 
@@ -49,12 +49,13 @@ CONTAINS
 
     CALL init_random_seed()
 
-    DO x = 1, OMPVV_NUM_THREADS_HOST
+    DO x = 1, OMPVV_NUM_THREADS_DEVICE
        CALL RANDOM_NUMBER(curr_rand)
        rand_indexes(x) = MODULO(INT(curr_rand*10),N) + 1
     END DO
 
-    !$omp parallel num_threads(OMPVV_NUM_THREADS_HOST)
+    !$omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE) &
+    !$omp& map(tofrom: a, num_threads, wait_errors) map(to: b, c)
     !$omp loop order(concurrent)
     DO x = 1, N
        a(x) = a(x) + b(x)*c(x)
@@ -66,7 +67,7 @@ CONTAINS
     IF (omp_get_thread_num() .eq. 0) THEN
        num_threads = omp_get_num_threads()
     END IF
-    !$omp end parallel
+    !$omp end target parallel
 
     DO x = 1, N
        OMPVV_TEST_AND_SET_VERBOSE(errors, a(x) .ne. 1 + (b(x)*c(x)))
@@ -74,7 +75,7 @@ CONTAINS
 
     OMPVV_WARNING_IF(num_threads .eq. 1, "Test ran with one thread. Cannot guarantee loop construct parallelism.")
     OMPVV_TEST_AND_SET_VERBOSE(errors, num_threads .lt. 1)
-    OMPVV_ERROR_IF(wait_errors .gt. 0, "Threads in parallel region did not wait for loop region to finish.")
+    OMPVV_ERROR_IF(wait_errors .gt. 0, "Threads in target parallel region did not wait for loop region to finish.")
 
     test_loop = errors + wait_errors
   END FUNCTION test_loop
