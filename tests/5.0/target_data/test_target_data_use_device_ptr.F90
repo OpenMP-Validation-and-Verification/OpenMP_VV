@@ -1,4 +1,4 @@
-!/===-- test_target_data_use_device_ptr.c ---------------------------------===//
+!/===-- test_target_data_use_device_ptr.F90 -------------------------------===//
 !
 ! OpenMP API Version 5.0 Nov 2018
 !
@@ -28,34 +28,28 @@ PROGRAM test_target_data_use_device_ptr
   OMPVV_REPORT_AND_RETURN()
 
 CONTAINS
-  INTEGER FUNCTION use_device_ptr()
-    INTEGER :: errors, x
-    INTEGER,POINTER,DIMENSION(:) :: array_device, array_host
+  SUBROUTINE run_target_region(host_data, device_data)
+    INTEGER :: host_data
+    INTEGER,INTENT(in) :: device_data
 
-    allocate(array_device(N))
-    allocate(array_host(N))
-
-    errors = 0
-
-    DO x = 1, N
-       array_device(x) = x
-       array_host(x) = 0
-    END DO
-
-    !$omp target data map(to: array_device(1:N)) use_device_ptr(array_device)
-    !$omp target is_device_ptr(array_device) map(tofrom: array_host(1:N))
-    DO x = 1, N
-       array_host(x) = array_host(x) + array_device(x)
-    END DO
+    !$omp target data map(to: device_data) use_device_ptr(device_data)
+    !$omp target is_device_ptr(device_data) map(tofrom: host_data)
+    host_data = host_data + device_data
     !$omp end target
     !$omp end target data
 
-    DO x = 1, N
-       OMPVV_TEST_AND_SET_VERBOSE(errors, array_host(x) .ne. x)
-    END DO
+  END SUBROUTINE run_target_region
+  INTEGER FUNCTION use_device_ptr()
+    INTEGER :: errors, x
+    INTEGER :: scalar_device, scalar_host
 
-    deallocate(array_device)
-    deallocate(array_host)
+    errors = 0
+    scalar_device = x
+    scalar_host = 0
+
+    call run_target_region(scalar_host, scalar_device)
+
+    OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_host .ne. x)
 
     use_device_ptr = errors
   END FUNCTION use_device_ptr
