@@ -40,16 +40,16 @@ CONTAINS
 
   END SUBROUTINE run_target_region
   INTEGER FUNCTION use_device_ptr()
-    INTEGER :: errors, x
+    INTEGER :: errors
     INTEGER :: scalar_device, scalar_host
 
     errors = 0
-    scalar_device = x
+    scalar_device = N
     scalar_host = 0
 
     call run_target_region(scalar_host, scalar_device)
 
-    OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_host .ne. x)
+    OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_host .ne. N)
 
     use_device_ptr = errors
   END FUNCTION use_device_ptr
