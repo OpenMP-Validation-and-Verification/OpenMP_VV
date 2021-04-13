@@ -28,7 +28,7 @@ int main() {
    max_active_levels = omp_get_max_active_levels();
 
    OMPVV_TEST_AND_SET_VERBOSE(errors, num_active_levels > max_active_levels);
-   OMPVV_TET_AND_SET_VERBOSE(errors, num_active_levels <= 0);
+   OMPVV_TEST_AND_SET_VERBOSE(errors, num_active_levels <= 0);
 
    OMPVV_REPORT_AND_RETURN(errors);
 

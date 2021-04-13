@@ -28,32 +28,27 @@ int to_before_alloc() {
   struct {
   int var;
   int b[N];
-  } member; 
+  } member;
 
   member.var = 1;
-  
-  for (i = 0; i < N; i++) { 
+
+  for (i = 0; i < N; i++) {
     a[i] = i;
     member.b[i] = i;
   }
 
-#pragma omp target  map (alloc: scalar, a, member) map(to: scalar, a, member) 
+#pragma omp target  map (alloc: scalar, a, member) map(to: scalar, a, member)
   {
-    if (scalar != 80 || a[1] != 2 || member.var != 1 || member.b[1] != 2) {
-      errors++;
-    }
-  }	 
-  return errors; 
+    OMPVV_TEST_AND_SET_VERBOSE(errors, scalar != 80 || a[1] != 2 || member.var != 1 || member.b[1] != 2)
+  }
+  return errors;
 }
 
 int main () {
-  
+
   int errors = 0;
-  
+
   OMPVV_TEST_OFFLOADING;
   OMPVV_TEST_AND_SET_VERBOSE(errors, to_before_alloc());
   OMPVV_REPORT_AND_RETURN(errors);
 }
-
-
-

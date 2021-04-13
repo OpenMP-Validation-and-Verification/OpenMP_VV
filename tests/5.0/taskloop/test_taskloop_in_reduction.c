@@ -29,7 +29,7 @@ int test_taskloop_in_reduction() {
     z[i] = 2*(i + 1);
   }
 
-#pragma omp parallel reduction(task, +: sum) num_threads(OMPVV_NUM_THREADS_HOST) shared(y, z, num_threads, sum)
+#pragma omp parallel reduction(task, +: sum) num_threads(OMPVV_NUM_THREADS_HOST) shared(y, z, num_threads)
   {
 #pragma omp master
     {
