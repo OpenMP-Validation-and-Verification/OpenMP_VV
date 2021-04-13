@@ -28,7 +28,7 @@ int test_target_parallel_for_notequals() {
     z[i] = 2*(i + 1);
   }
 
-#pragma omp target parallel for num_threads(OMPVV_NUM_THREADS_HOST) map(to: y, z) map(from: x)
+#pragma omp target parallel for num_threads(OMPVV_NUM_THREADS_HOST) map(to: y, z) map(tofrom: x)
   for (int i = 0; i != N; i++) {
     x[i] += y[i]*z[i];
   }
