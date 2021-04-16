@@ -5,7 +5,8 @@
 // Test for support of the omp_get_supported_active_levels() routine. 
 // This routine returns the number of active levels of parallelism 
 // supported by the implementation. This returned value must be greater
-// than 0 and less than the value of the max_active_levels-var ICV.
+// than 0 and the max-active-levels-var ICV may not have a value that is greater
+// than this number.
 // 
 ///===-----------------------------------------------------------------------===//
 
@@ -19,16 +20,16 @@
 int main() {
 
    int errors;
-   int num_active_levels;
+   int num_supp_active_levels;
    int max_active_levels;
 
    errors = 0;
  
-   num_active_levels = omp_get_supported_active_levels();
+   num_supp_active_levels = omp_get_supported_active_levels();
    max_active_levels = omp_get_max_active_levels();
 
-   OMPVV_TEST_AND_SET_VERBOSE(errors, num_active_levels > max_active_levels);
-   OMPVV_TEST_AND_SET_VERBOSE(errors, num_active_levels <= 0);
+   OMPVV_TEST_AND_SET_VERBOSE(errors, max_active_levels > num_supp_active_levels);
+   OMPVV_TEST_AND_SET_VERBOSE(errors, num_supp_active_levels <= 0);
 
    OMPVV_REPORT_AND_RETURN(errors);
 
