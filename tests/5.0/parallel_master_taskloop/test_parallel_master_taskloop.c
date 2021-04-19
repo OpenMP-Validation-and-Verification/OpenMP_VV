@@ -31,7 +31,7 @@ int test_parallel_master_taskloop() {
 #pragma omp parallel master taskloop num_threads(OMPVV_NUM_THREADS_HOST) shared(x, y, z, num_threads)
   for (int i = 0; i < N; i++) {
     x[i] += y[i]*z[i];
-    if (omp_get_thread_num() == 0) {
+    if (i == 0) {
       num_threads = omp_get_num_threads();
     }
   }
