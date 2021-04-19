@@ -1,4 +1,4 @@
-//===---test_requires_atomic_default_mem_order_relaxed.c---------------------===//
+//===---test_target_requires_atomic_default_mem_order_relaxed.c--------------===//
 //
 // OpenMP API Version 5.0 Nov 2018
 // 
@@ -20,13 +20,13 @@
 
 #pragma omp requires atomic_default_mem_order(relaxed)
 
-int test_requires_atomic_relaxed() {
-  OMPVV_INFOMSG("test_requires_atomic_relaxed");
+int test_target_requires_atomic_relaxed() {
+  OMPVV_INFOMSG("test_target_requires_atomic_relaxed");
 
   int x = 0, y = 0;
   int errors = 0;
 
-#pragma omp parallel num_threads(2)
+#pragma omp target parallel num_threads(2)
    {
       int thrd = omp_get_thread_num();
        if (thrd == 0) {
@@ -52,7 +52,9 @@ int main() {
 
   int errors = 0;
 
-  OMPVV_TEST_AND_SET_VERBOSE(errors, test_requires_atomic_relaxed());
+  OMPVV_TEST_OFFLOADING;
+
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_target_requires_atomic_relaxed());
 
   OMPVV_REPORT_AND_RETURN(errors);
 }
