@@ -1,6 +1,6 @@
 !===--- test_target_teams_distribute_reduction_add.F90----------------------===//
 !
-! OpenMP API Version 5.0 Nov 2018
+! OpenMP API Version 4.5 Nov 2015
 !
 ! This test uses the reduction clause on a target teams distribute
 ! directive, testing, for the add operator, that the variable in the
