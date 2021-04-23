@@ -23,8 +23,8 @@ int main() {
    int num_supp_active_levels;
    int max_active_levels;
 
-   errors = 0;
- 
+   errors = 0; 
+   
    num_supp_active_levels = omp_get_supported_active_levels();
    max_active_levels = omp_get_max_active_levels();
 
