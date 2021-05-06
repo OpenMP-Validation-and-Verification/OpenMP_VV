@@ -1,4 +1,4 @@
-//===--- test_set_and_get_affinity_format.c ---------------------------------===//
+//===--- test_set_and_get_omp_affinity.c ------------------------------------===//
 //
 // OpenMP API Version 5.0 Nov 2018
 //
@@ -46,5 +46,4 @@ int main () {
    OMPVV_ERROR_IF(nchars == set_nchars, "Default affinity is the same number of characters as the set affinity, it is likely that omp_set_affinity() did not work properly.");
                                      
    OMPVV_REPORT_AND_RETURN(errors);
-
 }
