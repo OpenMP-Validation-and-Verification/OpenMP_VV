@@ -29,16 +29,12 @@ int main () {
    char my_format[] = "host=%20H thrd_num=%0.4n binds_to=%A";
    char **buffer;
 
-   // Display Default Affinity Format using NULL
-   omp_display_affinity(NULL);
-   printf("\n");
-
-   // Display Default Affinity Format using omp_get_affinity_format
+   // Display Default Affinity Format using omp_get_affinity_format and omp_display_affinity
    nchars = omp_get_affinity_format(default_format,(size_t)FORMAT_STORE);
    omp_display_affinity(default_format);
    OMPVV_TEST_AND_SET_VERBOSE(errors, nchars >= FORMAT_STORE);
    
-   //Display Default Affinity Format after using omp_set_affinity_format
+   //Display Default Affinity Format after using omp_set_affinity_format using omp_display_affinity
    omp_set_affinity_format(my_format);
    set_nchars = omp_get_affinity_format(default_format,(size_t)FORMAT_STORE);
    omp_display_affinity(default_format);
