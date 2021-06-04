@@ -44,7 +44,7 @@ int test_omp_device() {
   OMPVV_TEST_AND_SET(errors, iDev1 != setDev);
 
 
-  buf1 = omp_target_alloc (sizeof(double)*4096, iDev1);
+  buf1 = omp_target_alloc (sizeof(double)* N, iDev1);
   iDev2 = omp_get_default_device();
   OMPVV_TEST_AND_SET(errors, iDev2 != iDev1);
 
