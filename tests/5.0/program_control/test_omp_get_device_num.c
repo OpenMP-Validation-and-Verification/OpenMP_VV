@@ -50,6 +50,8 @@ int test_omp_get_dev_num(void) {
    for (int i = 0; i < N; i++) {
       OMPVV_TEST_AND_SET_VERBOSE(errors, a[i] != i + 5);
    }
+
+   return errors;
 }
 
 int main () {

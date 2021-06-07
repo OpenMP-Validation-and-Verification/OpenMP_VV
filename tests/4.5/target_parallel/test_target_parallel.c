@@ -13,56 +13,26 @@
 #include <math.h>
 #include "ompvv.h"
 
-#define MIN(a,b) (a > b ? b : a)
-
 int test_target_parallel() {
   OMPVV_INFOMSG("test_target_parallel");
 
-  int max_threads, scalar_num_threads;
-  int *num_threads;
+  int num_threads[OMPVV_NUM_THREADS_DEVICE];
   int errors = 0;
 
-  // We obtain the default number of threads in the target region
-#pragma omp target map(from:max_threads)
+#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE) map(from:num_threads[0:OMPVV_NUM_THREADS_DEVICE])
   {
-    max_threads = omp_get_max_threads();
-  }
-
-  OMPVV_INFOMSG("Max threads = %d", max_threads);
-
-  // Warning if max  threads is just 1, parallel does nothing
-  OMPVV_WARNING_IF(max_threads == 1, "The max number of threads creatable was 1. This is not a specifications error but we could not confirm the parallel region.");
-
-  num_threads = (int *) malloc (sizeof(int) * max_threads); 
-
-  for (int i = 0; i < max_threads; ++i) {
-    num_threads[i] = -1;
-  }
-
-#pragma omp target parallel map(from:num_threads[0:max_threads], scalar_num_threads)
-  {
-#pragma omp master
-    {
-      scalar_num_threads = omp_get_num_threads();
-    }
     int thread_id = omp_get_thread_num();
     num_threads[thread_id] = omp_get_num_threads();
   }
 
   //Warning if only 1 thread in region 2, parallel does nothing
-  OMPVV_WARNING_IF(scalar_num_threads == 1, "The number of threads in the parallel region was 1. This is not a specifications error but we could not confirm the parallel region.");
-
-  //Error if threads created exceeds max_threads
-  OMPVV_TEST_AND_SET(errors, scalar_num_threads > max_threads);
-  OMPVV_ERROR_IF(scalar_num_threads > max_threads, "The reported number of threads = %d is larger than the max num threads = %d reported previously", scalar_num_threads, max_threads);
+  OMPVV_WARNING_IF(num_threads[0] == 1, "The number of threads in the parallel region was 1. This is not a specifications error but we could not confirm the parallel region.");
 
   //Error if num_threads is inconsistent between threads
-  for (int i = 0; i < (int) MIN(scalar_num_threads, max_threads); ++i) {
-    OMPVV_TEST_AND_SET(errors, num_threads[i] != scalar_num_threads);
-    OMPVV_ERROR_IF(num_threads[i] != scalar_num_threads, "The number of threads at threadID = %d was %d. Expected was %d.", i, num_threads[i], scalar_num_threads);
+  for (int i = 1; i < num_threads[0]; ++i) {
+    OMPVV_TEST_AND_SET(errors, num_threads[i] != num_threads[0]);
+    OMPVV_ERROR_IF(num_threads[i] != num_threads[0], "The number of threads recorded by thread %d was %d. Expected was %d.", i, num_threads[i], num_threads[0]);
   }
-
-  free(num_threads);
 
   return errors;
 }
