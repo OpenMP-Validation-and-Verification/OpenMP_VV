@@ -47,7 +47,7 @@ CONTAINS
        c(x) = 2*(x + 1)
     END DO
 
-    CALL init_random_seed()
+    CALL RANDOM_SEED()
 
     DO x = 1, OMPVV_NUM_THREADS_HOST
        CALL RANDOM_NUMBER(curr_rand)
