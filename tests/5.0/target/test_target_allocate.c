@@ -1,11 +1,10 @@
-//===------ test_allocate_allocators.c ------------------------------------===//
+//===------ test_allocate_allocators.c --------------------------------------===//
 //
 // OpenMP API Version 5.0 Nov 2018
 //
-// Tests the target directive with allocate clause, based on the OpenMP
-// 5.0 example for allocators. 
+// Tests the target directive with allocate clause.
 //
-//===----------------------------------------------------------------------===//
+//===------------------------------------------------------------------------===//
 
 #include <omp.h>
 #include <stdio.h>
@@ -14,47 +13,39 @@
 
 #define N 1024
 
-int test_target_allocate() {
+int test_target_allocate() { 
 
-  int errors = 0;
+   int errors = 0;
 
-  int* x;
-  omp_memspace_handle_t x_memspace = omp_default_mem_space;
-  omp_alloctrait_t x_traits[1] = {omp_atk_alignment, 64};
-  omp_allocator_handle_t x_alloc = omp_init_allocator(x_memspace, 1, x_traits);
+   int x = 0;
+   int host_result = 0, device_result = 0;
 
-#pragma omp allocate(x) allocator(x_alloc)
-
-  x = (int *) malloc(N*sizeof(int));
-
-#pragma omp target allocate(x) private(x) 
-{
-
-#pragma parallel for simd simdlen(16) aligned(x: 64)
-  for (int i = 0; i < N; i++) {
-    x[i] = i;
-  }
-}
-
-  for (int i = 0; i < N; i++) {
-    OMPVV_TEST_AND_SET_VERBOSE(errors, x[i] != i);
-  }
-
-
-  free(x);
-  omp_destroy_allocator(x_alloc);
-
-  return errors;
-
+   for (int i = 0; i < N; i++) {
+      host_result += i;
+   }
+   
+   #pragma omp target allocate(x) firstprivate(x) map(from: device_result)
+   {
+      for (int i = 0; i < N; i++) {
+         x += i;
+      }
+      device_result = x; 
+  
+   }
+   
+   OMPVV_TEST_AND_SET(errors, device_result != host_result);
+   
+   return errors; 
 }
 
 int main() {
 
-  OMPVV_TEST_OFFLOADING;
+   OMPVV_TEST_OFFLOADING;
+ 
+   int errors = 0;
 
-  int errors = 0;
+   OMPVV_TEST_AND_SET_VERBOSE(errors, test_target_allocate() != 0);
 
-  OMPVV_TEST_AND_SET_VERBOSE(errors, test_target_allocate() != 0);
+   OMPVV_REPORT_AND_RETURN(errors);
 
-  OMPVV_REPORT_AND_RETURN(errors);
 }
