@@ -51,6 +51,8 @@ int test_target_task_depend_mutexinoutset() {
 int main() {
   
   int errors = 0;
+  
+  OMPVV_TEST_OFFLOADING;
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_target_task_depend_mutexinoutset());
 
   OMPVV_REPORT_AND_RETURN(errors);
