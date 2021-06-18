@@ -1,4 +1,4 @@
-!/===--- test_target_uses_allocators_const.c --------------------------===//
+!/===--- test_target_uses_allocators_const.F90 ----------------------------===//
 !
 ! OpenMP API Version 5.0 Nov 2018
 !
