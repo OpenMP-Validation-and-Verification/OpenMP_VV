@@ -1,4 +1,4 @@
-!/===-- test_target_data_use_device_addr.c --------------------------------===//
+!/===-- test_target_data_use_device_addr.F90 ------------------------------===//
 !
 ! OpenMP API Version 5.0 Nov 2018
 !
