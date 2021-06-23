@@ -34,7 +34,7 @@ int test_collapse1() {
     }
   }
 
-#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE) map(tofrom: a, b)
+#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE) map(tofrom: a[:N][:N], b[:N][:N+1])
   {
 #pragma omp loop collapse(1)
     for (int x = 0; x < N; ++x) {
@@ -76,7 +76,7 @@ int test_collapse2() {
     }
   }
 
-#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE) map(tofrom: a, b, num_threads)
+#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE) map(tofrom: a[:N][:N][:N], b[:N][:N][:N+1], num_threads)
   {
     if (omp_get_thread_num() == 0) {
       num_threads = omp_get_num_threads();
