@@ -7,7 +7,8 @@
 // near to the memory location of the list items in the clause. This test
 // checks that the affinity clause can be used in the appropriate context
 // of a task construct but cannot guarantee that the compiler provides any
-// exact semantics for the clause.
+// exact semantics for the clause. This test checks the above in a target
+// offload context.
 //
 ////===----------------------------------------------------------------------===//
 
@@ -24,16 +25,17 @@ int test_task_affinity() {
   int errors = 0;
   int* A;
   int* B;
+  int t = omp_get_default_device();
 
-  A = (int*) malloc(sizeof(int)*N);
-  for (int i = 0; i < N; i++) {
-    A[i] = 0;
-  }
+  A = (int*) omp_target_alloc(sizeof(int)*N, t);
 
-#pragma omp target map(to: A[0:N]) map(from: B[0:N])
+#pragma omp target is_device_ptr(A) device(t) map(from: B[0:N])
   {
 #pragma omp task depend(out: B) shared(B) affinity(A[0:N])
     {
+      for (int i = 0; i < N; i++) {
+        A[i] = 0;
+      }
       B = (int*) malloc(sizeof(int)*N);
       for (int i = 0; i < N; i++) {
         B[i] = A[i];
