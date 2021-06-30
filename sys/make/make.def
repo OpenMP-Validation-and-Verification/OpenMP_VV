@@ -71,16 +71,16 @@ FC?=none
 ifeq ($(DEVICE_TYPE), amd)
   # CRAY compiler (AMD)
   ifeq ($(CC), cc)
-    CFLAGS += -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa
+    CFLAGS += -g -Ofast -fopenmp 
     CLINK = cc
-    CLINKFLAGS += -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa
+    CLINKFLAGS += -g -Ofast -fopenmp 
   endif
 else ifeq ($(DEVICE_TYPE), nvidia)
   # CRAY compiler (NVIDIA)
   ifeq ($(CC), cc)
-    CFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target
+    CFLAGS += -fopenmp -fopenmp-targets=nvptx64-nvidia-cuda -Xopenmp-target -march=sm_70
     CLINK = cc
-    CLINKFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target
+    CLINKFLAGS += -fopenmp -fopenmp-targets=nvptx64-nvidia-cuda -Xopenmp-target -march=sm_70
   endif
 endif
 
@@ -114,15 +114,28 @@ ifeq ($(CC), icx)
 endif
 
 # Clang compiler
-ifeq ($(CC), clang)
-  COFFLOADING = -fopenmp-targets=nvptx64-nvidia-cuda -Xopenmp-target -march=sm_70
-  C_NO_OFFLOADING =
-  CFLAGS += -lm -O3 -fopenmp $(COFFLOADING)
-  #Adding this to fix problem with math.h
-  CFLAGS +=  -D__NO_MATH_INLINES -U__SSE2_MATH__ -U__SSE_MATH__
-  CLINK = clang
-  CLINKFLAGS += -lm -O3 -fopenmp $(COFFLOADING)
-  C_VERSION = echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") clang --version | head -n 1 | sed 's/clang version \([0-9]*\.[0-9]*\.[0-9]*\)/\1/g')"
+ifeq ($(DEVICE_TYPE),nvidia)
+  ifeq ($(CC), clang)
+    COFFLOADING = -fopenmp-targets=nvptx64-nvidia-cuda -Xopenmp-target -march=sm_70
+    C_NO_OFFLOADING =
+    CFLAGS += -lm -O3 -fopenmp $(COFFLOADING)
+    #Adding this to fix problem with math.h
+    CFLAGS +=  -D__NO_MATH_INLINES -U__SSE2_MATH__ -U__SSE_MATH__
+    CLINK = clang
+    CLINKFLAGS += -lm -O3 -fopenmp $(COFFLOADING)
+    C_VERSION = echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") clang --version | head -n 1 | sed 's/clang version \([0-9]*\.[0-9]*\.[0-9]*\)/\1/g')"
+  endif
+else ifeq ($(DEVICE_TYPE),amd)
+  ifeq ($(CC), clang)
+    COFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908
+    C_NO_OFFLOADING =
+    CFLAGS += $(COFFLOADING)
+    #Adding this to fix problem with math.h
+    CFLAGS +=  -D__NO_MATH_INLINES -U__SSE2_MATH__ -U__SSE_MATH__
+    CLINK = clang
+    CLINKFLAGS += -lm -O3 -fopenmp $(COFFLOADING)
+    C_VERSION = echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") clang --version | head -n 1 | sed 's/clang version \([0-9]*\.[0-9]*\.[0-9]*\)/\1/g')"
+  endif
 endif
 
 # AOMP compiler
@@ -163,22 +176,22 @@ endif
 #---------------------------------------------------------------------------
 # C++ compilers
 #---------------------------------------------------------------------------
-CXXCOMPILERS?="clang++, g++, xlc++, icpx"
+CXXCOMPILERS?="CC, clang++, g++, xlc++, icpx"
 CXX_VERSION?= echo "version unknown"
 
 # CRAY compilers
 ifeq ($(DEVICE_TYPE), amd)
   # CRAY compiler (AMD)
   ifeq ($(CXX), CC)
-    CXXFLAGS += -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx906
-    CXXLINK = cc
-    CXXLINKFLAGS += -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx906
+    CXXFLAGS += -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908
+    CXXLINK = CC
+    CXXLINKFLAGS += -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908
   endif
 else
   # CRAY compiler (NVIDIA)
   ifeq ($(CXX), CC)
     CXXFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
-    CXXLINK = cc
+    CXXLINK = CC
     CXXLINKFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
   endif
 endif
@@ -213,15 +226,28 @@ ifeq ($(CXX), icpx)
 endif
 
 # Clang compiler
-ifeq ($(CXX), clang++)
-  CXXOFFLOADING = -fopenmp-targets=nvptx64-nvidia-cuda -Xopenmp-target -march=sm_70
-  CXX_NO_OFFLOADING =
-  CXXFLAGS += -std=c++11 -lm -O3 -fopenmp $(CXXOFFLOADING)
-  #Adding this to fix problem with math.h
-  CXXFLAGS +=  -D__NO_MATH_INLINES -U__SSE2_MATH__ -U__SSE_MATH__
-  CXXLINK = clang++
-  CXXLINKFLAGS += -lm -O3 -fopenmp $(CXXOFFLOADING)
-  CXX_VERSION = echo "$(shell $(call loadModules,$(CXX_COMPILER_MODULE),"shut up") clang++ --version | head -n 1 | sed 's/clang version \([0-9]*\.[0-9]*\.[0-9]*\)/\1/g')"
+ifeq ($(DEVICE_TYPE),nvidia)
+  ifeq ($(CXX), clang++)
+    CXXOFFLOADING = -fopenmp-targets=nvptx64-nvidia-cuda -Xopenmp-target -march=sm_70
+    CXX_NO_OFFLOADING =
+    CXXFLAGS += -std=c++11 -lm -O3 -fopenmp $(CXXOFFLOADING)
+    #Adding this to fix problem with math.h
+    CXXFLAGS +=  -D__NO_MATH_INLINES -U__SSE2_MATH__ -U__SSE_MATH__
+    CXXLINK = clang++
+    CXXLINKFLAGS += -lm -O3 -fopenmp $(CXXOFFLOADING)
+    CXX_VERSION = echo "$(shell $(call loadModules,$(CXX_COMPILER_MODULE),"shut up") clang++ --version | head -n 1 | sed 's/clang version \([0-9]*\.[0-9]*\.[0-9]*\)/\1/g')"
+  endif
+else ifeq ($(DEVICE_TYPE),amd)
+  ifeq ($(CXX), clang++)
+    CXXOFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908 
+    CXX_NO_OFFLOADING =
+    CXXFLAGS += -std=c++11 -lm -O3 -fopenmp $(CXXOFFLOADING)
+    #Adding this to fix problem with math.h
+    CXXFLAGS +=  -D__NO_MATH_INLINES -U__SSE2_MATH__ -U__SSE_MATH__
+    CXXLINK = clang++
+    CXXLINKFLAGS += -lm -O3 -fopenmp $(CXXOFFLOADING)
+    CXX_VERSION = echo "$(shell $(call loadModules,$(CXX_COMPILER_MODULE),"shut up") clang++ --version | head -n 1 | sed 's/clang version \([0-9]*\.[0-9]*\.[0-9]*\)/\1/g')"
+  endif
 endif
 
 # AOMP compiler
@@ -262,7 +288,7 @@ endif
 #---------------------------------------------------------------------------
 # FORTRAN compilers
 #---------------------------------------------------------------------------
-FCOMPILERS?="gfortran, xlf, ifx"
+FCOMPILERS?="gfortran, xlf, ifx, ftn"
 F_VERSION?= echo "version unknown"
 
 # GCC compiler
