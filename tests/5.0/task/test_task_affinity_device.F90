@@ -1,4 +1,4 @@
-!/===-- test_task_affinity.F90 --------------------------------------------===//
+!/===-- test_task_affinity_device.F90 -------------------------------------===//
 !
 ! OpenMP API Version 5.0 Nov 2018
 !
@@ -7,7 +7,8 @@
 ! near to the memory location of the list items in the clause. This test
 ! checks that the affinity clause can be used in the appropriate context
 ! of a task construct but cannot guarantee that the compiler provides any
-! exact semantics for the clause.
+! exact semantics for the clause. This test checks the above in a device
+! context.
 !
 !/===----------------------------------------------------------------------===//
 
@@ -20,6 +21,7 @@ PROGRAM test_task_affinity
   USE ompvv_lib
   USE omp_lib
   implicit none
+  OMPVV_TEST_OFFLOADING
 
   OMPVV_TEST_VERBOSE(run_tasks() .ne. 0)
 
@@ -27,14 +29,17 @@ PROGRAM test_task_affinity
 
 CONTAINS
   INTEGER FUNCTION run_tasks()
-    INTEGER:: errors, i
+    INTEGER:: errors, i, t
     INTEGER,ALLOCATABLE:: A(:), B(:)
+
+    t = omp_get_default_device()
 
     allocate(A(N))
     DO i = 1, N
        A(i) = 0
     END DO
 
+    !$omp target device(t) map(tofrom: A(1:N)) map(from: B(1:N))
     !$omp task depend(out: B) shared(B) affinity(A)
     allocate(B(N))
     DO i = 1, N
@@ -49,6 +54,7 @@ CONTAINS
     !$omp end task
 
     !$omp taskwait
+    !$omp end target
 
     DO i = 1, N
        OMPVV_TEST_AND_SET_VERBOSE(errors, B(i) .ne. i*2)
