@@ -1,3 +1,20 @@
+//===--- test_target_update_depend.c ----------------------------------------===//
+//
+// OpenMP API Version 4.5 Nov 2015
+//
+// This is a test of the target update construct with the depend clause.
+// The test_async_between_hosts_tasks() functions additionatly tests if
+// the target enter data and exit data constructs work properly with the
+// depend clause. Bits are used for each task in order to determine where
+// failure occurs. 
+//
+////===----------------------------------------------------------------------===//
+
+
+
+
+
+
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,14 +28,6 @@
 #define HOST_TASK3_BIT 0x8
 #define ALL_TASKS_BITS 0xF
 
-/*
- * Test if it is possible to:
- * 1. target enter data to depend 'in' and 'out'
- * 2. target exit data to depend 'in' and 'out'
- * 3. Mix target-based tasks with host tasks.
- *
- * We use bits for each task to know where it fails
- */
 int test_async_between_hosts_tasks() {
   OMPVV_INFOMSG("test_async_between_hosts_tasks");
 
