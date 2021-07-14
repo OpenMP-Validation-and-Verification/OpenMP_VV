@@ -22,9 +22,9 @@
 
 #include <omp.h>
 #include <stdio.h>
-#include <ctype.h>
+#include <ctype.h>  // For isspace.
 #include <stdlib.h>
-#include <string.h>
+#include <strings.h>  // For strncasecmp.
 #include "ompvv.h"
 
 #define N 1028

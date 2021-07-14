@@ -1,12 +1,13 @@
-//===--- test_target_uses_allocators_high_bw.c -------------------------------------===//
+//===--- test_target_uses_allocators_high_bw.c ---------------------------------===//
 //
 // OpenMP API Version 5.0 Nov 2018
 //
-// The tests checks the uses_allocators clause with omp_high_bw_mem_alloc. 
-// The variable allaocated in the target is modified and used to compute result 
-// on device. Result is copied back to the host  and checked with computed value on host.
+// The tests checks the uses_allocators clause with omp_high_bw_mem_alloc.
+// The variable allaocated in the target is modified and used to compute result
+// on device. Result is copied back to the host  and checked with computed value
+// on host.
 //
-//===----------------------------------------------------------------------===//
+//===---------------------------------------------------------------------------===//
 
 #include <omp.h>
 #include <stdio.h>

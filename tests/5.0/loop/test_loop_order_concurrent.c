@@ -65,7 +65,7 @@ int test_loop_order_concurrent() {
   OMPVV_WARNING_IF(num_threads == 1, "Test ran with one thread, so parallelism of loop construct can't be guaranteed.");
   OMPVV_TEST_AND_SET_VERBOSE(errors, num_threads < 1);
   OMPVV_ERROR_IF(num_threads < 1, "omp_get_num_threads() returned an invalid number of threads.");
-  OMPVV_ERROR_IF(total_wait_errors, "Threads in target parallel region did not wait for loop region to finish before proceeding.");
+  OMPVV_ERROR_IF(total_wait_errors, "Threads in parallel region did not wait for loop region to finish before proceeding.");
 
   return errors + total_wait_errors;
 }

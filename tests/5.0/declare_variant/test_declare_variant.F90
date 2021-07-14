@@ -72,7 +72,9 @@ CONTAINS
        c(x) = 0
     END DO
 
-    errors = 0
+    default_errors = 0
+    p_errors = 0
+    t_errors = 0
 
     call fn(a)
 

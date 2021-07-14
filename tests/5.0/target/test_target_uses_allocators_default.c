@@ -2,7 +2,7 @@
 //
 // OpenMP API Version 5.0 Nov 2018
 //
-// The tests checks the uses_allocators clause with omp_default_mem_alloc. 
+// The tests checks the uses_allocators clause with omp_default_mem_alloc.
 // The variable allaocated in the target is modified. Result is copied back to
 // the host and checked with computed value on host.
 //
