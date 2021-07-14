@@ -29,28 +29,31 @@ int test_task_affinity() {
 
   A = (int*) omp_target_alloc(sizeof(int)*N, t);
 
-#pragma omp target is_device_ptr(A) device(t) map(from: B[0:N])
-  {
 #pragma omp task depend(out: B) shared(B) affinity(A[0:N])
     {
-      for (int i = 0; i < N; i++) {
-        A[i] = 0;
-      }
-      B = (int*) malloc(sizeof(int)*N);
-      for (int i = 0; i < N; i++) {
-        B[i] = A[i];
+#pragma omp target is_device_ptr(A) device(t) map(from: B[0:N])
+      {
+        for (int i = 0; i < N; i++) {
+          A[i] = 0;
+        }
+        B = (int*) malloc(sizeof(int)*N);
+        for (int i = 0; i < N; i++) {
+          B[i] = A[i];
+        }
       }
     }
 
 #pragma omp task depend(in: B) shared(B) affinity(A[0:N])
     {
-      for (int i = 0; i < N; i++) {
-        B[i] = i*2;
+#pragma omp target device(t) map(tofrom: B[0:N])
+      {
+        for (int i = 0; i < N; i++) {
+          B[i] = i*2;
+        }
       }
     }
 
 #pragma omp taskwait
-  }
 
   for (int i = 0; i < N; i++) {
     OMPVV_TEST_AND_SET_VERBOSE(errors, B[i] != i*2);
