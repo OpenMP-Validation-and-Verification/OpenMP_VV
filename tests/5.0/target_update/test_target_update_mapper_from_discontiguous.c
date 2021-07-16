@@ -25,7 +25,7 @@ typedef struct newvec {
 int i;
 int errors = 0;
 
-#pragma omp declare mapper(newvec_t v) map(v, v.data[0:v.len])
+#pragma omp declare mapper(newvec_t v) map(v, v.data[0:v.len:2])
 
 int target_update_from_mapper() {
   
