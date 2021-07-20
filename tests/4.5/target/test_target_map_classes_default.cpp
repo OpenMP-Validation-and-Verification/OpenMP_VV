@@ -1,4 +1,4 @@
-//===--test_target_map_classes_default.c - test a class default mapping -----===//
+//===---test_target_map_classes_default.cpp ---------------------------------===//
 // 
 // OpenMP API Version 4.5 Nov 2015
 // 
