@@ -1,3 +1,14 @@
+//===--- test_target_enter_data_struct.c ------------------------------------===//
+//
+// This test checks that the target enter data construct with a map clause 
+// can be used to map a struct variable or a typedef variable to the device. 
+// Once the struct variable or typedef variable is mapped onto device, another 
+// struct variable or typedef variable is mapped back to host using target 
+// construct with map clause and map-type-modifier tofrom. 
+//
+//===------------------------------------------------------------------------===//
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

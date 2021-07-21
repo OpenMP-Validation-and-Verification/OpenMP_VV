@@ -1,3 +1,16 @@
+//===--- test_target_enter_data_devices.c ---------------------------------===//
+//
+// OpenMP API Version 4.5 Nov 2015
+// 
+// This file tests the target enter data directive when the device clause is
+// specified, and also when the device is set by omp_set_default_device().
+// The first function test_set_default_dev() does not specify the device
+// clause, but instead uses omp_set_default_device() to set device.
+// The second function test_device() uses the device clause on the target
+// enter data directive.
+// 
+//===----------------------------------------------------------------------===//
+
 #include <assert.h>
 #include <omp.h>
 #include <stdio.h>
