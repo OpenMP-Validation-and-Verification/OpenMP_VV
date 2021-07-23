@@ -38,12 +38,12 @@ int target_update_from_mapper() {
   }
   #pragma omp target
   {
-    for (i = 0; i < s.len; i++) {
+    for (i = 0; i < s.len; i+2) {
       s.data[i] = i;
     }
   }//end target
   #pragma omp target update from(s)
-  for (i =0; i < s.len; i++) {
+  for (i =0; i < s.len; i+2) {
     OMPVV_TEST_AND_SET(errors, s.data[i] != i);
   } 
   return errors;
