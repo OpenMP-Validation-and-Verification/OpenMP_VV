@@ -132,7 +132,7 @@ int main () {
   OMPVV_TEST_AND_SET_OFFLOADING(is_offloading);
   
   if (!is_offloading) {
-    OMPVV_ERROR("Mapping to device cannot be properly testing is offloading is not enabled");
+    OMPVV_ERROR("Mapping to device cannot be properly tested as offloading is not enabled");
     errors ++;
     OMPVV_REPORT_AND_RETURN(errors);
   }
