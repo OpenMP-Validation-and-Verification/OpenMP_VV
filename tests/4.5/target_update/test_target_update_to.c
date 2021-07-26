@@ -29,7 +29,6 @@ void update_b() {
 int main() {
   int errors= 0;
   int i = 0;
-  int change_flag = 0;
 
   OMPVV_TEST_OFFLOADING;
 
