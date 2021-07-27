@@ -15,23 +15,23 @@
 #include "ompvv.h"
 #include <stdio.h>
 
-#define SIZE_N 1024
+#define N 1024
 
 int test_target_teams_distribute_parallel_for_private() {
   OMPVV_INFOMSG("test_target_teams_distribute_parallel_for_devices");
 
-  int a[SIZE_N];
-  int b[SIZE_N];
-  int c[SIZE_N];
-  int d[SIZE_N];
+  int a[N];
+  int b[N];
+  int c[N];
+  int d[N];
   int privatized = 10;
-  int num_teams[SIZE_N];
-  int num_threads[SIZE_N];
+  int num_teams[N];
+  int num_threads[N];
   int errors = 0;
-  int i, j, dev;
+  int i, j;
 
   // array initialization
-  for (i = 0; i < SIZE_N; i++) {
+  for (i = 0; i < N; i++) {
     a[i] = 1;
     b[i] = i;
     c[i] = 2*i;
@@ -41,10 +41,10 @@ int test_target_teams_distribute_parallel_for_private() {
   }
 
   // check multiple sizes.
-#pragma omp target data map(to: a[0:SIZE_N], b[0:SIZE_N], c[0:SIZE_N]) map(from: d[0:SIZE_N])
+#pragma omp target data map(to: a[0:N], b[0:N], c[0:N]) map(from: d[0:N])
   {
 #pragma omp target teams distribute parallel for private(privatized, i) num_threads(OMPVV_NUM_THREADS_DEVICE) num_teams(OMPVV_NUM_TEAMS_DEVICE)
-    for (j = 0; j < SIZE_N; ++j) {
+    for (j = 0; j < N; ++j) {
       num_teams[j] = omp_get_num_teams();
       num_threads[j] = omp_get_num_threads();
 
@@ -59,14 +59,14 @@ int test_target_teams_distribute_parallel_for_private() {
   int warning_threads = 0;
   int warning_teams = 0;
 
-  for (i = 0; i < SIZE_N; i++) {
+  for (i = 0; i < N; i++) {
     OMPVV_TEST_AND_SET(errors, d[i] != (1 + i)*2*i);
     warning_teams += num_teams[i];
     warning_threads += num_threads[i];
   }
 
-  OMPVV_WARNING_IF(warning_teams == SIZE_N, "There was a single team across the target region. Privatization cannot be tested at the teams level");
-  OMPVV_WARNING_IF(warning_threads == SIZE_N, "All the parallel regions ran with a single thread. Privatization cannot be tested at the thread level");
+  OMPVV_WARNING_IF(warning_teams == N, "There was a single team across the target region. Privatization cannot be tested at the teams level");
+  OMPVV_WARNING_IF(warning_threads == N, "All the parallel regions ran with a single thread. Privatization cannot be tested at the thread level");
 
   return errors;
 }
