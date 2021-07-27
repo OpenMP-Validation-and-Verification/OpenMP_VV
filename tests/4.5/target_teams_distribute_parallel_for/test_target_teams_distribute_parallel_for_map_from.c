@@ -1,35 +1,35 @@
-//===---- test_target_teams_distribute_parallel_for_map_from.c - combined consutrct -===//
+//===--- test_target_teams_distribute_parallel_for_map_from.c ---------------===//
 // 
 // OpenMP API Version 4.5 Nov 2015
 // 
-// testing the map from of scalars and arrays when used with target teams distrbute
-// parallel for
+// Testing the map from of scalars and arrays when used with target teams 
+// distrbute parallel for.
 //
-//===-----------------------------------------------------------------------------------===//
+//===------------------------------------------------------------------------===//
 
 #include <omp.h>
 #include "ompvv.h"
 #include <stdio.h>
 
-#define SIZE_N 2000
+#define N 1024
 
 int test_target_teams_distribute_parallel_for_map_from() {
   OMPVV_INFOMSG("test_target_teams_distribute_parallel_for_map_from");
   
-  int a[SIZE_N];
+  int a[N];
   int scalar = 0;
   int errors = 0;
   int i,j, dev;
 
   scalar = 0;
   // array initialization
-  for (i = 0; i < SIZE_N; ++i) {
+  for (i = 0; i < N; ++i) {
     a[i] = 1;
   }
 
 
 #pragma omp target teams distribute parallel for map(from: a, scalar)
-  for (j = 0; j < SIZE_N; ++j) {
+  for (j = 0; j < N; ++j) {
 #pragma omp atomic write
     scalar = 20;
     a[j] = 10;
@@ -37,7 +37,7 @@ int test_target_teams_distribute_parallel_for_map_from() {
 
   // check the results
   OMPVV_TEST_AND_SET(errors, scalar != 20);
-  for (i = 0; i < SIZE_N; ++i) {
+  for (i = 0; i < N; ++i) {
     OMPVV_TEST_AND_SET(errors, a[i] != 10);
   }
 
@@ -45,12 +45,8 @@ int test_target_teams_distribute_parallel_for_map_from() {
 }
 
 int main() {
-  int isSharedEnv;
   int errors = 0;
   OMPVV_TEST_OFFLOADING;
-  OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(isSharedEnv);
-
-  OMPVV_WARNING_IF(isSharedEnv, "Testing map from is inconclusive under shared data environment. Data movement not guaranteed")
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_target_teams_distribute_parallel_for_map_from());
 
