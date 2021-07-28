@@ -23,13 +23,22 @@ int a[N], b[N], c[N];
 int i = 0;
 #pragma omp end declare target
 
-void update() { 
-  for (i = 0; i < N; i++) {
-    a[i] += 1;
-    b[i] += 2;
-    c[i] += 3;
-  }
-}
+#pragma omp begin declare variant match(device={kind(host)})
+ void update() {
+   assert(false && "update() should never be called from the host!");
+ }
+#pragma omp end declare variant
+
+#pragma omp begin declare variant match(device={kind(nohost)})
+ void update() {
+   for (i = 0; i < N; i++) {
+     a[i] += 1;
+     b[i] += 2;
+     c[i] += 3;
+   }
+ }
+#pragma omp end declare variant
+
 
 #pragma omp declare target to(update) device_type(nohost)
 
