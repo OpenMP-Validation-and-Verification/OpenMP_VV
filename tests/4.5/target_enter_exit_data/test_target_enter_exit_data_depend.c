@@ -119,7 +119,8 @@ int test_async_between_target() {
   for (int i = 0; i < N; ++i) {
     sum += h_array[i];
   }
-  errors = 2*N != sum;
+  
+  OMPVV_TEST_AND_SET(errors, 2*N != sum);
 
   return errors;
 }

@@ -1,11 +1,11 @@
-!===--test_target_enter_data_allocate_array_to.F90 - allocate array map to--===!
+!===--test_target_enter_data_allocate_array_to.F90 - allocate array map to ---===!
 ! 
 ! OpenMP API Version 4.5 Nov 2015
 !
 ! Testing the mapping of arrays that are allocated dynamically. This tests
 ! covers multiple array dimmensions and uses target enter data map(to) 
 !
-!!===----------------------------------------------------------------------===!
+!===--------------------------------------------------------------------------===!
 #include "ompvv.F90"
 
 #define N 20
@@ -23,16 +23,9 @@
         INTEGER, DIMENSION(N,N) :: my2DArr
         INTEGER, DIMENSION(N,N,N) :: my3DArr
         ! Helper functions
-        LOGICAL :: isSharedEnv
-        CHARACTER (len = 400) :: helperMsg
         INTEGER :: errors, i
       
         OMPVV_TEST_OFFLOADING
-        OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(isSharedEnv)
-
-        WRITE(helperMsg, *) "Omitting part of the test due to &
-          &shared data environment"
-        OMPVV_WARNING_IF(isSharedEnv, helperMsg)
 
         OMPVV_TEST_VERBOSE(test_allocate_array1D_map_to() .ne. 0)
         OMPVV_TEST_VERBOSE(test_allocate_array2D_map_to() .ne. 0)
@@ -56,22 +49,11 @@
             ! Mapping the array
             !$omp target enter data map(to: my1DPtr(:))
 
-            ! make sure it does not get mapped again
-            IF (.NOT. isSharedEnv) THEN
-              my1DPtr(:) = 10
-            END IF
- 
             ! Confirm mapping with target region
             !$omp target map(tofrom: my1DArr) 
               my1DArr = my1DPtr
             !$omp end target
 
-            ! This is not part of the test but it is necessary to avoid
-
-            ! Make sure it is not copied back
-            IF (.NOT. isSharedEnv) THEN
-              OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my1DPtr /= 10))
-            END IF
             OMPVV_TEST_AND_SET_VERBOSE(errors, SUM(my1DArr) /= ((N*(N+1)/2)))
             ! having memory leaks
             !$omp target exit data map(delete: my1DPtr(:))
@@ -93,20 +75,11 @@
             ! Mapping the array
             !$omp target enter data map(to: my2DPtr(:,:))
 
-            ! make sure it does not get mapped again
-            IF (.NOT. isSharedEnv) THEN
-              my2DPtr(:,:) = 10
-            END IF
- 
             ! Confirm mapping with target region
             !$omp target map(from: my2DArr) 
               my2DArr = my2DPtr
             !$omp end target
 
-            ! Make sure it is not copied back
-            IF (.NOT. isSharedEnv) THEN
-              OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my2DPtr /= 10))
-            END IF
             OMPVV_TEST_AND_SET_VERBOSE(errors, SUM(my2DArr) /= ((N**2*(N**2+1)/2)))
 
             ! Mapping the array
@@ -129,20 +102,11 @@
             ! Mapping the array
             !$omp target enter data map(to: my3DPtr(:,:,:))
 
-            ! make sure it does not get mapped again
-            IF (.NOT. isSharedEnv) THEN
-              my3DPtr(:,:,:) = 10
-            END IF
- 
             ! Confirm mapping with target region
             !$omp target map(from: my3DArr) 
               my3DArr = my3DPtr
             !$omp end target
 
-            ! Make sure it is not copied back
-            IF (.NOT. isSharedEnv) THEN
-              OMPVV_TEST_AND_SET_VERBOSE(errors, ANY(my3DPtr /= 10))
-            END IF
             OMPVV_TEST_AND_SET_VERBOSE(errors, SUM(my3DArr) /= (N**6+N**3)/2)
 
             ! Mapping the array
