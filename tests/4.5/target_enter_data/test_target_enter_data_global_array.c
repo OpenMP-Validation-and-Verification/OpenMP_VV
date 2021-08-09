@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
+#include "ompvv.h"
 
 // Test for OpenMP 4.5 target enter data with global arrays.
 
