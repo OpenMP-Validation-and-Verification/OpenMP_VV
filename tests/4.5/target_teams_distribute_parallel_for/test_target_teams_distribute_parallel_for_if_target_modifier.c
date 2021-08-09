@@ -4,7 +4,7 @@
 // 
 // In this test we want to try to check if the if clause is working 
 // when used with the combined construct target teams distribute parallel for
-// and no modifier is specified.
+// and the target modifier is specified.
 // To do this we check if offloading is working, if it is not, it won't be
 // possible for us to tell if the test passed or not, since it depends on 
 // offloading capabilities. 
@@ -22,7 +22,7 @@
 
 #define ATTEMPT_THRESHOLD 70
 #define NUM_ATTEMPTS 100
-#define SIZE_N 1024
+#define N 1024
 
 int checkPreconditions() {
   // We test if offloading is enable
@@ -39,7 +39,7 @@ int checkPreconditions() {
 int test_target_teams_distribute_if_target_modifier() {
   OMPVV_INFOMSG("test_target_teams_distribute_if_target_modifier");
   
-  int a[SIZE_N], warning[SIZE_N];
+  int a[N], warning[N];
   int attempt = 0;
   int errors = 0;
   int i;
@@ -47,7 +47,7 @@ int test_target_teams_distribute_if_target_modifier() {
 
   isOffloading = checkPreconditions();
 
-  for (i = 0; i < SIZE_N; i++) {
+  for (i = 0; i < N; i++) {
     a[i] = 1;
     warning[i] = 0;
   }
@@ -62,7 +62,7 @@ int test_target_teams_distribute_if_target_modifier() {
   for (attempt = 0; attempt < NUM_ATTEMPTS; ++attempt) {
 #pragma omp target teams distribute parallel for if(target: attempt >= ATTEMPT_THRESHOLD)\
     map(tofrom: a) num_threads(OMPVV_NUM_THREADS_DEVICE)
-    for (i = 0; i < SIZE_N; i++) {
+    for (i = 0; i < N; i++) {
       warning[i] += (omp_get_num_threads() == 1) ? 1 : 0; // Ideally we should not change the number of threads at any point
       if (attempt >= ATTEMPT_THRESHOLD) {
         a[i] += (isOffloading && omp_is_initial_device() ? 10 : 0); // True condition, it should run on the device
@@ -74,7 +74,7 @@ int test_target_teams_distribute_if_target_modifier() {
   }
 
   int raiseWarning = 0;
-  for (i = 0; i < SIZE_N; i++) {
+  for (i = 0; i < N; i++) {
     OMPVV_TEST_AND_SET(errors, a[i] != 1 + (ATTEMPT_THRESHOLD));
     if (warning[i] != 0) {
       raiseWarning = 1;
@@ -89,9 +89,11 @@ int test_target_teams_distribute_if_target_modifier() {
 }
 
 int main() {
-  OMPVV_TEST_OFFLOADING;
+ 
   int errors = 0;
 
+  //Offloading is checked in checkPreconditions() function
+  
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_target_teams_distribute_if_target_modifier());
 
   OMPVV_REPORT_AND_RETURN(errors);
