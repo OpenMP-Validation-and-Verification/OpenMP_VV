@@ -45,7 +45,7 @@ CONTAINS
        CALL RANDOM_NUMBER(randoms)
        DO x = 1, N
           a(x) = 0
-          DO y = 1, 32
+          DO y = 1, 16
              IF (randoms(x, y) .lt. false_margin) THEN
                 a(x) = a(x) + (2**y)
                 tested_true = .TRUE.
@@ -57,7 +57,7 @@ CONTAINS
 
        result = 0
        host_result = 0
-       DO y = 1, 32
+       DO y = 1, 16
           result = result + (2**y)
           host_result = host_result + (2**y)
        END DO
