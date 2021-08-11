@@ -12,35 +12,33 @@
 
 #include <omp.h>
 #include <stdio.h>
+#include <assert.h>
 #include <stdlib.h>
 #include "ompvv.h"
 
 #define N 1024
 int errors = 0;
 
+void target_function();
+
 #pragma omp declare target
 int a[N], b[N], c[N];  
 int i = 0;
 #pragma omp end declare target
 
-#pragma omp begin declare variant match(device={kind(host)})
- void update() {
-   assert(false && "update() should never be called from the host!");
- }
-#pragma omp end declare variant
+#pragma omp begin declare target device_type(nohost)
+#pragma omp declare variant(target_function) match(device={kind(nohost)})
+void update() {
+  for (i = 0; i < N; i++) {
+    a[i] += 1;
+    b[i] += 2;
+    c[i] += 3;
+  }
+}
+#pragma omp end declare target
 
-#pragma omp begin declare variant match(device={kind(nohost)})
- void update() {
-   for (i = 0; i < N; i++) {
-     a[i] += 1;
-     b[i] += 2;
-     c[i] += 3;
-   }
- }
-#pragma omp end declare variant
+//#pragma omp declare target to(update) device_type(nohost)
 
-
-#pragma omp declare target to(update) device_type(nohost)
 
 int test_declare_target_device_type_nohost() { 
 
@@ -48,7 +46,7 @@ int test_declare_target_device_type_nohost() {
   #pragma omp target  
   {
     if (!omp_is_initial_device()){
-      update();
+      target_function();
     }
     
     for (i = 0; i < N; i++) {
