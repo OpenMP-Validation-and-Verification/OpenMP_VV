@@ -7,7 +7,7 @@
 //
 //===------------------------------------------------------------------------===//
 
-
+#include "ompvv.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
@@ -15,25 +15,26 @@
 // Test for OpenMP 4.5 target enter data with global arrays.
 
 int n=10;
-int *x;
 int A[10]={10,10,10,10,10,10,10,10,10,10},B[10];
 
 
 int main (){
 
- int i, errors=0;
+ int i;
+ int errors = 0;
+ 
  OMPVV_TEST_OFFLOADING;
 
-#pragma omp target enter data map(to:A[:n])
-#pragma omp target map(from:B[:n])
+#pragma omp target enter data map(to: A[:n])
+#pragma omp target map(from: B[:n])
 {
 
- for(i=0;i< n; i++)
-   B[i] = A[i];
+ for (i = 0; i < n; i++)
+    B[i] = A[i];
 }
 
- for(i=0; i<n; i++)
-   if(B[i] != 10){
+ for (i = 0; i < n; i++)
+    if (B[i] != 10){
      errors += 1;
    }
 
