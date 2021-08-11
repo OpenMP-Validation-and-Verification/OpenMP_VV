@@ -34,6 +34,7 @@ int main() {
    for (i = 0; i < n; i++) { 
       buffer[i]=(char *)malloc( sizeof(char) * BUFFER_STORE); 
    }
+   errors = 0;
    max_req_store = 0;
 
    #pragma omp parallel private(thrd_num,nchars) reduction(max:max_req_store)
