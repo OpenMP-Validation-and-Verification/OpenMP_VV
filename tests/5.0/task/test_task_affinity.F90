@@ -30,6 +30,8 @@ CONTAINS
     INTEGER:: errors, i
     INTEGER,ALLOCATABLE:: A(:), B(:)
 
+    errors = 0
+
     allocate(A(N))
     DO i = 1, N
        A(i) = 0

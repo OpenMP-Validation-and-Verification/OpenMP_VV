@@ -32,6 +32,8 @@ CONTAINS
     INTEGER:: errors, i, t
     INTEGER,ALLOCATABLE:: A(:), B(:)
 
+    errors = 0
+
     t = omp_get_default_device()
 
     allocate(A(N))
