@@ -55,7 +55,7 @@ CONTAINS
        !$omp atomic
        c(x) = c(x) + (2*(a(x) + b(x)) + d(x))
     END DO
-    !omp taskwait
+    !$omp taskwait
     !$omp end target data
 
     DO x = 1, N

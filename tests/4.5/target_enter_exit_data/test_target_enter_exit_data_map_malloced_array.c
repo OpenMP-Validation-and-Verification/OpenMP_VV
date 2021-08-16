@@ -1,7 +1,11 @@
-//===--- test_target_enter_exit_data_map_malloced_array.c ---------------------===//
+//===--- test_target_enter_exit_data_map_malloced_array.c -------------------===//
 //
 // OpenMP API Version 4.5 Nov 2015
-//
+// 
+// This tests the mapping of a pointer to and from the device using target 
+// enter data map and target exit data map. Additionally, this test checks
+// that the use of the delete map-type-modifier on a target data construct
+// with a map clause is supported.
 //
 ////===----------------------------------------------------------------------===//
 
@@ -92,8 +96,6 @@ int main() {
   int errors = 0;
 
   OMPVV_TEST_OFFLOADING;
-
-  OMPVV_TEST_SHARED_ENVIRONMENT;
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_tofrom());
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_delete());

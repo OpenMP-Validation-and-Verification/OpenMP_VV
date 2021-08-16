@@ -2,8 +2,8 @@
 //
 // OpenMP API Version 5.0 Nov 2018
 //
-// The tests checks the uses_allocators clause with omp_thread_mem_alloc. 
-// The variable allaocated in the target region is modified and used to compute 
+// The tests checks the uses_allocators clause with omp_thread_mem_alloc.
+// The variable allaocated in the target region is modified and used to compute
 // result. Result is copied back to the host and checked with computed value on host.
 //
 //===----------------------------------------------------------------------===//
@@ -44,9 +44,8 @@ int main() {
   OMPVV_TEST_OFFLOADING;
 
   int errors = 0;
-  
+
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_uses_allocators_thread() != 0);
 
   OMPVV_REPORT_AND_RETURN(errors);
 }
-

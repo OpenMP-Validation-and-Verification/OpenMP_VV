@@ -1,15 +1,16 @@
-//===-- test_target_data_use_device_ptr.c - test of use_device_ptr on target data ----===//
-// 
+//===-- test_target_data_use_device_ptr.c ---------------------------------===//
+//
 // OpenMP API Version 5.0 Nov 2018
-// 
-// This file is a test for the use_device_ptr when used with the map
-// clause with target data directive. This test uses arrays of size N 
-// which values are modified on the  device and tested in the host. 
-// Once the array has been mapped to the device, the use_device_ptr should 
-// be able to be used with the ptr to the array and 
-// subsequent modify values on the device.
-// This test focuses on address conversions of use_device_ptr clauses will 
-// occur as if performed after all variables are mapped according to those map clauses.
+//
+// This file is a test for the use_device_ptr when used with the map clause
+// with target data directive. This test uses arrays of size N which values
+// are modified on the  device and tested in the host. Once the array has
+// been mapped to the device, the use_device_ptr should be able to be used
+// with the ptr to the array and subsequent modify values on the device.
+// This test focuses on address conversions of use_device_ptr clauses will
+// occur as if performed after all variables are mapped according to those
+// map clauses.
+//
 //===----------------------------------------------------------------------===//
 
 #include <omp.h>
@@ -39,7 +40,7 @@ int main() {
       {
         for (int i = 0; i < N; ++i) {
           array_host[i] += *(array_device + i);
-        } 
+        }
       } // end target
     } // end target data
 
@@ -50,7 +51,7 @@ int main() {
 
   free(array_device);
   free(array_host);
-  
+
   OMPVV_REPORT_AND_RETURN(errors);
 
 }

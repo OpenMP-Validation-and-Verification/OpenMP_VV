@@ -49,7 +49,7 @@ CONTAINS
     DO x = 1, N
        d(x) = c(x) + b(x)
     END DO
-    !omp taskwait
+    !$omp taskwait
     !$omp end target data
 
     errors = 0

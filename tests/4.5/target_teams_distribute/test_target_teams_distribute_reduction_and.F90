@@ -1,6 +1,6 @@
 !===--- test_target_teams_distribute_reduction_and.F90----------------------===//
 !
-! OpenMP API Version 5.0 Nov 2018
+! OpenMP API Version 4.5 Nov 2015
 !
 ! This test uses the reduction clause on a target teams distribute
 ! directive, testing, for the and operator, that the variable in the
@@ -60,8 +60,8 @@ CONTAINS
        END DO
 
        !$omp target teams distribute map(to: a(1:N)) &
-       !$omp& reduction(.and.: result) map(tofrom: &
-       !$omp& result)
+       !$omp& reduction(.and.: result) defaultmap( &
+       !$omp& tofrom: scalar)
        DO x = 1, N
           result = a(x) .AND. result
        END DO
