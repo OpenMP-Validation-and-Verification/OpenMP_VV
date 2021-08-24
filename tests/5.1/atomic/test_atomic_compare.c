@@ -2,6 +2,7 @@
 //
 // OpenMP API Version 5.0 Nov 2018
 //
+// Adapted from OpenMP example video https://www.youtube.com/watch?v=iS6IG7nzCSo
 // Creates an array with random numbers, and uses atomic compare to find the max,
 // testing against non-parallel maximum.
 //
@@ -29,7 +30,7 @@ int test_atomic_compare() {
          max = arr[i];
       }
    }
-   #pragma omp parallel for // Sets max using parallel for loop, using atomic to ensure max is correct
+   #pragma omp parallel for shared(pmax)// Sets max using parallel for loop, using atomic to ensure max is correct
    for(int i = 0; i<N; i++){
       #pragma omp atomic compare
       if(arr[i] > pmax){
