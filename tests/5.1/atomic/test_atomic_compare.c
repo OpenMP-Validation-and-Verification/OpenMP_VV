@@ -1,6 +1,6 @@
 //===--- test_atomic_compare.c ---===//
 //
-// OpenMP API Version 5.0 Nov 2018
+// OpenMP API Version 5.1 Nov 2020
 //
 // Adapted from OpenMP example video https://www.youtube.com/watch?v=iS6IG7nzCSo
 // Creates an array with random numbers, and uses atomic compare to find the max,
