@@ -39,15 +39,12 @@ int test_target_device_ancestor() {
 	    for (int i = 0; i < N; i++) {
                 a[i] = a[i] + 2;
 	    }
-	    // We like to use omp_is_initial_device(), but for ancestor:
-	    // "No OpenMP constructs or calls to OpenMP API runtime routines are allowed"
-	    // Thus, settle on the following. Note: With unified-shared memory, it is
-	    // not actually testing that this target region is executed on the initial device.
-	    which_device = 42;
+	    // For ancestor, the spec mandates: "No OpenMP constructs or calls to
+	    // OpenMP API runtime routines are allowed":
+	    // which_device = omp_is_initial_device();
 	}
     }
 
-    OMPVV_TEST_AND_SET(errors, which_device != 42);
     OMPVV_ERROR_IF(which_device != 1, "Target region was executed on device. Due to ancestor device-modifier,"
                                          "this region should execute on host");
 
