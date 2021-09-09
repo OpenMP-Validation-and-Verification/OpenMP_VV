@@ -1,4 +1,4 @@
-//===---- tests_target_teams_distribute_parallel_for_thread_limit.c     ------===//
+//===---- tests_target_teams_distribute_parallel_for_thread_limit.c ---------===//
 // 
 // OpenMP API Version 4.5 Nov 2015
 // 
@@ -6,21 +6,21 @@
 // the number of threads inside each of the contention groups created in the teams
 // region. This upper limit is different to the num_threads 
 //
-//===----------------------------------------------------------------------===//
+//===------------------------------------------------------------------------===//
 
 #include <omp.h>
 #include "ompvv.h"
 #include <stdio.h>
 
-#define SIZE_N 1024
+#define N 1024
 
 int test_target_teams_distribute_parallel_for_thread_limit() {
   OMPVV_INFOMSG("test_target_teams_distribute_parallel_for_threads_limit");
 
   int tested_num_threads[] = {1, 10, 100, 10000};
   int tested_thread_limit[] = {1, 10, 100, 10000};
-  int num_threads[SIZE_N];
-  int thread_limit[SIZE_N];
+  int num_threads[N];
+  int thread_limit[N];
   int errors = 0;
   int i, nt, tl;
 
@@ -31,20 +31,20 @@ int test_target_teams_distribute_parallel_for_thread_limit() {
     for (tl = 0; tl < 4; tl++) {
       OMPVV_INFOMSG("Testing thread_limit(%d) num_threads(%d) clauses", tested_thread_limit[tl], tested_num_threads[nt]);
       // Initializing the num_threads and thread_limit array
-      for (i = 0; i < SIZE_N; i++) {
+      for (i = 0; i < N; i++) {
         num_threads[i] = -1;
         thread_limit[i] = -1;
       }
 
 #pragma omp target teams distribute parallel for map(tofrom: num_threads) \
         num_threads(tested_num_threads[nt]) thread_limit(tested_thread_limit[tl])
-      for (i = 0; i < SIZE_N; i++) {
+      for (i = 0; i < N; i++) {
         num_threads[i] = omp_get_num_threads();
         thread_limit[i] = omp_get_thread_limit();
       }
    
       int prevThreadLimit = -1;
-      for (i = 0; i < SIZE_N; i++) {
+      for (i = 0; i < N; i++) {
         OMPVV_INFOMSG_IF(prevThreadLimit != thread_limit[i], "  reported thread limit = %d", thread_limit[i]);
         prevThreadLimit = thread_limit[i];
   
