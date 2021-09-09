@@ -22,7 +22,12 @@ int arr[N]; // implicit map 3 variables
 int errors = 0;
 int i = 0;
 
-void t_add(int *arr);
+
+void t_add(int *arr){
+	for (int i = 0; i < N; i++){
+		arr[i] = i+1;
+	}
+}
 
 #pragma omp begin declare variant match( construct={parallel} ) // If inside a parallel for, should use multiply function instead of add
 	void t_add(int *arr){
@@ -32,26 +37,45 @@ void t_add(int *arr);
 		}
 	}
 #pragma omp end declare variant
-void add(int *arr){
-	for (int i = 0; i < N; i++){
-		arr[i] = i+1;
+
+#pragma omp begin declare variant match( construct={target} ) // If inside target region
+	void t_add(int *arr){
+		#pragma omp for
+		for (int i = 0; i < N; i ++){
+			arr[i] = i + 3;
+		}
 	}
-}
+#pragma omp end declare variant
+
+
 //use multiply if in a parallel for, use add outside it
 int test_wrapper() { //wrapper for declare target function
-    add(arr);
+    t_add(arr);
     for(int i =0; i<N; i++){
 	OMPVV_TEST_AND_SET_VERBOSE(errors, arr[i] != i+1);
-	}
+    }
+    //add error msg;
+	
+    errors = 0;
     #pragma omp parallel
     {
-	add(arr);
-    }
-    //print("%d", a[5]);
-    //print("%d", b[5]);
+	t_add(arr);
+    }		
     for(int i=0; i<N; i++){
     	OMPVV_TEST_AND_SET_VERBOSE(errors, arr[i] != i+2);
     } 
+    //add error msg;
+	
+    errors=0;
+    #pragma omp target map(toforom: arr)
+    {
+	t_add(arr);
+    }		
+    for(int i=0; i<N; i++){
+    	OMPVV_TEST_AND_SET_VERBOSE(errors, arr[i] != i+3);
+    } 
+    //add error msg;
+	
   return errors;
 }
 
