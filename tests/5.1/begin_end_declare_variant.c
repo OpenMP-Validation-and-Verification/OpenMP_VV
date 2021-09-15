@@ -1,15 +1,11 @@
-//===---- test_declare_target_nested.c ---------------------------------------------===//
+//===---- begin_end_declare_variant.c ---------------------------------------------===//
 // 
-// OpenMP API Version 5.0 
+// OpenMP API Version 5.1
 //
-// The declaration-definition-seq defined by a declare target directive and an end
-// declare target directive may contain declare target directives. If a device_type
-// clause is present on the contained declare target directive, then its argument 
-// determines which versions are made available. If a list item appears both in an
-// implicit and explicit list, the explicit list determines which versions are made
-// available. 
+// Uses 'begin' and 'end' declare variant syntax to create a parallel and target
+// variant of a simple add function. To ensure that the variants are used, different
+// integers are used within the variants.
 // 
-// @Todo's 1. Test if wrapper is necessary
 //===-------------------------------------------------------------------------------===//
 
 #include <omp.h>
@@ -18,65 +14,59 @@
 #include "ompvv.h"
 
 #define N 1024
-int arr[N]; // implicit map 3 variables 
-int errors = 0;
+int arr[N]; // implicit map array 
+int errors;
 int i = 0;
 
-
-void t_add(int *arr){
-	for (int i = 0; i < N; i++){
+void add(int *arr){
+	for (int i = 0; i < N; i++){ // Base function adds 1 to array values
 		arr[i] = i+1;
 	}
 }
 
-#pragma omp begin declare variant match( construct={parallel} ) // If inside a parallel for, should use multiply function instead of add
-	void t_add(int *arr){
+#pragma omp begin declare variant match( construct={parallel} ) // Parallel variant adds 2 to array values
+	void add(int *arr){
 		#pragma omp for
-		for (int i = 0; i < N; i ++){
+		for (int i = 0; i < N; i++){
 			arr[i] = i + 2;
-		}
+		} 
 	}
 #pragma omp end declare variant
 
-#pragma omp begin declare variant match( construct={target} ) // If inside target region
-	void t_add(int *arr){
+#pragma omp begin declare variant match( construct={target} ) // Target variant adds 3 to array values
+	void add(int *arr){
 		#pragma omp for
-		for (int i = 0; i < N; i ++){
+		for (int i = 0; i < N; i++){
 			arr[i] = i + 3;
 		}
 	}
 #pragma omp end declare variant
 
-
 //use multiply if in a parallel for, use add outside it
 int test_wrapper() { //wrapper for declare target function
-    t_add(arr);
+    add(arr);
     for(int i =0; i<N; i++){
-	OMPVV_TEST_AND_SET_VERBOSE(errors, arr[i] != i+1);
+	    OMPVV_TEST_AND_SET_VERBOSE(errors, arr[i] != i+1);
     }
-    //add error msg;
-	
+    OMPVV_ERROR_IF(errors>0, "Base function is not working properly")
     errors = 0;
     #pragma omp parallel
     {
-	t_add(arr);
+	    add(arr);
     }		
     for(int i=0; i<N; i++){
     	OMPVV_TEST_AND_SET_VERBOSE(errors, arr[i] != i+2);
     } 
-    //add error msg;
-	
+    OMPVV_ERROR_IF(errors>0, "Parallel variant function is not working properly")
     errors=0;
-    #pragma omp target map(toforom: arr)
+    #pragma omp target map(tofrom: arr)
     {
-	t_add(arr);
+	    add(arr);
     }		
     for(int i=0; i<N; i++){
     	OMPVV_TEST_AND_SET_VERBOSE(errors, arr[i] != i+3);
     } 
-    //add error msg;
-	
-  return errors;
+    OMPVV_ERROR_IF(errors>0, "Target variant function is not working properly")
 }
 
 int main () {
