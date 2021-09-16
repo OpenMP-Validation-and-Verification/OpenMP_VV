@@ -29,11 +29,9 @@ PROGRAM test_target_parallel
          INTEGER, DIMENSION(OMPVV_NUM_THREADS_DEVICE) :: num_threads
          CHARACTER(len=400) :: threadMsg
          errors = 0
-         thread_id = 0
 
          !$omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE) map(from: num_threads(0:OMPVV_NUM_THREADS_DEVICE))
-            thread_id = omp_get_thread_num()
-            num_threads(thread_id) = omp_get_num_threads()
+            num_threads(omp_get_thread_num()) = omp_get_num_threads()
          !$omp end target parallel
 
          OMPVV_WARNING_IF(num_threads(0) .eq. 1, "The number of threads in the parallel region was 1. &

@@ -45,9 +45,10 @@ CONTAINS
                b(i) = (a(i) + b(i))
             END DO
          !$omp end target
-         !$omp target update from(b)
       !$omp end target data
 
+      !$omp target update from(b)
+     
       DO i = 1, N
          OMPVV_TEST_AND_SET_VERBOSE(errors, b(i) .ne. 12)
       END DO
