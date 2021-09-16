@@ -42,10 +42,12 @@ int test_target_device_ancestor() {
 	    // For ancestor, the spec mandates: "No OpenMP constructs or calls to
 	    // OpenMP API runtime routines are allowed":
 	    // which_device = omp_is_initial_device();
+	    // Instead, check that scalar is mapped back properly after exiting target region
+	    which_device = 75;
 	}
     }
 
-    OMPVV_ERROR_IF(which_device != 1, "Target region was executed on device. Due to ancestor device-modifier,"
+    OMPVV_ERROR_IF(which_device != 75, "Target region was executed on device. Due to ancestor device-modifier,"
                                          "this region should execute on host");
 
     return errors;
