@@ -26,10 +26,19 @@ int host_function(int incorrect_value, int index, int errors)
 {     
     OMPVV_INFOMSG("Planned Error in offload: A[%d]=%d\n", index, incorrect_value);
     OMPVV_INFOMSG("                Expecting: A[i] =i\n");
-    if (!omp_is_initial_device())
-        {
-            errors++;
-        }
+    // Would like to use omp_is_initial_device() here, but calls to OpenMP runtime API
+    // are not permitting inside target region when device(ancestor:1) is used
+    // Instead, we will change values of the array A that was previously defined on the host
+    // and will not explicity map back to host. If reverse offloading is truly enabled,
+    // these values should be updated back on the host.
+    // if (!omp_is_initial_device())
+    //    {
+    //        errors++;
+    //    }
+
+    for (int j = 0; j < N; j++) {
+        A[j] = 2*j;
+    }
 
     return errors;
 }
@@ -38,8 +47,10 @@ int host_function(int incorrect_value, int index, int errors)
 
 int main() 
 {    
+    int A[N];
     int isOffloading;
     int errors;
+    int device_num;
 
     errors = 0;
    
@@ -47,25 +58,28 @@ int main()
 
     OMPVV_WARNING_IF(!isOffloading, "Without offloading enabled, host execution is already guaranteed")
 
-    int A[N];
+    device_num = omp_get_num_devices();
 
-    for (int i = 0; i < N; i++) 
-    {
+    for (int i = 0; i < N; i++) {
         A[i] = i;
     }
 
     A[N-1] = -1;
 
-    #pragma omp target map (A) 
-    {
-        for (int i = 0; i < N; i++) 
-        {
-           if (A[i] != i) 
-           {
+    #pragma omp target enter data map(to: A) 
+ 
+    OMPVV_WARNING_IF(device_num < 2, "Cannot properly test reverse offload if only one device is available");
+
+    if (device_num > 1) {
+        for (int i = 0; i < N; i++) {
+            if (A[i] != i) {
                 #pragma omp target device(ancestor:1) map(always, to: A[i:1])
                 errors = host_function(A[i], i, errors);
-           }
+            }
         }
+	for (int i = 0; i < N; i++) {
+            OMPVV_TEST_AND_SET(errors, A[i] != 2*i);
+	}
     }
 
     OMPVV_REPORT_AND_RETURN(errors)
