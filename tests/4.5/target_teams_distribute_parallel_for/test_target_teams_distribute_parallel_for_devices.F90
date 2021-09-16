@@ -51,7 +51,7 @@ CONTAINS
       DO dev = 1, num_dev
       !$omp target teams distribute parallel do device(dev) map(tofrom: isHost)
             DO i = 1, N
-               IF ((omp_get_team_num() .eq. 0) .or. (omp_get_thread_num() .eq. 0)) THEN
+               IF ((omp_get_team_num() .eq. 0) .and. (omp_get_thread_num() .eq. 0)) THEN
                   isHost(dev) = omp_is_initial_device()
                END IF
                a(i) = a(i) + dev
