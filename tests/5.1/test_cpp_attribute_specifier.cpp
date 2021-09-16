@@ -1,7 +1,8 @@
-//===--- test_target_defaultmap_default.c --------------------------------------------------------------===//
+//===--- test_cpp_attribute_specifier.cpp --------------------------------------------------------------===//
 //
 //  OpenMP API Version 5.1 NOV 2021
-//
+//  
+//  C++ attribute specifiers allow for a different syntax for calling OMP directives.
 //  This test simply uses a for loop, and tests multiple times that it is not running in parallel. Then,
 //  using C++ OMP attribute specifiers, creates a parallel for loop and ensures that it is running in
 //  parallel.
