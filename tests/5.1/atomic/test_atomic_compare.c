@@ -20,7 +20,7 @@ int test_atomic_compare() {
 
   int arr[N];
   int errors = 0;
-  int pmax, max = 0;
+  int pmax = 0, max = 0;
 
    for(int i=0; i<N; i++){
       arr[i] = rand()%1000;
