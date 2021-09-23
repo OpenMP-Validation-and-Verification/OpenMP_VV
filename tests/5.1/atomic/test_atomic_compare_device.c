@@ -1,10 +1,10 @@
-//===--- test_atomic_compare.c ---===//
+//===--- test_atomic_compare_device.c ---===//
 //
 // OpenMP API Version 5.1 Nov 2020
 //
 // Adapted from OpenMP example video https://www.youtube.com/watch?v=iS6IG7nzCSo
-// Creates an array with random numbers, and uses atomic compare to find the max,
-// testing against non-parallel maximum.
+// Creates an array with random numbers, and uses atomic compare on the device
+// environment to find the max, testing against non-parallel maximum.
 //
 ////===----------------------------------------------------------------------===//
 #include <assert.h>
