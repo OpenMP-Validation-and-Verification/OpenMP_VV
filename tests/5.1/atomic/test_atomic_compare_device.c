@@ -37,7 +37,7 @@ int test_atomic_compare() {
          pmax = arr[i];
       }
    }
-   #pragma omp target update(from: pmax);
+   #pragma omp target update(from: pmax)
    OMPVV_TEST_AND_SET(errors, pmax != max);
    return errors;
 }
