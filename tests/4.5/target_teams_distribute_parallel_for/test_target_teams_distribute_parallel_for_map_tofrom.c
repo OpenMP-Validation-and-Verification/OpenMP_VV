@@ -14,15 +14,15 @@
 #include "ompvv.h"
 #include <stdio.h>
 
-#define SIZE_N 2000
+#define N 2000
 
 int test_target_teams_distribute_parallel_for_map_tofrom() {
   OMPVV_INFOMSG("test_target_teams_distribute_parallel_for_map_tofrom");
   
-  int a[SIZE_N];
-  int b[SIZE_N];
-  int c[SIZE_N];
-  int d[SIZE_N];
+  int a[N];
+  int b[N];
+  int c[N];
+  int d[N];
   int scalar_to = 50; //to avoid datarace on the scalar due to read and write in the loop
   int scalar_from = 50;
   int errors = 0;
@@ -32,7 +32,7 @@ int test_target_teams_distribute_parallel_for_map_tofrom() {
   // variables initialization
   scalar_to = 50;
   scalar_from = 50;
-  for (i = 0; i < SIZE_N; i++) {
+  for (i = 0; i < N; i++) {
     a[i] = 1;
     b[i] = i;
     c[i] = 2*i;
@@ -41,7 +41,7 @@ int test_target_teams_distribute_parallel_for_map_tofrom() {
 
     // Tests
 #pragma omp target teams distribute parallel for map(tofrom: a, b, c, d, scalar_to, scalar_from)
-  for (j = 0; j < SIZE_N; ++j) {
+  for (j = 0; j < N; ++j) {
     d[j] += c[j] * (a[j] + b[j] + scalar_to);
     a[j] = 10;
     b[j] = 11;
@@ -52,7 +52,7 @@ int test_target_teams_distribute_parallel_for_map_tofrom() {
 
   // Checking the results
   OMPVV_TEST_AND_SET(errors, scalar_from != 13);
-  for (i = 0; i < SIZE_N; i++) {
+  for (i = 0; i < N; i++) {
     OMPVV_TEST_AND_SET(errors, a[i] != 10);
     OMPVV_TEST_AND_SET(errors, b[i] != 11);
     OMPVV_TEST_AND_SET(errors, c[i] != 12);

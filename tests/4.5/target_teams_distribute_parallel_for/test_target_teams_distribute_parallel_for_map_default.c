@@ -1,32 +1,32 @@
-//===---- test_target_teams_distribute_parallel_for_map_default.c - combined consutrct -===//
+//===---- test_target_teams_distribute_parallel_for_map_default.c -----------===//
 // 
 // OpenMP API Version 4.5 Nov 2015
 // 
-// test the mapping of arrays by default. The expected behavior is that all the arrays are
-// mapped tofrom by default
+// test the mapping of arrays by default. The expected behavior is that all 
+// the arrays are mapped tofrom by default.
 //
-//===-----------------------------------------------------------------------------------===//
+//===------------------------------------------------------------------------===//
 
 #include <omp.h>
 #include "ompvv.h"
 #include <stdio.h>
 
-#define SIZE_N 2000
+#define N 2000
 
-int test_target_teams_distribute_parallel_for_map_default(int isShared) {
+int test_target_teams_distribute_parallel_for_map_default() {
   OMPVV_INFOMSG("test_target_teams_distribute_parallel_for_devices");
   
-  int a[SIZE_N];
-  int b[SIZE_N];
-  int c[SIZE_N];
-  int d[SIZE_N];
+  int a[N];
+  int b[N];
+  int c[N];
+  int d[N];
   int scalar = 20;
   int scalar2 = -1;
   int errors = 0;
   int i, j, dev;
 
   // array initialization
-  for (i = 0; i < SIZE_N; i++) {
+  for (i = 0; i < N; i++) {
     a[i] = 1;
     b[i] = i;
     c[i] = 2*i;
@@ -35,7 +35,7 @@ int test_target_teams_distribute_parallel_for_map_default(int isShared) {
 
 
 #pragma omp target teams distribute parallel for
-  for (j = 0; j < SIZE_N; ++j) {
+  for (j = 0; j < N; ++j) {
     // scalar is firstprivate for the target region, but 
     // in a parallel construct, if not default clause is present
     // the variable is shared. Hence scalar = any other value 
@@ -47,9 +47,7 @@ int test_target_teams_distribute_parallel_for_map_default(int isShared) {
   } // atomic prevents indeterminacy from simultaneous writes
     // since scalar2 is shared implicitly.
 
-  if (!isShared)
-    OMPVV_TEST_AND_SET(errors, scalar2 != -1);
-  for (i = 0; i < SIZE_N; i++) {
+  for (i = 0; i < N; i++) {
     OMPVV_TEST_AND_SET(errors, d[i] != (1 + i + 20) * 2*i);
   }
 
@@ -58,14 +56,10 @@ int test_target_teams_distribute_parallel_for_map_default(int isShared) {
 
 // Test for OpenMP 4.5 target enter data with if
 int main() {
-  int isSharedEnv, isOffloading;
   OMPVV_TEST_OFFLOADING;
-  OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(isSharedEnv);
   int errors = 0;
   
-  OMPVV_WARNING_IF(isSharedEnv, "This test is inconclusive on shared memory environments")
-
-  OMPVV_TEST_AND_SET_VERBOSE(errors, test_target_teams_distribute_parallel_for_map_default(isSharedEnv));
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_target_teams_distribute_parallel_for_map_default());
 
   OMPVV_REPORT_AND_RETURN(errors);
 }
