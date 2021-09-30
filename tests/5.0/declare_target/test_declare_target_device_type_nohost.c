@@ -27,7 +27,8 @@ int a[N], b[N], c[N];
 int i = 0;
 #pragma omp end declare target
 
-#pragma omp declare variant(target_function) match(construct={target})
+//#pragma omp declare variant(target_function) match(construct={target})
+#pragma omp declare variant(target_function) match(device={kind(nohost)})
 void update() {
   for (i = 0; i < N; i++) {
     a[i] += 5;
@@ -35,8 +36,9 @@ void update() {
     c[i] += 5;
   }
 }
+//#pragma omp end declare variant
 
-#pragma omp begin declare target device_type(nohost)
+#pragma omp declare target device_type(nohost)
 void target_function(){
   for (i = 0; i < N; i++) {
     a[i] += 1;
