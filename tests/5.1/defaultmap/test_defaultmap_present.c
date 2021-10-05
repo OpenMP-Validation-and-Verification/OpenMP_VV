@@ -37,14 +37,14 @@ int test_defaultmap_present() {
    new_struct.s = 10; new_struct.S[0] = 10; new_struct.S[1] = 10;
    ptr = &A[0]; 
    ptr[50] = 50; ptr[51] = 51;
-
-   #pragma omp target defaultmap(present) // Present means values should remain as if already declared in map as alloc
+   #pragma omp target map(tofrom: errors) \
+   defaultmap(present) // Present means values should remain as if already declared in map as alloc
    {     
-      OMPVV_TEST_AND_SET_VERBOSE(errors, scalar != 1);
-      OMPVV_TEST_AND_SET_VERBOSE(errors, A[0] != 0 || A[50] != 50);
-      OMPVV_TEST_AND_SET_VERBOSE(errors, A[50] != 50 || A[51] != 51);
-      OMPVV_TEST_AND_SET_VERBOSE(errors, new_struct.s != 10);
-      OMPVV_TEST_AND_SET_VERBOSE(errors, new_struct.S[0] != 10);
+      if(scalar != 1){errors++;}
+      if(A[0] != 0 || A[50] != 50){errors++;}
+      if(A[50] != 50 || A[51] != 51){errors++;}
+      if(new_struct.s != 10){errors++;}
+      if(new_struct.S[0] != 10){errors++;}
    }
   return errors;
 }
