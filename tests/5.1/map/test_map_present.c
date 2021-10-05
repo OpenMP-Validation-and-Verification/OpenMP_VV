@@ -39,14 +39,15 @@ int test_map_present() {
    ptr[50] = 50; ptr[51] = 51;
 
    #pragma omp target enter data map(alloc:scalar) map(alloc: A[N]) map(alloc: new_struct)
-   #pragma omp target map (present)
-   {     
-      OMPVV_TEST_AND_SET_VERBOSE(errors, scalar != 1);
-      OMPVV_TEST_AND_SET_VERBOSE(errors, A[0] != 0 || A[50] != 50);
-      OMPVV_TEST_AND_SET_VERBOSE(errors, A[50] != 50 || A[51] != 51);
-      OMPVV_TEST_AND_SET_VERBOSE(errors, new_struct.s != 10);
-      OMPVV_TEST_AND_SET_VERBOSE(errors, new_struct.S[0] != 10);
+   #pragma omp target map (present) map(tofrom: errors)
+   {
+      if(scalar != 1){errors++;}
+      if(A[0] != 0 || A[50] != 50){errors++;}
+      if(A[50] != 50 || A[51] != 51){errors++;}
+      if(new_struct.s != 10){errors++;}
+      if(new_struct.S[0] != 10){errors++;}
    }
+   
   return errors;
 }
 
