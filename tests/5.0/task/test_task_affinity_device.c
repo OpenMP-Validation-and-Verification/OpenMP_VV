@@ -65,6 +65,8 @@ int test_task_affinity() {
 
 int main() {
   int errors = 0;
+  
+  OMPVV_TEST_OFFLOADING;
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_task_affinity());
 
