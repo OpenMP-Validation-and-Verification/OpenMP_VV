@@ -29,6 +29,7 @@ int test_taskloop_reduction() {
 
 #pragma omp parallel num_threads(OMPVV_NUM_THREADS_HOST) shared(a, b, num_threads, sum) 
 {
+   #pragma omp single
    #pragma omp taskloop reduction(+:sum)
    for (int i = 0; i < N; i++) {
       #pragma omp atomic
@@ -46,11 +47,10 @@ int test_taskloop_reduction() {
    
    real_sum += N;
    
-   for (int j = 0; j < num_threads; j++) {
-      for (int i = 0; i < N; i++) {
-         real_sum += a[i]*b[i];
-      }
+   for (int i = 0; i < N; i++) {
+      real_sum += a[i]*b[i];
    }
+   
 
    OMPVV_TEST_AND_SET_VERBOSE(errors, sum != real_sum);
 
