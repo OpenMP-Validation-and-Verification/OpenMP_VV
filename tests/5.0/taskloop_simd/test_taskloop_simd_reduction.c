@@ -27,7 +27,7 @@ int test_taskloop_reduction() {
       b[i] = i * 2; 
    }
 
-#pragma omp parallel reduction(tasnum_threads(OMPVV_NUM_THREADS_HOST) shared(a, b, num_threads, sum) 
+#pragma omp parallel num_threads(OMPVV_NUM_THREADS_HOST) shared(a, b, num_threads, sum) 
 {
    #pragma omp single
    #pragma omp taskloop simd reduction(+:sum)
