@@ -50,6 +50,8 @@ CONTAINS
          y = y + a(i)
       END DO
 
+      !$omp end target
+
       OMPVV_TEST_AND_SET_VERBOSE(errors, x .ne. 70)
       OMPVV_TEST_AND_SET_VERBOSE(errors, y .ne. summation)
 
