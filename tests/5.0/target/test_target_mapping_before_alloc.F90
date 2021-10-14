@@ -44,6 +44,8 @@ CONTAINS
     IF (scalar.ne.80 .or. a(1).ne.2) THEN
       errors = errors + 1
     END IF
+    
+    !$omp end target
 
     to_before_alloc = errors
   END FUNCTION to_before_alloc
