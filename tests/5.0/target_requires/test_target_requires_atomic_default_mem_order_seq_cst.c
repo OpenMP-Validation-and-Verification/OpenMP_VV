@@ -26,7 +26,7 @@ int test_target_atomic_seq_cst() {
   int x = 0, y = 0;
   int errors = 0;
 
-#pragma omp target parallel num_threads(2)
+#pragma omp target parallel num_threads(2) map(tofrom: x, y, errors)
    {
       int thrd = omp_get_thread_num();
        if (thrd == 0) {
