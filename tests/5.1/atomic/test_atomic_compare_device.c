@@ -20,7 +20,7 @@ int test_atomic_compare() {
 
   int arr[N];
   int errors = 0;
-  int max = 0, pmax x= 0;
+  int max = 0, pmax = 0;
 
    for(int i=0; i<N; i++){
       arr[i] = rand()%1000;
@@ -37,7 +37,7 @@ int test_atomic_compare() {
          pmax = arr[i];
       }
    }
-   #pragma omp target update(from: pmax)
+   #pragma omp target update from(pmax)
    OMPVV_TEST_AND_SET(errors, pmax != max);
    return errors;
 }
