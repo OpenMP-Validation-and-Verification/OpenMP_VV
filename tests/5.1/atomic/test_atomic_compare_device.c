@@ -1,4 +1,4 @@
-//===--- test_atomic_compare_device.c ---===//
+//===--- test_atomic_compare_device.c ---------------------------------------===//
 //
 // OpenMP API Version 5.1 Nov 2020
 //
@@ -7,6 +7,7 @@
 // environment to find the max, testing against non-parallel maximum.
 //
 ////===----------------------------------------------------------------------===//
+
 #include <assert.h>
 #include <omp.h>
 #include <stdio.h>
