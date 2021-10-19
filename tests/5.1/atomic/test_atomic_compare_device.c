@@ -22,16 +22,16 @@ int test_atomic_compare() {
   int errors = 0;
   int max = 0, pmax = 0;
 
-   for(int i=0; i<N; i++){
+   for(int i = 0; i < N; i++){
       arr[i] = rand()%1000;
    }
-   for(int i = 0; i<N; i++){ // Sets max through non-parallel methods
+   for(int i = 0; i < N; i++){ // Sets max through non-parallel methods
       if(arr[i] > max){
          max = arr[i];
       }
    }
    #pragma omp target parallel for shared(pmax)// Sets max using parallel for loop, using atomic to ensure max is correct
-   for(int i = 0; i<N; i++){
+   for(int i = 0; i < N; i++){
       #pragma omp atomic compare
       if(arr[i] > pmax){
          pmax = arr[i];
