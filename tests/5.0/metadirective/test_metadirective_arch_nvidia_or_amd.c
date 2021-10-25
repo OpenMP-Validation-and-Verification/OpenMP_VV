@@ -17,14 +17,14 @@ int errors = 0;
 
 int metadirective2() {
 
-   int i, device_num, which_device;
+   int i, device_num, initial_device;
    int a[N], total[N];
  
    for (int i = 0; i < N; i++) {
       a[i] = 0;  
    }
    
-   for (device_num = 0; device_num < omp_get_num_devices(); device_num++) {
+   for (device_num = 0; device_num == 0 || device_num < omp_get_num_devices(); device_num++) {
       #pragma omp target device(device_num)
       #pragma omp metadirective \
                   when( implementation=vendor(nvidia): \
@@ -32,17 +32,18 @@ int metadirective2() {
                   when( implementation=vendor(amd): \
                         teams num_teams(512) thread_limit(64) ) \
                   default (teams)
+     {
+       initial_device = omp_is_initial_device();
 
-      which_device = omp_is_initial_device();
-
-      #pragma omp distribute parallel for
+       #pragma omp distribute parallel for
          for (i = 0; i < N; i++) {
             a[i] = i;
          }
+     }
    }
 
-   OMPVV_TEST_AND_SET_VERBOSE(errors, which_device != 0);
-   OMPVV_ERROR_IF(which_device != 0, "NVIDIA and AMD architecture not available, ran on host");
+   OMPVV_TEST_AND_SET_VERBOSE(errors, initial_device != 0);
+   OMPVV_ERROR_IF(initial_device != 0, "NVIDIA and AMD architecture not available, ran on host");
 
    for (i = 0; i < N; i++) {
       OMPVV_TEST_AND_SET_VERBOSE(errors, a[i] != i); 
@@ -61,4 +62,3 @@ int main () {
    OMPVV_REPORT_AND_RETURN(errors);
 
 }
-                   

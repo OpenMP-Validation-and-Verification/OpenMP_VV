@@ -32,19 +32,19 @@ int metadirective1() {
    #pragma omp target map(to:v1,v2) map(from:v3, target_device_num) device(default_device)
    {
       #pragma omp metadirective \
-                   when(   device={arch("nvptx")}: teams loop) \
-                   default(                     parallel loop)
-
-         target_device_num = omp_get_device_num(); 
+                   when(   device={arch("nvptx")}: teams distribute parallel for) \
+                   default(                     parallel for)
 
          for (int i = 0; i < N; i++) {
+	    #pragma omp atomic write
+            target_device_num = omp_get_device_num();
             v3[i] = v1[i] * v2[i];
          }
-   } 
+   }
    
    OMPVV_TEST_AND_SET(errors, host_device_num == target_device_num);
-   OMPVV_ERROR_IF(host_device_num == target_device_num, "Device number that executes target region is"
-                                  "the same as the device number on the host");
+   OMPVV_ERROR_IF(host_device_num == target_device_num, "Device number that executes target region is "
+                                                        "the same as the device number on the host");
  
    for (int i = 0; i < N; i++) {
       OMPVV_TEST_AND_SET_VERBOSE(errors, v3[i] != v1[i] * v2[i]);
