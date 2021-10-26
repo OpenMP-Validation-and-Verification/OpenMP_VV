@@ -28,7 +28,7 @@ template <typename T> void saxpy_d(T *x, T *y, T a, int n) {
 
 // SAXPY kernel using the target loop construct
 template <typename T> void saxpy_l(T *x, T *y, T a, int n) {
-#pragma omp target loop map(tofrom : x [0:n]) map(to : y [0:n])
+#pragma omp target teams loop map(tofrom : x [0:n]) map(to : y [0:n])
   for (int i = 0; i < n; ++i)
     x[i] = a * x[i] + y[i];
 }
