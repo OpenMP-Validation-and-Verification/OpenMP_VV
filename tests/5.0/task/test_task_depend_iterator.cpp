@@ -37,8 +37,20 @@ int test_task_depend_iterator() {
       }
     } // end single
   } // end parallel
-  std::sort(threadOrder.begin() + 1, threadOrder.begin() + 5);
-  std::sort(threadOrder.begin() + 5, threadOrder.begin() + 7);
+
+  std::vector<int>::iterator idx[8];
+  for (int i = 0; i < 8; ++i)
+    idx[i] = std::find (threadOrder.begin(), threadOrder.end(), i);
+  if (idx[0] != threadOrder.begin())
+    threadOrderError |= true;
+  if (idx[1] > idx[5] || idx[2] > idx[5])
+    threadOrderError |= true;
+  if (idx[3] > idx[6] || idx[4] > idx[6])
+    threadOrderError |= true;
+  if (idx[5] > idx[7] || idx[5] > idx[7])
+    threadOrderError |= true;
+
+  std::sort(threadOrder.begin(), threadOrder.end());
   for(int i = 0; i < 8; ++i)
     threadOrderError = (threadOrder[i] != i) || threadOrderError;
   OMPVV_ERROR_IF(threadOrderError, "The dependencies between tasks were not enforced in the correct order.");
