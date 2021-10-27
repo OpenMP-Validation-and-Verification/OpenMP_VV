@@ -31,14 +31,13 @@ int test_atomic_compare() {
          max = arr[i];
       }
    }
-   #pragma omp target parallel for shared(pmax)// Sets max using parallel for loop, using atomic to ensure max is correct
+   #pragma omp target parallel for map(pmax) shared(pmax)// Sets max using parallel for loop, using atomic to ensure max is correct
    for(int i = 0; i < N; i++){
       #pragma omp atomic compare
       if(arr[i] > pmax){
          pmax = arr[i];
       }
    }
-   #pragma omp target update from(pmax)
    OMPVV_TEST_AND_SET(errors, pmax != max);
    return errors;
 }
