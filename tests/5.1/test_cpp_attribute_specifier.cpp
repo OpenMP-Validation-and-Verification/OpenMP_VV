@@ -19,7 +19,7 @@
 
 int errors, i;
 
-int test_defaultmap_present() {
+int test_cpp_attribute_specifier() {
    omp_set_num_threads(4);
    for(int i = 0; i < N; i++){
        OMPVV_TEST_AND_SET_VERBOSE(errors, omp_in_parallel() == true);
@@ -34,6 +34,6 @@ int test_defaultmap_present() {
 int main() {
    errors = 0;
    OMPVV_TEST_OFFLOADING;
-   OMPVV_TEST_AND_SET_VERBOSE(errors, test_defaultmap_present() != 0);
+   OMPVV_TEST_AND_SET_VERBOSE(errors, test_cpp_attribute_specifier() != 0);
    OMPVV_REPORT_AND_RETURN(errors);
 }           
