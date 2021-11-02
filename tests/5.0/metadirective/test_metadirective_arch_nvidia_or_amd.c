@@ -27,7 +27,6 @@ int metadirective2() {
    for (device_num = 0; device_num == 0 || device_num < omp_get_num_devices(); device_num++) {
      #pragma omp target device(device_num)
      {
-       initial_device = omp_is_initial_device();
        #pragma omp metadirective \
                   when( implementation={vendor(nvidia)}: \
                         teams num_teams(512) thread_limit(32) ) \
@@ -36,6 +35,8 @@ int metadirective2() {
                   default (teams)
        #pragma omp distribute parallel for
          for (i = 0; i < N; i++) {
+            #pragma omp atomic write
+            initial_device = omp_is_initial_device();
             a[i] = i;
          }
      }
