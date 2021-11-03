@@ -21,6 +21,7 @@
 int errors = 0;
 
 void target_function();
+#pragma omp declare target to(target_function) device_type(nohost)
 
 #pragma omp declare target
 int a[N], b[N], c[N];  
@@ -36,7 +37,6 @@ void update() {
   }
 }
 
-#pragma omp declare target device_type(nohost)
 void target_function(){
   for (i = 0; i < N; i++) {
     a[i] += 1;
