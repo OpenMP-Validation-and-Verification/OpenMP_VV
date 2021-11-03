@@ -30,7 +30,7 @@ CONTAINS
       CHARACTER(len=400) :: difNumMessage, oneThreadMessage
       WRITE(difNumMessage, *) "When testing num_threads, the &
        &actual number of threads was different. This is not a &
-       compliance error with the specs."
+       &compliance error with the specs."
      
       WRITE(oneThreadMessage, *) "The number of threads was &
       &always one, regardless of the num_threads clause. This is not a &

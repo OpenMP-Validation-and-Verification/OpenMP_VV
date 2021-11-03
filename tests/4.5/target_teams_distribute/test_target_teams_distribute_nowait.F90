@@ -44,6 +44,7 @@ CONTAINS
     DO x = 1, N_TASKS
        !$omp target teams distribute map(alloc: work_storage(1:N, x), ticket(1:1)) private(my_ticket) nowait
        DO y = 1, N
+          work_storage(y, x) = 0
           DO z = 1, N*(N_TASKS - x)
              work_storage(y, x) = work_storage(y, x) + x*y*z
           END DO
