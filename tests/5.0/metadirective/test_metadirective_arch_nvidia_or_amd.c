@@ -25,7 +25,7 @@ int metadirective2() {
    }
    
    for (device_num = 0; device_num == 0 || device_num < omp_get_num_devices(); device_num++) {
-     #pragma omp target device(device_num)
+     #pragma omp target device(device_num) map(from:initial_device)
      {
        #pragma omp metadirective \
                   when( implementation={vendor(nvidia)}: \
