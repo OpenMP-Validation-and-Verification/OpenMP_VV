@@ -105,7 +105,7 @@ endif
 
 # Intel ICX compiler
 ifeq ($(CC), icx)
-  COFFLOADING = -fopenmp-targets=spir64
+  COFFLOADING = -qopenmp -fopenmp-targets=spir64
   C_NO_OFFLOADING =
   CFLAGS += -lm -O3 -fiopenmp $(COFFLOADING) -D__STRICT_ANSI__
   CLINK = icx
@@ -217,7 +217,7 @@ endif
 
 # Intel ICPX compiler
 ifeq ($(CXX), icpx)
-  CXXOFFLOADING = -fopenmp-targets=spir64
+  CXXOFFLOADING = -qopenmp -fopenmp-targets=spir64
   CXX_NO_OFFLOADING =
   CXXFLAGS += -lm -O3 -fiopenmp $(CXXOFFLOADING) -D__STRICT_ANSI__
   CXXLINK = icpx
@@ -314,7 +314,7 @@ endif
 
 # Intel IFX compiler
 ifeq ($(FC), ifx)
-  FOFFLOADING = -fopenmp-targets=spir64
+  FOFFLOADING = -qopenmp -fopenmp-targets=spir64
   F_NO_OFFLOADING =
   FFLAGS += -O3 -fiopenmp $(FOFFLOADING)
   FLINK = ifx
