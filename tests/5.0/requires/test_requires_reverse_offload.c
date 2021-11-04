@@ -67,10 +67,8 @@ int main()
     A[N-1] = -1;
 
     #pragma omp target enter data map(to: A) 
- 
-    OMPVV_WARNING_IF(device_num < 2, "Cannot properly test reverse offload if only one device is available");
 
-    if (device_num > 1) {
+    if (device_num > 0) {
         for (int i = 0; i < N; i++) {
             if (A[i] != i) {
                 #pragma omp target device(ancestor:1) map(always, to: A[i:1])
@@ -81,6 +79,8 @@ int main()
             OMPVV_TEST_AND_SET(errors, A[i] != 2*i);
 	}
     }
+
+    OMPVV_WARNING_IF(device_num <= 0, Cannot properly properly test reverse offload if no devices are available)
 
     OMPVV_REPORT_AND_RETURN(errors)
 }
