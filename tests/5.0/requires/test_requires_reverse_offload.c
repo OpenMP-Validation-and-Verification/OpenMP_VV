@@ -21,33 +21,9 @@
 
 #pragma omp requires reverse_offload
 
-
-int host_function(int incorrect_value, int index, int errors)
-{     
-    OMPVV_INFOMSG("Planned Error in offload: A[%d]=%d\n", index, incorrect_value);
-    OMPVV_INFOMSG("                Expecting: A[i] =i\n");
-    // Would like to use omp_is_initial_device() here, but calls to OpenMP runtime API
-    // are not permitting inside target region when device(ancestor:1) is used
-    // Instead, we will change values of the array A that was previously defined on the host
-    // and will not explicity map back to host. If reverse offloading is truly enabled,
-    // these values should be updated back on the host.
-    // if (!omp_is_initial_device())
-    //    {
-    //        errors++;
-    //    }
-
-    for (int j = 0; j < N; j++) {
-        A[j] = 2*j;
-    }
-
-    return errors;
-}
-
-#pragma omp declare target device_type(host) to(host_function)
-
 int main() 
-{    
-    int A[N];
+{
+    int A[N];	
     int isOffloading;
     int errors;
     int device_num;
@@ -64,23 +40,20 @@ int main()
         A[i] = i;
     }
 
-    A[N-1] = -1;
-
+    OMPVV_WARNING_IF(device_num <= 0, "Cannot properly properly test reverse offload if no devices are available");
+    
     #pragma omp target enter data map(to: A) 
 
     if (device_num > 0) {
-        for (int i = 0; i < N; i++) {
-            if (A[i] != i) {
-                #pragma omp target device(ancestor:1) map(always, to: A[i:1])
-                errors = host_function(A[i], i, errors);
-            }
-        }
-	for (int i = 0; i < N; i++) {
-            OMPVV_TEST_AND_SET(errors, A[i] != 2*i);
-	}
+       #pragma omp target device(ancestor:1) map(always, to: A)
+       for (int j = 0; j < N; j++) {
+          A[j] = 2*j;
+       } 
     }
-
-    OMPVV_WARNING_IF(device_num <= 0, Cannot properly properly test reverse offload if no devices are available)
+    
+    for (int i = 0; i < N; i++) {
+       OMPVV_TEST_AND_SET(errors, A[i] != 2*i);
+    }
 
     OMPVV_REPORT_AND_RETURN(errors)
 }
