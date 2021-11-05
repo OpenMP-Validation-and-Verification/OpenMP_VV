@@ -33,12 +33,12 @@ CONTAINS
     errors = 0
 
     allocate(A(N))
+    allocate(B(N))
     DO i = 1, N
-       A(i) = 0
+       A(i) = i
     END DO
 
     !$omp task depend(out: B) shared(B) affinity(A)
-    allocate(B(N))
     DO i = 1, N
        B(i) = A(i)
     END DO
@@ -46,7 +46,7 @@ CONTAINS
 
     !$omp task depend(in: B) shared(B) affinity(A)
     DO i = 1, N
-       B(i) = i*2
+       B(i) += A(i) 
     END DO
     !$omp end task
 
@@ -54,7 +54,6 @@ CONTAINS
 
     DO i = 1, N
        OMPVV_TEST_AND_SET_VERBOSE(errors, B(i) .ne. i*2)
-       OMPVV_TEST_AND_SET_VERBOSE(errors, A(i) .ne. 0)
     END DO
 
     run_tasks = errors
