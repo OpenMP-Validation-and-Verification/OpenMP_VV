@@ -1,4 +1,4 @@
-!===--- test_declare_variant.F90 -------------------------------------------===//
+!===--- test_declare_variant.F90 --------------------------------------------===//
 !
 ! OpenMP API Version 5.0 Nov 2018
 !
@@ -8,7 +8,9 @@
 ! index. Each variant is called on a separate array and the results are
 ! checked.
 !
-!//===----------------------------------------------------------------------===//
+! This test is derived from OpenMP 5.0 Examples Doc - declare_variant.1.f90
+!
+!===-------------------------------------------------------------------------===//
 
 #include "ompvv.F90"
 

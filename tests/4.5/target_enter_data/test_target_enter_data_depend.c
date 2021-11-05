@@ -1,3 +1,12 @@
+//===--- test_target_enter_data_depend.c ------------------------------------===//
+//
+// OpenMP API Version 4.5 Nov 2015
+//
+// This test checks the target enter data directive with a depend clause 
+// specified. Behavior for depend 'in' and depend 'out' are both addressed.
+//
+//===------------------------------------------------------------------------===//
+
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>

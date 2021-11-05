@@ -70,7 +70,7 @@ private:
   double sumB; 
 
 public:
-  B(int n) : Mapper<B>(this), n(n) {
+  B(int nn) : Mapper<B>(this), n(nn) {
     x = new double[n];
     std::fill(x, x+n, 0);
     // This is a work around to avoid referring to 
