@@ -29,21 +29,22 @@ PROGRAM test_task_affinity
 
 CONTAINS
   INTEGER FUNCTION run_tasks()
-    INTEGER:: errors, i, t
+    INTEGER:: errors, i
     INTEGER,ALLOCATABLE:: A(:), B(:)
 
     errors = 0
 
-    t = omp_get_default_device()
-
     allocate(A(N))
+    allocate(B(N))
+    
     DO i = 1, N
-       A(i) = 0
+       A(i) = i
     END DO
 
-    !$omp target device(t) map(tofrom: A(1:N)) map(from: B(1:N))
+    !$omp target enter data map(to: A(1:N)) 
+   
+    !$omp target map(from: B)
     !$omp task depend(out: B) shared(B) affinity(A)
-    allocate(B(N))
     DO i = 1, N
        B(i) = A(i)
     END DO
@@ -51,7 +52,7 @@ CONTAINS
 
     !$omp task depend(in: B) shared(B) affinity(A)
     DO i = 1, N
-       B(i) = i*2
+       B(i) += A(i)
     END DO
     !$omp end task
 
@@ -60,7 +61,6 @@ CONTAINS
 
     DO i = 1, N
        OMPVV_TEST_AND_SET_VERBOSE(errors, B(i) .ne. i*2)
-       OMPVV_TEST_AND_SET_VERBOSE(errors, A(i) .ne. 0)
     END DO
 
     run_tasks = errors
