@@ -32,20 +32,21 @@ int test_task_affinity() {
 
   for (int i = 0; i < N; i++) {
     A[i] = i;
+    B[i] = 0;
   }
 
 #pragma omp target enter data map(to: A[0:N])
 
-#pragma omp task depend(out: B) shared(B) affinity(A[0:N])
+#pragma omp target defaultmap(none) is_device_ptr(A) map(tofrom: B[0:N]) 
  {
-#pragma omp target map(tofrom: B[0:N]) 
+#pragma omp task depend(out: B) shared(B) affinity(A[0:N])
    {
      for (int i = 0; i < N; i++) {
        B[i] = 2 * A[i];
      }
    }
 
-#pragma omp target map(tofrom: B[0:N])
+#pragma omp task depend(in: B) shared(B) affinity(A[0:N])
    {
      for (int i = 0; i < N; i++) {
        B[i] += A[i];
@@ -53,7 +54,8 @@ int test_task_affinity() {
    }
 
 #pragma omp taskwait
-}
+ }
+
 
   for (int i = 0; i < N; i++) {
     OMPVV_TEST_AND_SET_VERBOSE(errors, B[i] != i*3);
