@@ -21,43 +21,42 @@
 #define N 1024
 
 int test_task_affinity() {
-  OMPVV_INFOMSG("test_task_affinity");
+  OMPVV_INFOMSG("test_task_affinity_device");
   int errors = 0;
   int* A;
   int* B;
   int t = omp_get_default_device();
 
-  A = (int*) omp_target_alloc(sizeof(int)*N, t);
-
-#pragma omp task depend(out: B) shared(B) affinity(A[0:N])
-    {
-#pragma omp target is_device_ptr(A) device(t) map(from: B[0:N])
-      {
-        for (int i = 0; i < N; i++) {
-          A[i] = 0;
-        }
-        B = (int*) malloc(sizeof(int)*N);
-        for (int i = 0; i < N; i++) {
-          B[i] = A[i];
-        }
-      }
-    }
-
-#pragma omp task depend(in: B) shared(B) affinity(A[0:N])
-    {
-#pragma omp target device(t) map(tofrom: B[0:N])
-      {
-        for (int i = 0; i < N; i++) {
-          B[i] = i*2;
-        }
-      }
-    }
-
-#pragma omp taskwait
+  A = (int*) malloc(sizeof(int)*N);
+  B = (int*) malloc(sizeof(int)*N);
 
   for (int i = 0; i < N; i++) {
-    OMPVV_TEST_AND_SET_VERBOSE(errors, B[i] != i*2);
-    OMPVV_TEST_AND_SET_VERBOSE(errors, A[i] != 0);
+    A[i] = i;
+  }
+
+#pragma omp target enter data map(to: A[0:N])
+
+#pragma omp task depend(out: B) shared(B) affinity(A[0:N])
+ {
+#pragma omp target map(tofrom: B[0:N]) 
+   {
+     for (int i = 0; i < N; i++) {
+       B[i] = 2 * A[i];
+     }
+   }
+
+#pragma omp target map(tofrom: B[0:N])
+   {
+     for (int i = 0; i < N; i++) {
+       B[i] += A[i];
+     }
+   }
+
+#pragma omp taskwait
+}
+
+  for (int i = 0; i < N; i++) {
+    OMPVV_TEST_AND_SET_VERBOSE(errors, B[i] != i*3);
   }
 
   return errors;
