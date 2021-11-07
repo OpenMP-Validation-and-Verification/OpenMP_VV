@@ -61,11 +61,18 @@ endef
 #---------------------------------------------------------------------------
 # C compilers
 #---------------------------------------------------------------------------
-CCOMPILERS?="cc, clang, gcc, xlc, icx"
+CCOMPILERS?="cc, clang, gcc, xlc, icx, nvc"
 C_VERSION?= echo "version unknown"
 CC?=none
 CPP?=none
 FC?=none
+
+# NVIDIA compiler
+ifeq ($(CC), nvc)
+    CFLAGS += -fast -mp=gpu -gpu=cc70
+    CLINK = nvc
+    CLINKFLAGS += -fast -mp=gpu -gpu=cc70
+endif
 
 # CRAY compilers
 ifeq ($(DEVICE_TYPE), amd)
@@ -176,8 +183,15 @@ endif
 #---------------------------------------------------------------------------
 # C++ compilers
 #---------------------------------------------------------------------------
-CXXCOMPILERS?="CC, clang++, g++, xlc++, icpx"
+CXXCOMPILERS?="CC, clang++, g++, xlc++, icpx, nvc++"
 CXX_VERSION?= echo "version unknown"
+
+# NVIDIA compiler
+ifeq ($(CXX), nvc++)
+    CXXFLAGS += -fast -mp=gpu -gpu=cc70
+    CXXLINK = nvc
+    CXXLINKFLAGS += -fast -mp=gpu -gpu=cc70
+endif
 
 # CRAY compilers
 ifeq ($(DEVICE_TYPE), amd)
@@ -288,8 +302,16 @@ endif
 #---------------------------------------------------------------------------
 # FORTRAN compilers
 #---------------------------------------------------------------------------
-FCOMPILERS?="gfortran, xlf, ifx, ftn"
+FCOMPILERS?="gfortran, xlf, ifx, ftn, nvfortran"
 F_VERSION?= echo "version unknown"
+
+
+# NVIDIA compiler
+ifeq ($(FC), nvfortran)
+    FFLAGS += -fast -mp=gpu -gpu=cc70 
+    FLINK = nvfortran
+    FLINKFLAGS += -fast -mp=gpu -gpu=cc70
+endif
 
 # GCC compiler
 ifeq ($(FC), gfortran)
