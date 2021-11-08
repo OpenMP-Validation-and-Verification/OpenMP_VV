@@ -41,8 +41,9 @@ int test_motion_present() {
    new_struct.s = 10; new_struct.S[0] = 10; new_struct.S[1] = 10;
    ptr = &A[0]; 
    ptr[50] = 50; ptr[51] = 51;
-   
-   #pragma omp target update to(scalar_var, A, new_struct) // Only looking to test lines 5-6 on page 207
+  
+   // Tests OpenMP 5.1 Specification pp. 207 lines 2-4
+   #pragma omp target update to(scalar_var, A, new_struct) 
    #pragma omp target map(tofrom: errors) defaultmap(none) map(from: scalar_var, A, new_struct)
    {     
         if(scalar_var == 1){errors++;}
@@ -52,6 +53,8 @@ int test_motion_present() {
         if(new_struct.S[0] == 10){errors++;}
    }
 
+   // Tests OpenMP 5.1 Specification pp. 207 lines 5-6
+   #pragma omp target enter data map(alloc: scalar_var, A, new_struct)
    #pragma omp target update to(present: scalar_var, A, new_struct) 
    #pragma omp target map(tofrom: errors) defaultmap(none) map(from: scalar_var, A, new_struct)
    {     
