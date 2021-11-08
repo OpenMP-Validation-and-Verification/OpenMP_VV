@@ -52,7 +52,7 @@ CONTAINS
 
     !$omp task depend(in: B) shared(B) affinity(A)
     DO i = 1, N
-       B(i) += A(i)
+       B(i) = B(i) + A(i)
     END DO
     !$omp end task
 
