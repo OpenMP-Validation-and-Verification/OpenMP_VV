@@ -4,9 +4,9 @@
 //
 //  This test checks behavior of the defaultmap clause when the specified implicit-behavior  
 //  is present. The variable-categories avaiable for defaultmap are scalar, aggregate, and pointer.
-//  When no mapping is specified, all variables (pointer, aggregate, scalar) will be mapped with present
-//  behavior, thus, expected behavior is that all list items are treated as if they had been listed in a
-//  map clause with map-type alloc.
+//  If implicit-behavior is present, each variable referenced in the construct in the category specified
+//  by variable-category is treated as if it had been listed in a map clause wih the map-type of alloc
+//  and map-type-modifier of present.
 //
 ////===-------------------------------------------------------------------------------------------------===//
 
@@ -27,27 +27,41 @@ int test_defaultmap_present() {
      int S[N]; 
    }; 
 
-   int scalar; // scalar 
+   int scalar_var; // scalar 
    int A[N]; // aggregate 
    struct test_struct new_struct; // aggregate
    int *ptr; // scalar, pointer 
+   errors = 0;
 
-   scalar = 1; 
+   scalar_var = 1; 
    A[0] = 0; A[50] = 50;
    new_struct.s = 10; new_struct.S[0] = 10; new_struct.S[1] = 10;
    ptr = &A[0]; 
    ptr[50] = 50; ptr[51] = 51;
    
-   // defaultmap(present) means values should remain as if already declared in map as alloc
+   #pragma omp target enter data map(to: scalar_var, A, new_struct)
+   
    #pragma omp target map(tofrom: errors) defaultmap(present)
    {     
       if(scalar != 1){errors++;}
-      if(A[0] != 0 || A[50] != 50){errors++;}
+      if(A[0] != 0){errors++;}
       if(A[50] != 50 || A[51] != 51){errors++;}
       if(new_struct.s != 10){errors++;}
-      if(new_struct.S[0] != 10){errors++;}
+      if(new_struct.S[0] != 10 || new_struct.S[1] != 10){errors++;}
+      
+      scalar_var = 7; 
+      A[0] = 70; A[50] = 150;
+      new_struct.s = 110; new_struct.S[0] = 110; new_struct.S[1] = 110;
+      ptr = &A[0]; 
+      ptr[50] = 150; ptr[51] = 151;
    }
    
+  for (i = 0; i < N; i++) {
+      OMPVV_TEST_AND_SET(errors, scalar_var == 7);
+      OMPVV_TEST_AND_SET(errors, A[0] == 70 || A[50] == 150 || A[51] = 151);
+      OMPVV_TEST_AND_SET(errors, new_struct.s == 110 || new_struct.S[0] = 110 || new_struct.S[1] = 110);
+  }
+      
   return errors;
 }
 
