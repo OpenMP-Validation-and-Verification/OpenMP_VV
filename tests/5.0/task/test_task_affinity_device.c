@@ -61,6 +61,9 @@ int test_task_affinity() {
     OMPVV_TEST_AND_SET_VERBOSE(errors, B[i] != i*3);
   }
 
+  free(A);
+  free(B);
+
   return errors;
 }
 
