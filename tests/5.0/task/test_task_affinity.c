@@ -38,7 +38,7 @@ int test_task_affinity() {
     }
   }
 
-#pragma omp task depend(in: B) shared(B) affinity(A[0:N])
+#pragma omp task depend(in: B) shared(B)
   {
     for (int i = 0; i < N; i++) {
       B[i] = i*2;
