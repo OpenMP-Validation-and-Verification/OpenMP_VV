@@ -67,6 +67,11 @@ int test_struct() {
       OMPVV_TEST_AND_SET_VERBOSE(errors, (array[i].b[j] != 1));
     OMPVV_TEST_AND_SET_VERBOSE(errors, (pointers[i + 1] != array[i].p));
   }
+
+  free(single.p);
+  for (int i = 0; i < 5; ++i) {
+    free(array[i].p);
+  }
   
   return errors;
 }
@@ -124,7 +129,11 @@ int test_typedef() {
     OMPVV_TEST_AND_SET_VERBOSE(errors, (pointers[i + 1] != array[i].p));
   }
   
-  return errors;
+  free(single.p);
+  for (int i = 0; i < 5; ++i) {
+    free(array[i].p);
+  }
+   return errors;
 }
 
 int main () {

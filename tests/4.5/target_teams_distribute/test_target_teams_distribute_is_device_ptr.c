@@ -48,6 +48,8 @@ int main() {
       }
     }
 
+    omp_target_free (c, omp_get_default_device());
+
     OMPVV_REPORT_AND_RETURN(errors);
   }
 }

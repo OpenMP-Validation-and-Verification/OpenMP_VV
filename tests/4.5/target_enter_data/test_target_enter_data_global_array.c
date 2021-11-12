@@ -38,6 +38,7 @@ int main (){
      errors += 1;
    }
 
+#pragma omp target exit data map(release: A[:n])
 
   OMPVV_REPORT_AND_RETURN(errors);
 }

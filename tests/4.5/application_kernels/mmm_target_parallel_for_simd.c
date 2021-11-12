@@ -61,6 +61,9 @@ int main (int argc, char *argv[])
       OMPVV_ERROR_IF(500 != c[i*rowA+j], "Error: [%d][%d] should be 500 is %d",i,j,c[i*rowA+j]);
     }
   }
+  free(a);
+  free(b);
+  free(c);
 
   OMPVV_REPORT_AND_RETURN(error);
 }

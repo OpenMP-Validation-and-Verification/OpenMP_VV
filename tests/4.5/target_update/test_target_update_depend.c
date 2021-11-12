@@ -111,6 +111,9 @@ int test_async_between_hosts_tasks() {
   OMPVV_TEST_AND_SET(errors, (N * ALL_TASKS_BITS != sum));
   OMPVV_INFOMSG("Test test_async_between_task_target ran on the %s", (isHost ? "host" : "device"));
  
+  free(h_array);
+  free(in_1);
+  free(in_2);
 
   return errors;
 }
@@ -200,6 +203,9 @@ int test_async_between_host_and_device() {
   OMPVV_TEST_AND_SET(errors, (N * ALL_TASKS_BITS != sum));
   OMPVV_INFOMSG("Test test_async_between_task_target ran on the %s", (isHost ? "host" : "device"));
  
+  free(h_array);
+  free(in_1);
+  free(in_2);
 
   return errors;
 }
@@ -213,4 +219,3 @@ int main(){
 
   OMPVV_REPORT_AND_RETURN(errors);
 }
-

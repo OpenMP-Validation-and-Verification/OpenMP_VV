@@ -122,6 +122,10 @@ int test_async_between_task_target() {
 // This is outside of the testing area but we need to clear memory on the device 
 // created with the target enter data
 #pragma omp target exit data map(delete: h_array[0:N])
+  free(h_array);
+  free(h_array_copy);
+  free(in_1);
+  free(in_2);
 
   return errors;
 }
@@ -184,6 +188,8 @@ int test_async_between_target() {
 // created with the target enter data
 #pragma omp target exit data map(delete: h_array[0:N])
 
+  free(h_array);
+  free(h_array_copy);
   return errors;
 }
 

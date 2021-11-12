@@ -139,6 +139,12 @@ int main() {
   
   OMPVV_TEST_AND_SET_VERBOSE(error, check(head));
 
+  while (head) {
+    node_t * next = head->next;
+    free (head);
+    head = next;
+  }
+
   OMPVV_REPORT_AND_RETURN(error);
   return 0;
 }
