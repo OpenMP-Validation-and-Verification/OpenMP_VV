@@ -52,6 +52,7 @@ PROGRAM declare_target_subroutine
 
   OMPVV_TEST_VERBOSE(sum .ne. N)
 
+  DEALLOCATE(a)
   OMPVV_REPORT_AND_RETURN()
 END PROGRAM declare_target_subroutine
 
