@@ -221,7 +221,7 @@ int test_defaultmap_off() {
     float_array_b[x] = 0;
     double_array_a[x] = x / 50.0;
     double_array_b[x] = 0;
-    enum_array_a[x] = x%4 + 1;
+    enum_array_a[x] = (enum enum_type)(x%4 + 1);
     enum_array_b[x] = VAL1;
   }
 
@@ -261,7 +261,7 @@ int test_defaultmap_off() {
     double_array_b[x] = scalar_double;
     scalar_enum = VAL1;
     for (int y = 1; y < enum_array_a[x]; ++y) {
-      scalar_enum += 1;
+      scalar_enum = (enum enum_type)(scalar_enum + 1);
     }
     enum_array_b[x] = scalar_enum;
   }
@@ -313,7 +313,7 @@ int test_defaultmap_off() {
   scalar_int = 5126;
   scalar_float = 5.126;
   scalar_double = 51.26;
-  scalar_enum = 2;
+  scalar_enum = VAL2;
 
   scalar_char_copy = scalar_char;
   scalar_short_copy = scalar_short;
@@ -344,7 +344,7 @@ int test_defaultmap_off() {
     scalar_int = 0;
     scalar_float = 0;
     scalar_double = 0;
-    scalar_enum = 0;
+    scalar_enum = VAL3;
   }
 
   for (int x = 0; x < ARRAY_SIZE; ++x) {
