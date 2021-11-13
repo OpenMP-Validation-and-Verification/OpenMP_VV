@@ -42,7 +42,8 @@ int test_loop_nested_teams() {
         x[i][j] += y[i]*z[i];
       }
     }
-    if (omp_get_thread_num() == 0 && omp_get_team_num() == 0) {
+    #pragma omp parallel if(0)
+    if (omp_get_team_num() == 0) {
       num_teams = omp_get_num_teams();
     }
   }
