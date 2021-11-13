@@ -7,6 +7,7 @@
 !
 !===------------------------------------------------------------------------------===//
 
+#define OMPVV_MODULE_REQUIRES_LINE !$omp requires unified_shared_memory
 #include "ompvv.F90"
 
 PROGRAM test_requires_unified_shared_memory
