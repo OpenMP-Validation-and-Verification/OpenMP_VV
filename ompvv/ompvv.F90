@@ -16,6 +16,10 @@
 #define EXIT_FAILURE 1
 #endif
 
+#ifndef OMPVV_MODULE_REQUIRES_LINE
+#define OMPVV_MODULE_REQUIRES_LINE
+#endif
+
 ! Macro for output of information, warning and error messages
 #ifdef VERBOSE_MODE
 #define OMPVV_WARNING_HELPER(message, filename, line) WRITE(*, OMPVV_HEADER_FMT(OMPVV_WARNING)) TRIM(clean_fn(filename)), line, TRIM(message)
@@ -100,6 +104,7 @@ module ompvv_lib
   use omp_lib
   use iso_fortran_env
   implicit none
+OMPVV_MODULE_REQUIRES_LINE
     LOGICAL, PRIVATE :: ompvv_isHost
     INTEGER, PRIVATE :: ompvv_errors = 0
     LOGICAL, PRIVATE :: ompvv_sharedEnv
