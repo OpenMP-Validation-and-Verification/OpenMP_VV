@@ -58,8 +58,8 @@ int test_defaultmap_present() {
    
   for (i = 0; i < N; i++) {
       OMPVV_TEST_AND_SET(errors, scalar_var == 7);
-      OMPVV_TEST_AND_SET(errors, A[0] == 70 || A[50] == 150 || A[51] = 151);
-      OMPVV_TEST_AND_SET(errors, new_struct.s == 110 || new_struct.S[0] = 110 || new_struct.S[1] = 110);
+      OMPVV_TEST_AND_SET(errors, A[0] == 70 || A[50] == 150 || A[51] == 151);
+      OMPVV_TEST_AND_SET(errors, new_struct.s == 110 || new_struct.S[0] == 110 || new_struct.S[1] == 110);
   }
       
   return errors;
