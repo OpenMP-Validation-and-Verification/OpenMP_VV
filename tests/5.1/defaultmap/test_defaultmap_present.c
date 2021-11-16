@@ -41,9 +41,9 @@ int test_defaultmap_present() {
    
    #pragma omp target enter data map(to: scalar_var, A, new_struct)
    
-   #pragma omp target map(tofrom: errors) defaultmap(present)
+   #pragma omp target map(tofrom: errors) defaultmap(present) map(alloc,present: scalar_Var)
    {     
-      if(scalar != 1){errors++;}
+      if(scalar_var != 1){errors++;}
       if(A[0] != 0){errors++;}
       if(A[50] != 50 || A[51] != 51){errors++;}
       if(new_struct.s != 10){errors++;}
