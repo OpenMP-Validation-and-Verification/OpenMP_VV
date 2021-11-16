@@ -86,6 +86,10 @@ int test_struct() {
   // to do garbage collection without target exit data
 #pragma omp target exit data map(delete: single, array[0:ARRAY_SIZE])
 
+  free(single.p);
+  for (int i = 0; i < ARRAY_SIZE; ++i) {
+    free(array[i].p);
+  }
   return errors;
 }
 
@@ -159,6 +163,10 @@ int test_typedef() {
   // to do garbage collection without target exit data
 #pragma omp target exit data map(delete: single, array[0:ARRAY_SIZE])
 
+  free(single.p);
+  for (int i = 0; i < ARRAY_SIZE; ++i) {
+    free(array[i].p);
+  }
   return errors;
 }
 

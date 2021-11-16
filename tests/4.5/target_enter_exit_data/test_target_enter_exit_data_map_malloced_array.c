@@ -49,7 +49,7 @@ int test_tofrom() {
   for (i = 0; i < N; i++) {
     OMPVV_TEST_AND_SET_VERBOSE(errors, A[i] != N);
   }
-
+  free(A);
   return errors;
 }
 
@@ -88,6 +88,8 @@ int test_delete() {
   for (i = 0; i < N; i++) {
     OMPVV_TEST_AND_SET_VERBOSE(errors, B[i] != 0);
   }
+  free(A);
+  free(B);
 
   return errors;
 }

@@ -19,8 +19,8 @@
 
 int test_collapse1() {
 
-  int * a_mem = malloc(N*N*sizeof(int));
-  int * b_mem = malloc(N*(N+1)*sizeof(int));
+  int * a_mem = (int *)malloc(N*N*sizeof(int));
+  int * b_mem = (int *)malloc(N*(N+1)*sizeof(int));
   int (*a)[N] = (int (*)[N])a_mem;
   int (*b)[N + 1] = (int (*)[N+1])b_mem;
   int errors = 0;
@@ -54,12 +54,14 @@ int test_collapse1() {
       }
     }
   }
+  free (a_mem);
+  free (b_mem);
   return errors;
 }
 
 int test_collapse2() {
-  int * a_mem = malloc(N*N*N*sizeof(int));
-  int * b_mem = malloc(N*N*(N+1)*sizeof(int));
+  int * a_mem = (int *)malloc(N*N*N*sizeof(int));
+  int * b_mem = (int *)malloc(N*N*(N+1)*sizeof(int));
   int (*a)[N][N] = (int (*)[N][N])a_mem;
   int (*b)[N][N + 1] = (int (*)[N][N+1])b_mem;
   int errors = 0;
@@ -108,6 +110,8 @@ int test_collapse2() {
     OMPVV_WARNING("Test operated with one thread.  Parallelism of loop directive in parallel region can't be guaranteed.");
   }
 
+  free (a_mem);
+  free (b_mem);
   return errors;
 }
 

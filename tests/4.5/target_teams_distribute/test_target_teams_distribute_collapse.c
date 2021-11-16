@@ -18,8 +18,8 @@
 
 int test_collapse1() {
 
-  int * a_mem = malloc(ARRAY_SIZE*ARRAY_SIZE*sizeof(int));
-  int * b_mem = malloc(ARRAY_SIZE*(ARRAY_SIZE+1)*sizeof(int));
+  int * a_mem = (int *)malloc(ARRAY_SIZE*ARRAY_SIZE*sizeof(int));
+  int * b_mem = (int *)malloc(ARRAY_SIZE*(ARRAY_SIZE+1)*sizeof(int));
   int (*a)[ARRAY_SIZE] = (int (*)[ARRAY_SIZE])a_mem;
   int (*b)[ARRAY_SIZE + 1] = (int (*)[ARRAY_SIZE+1])b_mem;
   int errors = 0;
@@ -50,12 +50,15 @@ int test_collapse1() {
       }
     }
   }
+
+  free (a_mem);
+  free (b_mem);
   return errors;
 }
 
 int test_collapse2() {
-  int * a_mem = malloc(ARRAY_SIZE*ARRAY_SIZE*ARRAY_SIZE*sizeof(int));
-  int * b_mem = malloc(ARRAY_SIZE*ARRAY_SIZE*(ARRAY_SIZE+1)*sizeof(int));
+  int * a_mem = (int *)malloc(ARRAY_SIZE*ARRAY_SIZE*ARRAY_SIZE*sizeof(int));
+  int * b_mem = (int *)malloc(ARRAY_SIZE*ARRAY_SIZE*(ARRAY_SIZE+1)*sizeof(int));
   int (*a)[ARRAY_SIZE][ARRAY_SIZE] = (int (*)[ARRAY_SIZE][ARRAY_SIZE])a_mem;
   int (*b)[ARRAY_SIZE][ARRAY_SIZE + 1] = (int (*)[ARRAY_SIZE][ARRAY_SIZE+1])b_mem;
   int errors = 0;
@@ -101,6 +104,8 @@ int test_collapse2() {
     OMPVV_WARNING("Test operated with one team.  Parallelism of teams distribute can't be guarunteed.");
   }
 
+  free (a_mem);
+  free (b_mem);
   return errors;
 }
 

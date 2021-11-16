@@ -80,7 +80,10 @@ int test_async_between_task_target() {
 #pragma omp taskwait
 
   errors = 2.0*N != sum;
-  
+
+  free(h_array);
+  free(in_1);
+  free(in_2);
   return errors;
 }
 
@@ -121,6 +124,7 @@ int test_async_between_target() {
   }
   errors = 2*N != sum;
 
+  free(h_array);
   return errors;
 }
 
@@ -136,4 +140,3 @@ int main(){
 
   OMPVV_REPORT_AND_RETURN(errors);
 }
-

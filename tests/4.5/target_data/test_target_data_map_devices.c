@@ -57,7 +57,7 @@ int test_map_set_default_dev() {
   }
 
   omp_set_default_device(def_dev);
-
+  free(h_matrix);
   return errors;
 }
 
@@ -96,6 +96,7 @@ int test_map_device() {
     OMPVV_TEST_AND_SET_VERBOSE(errors, (dev * N != sum[dev]));
   }
 
+  free(h_matrix);
   return errors;
 }
 
