@@ -31,6 +31,7 @@ int main() {
 #pragma omp teams num_teams(OMPVV_NUM_TEAMS_DEVICE) thread_limit(OMPVV_NUM_THREADS_DEVICE)
   {
     num_teams[omp_get_team_num()] = omp_get_num_teams();
+#pragma omp parallel master
     num_threads[omp_get_team_num()]= omp_get_num_threads();
   }
 
