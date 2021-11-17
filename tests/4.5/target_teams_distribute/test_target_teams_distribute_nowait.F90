@@ -30,9 +30,10 @@ PROGRAM test_target_teams_distribute_nowait
   OMPVV_REPORT_AND_RETURN()
 CONTAINS
   INTEGER FUNCTION test_nowait()
+    USE ISO_Fortran_env, only: INT64
     INTEGER:: errors, x, y, z, was_async, my_ticket
     INTEGER,DIMENSION(N_TASKS):: order
-    INTEGER,DIMENSION(N, N_TASKS):: work_storage
+    INTEGER(INT64),DIMENSION(N, N_TASKS):: work_storage
     INTEGER,DIMENSION(1):: ticket
 
     ticket(1) = 0

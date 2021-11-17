@@ -10,6 +10,7 @@
 ////===----------------------------------------------------------------------===//
 
 #include <omp.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "ompvv.h"
@@ -22,7 +23,7 @@ int main() {
   OMPVV_WARNING("This test does not throw an error if tasks fail to execute asynchronously, as this is still correct behavior. If execution is not asynchronous, we will throw a warning.");
   int isOffloading = 0;
   OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
-  int work_storage[N_TASKS][N];
+  int64_t work_storage[N_TASKS][N];
   int order[N_TASKS];  // Each position marks the order in which that task executed
   int errors = 0;
   int ticket[1] = {0};
@@ -33,6 +34,7 @@ int main() {
   for (int i = 0; i < N_TASKS; ++i) {
 #pragma omp target teams distribute map(alloc: work_storage[i][0:N], ticket[0:1]) nowait
     for (int j = 0; j < N; ++j) {
+      work_storage[i][j] = 0;
       for (int k = 0; k < N*(N_TASKS - i); ++k) { // Creates skewed work distribution
 	work_storage[i][j] += k*i*j;              // This value will not be verified
       }
