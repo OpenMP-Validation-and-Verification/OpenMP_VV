@@ -37,6 +37,8 @@ int test_task_affinity() {
 
 #pragma omp target enter data map(to: A[0:N])
 
+#pragma omp target data use_device_ptr(A)
+{
 #pragma omp target defaultmap(none) is_device_ptr(A) map(tofrom: B[0:N]) 
  {
 #pragma omp task depend(out: B) shared(B) affinity(A[0:N])
@@ -55,7 +57,7 @@ int test_task_affinity() {
 
 #pragma omp taskwait
  }
-
+}
 
   for (int i = 0; i < N; i++) {
     OMPVV_TEST_AND_SET_VERBOSE(errors, B[i] != i*3);
