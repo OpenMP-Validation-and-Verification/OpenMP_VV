@@ -81,6 +81,7 @@ int test_async_between_task_target() {
 
   errors = 2.0*N != sum;
 
+#pragma omp target exit data map(release: h_array[0:N], in_1[0:N], in_2[0:N])
   free(h_array);
   free(in_1);
   free(in_2);
@@ -124,6 +125,7 @@ int test_async_between_target() {
   }
   errors = 2*N != sum;
 
+#pragma omp target exit data map(release: h_array[0:N], val)
   free(h_array);
   return errors;
 }
