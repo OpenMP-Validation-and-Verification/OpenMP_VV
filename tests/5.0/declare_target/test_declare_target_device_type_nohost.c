@@ -58,9 +58,18 @@ int test_declare_target_device_type_nohost() {
 
   #pragma omp target update from (a,b,c)
   
-  for (i = 0; i < N; i++) { //check array values on host
-    if ( a[i] != 6 || b[i] != 7 || c[i] != 8 ) {
-      errors++;
+  if (omp_get_default_device () >= 0 && omp_get_default_device () < omp_get_num_devices ()) {
+    for (i = 0; i < N; i++) { //check array values on host
+      if ( a[i] != 6 || b[i] != 7 || c[i] != 8 ) {
+        errors++;
+      }
+    }
+  } else {
+    OMPVV_WARNING("Default device is the host device. Thus, test only ran on the host");
+    for (i = 0; i < N; i++) { //check array values on host
+      if ( a[i] != 10 || b[i] != 10 || c[i] != 10 ) {
+        errors++;
+      }
     }
   }
   
