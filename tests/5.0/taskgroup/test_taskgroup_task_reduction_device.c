@@ -9,6 +9,7 @@
 //
 ////===----------------------------------------------------------------------===//
 #include <stdlib.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <omp.h>
 #include "ompvv.h"
@@ -16,8 +17,8 @@
 #define N 128
 
 typedef struct node_tag {
-  int val;
   struct node_tag *next;
+  int val;
 } node_t;
 
 #pragma omp declare target
@@ -64,16 +65,44 @@ int main(int argc, char *argv[]) {
     temp = temp->next;
     temp->val = i;
   }
+  temp->next = NULL;
 
-  temp->next = 0;
+  // Copy linked list to the device
+  temp = root;
+  while(temp != NULL) {
+#pragma omp target enter data map(to:temp[:1])
+    temp = temp->next;
+  }
 
-#pragma omp target parallel shared(result) num_threads(OMPVV_NUM_THREADS_DEVICE) defaultmap(tofrom)
+  // And update the next pointer on the device side,
+  temp = root;
+  while(temp != NULL) {
+    node_t* next = temp->next;
+    if (!next)
+      break;
+#pragma omp target data use_device_ptr(temp, next)
+    {
+      intptr_t var = (intptr_t) next;
+      omp_target_memcpy (temp, &var, sizeof (void*), 0, 0,
+                        omp_get_default_device(), omp_get_initial_device());
+    }
+    temp = temp->next;
+  }
+
+#pragma omp target parallel shared(result) num_threads(OMPVV_NUM_THREADS_DEVICE) defaultmap(tofrom) map(root[:1])
 #pragma omp single
   {
     result = linked_list_sum(root);
   }
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, result != seq_linked_list_sum(root));
+
+  // Free linked list to the device
+  temp = root;
+  while(temp != 0) {
+#pragma omp target exit data map(release:temp[:1])
+    temp = temp->next;
+  }
 
   while (root) {
     temp = root->next;
