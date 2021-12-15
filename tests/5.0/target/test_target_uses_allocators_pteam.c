@@ -27,12 +27,11 @@ int test_uses_allocators_pteam() {
   }
 
 #pragma omp target teams distribute uses_allocators(omp_pteam_mem_alloc) allocate(omp_pteam_mem_alloc: x) private(x) map(from: device_result)
-{
   for (int i = 0; i < N; i++) {
     x = 2 * i;
     device_result[i] = i + x;
   }
-}
+
   for (int i = 0; i < N; i++) {
     OMPVV_TEST_AND_SET_VERBOSE(errors, result[i] != device_result[i]);
   }
