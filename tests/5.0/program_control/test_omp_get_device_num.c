@@ -51,6 +51,17 @@ int test_omp_get_dev_num(void) {
       OMPVV_TEST_AND_SET_VERBOSE(errors, a[i] != i + 5);
    }
 
+   target_device_num = 99;
+
+   for (int i = 0; i <= omp_get_num_devices(); i++) {
+     #pragma omp target map(from: target_device_num) device(i)
+     {
+       target_device_num = omp_get_device_num();
+     }
+
+     OMPVV_TEST_AND_SET_VERBOSE(errors, target_device_num != i);
+   }
+
    return errors;
 }
 
