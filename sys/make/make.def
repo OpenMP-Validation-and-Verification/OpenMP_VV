@@ -123,7 +123,13 @@ endif
 # Clang compiler
 ifeq ($(DEVICE_TYPE),nvidia)
   ifeq ($(CC), clang)
-    COFFLOADING = -fopenmp-targets=nvptx64-nvidia-cuda -Xopenmp-target -march=sm_70
+    ifeq ($(OMP_VERSION), 5.0)
+      COFFLOADING = -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70 -fopenmp-version=50
+    else ifeq ($(OMP_VERSION), 5.1)
+      COFFLOADING = -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70 -fopenmp-version=51
+    else 
+      COFFLOADING = -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
+    endif
     C_NO_OFFLOADING =
     CFLAGS += -lm -O3 -fopenmp $(COFFLOADING)
     #Adding this to fix problem with math.h
@@ -134,7 +140,13 @@ ifeq ($(DEVICE_TYPE),nvidia)
   endif
 else ifeq ($(DEVICE_TYPE),amd)
   ifeq ($(CC), clang)
-    COFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908
+    ifeq ($(OMP_VERSION), 5.0)
+      COFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908 -fopenmp-version=50
+    else ifeq ($(OMP_VERSION), 5.1)
+      COFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908 -fopenmp-version=51
+    else
+      COFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908
+    endif
     C_NO_OFFLOADING =
     CFLAGS += $(COFFLOADING)
     #Adding this to fix problem with math.h
@@ -242,7 +254,13 @@ endif
 # Clang compiler
 ifeq ($(DEVICE_TYPE),nvidia)
   ifeq ($(CXX), clang++)
-    CXXOFFLOADING = -fopenmp-targets=nvptx64-nvidia-cuda -Xopenmp-target -march=sm_70
+    ifeq ($(OMP_VERSION), 5.0)
+      CXXOFFLOADING = -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70 -fopenmp-version=50
+    else ifeq ($(OMP_VERSION), 5.1)
+      CXXOFFLOADING = -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70 -fopenmp-version=51
+    else
+      CXXOFFLOADING = -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
+    endif 
     CXX_NO_OFFLOADING =
     CXXFLAGS += -std=c++11 -lm -O3 -fopenmp $(CXXOFFLOADING)
     #Adding this to fix problem with math.h
@@ -253,7 +271,13 @@ ifeq ($(DEVICE_TYPE),nvidia)
   endif
 else ifeq ($(DEVICE_TYPE),amd)
   ifeq ($(CXX), clang++)
-    CXXOFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908 
+    ifeq ($(OMP_VERSION), 5.0)
+      CXXOFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908 -fopenmp-version=50
+    else ifeq ($(OMP_VERSION), 5.1)
+      CXXOFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908 -fopenmp-version=51
+    else
+      CXXOFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908 
+    endif
     CXX_NO_OFFLOADING =
     CXXFLAGS += -std=c++11 -lm -O3 -fopenmp $(CXXOFFLOADING)
     #Adding this to fix problem with math.h
