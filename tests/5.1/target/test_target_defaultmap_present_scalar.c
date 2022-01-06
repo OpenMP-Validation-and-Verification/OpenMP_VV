@@ -32,7 +32,7 @@ int test_defaultmap_present_scalar() {
    double_var = 12.22;
 
    #pragma omp target enter data map(to: scalar_var, float_var, double_var)
-   #pragma omp target map(tofrom: errors) map(present, alloc: scalar_var, float_var, double_var)
+   #pragma omp target map(tofrom: errors) defaultmap(present: scalar)
    {
       if(scalar_var != 1){errors++;}
       if(float_var != 10.7f){errors++;}
