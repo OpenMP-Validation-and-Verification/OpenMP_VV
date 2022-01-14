@@ -27,9 +27,9 @@ int test_allocate_allocator() {
   omp_alloctrait_t x_traits[1] = {omp_atk_alignment, 64};
   omp_allocator_handle_t x_alloc = omp_init_allocator(x_memspace, 1, x_traits);
 
-#pragma omp allocate(x) allocator(x_alloc)
 
-  x = (int *) malloc(N*sizeof(int));
+#pragma omp allocate(x) allocator(x_alloc)
+  x = (int *)omp_alloc(N * sizeof(int), x_alloc);
 
 #pragma omp parallel for simd simdlen(16) aligned(x: 64)
   for (int i = 0; i < N; i++) {
@@ -40,14 +40,13 @@ int test_allocate_allocator() {
     OMPVV_TEST_AND_SET_VERBOSE(errors, x[i] != i);
   }
 
-  free(x);
+  omp_free(x, x_alloc);
   omp_destroy_allocator(x_alloc);
 
   return errors;
 }
 
 int main() {
-  OMPVV_TEST_OFFLOADING;
 
   int errors = 0;
 
