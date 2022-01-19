@@ -29,17 +29,13 @@ PROGRAM test_target_parallel
          INTEGER, DIMENSION(OMPVV_NUM_THREADS_DEVICE) :: thread_id
          CHARACTER(len=400) :: threadMsg
          errors = 0
-         summation = 0
 
          DO i = 1, OMPVV_NUM_THREADS_DEVICE
             thread_id(i) = 0
          END DO 
 
          !$omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE) map(from: summation, thread_id)
-            thread_id(omp_get_thread_num()) = omp_get_num_threads()
-            IF (omp_get_thread_num() == 8) THEN
-               summation = omp_get_num_threads()
-            END IF
+            thread_id(omp_get_thread_num() + 1) = omp_get_num_threads()
          !$omp end target parallel
 
          Print *, "Value of summation is", summation
