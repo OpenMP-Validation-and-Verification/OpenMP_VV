@@ -39,13 +39,12 @@ CONTAINS
          c(i) = 0
       END DO
 
-      !$omp target data map(to: a, b)
-         !$omp target
-            DO i = 1, N
-               b(i) = (a(i) + b(i))
-            END DO
-         !$omp end target
-      !$omp end target data
+      !$omp target enter data map(to: a, b)
+      !$omp target
+         DO i = 1, N
+            b(i) = (a(i) + b(i))
+         END DO
+      !$omp end target
 
       !$omp target update from(b)
      

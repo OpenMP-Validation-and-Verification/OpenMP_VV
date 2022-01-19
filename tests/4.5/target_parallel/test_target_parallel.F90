@@ -25,22 +25,33 @@ PROGRAM test_target_parallel
 
    CONTAINS
       INTEGER FUNCTION target_parallel()
-         INTEGER :: errors, thread_id, i
-         INTEGER, DIMENSION(OMPVV_NUM_THREADS_DEVICE) :: num_threads
+         INTEGER :: errors, i, summation
+         INTEGER, DIMENSION(OMPVV_NUM_THREADS_DEVICE) :: thread_id
          CHARACTER(len=400) :: threadMsg
          errors = 0
+         summation = 0
 
-         !$omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE) map(from: num_threads(0:OMPVV_NUM_THREADS_DEVICE))
-            num_threads(omp_get_thread_num()) = omp_get_num_threads()
+         DO i = 1, OMPVV_NUM_THREADS_DEVICE
+            thread_id(i) = 0
+         END DO 
+
+         !$omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE) map(from: summation, thread_id)
+            thread_id(omp_get_thread_num()) = omp_get_num_threads()
+            IF (omp_get_thread_num() == 8) THEN
+               summation = omp_get_num_threads()
+            END IF
          !$omp end target parallel
 
-         OMPVV_WARNING_IF(num_threads(0) .eq. 1, "The number of threads in the parallel region was 1. &
+         Print *, "Value of summation is", summation
+         Print *, 'Value of numthreads(8) is', thread_id(8)
+
+         OMPVV_WARNING_IF(thread_id(1) .eq. 1, "The number of threads in the parallel region was 1. &
                  &This is not a specifications error but we could not confirm the parallel region.")
 
-         DO i = 2, num_threads(0)
-            OMPVV_TEST_AND_SET(errors, num_threads(i) .ne. num_threads(0))
+         DO i = 1, thread_id(1)
+            OMPVV_TEST_AND_SET(errors, thread_id(i) .ne. thread_id(1))
             WRITE (threadMsg, *) "The number of threads recorded by thread", i, &
-                     &" was", num_threads(i), ". Expected was", num_threads(0) 
+                     & " was", thread_id(i), ". Expected was", thread_id(1) 
             OMPVV_INFOMSG(threadMsg)
          END DO
 
