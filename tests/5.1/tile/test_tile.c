@@ -46,34 +46,21 @@ int test_tile_complete() {
 
   time = 0;
 
-  /*
-  for (int i = 0; i < N; i++) {
-    for (int j = 0; j < N; j++) {
-      printf("%d ", result[i][j]);
-    }
-    printf("\n");
-  }
-  */
-
   for (int i1 = 0; i1 < N; i1 += 4) {
     for (int j1 = 0; j1 < N; j1 += 4) {
       for (int i2 = i1; i2 < i1 + 4; i2 += 1) {
         for (int j2 = j1; j2 < j1 + 4; j2 += 1) {
-          OMPVV_TEST_AND_SET_VERBOSE(errors, result[i2][j2] != time++);
           expected[i2][j2] = time++;
         }
       }
     }
   }
 
-  /*
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
-      printf("%d ", expected[i][j]);
+      OMPVV_TEST_AND_SET(errors, result[i][j] != expected[i][j]);
     }
-    printf("\n");
   }
-  */
 
   return errors;
 }
