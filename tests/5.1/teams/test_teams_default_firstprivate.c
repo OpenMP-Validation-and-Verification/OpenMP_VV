@@ -6,7 +6,10 @@
 // validates that when the default(firstprivate) clause is present that all
 // variables without explicit sharing rules is not avaialble outside the region
 // and is encapsulated between each thread. Starting with the initial value from
-// outside the region.
+// outside the region. This is checked by by establishing a not_shared value. Since
+// all changes should not persist after the construct region, it should have 
+// not changed. Additionally if there is a race condition, we know the variable 
+// is not defaulting to firstprivate either.
 //
 ////===----------------------------------------------------------------------===//
 
@@ -31,7 +34,7 @@ int main() {
 		not_shared += 5;
 	}
 
-	OMPVV_TEST_AND_SET(errors, not_shared != 5);
+	OMPVV_TEST_AND_SET(errors, (not_shared != 5));
 
 	OMPVV_REPORT_AND_RETURN(errors);
 }
