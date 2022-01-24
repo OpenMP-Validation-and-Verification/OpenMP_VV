@@ -38,8 +38,6 @@ PROGRAM test_target_parallel
             thread_id(omp_get_thread_num() + 1) = omp_get_num_threads()
          !$omp end target parallel
 
-         Print *, "Value of summation is", summation
-         Print *, 'Value of numthreads(8) is', thread_id(8)
 
          OMPVV_WARNING_IF(thread_id(1) .eq. 1, "The number of threads in the parallel region was 1. &
                  &This is not a specifications error but we could not confirm the parallel region.")
