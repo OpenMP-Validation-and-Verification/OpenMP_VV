@@ -21,21 +21,19 @@
 #define N 1024
 
 int main() {
-	int a[N];
 	int errors = 0;
 	int not_shared = 5;
+	int num_teams = 0;
 
-	for (int i = 0; i < N; i++) {
-		a[i] = i;
-	}
-
-	#pragma omp teams default(firstprivate) num_teams(OMPVV_NUM_TEAMS_DEVICE)
+	#pragma omp teams default(firstprivate) shared(num_teams) num_teams(OMPVV_NUM_TEAMS_DEVICE)
 	{
+		num_teams = omp_get_num_teams();
 		for (int i = 0; i < omp_get_num_teams(); i++) {
 			not_shared += 5;
 		}
 	}
 
+	OMPVV_WARNING_IF(num_teams != 8, "The number of teams was unexpected, the test results are likely inconcuslive")
 	OMPVV_TEST_AND_SET(errors, (not_shared != 5));
 
 	OMPVV_REPORT_AND_RETURN(errors);
