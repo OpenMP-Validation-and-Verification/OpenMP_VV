@@ -1,4 +1,4 @@
-//===------ test_allocate_allocators.c ------------------------------------===//
+//===------ test_allocate_allocator_align.c ------------------------------------===//
 //
 // OpenMP API Version 5.1 Nov 2020
 //
@@ -18,7 +18,7 @@
 
 #define N 1024
 
-int test_allocate_allocator() {
+int test_allocate_allocator_align() {
   int errors = 0;
 
   int* x;
@@ -48,7 +48,7 @@ int main() {
 
   int errors = 0;
 
-  OMPVV_TEST_AND_SET_VERBOSE(errors, test_allocate_allocator() != 0);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_allocate_allocator_align() != 0);
 
   OMPVV_REPORT_AND_RETURN(errors);
 }
