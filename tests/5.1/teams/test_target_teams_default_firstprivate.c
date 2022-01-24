@@ -29,10 +29,11 @@ int main() {
 		a[i] = i;
 	}
 
-	#pragma omp target
-	#pragma omp teams default(firstprivate) num_teams(OMPVV_NUM_TEAMS_DEVICE)
-	for (int i = 0; i < omp_get_num_teams(); i++) {
-		not_shared += 5;
+	#pragma omp target teams default(firstprivate) num_teams(OMPVV_NUM_TEAMS_DEVICE)
+	{
+		for (int i = 0; i < omp_get_num_teams(); i++) {
+			not_shared += 5;
+		}
 	}
 
 	OMPVV_TEST_AND_SET(errors, (not_shared != 5));
