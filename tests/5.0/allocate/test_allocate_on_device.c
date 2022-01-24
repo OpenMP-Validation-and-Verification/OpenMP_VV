@@ -7,7 +7,9 @@
 // According to the spec omp_alloc invocations that appear in target regions 
 // must not pass omp_null_allocator as the allocator argument, which must be 
 // a constant expression that evaluates to one of the predefined memory allocator 
-// values. The test checks that the values were written correctly, and then frees the memory.
+// values. Predefined allocators appearing in a uses_allocators clause cannot 
+// have traits specified. The test checks that the values were written correctly, 
+// and then frees the memory.
 //
 //===----------------------------------------------------------------------===//
 
@@ -22,7 +24,7 @@ int test_allocate_on_device() {
 
   int A[N], errors = 0;
 
-#pragma omp target map(tofrom: errors, A)
+#pragma omp target map(tofrom: errors, A) uses_allocators(omp_default_mem_alloc)
   {
    int* x;
    #pragma omp allocate(x) allocator(omp_default_mem_alloc)
