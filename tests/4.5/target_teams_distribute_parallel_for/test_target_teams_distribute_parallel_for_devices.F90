@@ -34,8 +34,7 @@ CONTAINS
       errors = 0
 
       num_dev = omp_get_num_devices()
-      OMPVV_WARNING_IF(num_dev .le. 1, "Testing devices clause without&
-                                        & multiple devices")
+      OMPVV_WARNING_IF(num_dev .le. 1, "Testing devices clause without multiple devices")
 
       WRITE(numDeviceMsg, *) "Number of devices =", num_dev
       OMPVV_INFOMSG(numDeviceMsg)
