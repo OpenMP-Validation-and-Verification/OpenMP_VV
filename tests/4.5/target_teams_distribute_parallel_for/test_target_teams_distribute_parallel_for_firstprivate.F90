@@ -66,16 +66,14 @@ CONTAINS
             warning_threads = warning_threads + 1
          END IF
          IF (i .gt. 1) THEN
-            OMPVV_ERROR_IF(num_teams(i) .ne. num_teams(i-1), "&
-                    & Discrepancy in the reported number of teams across teams")
+            OMPVV_ERROR_IF(num_teams(i) .ne. num_teams(i-1), "Discrepancy in the reported number of teams across teams")
             IF ((team_num(i) .eq. team_num(i-1)) .and. (num_threads(i) .ne. num_threads(i-1))) THEN
                OMPVV_ERROR("Discrepancy in the reported number of threads inside a single team")
             END IF
          END IF
       END DO
 
-      OMPVV_WARNING_IF(warning_threads .eq. N, "Number of threads was 1 for all teams. &
-              &test cannot assert privatization across teams");
+      OMPVV_WARNING_IF(warning_threads .eq. N, "Number of threads was 1 for all teams test cannot assert privatization across teams")
       
       DO i = 1, N
          OMPVV_TEST_AND_SET(errors, d(i) .ne. (10 + 1+ i) * (2 * i))
