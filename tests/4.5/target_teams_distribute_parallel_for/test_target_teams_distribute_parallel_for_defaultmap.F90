@@ -136,7 +136,7 @@ CONTAINS
          scalar_double = 20.45
       END DO
       
-      OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_char .ne. 'a') ! Character type is not a scalar variable in fortran
+      OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_char .ne. 'b') ! The Fortran character type is not a scalar variable in OpenMP
       OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_short .ne. 10)
       OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_int .ne. 11)
       OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(scalar_float - 5.5) > 0.0001)
