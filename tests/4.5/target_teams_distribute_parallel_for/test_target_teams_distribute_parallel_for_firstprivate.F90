@@ -59,7 +59,7 @@ CONTAINS
             END DO
       !$omp end target data
       
-      OMPVV_WARNING_IF(num_teams(0) .eq. 1, "Number of teams reported was 1, test cannot assert privatization across teams")
+      OMPVV_WARNING_IF(num_teams(1) .eq. 1, "Number of teams reported was 1, test cannot assert privatization across teams")
       warning_threads = 0
       DO i = 1, N
          IF (num_threads(i) .eq. 1) THEN
