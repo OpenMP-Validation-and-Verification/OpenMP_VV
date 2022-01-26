@@ -23,8 +23,10 @@ int sum;
 void task_container(int i) {
 #pragma omp task in_reduction(+:sum)
   sum += 1 + i;
+#pragma omp taskwait
 #pragma omp task in_reduction(+:sum)
   sum += 1 + i*2;
+#pragma omp taskwait
 }
 
 int test_task_in_reduction_dynamically_enclosed() {
