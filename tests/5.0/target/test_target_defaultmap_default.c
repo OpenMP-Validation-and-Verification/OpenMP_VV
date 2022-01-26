@@ -46,7 +46,7 @@ int test_defaultmap_with_default() {
       scalar = 17;    // scalar firstprivate, value not returned
       A[0] = 5; A[1] = 5; // aggregate array, default is tofrom
       new_struct.s = 10; new_struct.S[0] = 10; new_struct.S[1] = 10; // aggregate structure, default is tofrom
-      ptr = &A[0]; // Pointer, default is private
+      ptr = &A[0]; // Pointer, default is firstprivate
       ptr[50] = 50; ptr[51] = 51;
    }
 
