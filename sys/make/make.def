@@ -124,11 +124,11 @@ endif
 ifeq ($(DEVICE_TYPE),nvidia)
   ifeq ($(CC), clang)
     ifeq ($(OMP_VERSION), 5.0)
-      COFFLOADING = -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_80 -fopenmp-version=50
+      COFFLOADING = -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70 -fopenmp-version=50
     else ifeq ($(OMP_VERSION), 5.1)
-      COFFLOADING = -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_80 -fopenmp-version=51
+      COFFLOADING = -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70 -fopenmp-version=51
     else 
-      COFFLOADING = -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_80
+      COFFLOADING = -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
     endif
     C_NO_OFFLOADING =
     CFLAGS += -lm -O3 -fopenmp $(COFFLOADING)
