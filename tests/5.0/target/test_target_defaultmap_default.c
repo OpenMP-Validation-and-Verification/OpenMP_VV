@@ -5,7 +5,7 @@
 //  This test checks behavior of the defaultmap clause when the specified implicit-behavior  
 //  is default. The variable-categories avaiable for defaultmap are scalar, aggregate, and pointer.
 //  When no mapping is specified, the implicit-behavior of these variable-categories are
-//  firstprivate, tofrom, and private, respectively. This test specifies the default implicit-behavior 
+//  firstprivate, tofrom, and firstprivate, respectively. This test specifies the default implicit-behavior 
 //  for the three variable-categories and expects the same behavior as when there is no
 //  explicit mapping.
 //
