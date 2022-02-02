@@ -2,12 +2,10 @@
 //
 //  OpenMP API Version 5.1 Aug 2021
 //
-//  This test checks behavior of the default clause when the specified data-sharing-attribute  
-//  is firstprivate. The constructs allowed for a default clause are parallel, teams, task, and taskloop.
-//  This test utilizes the taskloop construct, where firstprivate states that one or more list items are
-//  private to the parallel task, and each of them are initialized with the value of the corresponding
-//  original item. The taskloop construct executes one or more loops in parallel on each thread. 
-//
+// This test checks the behavior of taskloop's clause grainsize, when the strict 
+// modifier is present. The grainsize strict expressions specifies the exact number of 
+// logical iterations which should be performed per task, except for the sequentially
+// last iteration which may have fewer than the specified iterations. 
 ////===--------------------------------------------------------------------------------------===//
 #include <omp.h>
 #include <stdio.h>
@@ -20,36 +18,31 @@
 int errors;
 
 int test_strict_grainsize() {
-  int scalar_var = 6;
   int arr[N];
-  int newarr[N];
-  int sum =0;
+  int sum = 0;
+  int parallel_sum = 0; 
   for (int i=0; i<N; i++){
         arr[i] = i;
         sum += arr[i];
  }
-#pragma omp parallel shared(arr, newarr)
+#pragma omp parallel shared(arr, parallel_sum)
   {  
-#pragma single { 
+#pragma single 
+	  { 
 #pragma omp taskloop grainsize(1000)
   for (int i = 0; i < N; i++) {
-                newarr[i] = arr[i] + arr[i];
-                scalar_var += 7;
-        }
+  	parallel_sum += arr[i];
   }
   }
-  int new_sum =0;
-  for (int i = 0; i < N; i++) {
-        new_sum += newarr[i];
   }
-  OMPVV_TEST_AND_SET(errors, sum == new_sum);
-  OMPVV_INFOMSG_IF(new_sum == 0, "Array was not initialzed.");
-  OMPVV_INFOMSG_IF(new_sum==sum, "Something went wrong.");
+  OMPVV_TEST_AND_SET(errors, parallel_sum == sum);
+  OMPVV_INFOMSG_IF(sum == 0, "Array was not initialzed.");
+  OMPVV_INFOMSG_IF(parallel_sum == sum, "Test passed.");
   return errors;
 }
 
 int main() {
-   errors = 0;
+  errors = 0;
   OMPVV_TEST_OFFLOADING;
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_strict_grainsize() != 0);
   OMPVV_REPORT_AND_RETURN(errors);
