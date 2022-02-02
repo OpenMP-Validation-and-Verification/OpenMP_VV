@@ -1,4 +1,4 @@
-//===--- test_default_firstprivate_parallel.c -----------------------------------------------===//
+//===--- test_strict_grainsize.c -----------------------------------------------===//
 //
 //  OpenMP API Version 5.1 Aug 2021
 //
@@ -19,40 +19,37 @@
 
 int errors;
 
-int test_default_firstprivate_taskloop_device() {
+int test_strict_grainsize() {
   int scalar_var = 6;
   int arr[N];
+  int newarr[N];
   int sum =0;
   for (int i=0; i<N; i++){
         arr[i] = i;
         sum += arr[i];
  }
-   #pragma omp target 
-  {
-# pragma omp taskloop default(firstprivate)
+#pragma omp parallel shared(arr, newarr)
+  {   
+#pragma omp taskloop grainsize(1000)
   for (int i = 0; i < N; i++) {
-		arr[i] = i + 3;
-		scalar_var += 7;
-	}
+                newarr[i] = arr[i] + arr[i];
+                scalar_var += 7;
+        }
   }
   int new_sum =0;
-  int wrong_sum =0;
   for (int i = 0; i < N; i++) {
-	new_sum += arr[i];
-	wrong_sum += i + 3;
+        new_sum += newarr[i];
   }
-  OMPVV_TEST_AND_SET(errors, scalar_var != 6);
-  OMPVV_INFOMSG_IF(scalar_var == 0, "Scalar was not initialized in parallel region & not updated");
-  OMPVV_INFOMSG_IF(scalar_var >  6, "Scalar was not firstprivate, changes made in parallel affected original copy");
-  OMPVV_TEST_AND_SET(errors, sum != new_sum);
-  OMPVV_INFOMSG_IF(new_sum == 0, "Array was not initialized in parallel region properly");
-  OMPVV_INFOMSG_IF(new_sum == wrong_sum, "Array was not first private, changes made in parallel affected original copy");
+  OMPVV_TEST_AND_SET(errors, sum == new_sum);
+  OMPVV_INFOMSG_IF(new_sum == 0, "Array was not initialzed.");
+  OMPVV_INFOMSG_IF(new_sum==sum, "Something went wrong.");
   return errors;
 }
 
 int main() {
    errors = 0;
-   OMPVV_TEST_OFFLOADING;
-   OMPVV_TEST_AND_SET_VERBOSE(errors, test_default_firstprivate_taskloop_device() != 0);
-   OMPVV_REPORT_AND_RETURN(errors);
+  OMPVV_TEST_OFFLOADING;
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_strict_grainsize() != 0);
+  OMPVV_REPORT_AND_RETURN(errors);
 }
+

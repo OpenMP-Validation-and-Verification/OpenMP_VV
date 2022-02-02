@@ -58,3 +58,6 @@ fi
 
 unset report
 exit $status
+make clean
+
+make tidy
