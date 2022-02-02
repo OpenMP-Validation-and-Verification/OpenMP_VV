@@ -121,12 +121,12 @@ CONTAINS
 
       raiseWarning = 0
       DO i = 1, N
-         OMPVV_TEST_AND_SET(errors, a(i) .ne. ATTEMPT_THRESHOLD)
+         OMPVV_TEST_AND_SET(errors, a(i) .ne. ATTEMPT_THRESHOLD - 1)
          IF (warning(i) .ne. 0) THEN
             raiseWarning = raiseWarning + 1
          END IF
       END DO
-
+      
       OMPVV_WARNING_IF(raiseWarning .eq. (N * (NUM_ATTEMPTS - ATTEMPT_THRESHOLD)), "The number of threads was 1 when a number > 1 was expected. if(parallel:true). Not a compliance error in the specs")
 
       OMPVV_ERROR_IF(errors .ne. 0, "error in if(parallel: modifier). Possible causes are: the execution occurred in the host even though it should not affect the target region. The number of threads was > 1 when if(false).")
