@@ -85,7 +85,7 @@ CONTAINS
    INTEGER FUNCTION target_teams_distribute_if_no_modifier()
       INTEGER, DIMENSION(N) :: a, warning 
       LOGICAL :: isOffloading  
-      INTEGER :: errors, attempt, i, raiseWarning 
+      INTEGER :: errors, attempt, i, raiseWarning, tempsum 
       errors = 0 
       attempt = 0
 
@@ -96,7 +96,7 @@ CONTAINS
          warning(i) = 0
       END DO
  
-      DO attempt = 1, NUM_ATTEMPTS
+      DO attempt = 1, NUM_ATTEMPTS - 1
          !$omp target teams distribute parallel do if(attempt .ge. ATTEMPT_THRESHOLD) &
          !$omp& map(tofrom: a, warning) num_threads(OMPVV_NUM_THREADS_DEVICE)
          DO i = 1, N
@@ -125,11 +125,12 @@ CONTAINS
       raiseWarning = 0
   
       DO i = 1, N
-         OMPVV_TEST_AND_SET(errors, a(i) .ne. 1 + (NUM_ATTEMPTS - ATTEMPT_THRESHOLD))
+         OMPVV_TEST_AND_SET_VERBOSE(errors, a(i) .ne. 1 + (NUM_ATTEMPTS - ATTEMPT_THRESHOLD))
          IF (warning(i) .ne. 0) THEN
             raiseWarning = 1
          END IF
       END DO
+
 
       OMPVV_WARNING_IF(raiseWarning .ne. 0 , "The number of threads was 1 even though we expected it to be more than 1. Not a compliance error in the specs")
 
