@@ -27,11 +27,17 @@ int test_default_firstprivate_taskloop() {
         arr[i] = i;
         sum += arr[i];
  }
-   #pragma omp taskloop default(firstprivate)
+#pragma omp parallel num_threads(OMPVV_NUM_THREADS_HOST)
+  {
+#pragma omp single 
+	  {	  
+#pragma omp taskloop default(firstprivate)
   for (int i = 0; i < N; i++) {
 		arr[i] = i + 3;
 		scalar_var += 7;
-	}
+ }
+  }
+  }
   int new_sum =0;
   int wrong_sum =0;
   for (int i = 0; i < N; i++) {
