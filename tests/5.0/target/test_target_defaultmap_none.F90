@@ -1,4 +1,4 @@
-!===--- test_target_defaultmap_default.F90 -------------------------------===//
+!===--- test_target_defaultmap_none.F90 -------------------------------===//
 !
 ! OpenMP API Version 5.0 Nov 2018
 !
@@ -14,19 +14,19 @@
 
 #define N 1024
 
-PROGRAM test_target_defaultmap_default
+PROGRAM test_target_defaultmap_none
   USE iso_fortran_env
   USE ompvv_lib
   USE omp_lib
   implicit none
   OMPVV_TEST_OFFLOADING
 
-  OMPVV_TEST_VERBOSE(defaultmap_default() .ne. 0)
+  OMPVV_TEST_VERBOSE(defaultmap_none() .ne. 0)
 
   OMPVV_REPORT_AND_RETURN()
 
 CONTAINS
-  INTEGER FUNCTION defaultmap_default()
+  INTEGER FUNCTION defaultmap_none()
     TYPE structure
        INTEGER :: s
        INTEGER,DIMENSION(N) :: SA
@@ -90,6 +90,6 @@ CONTAINS
     OMPVV_TEST_AND_SET_VERBOSE(errors, new_struct%SA(1) /= 10)
     OMPVV_TEST_AND_SET_VERBOSE(errors, new_struct%SA(2) /= 10)
 
-    defaultmap_default = errors
-  END FUNCTION defaultmap_default
-END PROGRAM test_target_defaultmap_default
+    defaultmap_none = errors
+  END FUNCTION defaultmap_none
+END PROGRAM test_target_defaultmap_none
