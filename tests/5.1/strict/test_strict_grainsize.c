@@ -29,12 +29,14 @@ int test_strict_grainsize() {
         sum += arr[i];
  }
 #pragma omp parallel shared(arr, newarr)
-  {   
+  {  
+#pragma single { 
 #pragma omp taskloop grainsize(1000)
   for (int i = 0; i < N; i++) {
                 newarr[i] = arr[i] + arr[i];
                 scalar_var += 7;
         }
+  }
   }
   int new_sum =0;
   for (int i = 0; i < N; i++) {
