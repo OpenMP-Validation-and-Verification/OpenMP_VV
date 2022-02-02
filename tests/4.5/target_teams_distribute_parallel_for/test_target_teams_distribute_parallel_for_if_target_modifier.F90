@@ -79,7 +79,7 @@ CONTAINS
       
       raiseWarning = 0
       DO i = 1, N
-         OMPVV_TEST_AND_SET(errors, a(i) .ne. (1 + (ATTEMPT_THRESHOLD)))
+         OMPVV_TEST_AND_SET(errors, a(i) .ne. (ATTEMPT_THRESHOLD))
          IF (warning(i) .ne. 0) THEN
             raiseWarning = 1
          END IF
