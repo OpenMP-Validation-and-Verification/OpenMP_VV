@@ -22,22 +22,20 @@ int test_strict_grainsize() {
   int sum = 0;
   int parallel_sum = 0; 
   for (int i=0; i<N; i++){
-        arr[i] = i;
+        arr[i] = 1;
         sum += arr[i];
  }
 #pragma omp parallel shared(arr, parallel_sum)
-  {  
 #pragma single 
-	  { 
-#pragma omp taskloop grainsize(1000)
+#pragma omp taskloop grainsize(strict:1000) 
   for (int i = 0; i < N; i++) {
   	parallel_sum += arr[i];
   }
-  }
-  }
-  OMPVV_TEST_AND_SET(errors, parallel_sum == sum);
+  printf("Sums are : %d and %d\n", parallel_sum, sum);
+  OMPVV_TEST_AND_SET(errors, parallel_sum != sum);
   OMPVV_INFOMSG_IF(sum == 0, "Array was not initialzed.");
   OMPVV_INFOMSG_IF(parallel_sum == sum, "Test passed.");
+  OMPVV_INFOMSG_IF(parallel_sum != sum, "Test did not pass.");
   return errors;
 }
 
