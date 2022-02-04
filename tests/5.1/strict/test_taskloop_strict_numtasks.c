@@ -1,4 +1,4 @@
-//===--- test_strict_grainsize.c -----------------------------------------------===//
+//===--- test_taskloop_strict_numtasks.c -----------------------------------------------===//
 //
 //  OpenMP API Version 5.1 Aug 2021
 //
@@ -17,7 +17,7 @@
 
 int errors;
 
-int test_strict_grainsize() {
+int test_taskloop_strict_numtasks() {
   int arr[N];
   int sum = 0;
   int parallel_sum = 0; 
@@ -27,7 +27,7 @@ int test_strict_grainsize() {
  }
 #pragma omp parallel  
 #pragma omp single
-#pragma omp taskloop reduction(+: parallel_sum) grainsize(strict:1000)
+#pragma omp taskloop reduction(+:parallel_sum) num_tasks(strict: 1000)
   for (int i = 0; i < N; i++) {
   	parallel_sum += arr[i];
   }
@@ -42,7 +42,6 @@ int test_strict_grainsize() {
 int main() {
   errors = 0;
   OMPVV_TEST_OFFLOADING;
-  OMPVV_TEST_AND_SET_VERBOSE(errors, test_strict_grainsize() != 0);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_taskloop_strict_numtasks() != 0);
   OMPVV_REPORT_AND_RETURN(errors);
 }
-
