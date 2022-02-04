@@ -25,7 +25,7 @@ int test_strict_grainsize() {
         arr[i] = 1;
         sum += arr[i];
  }
-#pragma omp parallel  
+#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE) 
 #pragma omp single
 #pragma omp taskloop reduction(+: parallel_sum) grainsize(strict:1000)
   for (int i = 0; i < N; i++) {
