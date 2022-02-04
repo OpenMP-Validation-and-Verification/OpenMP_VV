@@ -96,8 +96,8 @@ CONTAINS
          warning(i) = 0
       END DO
  
-      DO attempt = 1, NUM_ATTEMPTS - 1
-         !$omp target teams distribute parallel do if(attempt .ge. ATTEMPT_THRESHOLD) &
+      DO attempt = 1, NUM_ATTEMPTS 
+         !$omp target teams distribute parallel do if(attempt .gt. ATTEMPT_THRESHOLD) &
          !$omp& map(tofrom: a, warning) num_threads(OMPVV_NUM_THREADS_DEVICE)
          DO i = 1, N
             IF (omp_is_initial_device() .eqv. .TRUE.) THEN
@@ -106,7 +106,7 @@ CONTAINS
                ELSE
                   a(i) = a(i) + 0
                END IF
-               IF (attempt .ge. ATTEMPT_THRESHOLD) THEN
+               IF (attempt .gt. ATTEMPT_THRESHOLD) THEN
                   a(i) = a(i) + 10
                ELSE
                   a(i) = a(i) + 0
@@ -130,7 +130,6 @@ CONTAINS
             raiseWarning = 1
          END IF
       END DO
-
 
       OMPVV_WARNING_IF(raiseWarning .ne. 0 , "The number of threads was 1 even though we expected it to be more than 1. Not a compliance error in the specs")
 
