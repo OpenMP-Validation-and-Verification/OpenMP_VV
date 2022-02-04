@@ -25,15 +25,15 @@ int test_strict_grainsize() {
         arr[i] = 1;
         sum += arr[i];
  }
-#pragma omp parallel shared(arr, parallel_sum)
-#pragma single 
-#pragma omp taskloop grainsize(strict:1000) 
+#pragma omp parallel  
+#pragma omp single
+#pragma omp taskloop grainsize(strict:1000)
   for (int i = 0; i < N; i++) {
   	parallel_sum += arr[i];
   }
-  printf("Sums are : %d and %d\n", parallel_sum, sum);
   OMPVV_TEST_AND_SET(errors, parallel_sum != sum);
-  OMPVV_INFOMSG_IF(sum == 0, "Array was not initialzed.");
+  OMPVV_INFOMSG_IF(sum == 0, "Array was not initialized.");
+  OMPVV_INFOMSG_IF(parallel_sum == 0, "Data sharing of parallel_sum was wrong.");
   OMPVV_INFOMSG_IF(parallel_sum == sum, "Test passed.");
   OMPVV_INFOMSG_IF(parallel_sum != sum, "Test did not pass.");
   return errors;
