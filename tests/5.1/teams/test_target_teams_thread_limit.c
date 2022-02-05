@@ -28,7 +28,10 @@ int main() {
 	{
 		#pragma omp teams num_teams(OMPVV_NUM_TEAMS_DEVICE)
 		{
-			num_teams = omp_get_num_teams();
+			if (omp_get_team_num() == 0) {
+				num_teams = omp_get_num_teams();
+			}
+			
 			for (int i = 0; i < omp_get_num_threads(); i++) {
 				shared += 1;
 			}
