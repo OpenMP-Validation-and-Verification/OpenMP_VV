@@ -57,13 +57,13 @@ CONTAINS
       END DO
 
       DO attempt = 1, NUM_ATTEMPTS
-         !$omp target teams distribute parallel do if(target: attempt >= ATTEMPT_THRESHOLD)&
+         !$omp target teams distribute parallel do if(target: attempt .gt. ATTEMPT_THRESHOLD)&
          !$omp& map (tofrom: a) num_threads(OMPVV_NUM_THREADS_DEVICE)
             DO i = 1, N
                IF (omp_get_num_threads() .eq. 1) THEN
                   warning(i) = warning(i) + 1
                END IF
-               IF (attempt .ge. ATTEMPT_THRESHOLD) THEN
+               IF (attempt .gt. ATTEMPT_THRESHOLD) THEN
                   IF ((isOffloading .eqv. .TRUE.) .and. (omp_is_initial_device() .eqv. .true.)) THEN
                      a(i) = a(i) + 10
                   END IF
@@ -79,7 +79,7 @@ CONTAINS
       
       raiseWarning = 0
       DO i = 1, N
-         OMPVV_TEST_AND_SET(errors, a(i) .ne. (ATTEMPT_THRESHOLD))
+         OMPVV_TEST_AND_SET(errors, a(i) .ne. 1 + (ATTEMPT_THRESHOLD))
          IF (warning(i) .ne. 0) THEN
             raiseWarning = 1
          END IF
