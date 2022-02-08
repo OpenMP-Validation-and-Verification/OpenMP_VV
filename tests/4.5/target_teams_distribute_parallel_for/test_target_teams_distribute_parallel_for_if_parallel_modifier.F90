@@ -42,7 +42,6 @@ CONTAINS
       INTEGER, DIMENSION(N) :: init_num_threads_dev, init_num_threads_host
 
       OMPVV_TEST_AND_SET_OFFLOADING(isOffloading)
-      OMPVV_WARNING_IF(isOffloading .eqv. .FALSE. , "With offloading off, it is not possible to test if code executes on parallel or target")
  
       ! Initialize init_num_threads_dev and init_num_threads_host arrays
       DO i = 1, N
@@ -98,14 +97,14 @@ CONTAINS
       END DO
 
       DO attempt = 1, NUM_ATTEMPTS
-         !$omp target teams distribute parallel do if(parallel: attempt .ge. ATTEMPT_THRESHOLD) &
+         !$omp target teams distribute parallel do if(parallel: attempt .gt. ATTEMPT_THRESHOLD) &
          !$omp& map(tofrom: a, warning) num_threads(OMPVV_NUM_THREADS_DEVICE)
          DO i = 1, N
             IF (omp_is_initial_device() .eqv. .TRUE.) THEN
                a(i) = a(i) + 10 ! This +10 should not happen
             END IF
             
-            IF (attempt .ge. ATTEMPT_THRESHOLD) THEN
+            IF (attempt .gt. ATTEMPT_THRESHOLD) THEN
                IF (omp_get_num_threads() .eq. 1) THEN
                   warning(i) = warning(i) + 1
                END IF
@@ -121,7 +120,7 @@ CONTAINS
 
       raiseWarning = 0
       DO i = 1, N
-         OMPVV_TEST_AND_SET(errors, a(i) .ne. ATTEMPT_THRESHOLD - 1)
+         OMPVV_TEST_AND_SET(errors, a(i) .ne. ATTEMPT_THRESHOLD)
          IF (warning(i) .ne. 0) THEN
             raiseWarning = raiseWarning + 1
          END IF
