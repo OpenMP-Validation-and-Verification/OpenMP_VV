@@ -24,6 +24,8 @@ int main() {
 	int shared = 0;
 	int num_teams = 0;
 
+	OMPVV_TEST_OFFLOADING;
+
 	#pragma omp target thread_limit(4)
 	{
 		#pragma omp teams num_teams(OMPVV_NUM_TEAMS_DEVICE)
