@@ -21,7 +21,6 @@ int test_allocate() {
   int* x;
 
 #pragma omp allocate(x) 
-  x = (int *) omp_alloc(N*sizeof(int), omp_null_allocator);
 
 #pragma omp parallel for 
   for (int i = 0; i < N; i++) {
@@ -32,7 +31,6 @@ int test_allocate() {
     OMPVV_TEST_AND_SET_VERBOSE(errors, x[i] != i);
   }
 
-  omp_free(x,omp_default_mem_alloc);
 
   return errors;
 }
