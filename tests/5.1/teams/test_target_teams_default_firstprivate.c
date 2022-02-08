@@ -21,6 +21,9 @@
 #define N 1024
 
 int main() {
+
+	OMPVV_TEST_OFFLOADING;
+
 	int errors = 0;
 	int not_shared = 5;
 	int num_teams = 0; 
