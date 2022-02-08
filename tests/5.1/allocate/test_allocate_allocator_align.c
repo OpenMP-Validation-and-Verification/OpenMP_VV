@@ -21,11 +21,10 @@
 int test_allocate_allocator_align() {
   int errors = 0;
 
-  int* x;
+  int x[N];
 
 #pragma omp allocate(x) allocator(omp_default_mem_alloc) align(64)
 
-  x = (int *) omp_alloc(N*sizeof(int), omp_default_mem_alloc);
 
 #pragma omp target map(from:x[:N])
 {	
