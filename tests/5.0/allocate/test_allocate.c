@@ -18,7 +18,7 @@
 
 int test_allocate() {
   int errors = 0;
-  int* x;
+  int x[N];
 
 #pragma omp allocate(x) 
 
