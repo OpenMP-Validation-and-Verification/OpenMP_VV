@@ -28,7 +28,7 @@ int test_default_firstprivate_task(){
 		sum += i;
 	}
 
-	#pragma omp task
+	#pragma omp task default(firstprivate)
 	{
 		test_num += 1;
 		for (int i=0; i<N; i++){
