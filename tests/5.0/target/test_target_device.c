@@ -13,7 +13,7 @@
 #include <omp.h>
 #include "ompvv.h"
 
-#define N 1028
+#define N 1024
 
 // Required for 'device(ancestor: 1)
 #pragma omp requires reverse_offload
