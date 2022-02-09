@@ -1,4 +1,4 @@
-//===------ test_allocate_allocators.c --------------------------------------===//
+//===------ test_target_allocate.c --------------------------------------===//
 //
 // OpenMP API Version 5.0 Nov 2018
 //
