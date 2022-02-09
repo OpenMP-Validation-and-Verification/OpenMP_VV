@@ -47,10 +47,8 @@ int test_default_firstprivate_task(){
 	}
 
 	OMPVV_TEST_AND_SET(errors, test_num != 1);
-	OMPVV_INFOMSG_IF(test_num == 0, "Scalar was not initialized in parallel region & was not updated");
 	OMPVV_INFOMSG_IF(test_num == 2, "Scalar was not firstprivate, changes made in task affected original copy");
 	OMPVV_TEST_AND_SET(errors, sum != new_sum);
-	OMPVV_INFOMSG_IF(new_sum == 0, "Array was not initialized in parallel region properly");
 	OMPVV_INFOMSG_IF(new_sum == wrong_sum, "Array was not firstprivate, changes mae in task affected original copy");
 	return errors;
 }
