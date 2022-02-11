@@ -23,26 +23,47 @@ int main() {
 	int errors = 0;
 	int shared = 0;
 	int num_teams = 0;
+	int num_threads = 0;
 
 	OMPVV_TEST_OFFLOADING;
 
-	#pragma omp target thread_limit(4)
+	#pragma omp target map(tofrom:num_teams,num_threads,shared) //thread_limit(4)
 	{
-		#pragma omp teams num_teams(OMPVV_NUM_TEAMS_DEVICE)
+		#pragma omp teams thread_limit(8) num_teams(OMPVV_NUM_TEAMS_DEVICE)
 		{
+
+			#pragma omp parallel
+			{
+			for (int i = 0; i < omp_get_num_teams(); i++) {
+				if (omp_get_team_num() == i) {
+					#pragma omp atomic write
+					num_threads = omp_get_num_threads();	
+				}
+			}
+				
 			if (omp_get_team_num() == 0) {
 				num_teams = omp_get_num_teams();
 			}
+
 			
 			for (int i = 0; i < omp_get_num_threads(); i++) {
-				shared += 1;
+				printf("%d\n", omp_get_thread_num());
+				#pragma omp atomic
+				shared++;
 			}
+			}
+
+
 		}
+	
 	}
 
-	OMPVV_WARNING_IF(num_teams != 8, "The number of teams was unexpected, the test results are likely inconcuslive")
+	printf("Threads %d\n", num_threads);
+	printf("Shared %d\n", shared);
+	printf("Teams %d\n", num_teams);
+	OMPVV_WARNING_IF(num_teams != OMPVV_NUM_TEAMS_DEVICE, "The number of teams was unexpected, the test results are likely inconcuslive")
 	OMPVV_WARNING_IF(shared > 32, "The sum was higher than expected. This likely means thread_limit isn't capping the maximum threads created.");
-	OMPVV_TEST_AND_SET(errors, (shared != 32));
+	OMPVV_TEST_AND_SET(errors, (shared != (num_teams * 4)));
 
 	OMPVV_REPORT_AND_RETURN(errors);
 }
