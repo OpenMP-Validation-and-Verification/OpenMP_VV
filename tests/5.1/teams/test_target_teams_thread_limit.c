@@ -25,11 +25,13 @@ int main() {
 	int num_teams = 0;
 	int num_threads = 0;
 
+	int testing_thread_limit = OMPVV_NUM_THREADS_DEVICE/OMPVV_NUM_TEAMS_DEVICE;
+
 	OMPVV_TEST_OFFLOADING;
 
 	#pragma omp target map(tofrom:num_teams,num_threads,shared) //thread_limit(4)
 	{
-		#pragma omp teams thread_limit(8) num_teams(OMPVV_NUM_TEAMS_DEVICE)
+		#pragma omp teams thread_limit(testing_thread_limit) num_teams(OMPVV_NUM_TEAMS_DEVICE)
 		{
 
 			#pragma omp parallel
@@ -61,9 +63,10 @@ int main() {
 	printf("Threads %d\n", num_threads);
 	printf("Shared %d\n", shared);
 	printf("Teams %d\n", num_teams);
+	printf("Val %d\n", num_teams * testing_thread_limit);
 	OMPVV_WARNING_IF(num_teams != OMPVV_NUM_TEAMS_DEVICE, "The number of teams was unexpected, the test results are likely inconcuslive")
-	OMPVV_WARNING_IF(shared > 32, "The sum was higher than expected. This likely means thread_limit isn't capping the maximum threads created.");
-	OMPVV_TEST_AND_SET(errors, (shared != (num_teams * 4)));
+	OMPVV_WARNING_IF(shared > (num_teams * testing_thread_limit), "The sum was higher than expected. This likely means thread_limit isn't capping the maximum threads created.");
+	OMPVV_TEST_AND_SET(errors, (shared != (num_teams * testing_thread_limit)));
 
 	OMPVV_REPORT_AND_RETURN(errors);
 }
