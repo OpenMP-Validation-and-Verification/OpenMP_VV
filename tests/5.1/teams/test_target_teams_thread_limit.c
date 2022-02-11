@@ -36,23 +36,21 @@ int main() {
 
 			#pragma omp parallel
 			{
-			for (int i = 0; i < omp_get_num_teams(); i++) {
-				if (omp_get_team_num() == i) {
-					#pragma omp atomic write
-					num_threads = omp_get_num_threads();	
+				if (omp_get_team_num() == 0) {
+					num_teams = omp_get_num_teams();
 				}
-			}
-				
-			if (omp_get_team_num() == 0) {
-				num_teams = omp_get_num_teams();
-			}
 
-			
-			for (int i = 0; i < omp_get_num_threads(); i++) {
-				printf("%d\n", omp_get_thread_num());
-				#pragma omp atomic
-				shared++;
-			}
+				for (int i = 0; i < omp_get_num_teams(); i++) {
+					if (omp_get_team_num() == i) {
+						#pragma omp atomic write
+						num_threads = omp_get_num_threads();	
+					}
+				}
+
+				for (int i = 0; i < omp_get_num_threads(); i++) {
+					#pragma omp atomic
+					shared++;
+				}
 			}
 
 
@@ -60,13 +58,10 @@ int main() {
 	
 	}
 
-	printf("Threads %d\n", num_threads);
-	printf("Shared %d\n", shared);
-	printf("Teams %d\n", num_teams);
-	printf("Val %d\n", num_teams * testing_thread_limit);
 	OMPVV_WARNING_IF(num_teams != OMPVV_NUM_TEAMS_DEVICE, "The number of teams was unexpected, the test results are likely inconcuslive")
 	OMPVV_WARNING_IF(shared > (num_teams * testing_thread_limit), "The sum was higher than expected. This likely means thread_limit isn't capping the maximum threads created.");
 	OMPVV_TEST_AND_SET(errors, (shared != (num_teams * testing_thread_limit)));
+	OMPVV_TEST_AND_SET(errors, (num_threads != testing_thread_limit));
 
 	OMPVV_REPORT_AND_RETURN(errors);
 }
