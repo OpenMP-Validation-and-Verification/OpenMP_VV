@@ -17,9 +17,11 @@
 int errors;
 
 int test_omp_display_env(){
-	check = omp_display_env(1);
+	 omp_display_env(1);
+	 return 0;
 }
 
 int main(){
-	test_omp_display_env();
+	OMPVV_REPORT_AND_RETURN(test_omp_display_env());
+	return 0;
 }
