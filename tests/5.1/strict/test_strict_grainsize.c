@@ -41,7 +41,6 @@ int test_strict_grainsize() {
 
 int main() {
   errors = 0;
-  OMPVV_TEST_OFFLOADING;
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_strict_grainsize() != 0);
   OMPVV_REPORT_AND_RETURN(errors);
 }
