@@ -27,7 +27,7 @@ int test_taskloop_strict_numtasks() {
  }
 #pragma omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE)
 #pragma omp single
-#pragma omp taskloop num_tasks(100)
+#pragma omp taskloop num_tasks(strict: 100)
   for (int i = 0; i < N; i++) {
   	parallel_sum += arr[i];
   }
