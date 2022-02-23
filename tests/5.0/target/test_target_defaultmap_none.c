@@ -45,7 +45,7 @@ int test_defaultmap_with_none() {
 
    #pragma omp target defaultmap(none) map(tofrom: scalar, A, new_struct, ptr) 
    {
-      scalar = 17;    // Scalar firstprivate, value not returned
+      scalar = 17;    // Scalar variable, default is firstprivate
       A[0] = 5; A[1] = 5; // Aggregate array, default is tofrom
       new_struct.s = 10; new_struct.S[0] = 10; new_struct.S[1] = 10; // Aggregate structure, default is tofrom
       ptr = &A[0]; ptr[50] = 50; ptr[51] = 51; // Pointer, default is private

@@ -54,7 +54,7 @@ CONTAINS
     errors = 0
 
     !$omp target defaultmap(none) map(tofrom: scalar, A, B, new_struct, ptr)
-    scalar = 17 !scalar firstprivate, value not returned
+    scalar = 17 !scalar variable, default is firstprivate
     A(1) = 5; A(2) = 5 ! aggregate array, default is tofrom
     B(1) = 5; B(2) = 5 ! allocatable array, default is tofrom
     ! aggregate structure, default is tofrom
@@ -72,7 +72,7 @@ CONTAINS
     OMPVV_TEST_AND_SET_VERBOSE(errors, new_struct%SA(2) /= 10)
 
     !$omp target defaultmap(none) map(to: scalar, A, B, new_struct, ptr)
-    scalar = scalar + 10 !scalar firstprivate, value not returned
+    scalar = scalar + 10 ! scalar variable, default is firstprivate
     A(1) = A(1) + 10; A(2) = A(2) + 10 ! aggregate array, default is tofrom
     B(1) = B(1) + 10; B(2) = B(2) + 10 ! allocatable array, default is tofrom
     ! aggregate structure, default is tofrom
