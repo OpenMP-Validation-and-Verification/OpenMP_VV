@@ -16,6 +16,7 @@
 #include "ompvv.F90"
 
 #define N 10
+#define M 16
 
 PROGRAM test_target_imperfect_loop
   USE iso_fortran_env
@@ -31,14 +32,14 @@ PROGRAM test_target_imperfect_loop
 CONTAINS
   INTEGER FUNCTION target_imperfect_loop()
     INTEGER, DIMENSION(N) :: data1
-    INTEGER, DIMENSION(N,N) :: data2
+    INTEGER, DIMENSION(N,M) :: data2
     INTEGER :: errors, i, j
 
     errors = 0
 
     DO i = 1, N
        data1(i) = 0
-       DO j = 1, N
+       DO j = 1, M
           data2(i,j) = 0
        END DO
     END DO
@@ -47,7 +48,7 @@ CONTAINS
     !$omp parallel do collapse(2)
     DO i = 1, N
        data1(i) = data1(i) + i
-       DO j = 1, N
+       DO j = 1, M
           data2(i,j) = data2(i,j) + i + j
        END DO
     END DO
@@ -56,9 +57,9 @@ CONTAINS
 
     DO i = 1, N
        OMPVV_TEST_AND_SET(errors, data1(i) .lt. i)
-       OMPVV_TEST_AND_SET(errors, data1(i) .gt. i * N)
-       DO j = 1, N
-          OMPVV_TEST_AND_SET(errors, data2(i,j) .ne. i * j)
+       OMPVV_TEST_AND_SET(errors, data1(i) .gt. i * M)
+       DO j = 1, M
+          OMPVV_TEST_AND_SET(errors, data2(i,j) .ne. i + j)
        END DO
     END DO
 
