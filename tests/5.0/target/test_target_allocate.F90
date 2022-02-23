@@ -35,7 +35,7 @@ CONTAINS
     END DO
 
 
-    !$omp target allocate(x) firstprivate(x) map(from: device_result)
+    !$omp target allocate(omp_default_mem_alloc:x) firstprivate(x) map(from: device_result)
     DO i = 1, N
        x = x + i
     END DO

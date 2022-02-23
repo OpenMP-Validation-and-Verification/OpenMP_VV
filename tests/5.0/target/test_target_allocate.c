@@ -24,7 +24,7 @@ int test_target_allocate() {
       host_result += i;
    }
    
-   #pragma omp target allocate(x) firstprivate(x) map(from: device_result)
+   #pragma omp target allocate(omp_default_mem_alloc:x) firstprivate(x) map(from: device_result)
    {
       for (int i = 0; i < N; i++) {
          x += i;
