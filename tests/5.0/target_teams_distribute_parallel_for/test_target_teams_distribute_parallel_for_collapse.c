@@ -1,4 +1,4 @@
-//===---- test_target_teams_distribute_parallel_for_devices.c - combined consutrct -===//
+//===---- test_target_teams_distribute_parallel_for_collapse.c - combined consutrct -===//
 // 
 // OpenMP API Version 5.0 Nov 2018
 // 
@@ -13,7 +13,7 @@
 #define SIZE_M 12
 
 int test_target_teams_distribute_parallel_for_collapse() {
-  OMPVV_INFOMSG("test_target_teams_distribute_parallel_for_devices");
+  OMPVV_INFOMSG("test_target_teams_distribute_parallel_for_collapse");
   
   int a[SIZE_N][SIZE_M][SIZE_N][SIZE_M];
   int errors = 0;
