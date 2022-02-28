@@ -29,21 +29,17 @@ int metadirective() {
    #pragma omp target map(to:v1,v2) map(from:v3,teams)  
    {
       #pragma omp metadirective \
-                   when(   device={arch("nvptx")}: teams distribute parallel for) \
-                   default(                        nothing)
+                   when(   device={arch("nvptx")}: teams distribute for) \
+                   default( parallel for)
 
-	 teams = 
          for (int i = 0; i < N; i++) {
 	    #pragma omp atomic write
             v3[i] = v1[i] * v2[i];
          }
-   }
-   
-   for (int i = 0; i < N; i++) {
-      OMPVV_TEST_AND_SET_VERBOSE(errors, v3[i] != v1[i] * v2[i]);
+	 teams = omp_get_num_teams();
    }
 
-   OMPVV_TEST_AND_SET(errors, test != 1);
+   OMPVV_TEST_AND_SET(errors, teams != 0);
 
    return errors;
 }
