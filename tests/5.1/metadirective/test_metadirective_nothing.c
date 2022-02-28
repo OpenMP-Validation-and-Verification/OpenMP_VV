@@ -15,31 +15,22 @@
 #define N 1024
 
 int metadirective() {
-   
-   int v1[N], v2[N], v3[N];
 
    int errors = 0;
-   int teams = 0;
+   int base_threads = 0;
+   int threads = 0;
 
-   for(int i=0; i<N; i++) { 
-      v1[i] = (i+1); 
-      v2[i] = -(i+1); 
-   }
-
-   #pragma omp target map(to:v1,v2) map(from:v3,teams)  
+   #pragma omp target map(from:base_threads,threads)  
    {
-      #pragma omp metadirective \
-                   when(   device={arch("nvptx")}: teams distribute for) \
-                   default( parallel for)
-
-         for (int i = 0; i < N; i++) {
-	    #pragma omp atomic write
-            v3[i] = v1[i] * v2[i];
-         }
-	 teams = omp_get_num_teams();
+	 if (omp_get_thread_num() == 0) {
+	 	base_threads = omp_get_num_threads();
+      	 	
+		#pragma omp metadirective default( nothing )
+	 	threads = omp_get_num_threads();
+	 }
    }
 
-   OMPVV_TEST_AND_SET(errors, teams != 0);
+   OMPVV_TEST_AND_SET(errors, base_threads != threads);
 
    return errors;
 }
