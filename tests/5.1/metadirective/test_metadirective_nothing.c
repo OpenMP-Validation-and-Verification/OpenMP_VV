@@ -22,12 +22,12 @@ int metadirective() {
 
    #pragma omp target map(from:base_threads,threads)  
    {
-	 if (omp_get_thread_num() == 0) {
+	   	#pragma omp atomic write
 	 	base_threads = omp_get_num_threads();
       	 	
 		#pragma omp metadirective default( nothing )
-	 	threads = omp_get_num_threads();
-	 }
+		#pragma omp atomic write
+		threads = omp_get_num_threads();
    }
 
    OMPVV_TEST_AND_SET(errors, base_threads != threads);
