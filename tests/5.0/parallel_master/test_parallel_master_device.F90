@@ -31,13 +31,16 @@ CONTAINS
     INTEGER, DIMENSION(N):: x, y, z
     INTEGER:: i
 
+    OMPVV_INFOMSG("test_parallel_master_device")
+
     DO i = 1, N
        x(i) = 1
        y(i) = i + 1
        z(i) = 2*(i + 1)
     END DO
 
-    !$omp parallel master num_threads(OMPVV_NUM_THREADS_HOST) shared(x, y, z, num_threads) 
+    !$omp target map(tofrom: x, num_threads) map(to: y, z)
+    !$omp parallel master num_threads(OMPVV_NUM_THREADS_DEVICE) shared(x, y, z, num_threads) 
     !$omp taskloop
     DO i = 1, N
        x(i) = x(i) + y(i) * z(i)
@@ -45,6 +48,7 @@ CONTAINS
     !$omp end taskloop
     num_threads = omp_get_num_threads()
     !$omp end parallel master
+    !$omp end target 
 
     DO i = 1, N
        OMPVV_TEST_AND_SET_VERBOSE(errors, x(i) .ne. 1 + y(i)*z(i))
