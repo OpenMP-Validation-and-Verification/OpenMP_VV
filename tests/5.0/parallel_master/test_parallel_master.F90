@@ -28,6 +28,8 @@ CONTAINS
     INTEGER, DIMENSION(N):: x, y, z
     INTEGER:: i
 
+    OMPVV_INFOMSG("test_parallel_master")
+
     DO i = 1, N
        x(i) = 1
        y(i) = i + 1
