@@ -15,8 +15,8 @@
 
 #define N 1024
 
-int test_parallel_master_taskloop() {
-  OMPVV_INFOMSG("test_parallel_master_taskloop");
+int test_parallel_master_taskloop_simd_device() {
+  OMPVV_INFOMSG("test_parallel_master_taskloop_simd_device");
   int errors = 0;
   int x[N];
   int y[N];
@@ -51,7 +51,7 @@ int main() {
 
   int errors = 0;
 
-  OMPVV_TEST_AND_SET_VERBOSE(errors, test_parallel_master_taskloop());
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_parallel_master_taskloop_simd_device());
 
   OMPVV_REPORT_AND_RETURN(errors);
 }
