@@ -2,13 +2,12 @@
 !
 ! OpenMP API Version 5.0 Nov 2018
 !
-!  This test seeks to ensure that target update with motion-clause "to"
-!  can properly map data to the device by specifying a user-defined
-!  mapper. Additionally, the test checks a new addition to target update
-!  in OpenMP 5.0 that states "List items in the to or from clauses may
-!  include array sections with stride expressions."
+! This test seeks to ensure that target update with motion-clause "from" can properly
+! map data from the device by specifying a user-defined mapper. Additionally, the test
+! checks a new addition to target update in OpenMP 5.0 that states "List items in the
+! to or from clauses may include array sections with stride expressions." 
 !
-!  Adopted from OpenMP 5.0 Example target_mapper.1.F90
+!  Adopted from OpenMP 5.0 Example target_mapper.1.c
 !===-----------------------------------------------------------------------===//
 
 #include "ompvv.F90"
