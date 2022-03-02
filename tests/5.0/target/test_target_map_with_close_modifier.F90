@@ -45,21 +45,21 @@ CONTAINS
     END DO
 
     !$omp target map(close,tofrom : scalar, a, member)
-    scalar = 25
-    member%var = 16
+    scalar = scalar + 25
+    member%var = member%var + 16
     DO i = 1, N
-       a(i) = i * 2
-       member%b(i) = i * 2
+       a(i) = a(i) + i * 2
+       member%b(i) = member%b(i) + i * 2
     END DO
     !$omp end target
 
     DO i = 1, N
-       OMPVV_TEST_AND_SET(errors, a(i) .ne. i * 2)
-       OMPVV_TEST_AND_SET(errors, member%b(i) .ne. i * 2)
+       OMPVV_TEST_AND_SET(errors, a(i) .ne. i * 3)
+       OMPVV_TEST_AND_SET(errors, member%b(i) .ne. i * 3)
     END DO
 
-    OMPVV_TEST_AND_SET(errors, scalar .ne. 25)
-    OMPVV_TEST_AND_SET(errors, member%var .ne. 16)
+    OMPVV_TEST_AND_SET(errors, scalar .ne. 44)
+    OMPVV_TEST_AND_SET(errors, member%var .ne. 17)
 
     test_close_modifier = errors
   END FUNCTION test_close_modifier

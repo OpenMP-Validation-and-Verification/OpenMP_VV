@@ -37,22 +37,22 @@ int test_close_modifier() {
 
 #pragma omp target map (close, tofrom: scalar, a, member) 
   {
-    scalar = 25;
-    member.var = 16;
+    scalar += 25;
+    member.var += 16;
     
     for (i = 0; i < N; i++) {
-      a[i] = i*2;
-      member.b[i] = i*2;
+      a[i] += i*2;
+      member.b[i] += i*2;
     }
   }
 
   for (i = 0; i < N; i++) {
-    OMPVV_TEST_AND_SET(errors, a[i] != i*2);
-    OMPVV_TEST_AND_SET(errors, member.b[i] != i*2);
+    OMPVV_TEST_AND_SET(errors, a[i] != i*3);
+    OMPVV_TEST_AND_SET(errors, member.b[i] != i*3);
   }
  
-  OMPVV_TEST_AND_SET(errors, scalar != 25);
-  OMPVV_TEST_AND_SET(errors, member.var != 16);
+  OMPVV_TEST_AND_SET(errors, scalar != 44);
+  OMPVV_TEST_AND_SET(errors, member.var != 17);
 
   return errors;  	 
 }
