@@ -27,10 +27,10 @@ PROGRAM test_target_in_reduction
   !$omp parallel master
   !$omp taskgroup task_reduction(+:sum)
   !$omp target in_reduction(+:sum)
-  compute_on_device(sum)
+  CALL compute_on_device(sum)
   !$omp end target
   !$omp task in_reduction(+:sum)
-  compute_on_host(sum)
+  CALL compute_on_host(sum)
   !$omp end task
   !$omp end taskgroup
   !$omp end parallel master 
