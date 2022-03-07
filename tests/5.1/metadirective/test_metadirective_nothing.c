@@ -25,7 +25,13 @@ int metadirective() {
 	   	#pragma omp atomic write
 	 	base_threads = omp_get_num_threads();
       	 	
-		#pragma omp metadirective default( nothing )
+		#pragma omp metadirective \
+                   when( device={arch("nvptx")}: nothing ) \
+		   default( nothing )
+		#pragma omp metadirective \
+		   when( implementation={vendor(nvidia)}: nothing) \
+	           default( nothing )	
+
 		#pragma omp atomic write
 		threads = omp_get_num_threads();
    }
