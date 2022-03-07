@@ -37,8 +37,6 @@ int test_allocate_allocator_align() {
     OMPVV_TEST_AND_SET_VERBOSE(errors, x[i] != i);
   }
 
-  omp_free(x, omp_default_mem_alloc);
-
   return errors;
 }
 
