@@ -78,6 +78,9 @@ PROGRAM test_target_enter_exit_data_depend
          
          !$omp taskwait
 
+         !$omp target exit data map(release: h_array) map(release: in_1_ptr)&
+         !$omp& map(release: in_2_ptr)
+
          OMPVV_TEST_AND_SET(errors, 2.0*N .ne. summation)
 
          test_async_between_task_target = errors
@@ -107,6 +110,8 @@ PROGRAM test_target_enter_exit_data_depend
 
          !$omp taskwait
            
+         !$omp target exit data map(release: val)
+
          !---checking results---!
          DO i = 1, N
             summation = summation + compute_array(i)
