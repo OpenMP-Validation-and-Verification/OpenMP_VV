@@ -41,10 +41,10 @@ CONTAINS
     !$omp master taskloop
     DO i = 1, N
        x(i) = x(i) + y(i) * z(i)
-       IF (omp_get_thread_num() .eq. 0) THEN
-          num_threads = omp_get_num_threads()
-       END IF
     END DO
+    IF (omp_get_thread_num() .eq. 0) THEN
+       num_threads = omp_get_num_threads()
+    END IF
     !$omp end master taskloop
     !$omp end parallel
 
