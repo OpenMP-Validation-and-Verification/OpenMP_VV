@@ -25,21 +25,17 @@ int test_task_nowait(){
 		test_arr[i] = i;
 		sum += i;
 	}
-	
-	#pragma omp parallel
+	#pragma omp task private(test_scaler)
 	{
-		#pragma omp taskwait nowait
-		{
-			test_scaler += 1;
-		}
-
-		#pragma omp taskwait nowait
-		{
-			for (int i=0; i<N; i++){
-				test_arr[i] = i;
-			}
+		test_scaler += 1;
+	}
+	#pragma omp task private(test_arr)
+	{
+		for (int i=0; i<N; i++){
+			test_arr[i] = i;
 		}
 	}
+	#pragma omp taskwait
 	int new_sum;
 	for (int i = 0; i < N; i++){
 		new_sum += test_arr[i];
