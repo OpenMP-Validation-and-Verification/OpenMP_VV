@@ -39,10 +39,10 @@ CONTAINS
     !$omp parallel master taskloop num_threads(OMPVV_NUM_THREADS_HOST) shared(x, y, z, num_threads) 
     DO i = 1, N
        x(i) = x(i) + y(i) * z(i)
+       IF (i .eq. 1) THEN
+          num_threads = omp_get_num_threads()
+       END IF
     END DO
-    IF (i .eq. 1) THEN
-       num_threads = omp_get_num_threads()
-    END IF
     !$omp end parallel master taskloop
 
     DO i = 1, N
