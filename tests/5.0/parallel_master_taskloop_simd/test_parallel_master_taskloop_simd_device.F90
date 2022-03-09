@@ -29,6 +29,7 @@ CONTAINS
     INTEGER:: errors = 0
     INTEGER, DIMENSION(N):: x, y, z
     INTEGER:: i
+    INTEGER:: num_threads = -1
 
     OMPVV_INFOMSG("test_parallel_master_taskloop_simd_device")
 
@@ -38,10 +39,13 @@ CONTAINS
        z(i) = 2*(i + 1)
     END DO
 
-    !$omp target map(tofrom: x) map(to: y, z)
-    !$omp parallel master taskloop simd num_threads(OMPVV_NUM_THREADS_DEVICE) shared(x, y, z) 
+    !$omp target map(tofrom: x, num_threads) map(to: y, z)
+    !$omp parallel master taskloop simd num_threads(OMPVV_NUM_THREADS_DEVICE) shared(x, y, z, num_threads) 
     DO i = 1, N
        x(i) = x(i) + y(i) * z(i)
+       IF (i .eq. 1) THEN
+          num_threads = omp_get_num_threads()
+       ENDIF
     END DO
     !$omp end parallel master taskloop simd
     !$omp end target
@@ -50,7 +54,9 @@ CONTAINS
        OMPVV_TEST_AND_SET_VERBOSE(errors, x(i) .ne. 1 + y(i)*z(i))
     END DO
 
-    OMPVV_INFOMSG("This test does not guarantee thread parallelism of the clause.")
+    OMPVV_WARNING_IF(num_threads .eq. 1, "Test ran with one thread, so parallelism of parallel master with taskloop can't be guaranteed.")
+    OMPVV_ERROR_IF(num_threads .lt. 1, "Test returned an invalid number of threads.")
+    OMPVV_INFOMSG("This test does not guarantee vector instructions were generated for the simd construct.")
 
     parallel_master_taskloop_simd_device = errors
   END FUNCTION parallel_master_taskloop_simd_device
