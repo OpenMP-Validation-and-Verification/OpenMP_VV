@@ -31,9 +31,9 @@ int test_task_default_private(){
 		old_sum += i;
 	}
 
-	#pragma target map(tofrom: test_num, test_arr, sum)
+	#pragma omp target map(tofrom: test_num, test_arr, sum)
 	{
-		#pragma omp task private(test_num, test_arr, sum)
+		#pragma omp task shared(test_num) private(test_arr, sum)
 		test_num += 1;
 		for (int i = 0; i<N; i++){
 			test_arr[i] = 1;
@@ -42,7 +42,7 @@ int test_task_default_private(){
 
 	}
 
-	int new_sum;
+	int new_sum = 0;
 	for (int i = 0; i<N; i++){
 		new_sum += test_arr[i];
 	}
@@ -52,7 +52,6 @@ int test_task_default_private(){
 	OMPVV_TEST_AND_SET_VERBOSE(errors, sum != new_sum);
         
 	OMPVV_INFOMSG_IF(new_sum == old_sum, "Array was not private, changes made inside task region were not kept");
-	printf("Hi");
 	return errors;
 
 }
