@@ -24,7 +24,7 @@ PROGRAM test_target_in_reduction
   total = 0
   errors = 0 
 
-OMPVV_TEST_OFFLOADING
+  OMPVV_TEST_OFFLOADING
 
   !$omp parallel master
   !$omp taskgroup task_reduction(+:sum)

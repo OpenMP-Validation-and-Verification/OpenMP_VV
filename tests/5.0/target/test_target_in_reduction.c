@@ -23,6 +23,8 @@ int main ()
 {
    int i, host_reduction_sum = 0, device_reduction_sum = 0;
    int sum = 0, total = 0, errors = 0;
+
+   OMPVV_TEST_OFFLOADING;
    
    #pragma omp parallel master
    #pragma omp taskgroup task_reduction(+:sum)
