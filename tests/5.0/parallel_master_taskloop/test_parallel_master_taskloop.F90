@@ -17,6 +17,8 @@ PROGRAM test_parallel_master_taskloop
   USE omp_lib
   implicit none
 
+  OMPVV_TEST_OFFLOADING
+
   OMPVV_TEST_VERBOSE(parallel_master_taskloop() .ne. 0)
 
   OMPVV_REPORT_AND_RETURN()
