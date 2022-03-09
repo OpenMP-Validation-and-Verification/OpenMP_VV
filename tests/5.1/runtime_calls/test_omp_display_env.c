@@ -17,7 +17,6 @@
 int errors;
 
 int test_omp_display_env(){
-#pragma omp target
 	omp_display_env(1);
 	return 0;
 }
