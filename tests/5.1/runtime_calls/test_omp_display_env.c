@@ -1,3 +1,5 @@
+//===-- test_omp_display_env.c --------------------------------------------===//
+//
 // OpenMP API Version 5.1 Aug 2021
 //
 // Tests the behavior of omp_display_env. This testshould print out the OpenMP
