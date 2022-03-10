@@ -112,7 +112,7 @@ OMPVV_MODULE_REQUIRES_LINE
     function clean_fn(fn)
       CHARACTER(len = *) :: fn
       CHARACTER(len = 400) :: clean_fn
-      INTEGER :: ln, fn_cut_point
+      INTEGER :: fn_cut_point
 
       ! Avoid unused variables warning
       fn_cut_point = SCAN(fn, "/", .TRUE.)
