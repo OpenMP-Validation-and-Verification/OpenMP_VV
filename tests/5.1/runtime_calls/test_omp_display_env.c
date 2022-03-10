@@ -2,7 +2,7 @@
 //
 // OpenMP API Version 5.1 Aug 2021
 //
-// Tests the behavior of omp_display_env. This testshould print out the OpenMP
+// Tests the behavior of omp_display_env. This test should print out the OpenMP
 // version number and the initial values of the ICV's associated with the
 // environment variables
 //
