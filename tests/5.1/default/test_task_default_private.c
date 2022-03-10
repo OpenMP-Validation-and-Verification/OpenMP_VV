@@ -22,38 +22,22 @@
 
 int test_task_default_private(){
 	int errors = 0;
-	int test_num = 1;
-	int test_arr[N];
-	int sum = 0;
-	int old_sum = 0;
-	for (int i =0; i<N; i++){
-		test_arr[i] = i;
-		old_sum += i;
-	}
+	int test_num= 1;
+	int temp_errors1 = 0;
+	int *ptr1 = &test_num;
 
-	#pragma omp target map(tofrom: test_num, test_arr, sum)
+	#pragma omp task shared(temp_errors1) private(test_num)
 	{
-		#pragma omp task shared(test_num) private(test_arr, sum)
-		test_num += 1;
-		for (int i = 0; i<N; i++){
-			test_arr[i] = 1;
-			sum += test_arr[i];
-		}	
 
-	}
-
-	int new_sum = 0;
-	for (int i = 0; i<N; i++){
-		new_sum += test_arr[i];
-	}
-
-	OMPVV_TEST_AND_SET_VERBOSE(errors, test_num != 2);
-	OMPVV_INFOMSG_IF(test_num == 1, "Scalar was not private, changes made inside task region were not kept");
-	OMPVV_TEST_AND_SET_VERBOSE(errors, sum != new_sum);
-        
-	OMPVV_INFOMSG_IF(new_sum == old_sum, "Array was not private, changes made inside task region were not kept");
+		int test_num = 2;
+		if (*ptr1 != 1){
+			temp_errors1 = 1;
+		}
+		
+	}	
+	OMPVV_TEST_AND_SET_VERBOSE(errors, temp_errors1 != 0);
+	OMPVV_INFOMSG_IF(temp_errors1 == 1, "Original value was overridden");
 	return errors;
-
 }
 
 int main(){
