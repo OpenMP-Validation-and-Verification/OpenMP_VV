@@ -30,8 +30,10 @@ int main() {
 
 	#pragma omp target map(tofrom:num_teams,shared,errors) thread_limit(testing_thread_limit)
 	{
-		#pragma omp teams distribute parallel num_teams(OMPVV_NUM_TEAMS_DEVICE)
+		#pragma omp teams distribute num_teams(OMPVV_NUM_TEAMS_DEVICE)
 		{
+			#pragma omp parallel
+			{
 
 				if (omp_get_team_num() == 0 && omp_get_thread_num() == 0) {
 					num_teams = omp_get_num_teams();
@@ -55,6 +57,8 @@ int main() {
 					#pragma omp atomic
 					shared++;
 				}
+
+			}
 
 		}
 	
