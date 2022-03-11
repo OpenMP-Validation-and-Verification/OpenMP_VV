@@ -3,7 +3,8 @@
 // OpenMP API Version 5.0 Nov 2018
 // 
 // Testing loop collapse with multiple loops. Trying to mimic lsms kernel.
-//===-------------------------------------------------------------------------------===//
+//
+//===--------------------------------------------------------------------------------===//
 
 #include <stdio.h>
 #include <omp.h>
@@ -18,7 +19,6 @@ int test_target_teams_distribute_parallel_for_collapse() {
   int a[SIZE_N][SIZE_M][SIZE_N][SIZE_M];
   int errors = 0;
   int i,j,k,l;
-
 
   // a array initialization
   for (i = 0; i < SIZE_N; i++) {
@@ -48,7 +48,6 @@ int test_target_teams_distribute_parallel_for_collapse() {
         for (l = 0; l < SIZE_M; l++) {
           int temp = 1+ i + 2*j + 3*k + 4*l;
           OMPVV_TEST_AND_SET(errors, a[i][j][k][l] != temp);
-          //printf("Expected:%d, found:%d\n",temp, a[i][j][k][l]);
         }
       }
     }
