@@ -105,7 +105,7 @@ module ompvv_lib
   use iso_fortran_env
   implicit none
 OMPVV_MODULE_REQUIRES_LINE
-    LOGICAL, PRIVATE :: ompvv_isHost
+    LOGICAL, PRIVATE :: ompvv_isHost = .true.
     INTEGER, PRIVATE :: ompvv_errors = 0
     LOGICAL, PRIVATE :: ompvv_sharedEnv
   contains
