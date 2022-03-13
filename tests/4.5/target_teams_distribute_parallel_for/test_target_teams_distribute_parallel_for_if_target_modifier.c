@@ -11,10 +11,10 @@
 //
 // The if has a directive-name-modifier that specifies to which directive the 
 // if applies to (either both directives, to the target or to the parallel). 
-// we create three test, one for no directive, another one for the target directive
-// and another one for the parallel directive 
+// We have three tests: one for no directive, another for the target directive
+// and another for the parallel directive 
 //
-//===----------------------------------------------------------------------===//
+//===------------------------------------------------------------------------===//
 
 #include <omp.h>
 #include "ompvv.h"
@@ -53,7 +53,7 @@ int test_target_teams_distribute_if_target_modifier() {
   }
 
   // We iterate NUM_ATTEMPTS times. When the iteration value is >= ATTEMPT_THRESHOLD the 
-  // execution of the target region should happen in the devie, and the number of threads
+  // execution of the target region should happen in the device, and the number of threads
   // is expected to be greater than 1 (although if it is not, this is not an error, just warning)
   // If the iteration variable attempt  < ATTEMPT_THRESHOLD, then the if condition evaluates to false, 
   // and hence the execution should occur in the host, while the number of threads should not change
@@ -83,7 +83,6 @@ int test_target_teams_distribute_if_target_modifier() {
 
   OMPVV_WARNING_IF(raiseWarning != 0, "The number of threads was 1 even though we expected it to be more than 1. Not a compliance error in the specs");
   OMPVV_ERROR_IF(errors, "error in if(target: modifier). The execution was expected to occur in the device, but it happened in the host when if(false), or the other way around");
-
 
   return errors;
 }
