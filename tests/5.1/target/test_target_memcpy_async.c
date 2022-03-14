@@ -46,7 +46,7 @@ int test_target_memcpy_async() {
                                 t,          h,
                                 1,          *obj);
 
-    #pragma omp target is_device_ptr(mem_dev_cpy) device(t)
+    #pragma omp target is_device_ptr(mem_dev_cpy) device(t) depend(depobj: *obj)
     #pragma omp teams distribute parallel for
     for(i = 0;i<N;i++){
         mem_dev_cpy[i] = cos((double)i); // initialize data
