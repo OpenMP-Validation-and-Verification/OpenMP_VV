@@ -35,6 +35,7 @@ int test_target_has_device_addr() {
   }
   int *second_scalar_device_addr, *second_arr_device_addr;
   //check addresses are same on device region
+  #pragma omp target data use_device_addr(x, arr)
   #pragma omp target map(from:second_scalar_device_addr, second_arr_device_addr) has_device_addr(x, arr) 
   {
     second_scalar_device_addr = &x;
