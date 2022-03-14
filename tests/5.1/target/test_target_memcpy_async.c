@@ -53,7 +53,7 @@ int test_target_memcpy_async() {
         mem_dev_cpy[i] = cos((double)i); // initialize data
     }
     /* dst src */
-    omp_target_memcpy_async(mem_dev_cpy, mem, sizeof(double)*N,
+    omp_target_memcpy_async(mem, mem_dev_cpy, sizeof(double)*N,
                                 0,          0,
                                 h,          t,
                                 1,          *obj);
