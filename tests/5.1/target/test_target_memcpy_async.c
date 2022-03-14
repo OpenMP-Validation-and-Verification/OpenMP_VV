@@ -33,7 +33,7 @@ int test_target_memcpy_async() {
     OMPVV_TEST_AND_SET_VERBOSE(errors, omp_get_num_devices() < 1 || t < 0);
 
     mem = (double *)malloc( sizeof(double)*N);
-    mem_dev_cpy = (double *)omp_target_alloc( sizeof(double)*N, def_dev);
+    mem_dev_cpy = (double *)omp_target_alloc( sizeof(double)*N, t);
 
     OMPVV_TEST_AND_SET_VERBOSE(errors, mem_dev_cpy == NULL);
 
