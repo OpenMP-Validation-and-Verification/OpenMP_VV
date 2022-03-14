@@ -26,7 +26,6 @@ int test_target_memcpy_async() {
     errors = 0;
     double *mem;
     double *mem_dev_cpy;
-    *mem = 10; 
     h = omp_get_initial_device();
     t = omp_get_default_device();
 
