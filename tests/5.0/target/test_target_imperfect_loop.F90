@@ -3,7 +3,7 @@
 ! OpenMP API Version 5.0 Nov 2018
 !
 ! The test maps two arrays to the device and uses the collapse clause on the work 
-! sharing loop construct enclosing two loops. Accorging to 5.0 Spec if more than 
+! sharing loop construct enclosing two loops. According to 5.0 Spec if more than 
 ! one loop is associated with the worksharing-loop construct then the number of 
 ! times that any intervening code between any two associated loops will be executed 
 ! is unspecified but will be at least once per iteration of the loop enclosing the 
