@@ -41,6 +41,7 @@ CONTAINS
     TYPE(structure) :: new_struct !aggregate
     ALLOCATE(B(N))
 
+    ptr => null()
     scalar = 1
     new_struct%s = 1
 
@@ -66,7 +67,7 @@ CONTAINS
     OMPVV_TEST_AND_SET_VERBOSE(errors, A(1) /= 0 .OR. A(2) /= 0) 
     OMPVV_TEST_AND_SET_VERBOSE(errors, A(51) /= 0 .OR. A(52) /= 0)
     OMPVV_TEST_AND_SET_VERBOSE(errors, B(1) /= 0 .OR. B(2) /= 0) 
-    OMPVV_TEST_AND_SET_VERBOSE(errors, new_struct%s /= 0)
+    OMPVV_TEST_AND_SET_VERBOSE(errors, new_struct%s /= 1)
     OMPVV_TEST_AND_SET_VERBOSE(errors, new_struct%SA(1) /= 0)
     OMPVV_TEST_AND_SET_VERBOSE(errors, new_struct%SA(2) /= 0)
 
