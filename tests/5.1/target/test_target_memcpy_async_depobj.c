@@ -1,4 +1,4 @@
-//===--- test_target_memcpy_async.c -----------------------------------===//
+//===--- test_target_memcpy_async_depobj.c ----------------------------===//
 //
 //  OpenMP API Version 5.1 Aug 2021
 //
@@ -6,7 +6,7 @@
 //  This test utilizes the omp_target_memcpy_async construct to
 //  allocate memory on the device asynchronously. The construct
 //  uses 'obj' for dependency, so that memory is only copied once
-//  the x variable is changed
+//  the variable listed in the depend clause is changed.
 //
 ////===----------------------------------------------------------------------===//
 
@@ -20,7 +20,7 @@
 
 int errors, i;
 
-int test_target_memcpy_async() {
+int test_target_memcpy_async_depobj() {
 
     int h, t, i, x;
     errors = 0;
@@ -68,6 +68,6 @@ int test_target_memcpy_async() {
 int main() {
    errors = 0;
    OMPVV_TEST_OFFLOADING;
-   OMPVV_TEST_AND_SET_VERBOSE(errors, test_target_memcpy_async() != 0);
+   OMPVV_TEST_AND_SET_VERBOSE(errors, test_target_memcpy_async_depobj() != 0);
    OMPVV_REPORT_AND_RETURN(errors);
 }           
