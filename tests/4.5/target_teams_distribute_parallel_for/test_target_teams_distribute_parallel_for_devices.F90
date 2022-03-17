@@ -28,7 +28,7 @@ CONTAINS
    INTEGER FUNCTION target_teams_distribute_parallel_for_devices()
       INTEGER :: num_dev, errors, i, dev
       INTEGER, DIMENSION(N) :: a
-      LOGICAL, DIMENSION(N) :: isHost
+      LOGICAL, DIMENSION(0:N) :: isHost
       CHARACTER(len=400) :: numDeviceMsg, hostOrDevMsg
 
       errors = 0
@@ -43,11 +43,15 @@ CONTAINS
          a(i) = 1
       END DO
 
-      DO dev = 1, num_dev
+      DO dev = 0, num_dev
+         ! This testcase assumes that 'map' actually places 'a' into device memory
+         ! and is not a no op - not even with (unified) shared memory.
          !$omp target enter data map(to: a) device(dev)
       END DO
 
-      DO dev = 1, num_dev
+      DO dev = 0, num_dev
+      ! The implicit 'map(tofrom: a)' does not imply an update of 'a' as 'a'
+      ! is already present on the device.
       !$omp target teams distribute parallel do device(dev) map(tofrom: isHost)
             DO i = 1, N
                IF ((omp_get_team_num() .eq. 0) .and. (omp_get_thread_num() .eq. 0)) THEN
@@ -57,7 +61,9 @@ CONTAINS
             END DO
       END DO
 
-      DO dev = 1, num_dev
+      ! Check the host value (dev == num_dev) first in order to avoid that it
+      ! gets overridden by the device-memory versions (dev = 0 ... num_dev - 1)
+      DO dev = num_dev, 0, -1
          !$omp target exit data map(from: a) device(dev)
          IF (isHost(dev) .eqv. .true.) THEN 
             WRITE(hostOrDevMsg, *) "Device", dev, "ran on the host"
