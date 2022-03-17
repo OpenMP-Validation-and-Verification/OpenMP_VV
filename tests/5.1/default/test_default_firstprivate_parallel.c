@@ -23,7 +23,7 @@ int errors, i;
 int test_default_firstprivate_parallel() {
   int scalar_var = 5;
   int arr[N];
-  int sum;
+  int sum = 0;
   for (int i=0; i<N; i++){
 	arr[i] = i;
 	sum += arr[i];
@@ -35,8 +35,8 @@ int test_default_firstprivate_parallel() {
 		arr[i] = i+2;
   	}	
   }
-  int newsum;
-  int wrongsum;
+  int newsum = 0;
+  int wrongsum = 0;
   for(int i=0; i<N; i++){
 	newsum += arr[i];
 	wrongsum += i+2;

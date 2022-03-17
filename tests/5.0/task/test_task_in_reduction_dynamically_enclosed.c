@@ -18,7 +18,7 @@
 
 #define N 1024
 
-int sum;
+int sum = 0;
 
 void task_container(int i) {
 #pragma omp task in_reduction(+:sum)
