@@ -19,8 +19,6 @@
 
 int test_and() {
   char a[N];
-  char result;
-  char host_result;
       // The below calculation is meant to ensure about half the arrays we will
       // test will come out to true under the 'and' operator, and the rest false.
       // For the and operator, a test array that comes out true requires every

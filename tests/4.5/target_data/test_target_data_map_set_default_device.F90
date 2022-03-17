@@ -16,7 +16,7 @@
         USE omp_lib
         implicit none
         LOGICAL :: isOffloading
-        INTEGER :: i, j, num_dev
+        INTEGER :: num_dev
         CHARACTER(len=500) :: msgHelper
 
         OMPVV_TEST_AND_SET_OFFLOADING(isOffloading)
