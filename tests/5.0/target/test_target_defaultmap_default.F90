@@ -46,6 +46,7 @@ CONTAINS
     TYPE(structure) :: new_struct !aggregate
     ALLOCATE(B(N))
 
+    ptr => null()
     scalar = 1
     new_struct%s = 1
 
@@ -65,6 +66,7 @@ CONTAINS
     new_struct%s = 10; new_struct%SA(1) = 10; new_struct%SA(2) = 10
     ptr => A
     ptr(51) = 50; ptr(52) = 51
+    ptr => null()
     !$omp end target
 
     OMPVV_TEST_AND_SET_VERBOSE(errors, scalar /= 1)
