@@ -30,7 +30,7 @@ CONTAINS
     TYPE memberT
     INTEGER :: var
     INTEGER, DIMENSION(N) :: b
-    ENDTYPE memberT
+    END TYPE memberT
 
     TYPE(memberT) :: member
 
