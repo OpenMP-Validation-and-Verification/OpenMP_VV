@@ -31,7 +31,7 @@ int test_taskloop_strict_numtasks() {
   for (int i = 0; i < N; i++) {
   	parallel_sum += arr[i];
   }
-  OMPVV_TEST_AND_SET(errors, parallel_sum != sum);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, parallel_sum != sum);
   OMPVV_INFOMSG_IF(sum == 0, "Array was not initialized.");
   OMPVV_INFOMSG_IF(parallel_sum == 0, "Data sharing of parallel_sum was wrong.");
   OMPVV_INFOMSG_IF(parallel_sum == sum, "Test passed.");
