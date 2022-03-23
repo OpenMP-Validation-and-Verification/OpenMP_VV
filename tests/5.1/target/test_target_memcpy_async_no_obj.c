@@ -52,7 +52,7 @@ int test_target_memcpy_async_no_obj() {
     omp_target_memcpy_async(mem, mem_dev_cpy, sizeof(double)*N,
                                 0,          0,
                                 h,          t,
-                                0,          0);
+                                0,          NULL);
 
     #pragma omp taskwait
     
