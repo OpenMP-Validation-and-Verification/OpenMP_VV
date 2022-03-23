@@ -54,6 +54,8 @@ int test_target_memcpy_async_no_obj() {
                                 h,          t,
                                 0,          0);
 
+    #pragma omp taskwait
+    
     for(int i=0;i<N;i++){
         OMPVV_TEST_AND_SET(errors, mem[i]!=i*2);
     }
