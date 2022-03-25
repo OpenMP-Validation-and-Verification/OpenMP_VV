@@ -57,10 +57,10 @@ CONTAINS
        OMPVV_TEST_AND_SET_VERBOSE(errors, x(i) .ne. i)
     END DO
 
-    !$omp end target
-
     deallocate(x)
     call omp_destroy_allocator(x_alloc)
+
+    !$omp end target
 
     test_dynamic_allocators = errors
   END FUNCTION test_dynamic_allocators
