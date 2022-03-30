@@ -28,7 +28,7 @@ typedef struct myvec{
 
 void init( myvec_t *s )
 { 
-  for(int i = 0; i < s->len; i++) 
+  for(size_t i = 0; i < s->len; i++)
     s->data[i] = i; 
 }
 

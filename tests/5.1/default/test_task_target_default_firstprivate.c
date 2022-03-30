@@ -28,7 +28,7 @@ int test_default_firstprivate_task(){
 		sum += i;
 	}
 
-	#pragma target map(tofrom: test_num, test_arr, N)
+	#pragma omp target map(tofrom: test_num, test_arr)
 	{
 		#pragma omp task default(firstprivate)
 		{

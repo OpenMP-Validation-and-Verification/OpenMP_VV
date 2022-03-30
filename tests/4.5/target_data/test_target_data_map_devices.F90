@@ -16,7 +16,7 @@
         USE omp_lib
         implicit none
         LOGICAL :: isOffloading
-        INTEGER :: i, j, num_dev
+        INTEGER :: num_dev
         CHARACTER(len=500) :: msgHelper
 
         OMPVV_TEST_AND_SET_OFFLOADING(isOffloading)
@@ -42,7 +42,7 @@
         CONTAINS
           ! Testing set default device API
           INTEGER FUNCTION test_set_default_device()
-            INTEGER :: errors, devData, devComp, def_dev
+            INTEGER :: devData, devComp, def_dev
             INTEGER :: errors_bf, errors_af
             INTEGER, dimension(N) :: anArray
 

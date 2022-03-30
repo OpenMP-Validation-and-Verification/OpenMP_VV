@@ -16,16 +16,13 @@
 #include <omp.h>
 #include "ompvv.h"
 
-#define FORMAT_STORE 80 
 #define BUFFER_STORE 80
 
 int main() {
 
-   int i, errors, n, thrd_num, max_req_store;
-   size_t nchars;
+   int i, n, errors, thrd_num;
+   size_t nchars, max_req_store;
 
-   char default_format[FORMAT_STORE];
-   char my_format[] = "host=%20H thrd_num=%0.4n binds_to=%A";
    char **buffer;
 
 

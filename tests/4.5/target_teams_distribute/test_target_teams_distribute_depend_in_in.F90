@@ -28,7 +28,7 @@ PROGRAM test_target_teams_distribute_depend
 CONTAINS
   INTEGER FUNCTION depend_in_in()
     INTEGER:: x, errors
-    LOGICAL:: invalid_found, async_found
+    LOGICAL:: async_found
     INTEGER,DIMENSION(N):: a, b, c, d
 
     async_found = .FALSE.

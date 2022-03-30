@@ -25,7 +25,6 @@ int test_task_affinity() {
   int errors = 0;
   int* A;
   int* B;
-  int t = omp_get_default_device();
 
   A = (int*) malloc(sizeof(int)*N);
   B = (int*) malloc(sizeof(int)*N);

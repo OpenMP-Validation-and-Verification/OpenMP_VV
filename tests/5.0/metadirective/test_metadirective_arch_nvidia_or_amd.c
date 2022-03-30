@@ -18,7 +18,7 @@ int errors = 0;
 int metadirective2() {
 
    int i, device_num, initial_device;
-   int a[N], total[N];
+   int a[N];
  
    for (int i = 0; i < N; i++) {
       a[i] = 0;  

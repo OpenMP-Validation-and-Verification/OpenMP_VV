@@ -47,7 +47,6 @@ private:
 
 
 int main() {
-  int i;
   int errors = 0;
 
   OMPVV_TEST_OFFLOADING;

@@ -24,7 +24,6 @@
 int test_motion_present() {
    
    int errors = 0;
-   int i;
 
    struct test_struct {
      int s; 

@@ -25,7 +25,6 @@ typedef struct node {
 
 void map_ll(node_t * head) {
   OMPVV_INFOMSG("Entering map_ll");
-  int i;
 
   node_t * temp = head;
   if (!temp) {

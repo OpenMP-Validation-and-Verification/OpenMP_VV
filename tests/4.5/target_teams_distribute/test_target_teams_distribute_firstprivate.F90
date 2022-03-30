@@ -78,7 +78,7 @@ CONTAINS
     test_firstprivate_private = errors
   END FUNCTION test_firstprivate_private
   INTEGER FUNCTION test_firstprivate_first()
-    INTEGER:: errors, x, p, privatized
+    INTEGER:: errors, x, privatized
     INTEGER,DIMENSION(N):: a, b, c, d, num_teams
     INTEGER,DIMENSION(10):: privatized_array
 

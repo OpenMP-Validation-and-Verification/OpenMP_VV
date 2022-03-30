@@ -22,7 +22,7 @@ void compute_on_host(int *);
 int main ()
 {
    int i, host_reduction_sum = 0, device_reduction_sum = 0;
-   int sum = 0, total = 0, errors = 0;
+   int sum = 0, errors = 0;
    
    #pragma omp parallel master
    #pragma omp taskgroup task_reduction(+:sum)
