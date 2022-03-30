@@ -30,8 +30,6 @@ PROGRAM test_target_teams_distribute_parallel_for_if_parallel_modifier
    USE omp_lib
    implicit none
 
-   ! Offloading is checked in checkPreconditions() function
-
    OMPVV_TEST_VERBOSE(target_teams_distribute_if_parallel_modifier() .ne. 0)
    OMPVV_REPORT_AND_RETURN()  
 
@@ -51,32 +49,35 @@ CONTAINS
 
       ! Get the init_num_threads for host and device, if it is 1 then parallel
       ! cannot be tested
-      !$omp target teams distribute parallel do
-      !num_threads(OMPVV_NUM_THREADS_DEVICE)
+      !$omp target teams distribute parallel do num_threads(OMPVV_NUM_THREADS_DEVICE)
       DO i = 1, N
-         init_num_threads_dev(i) = omp_get_num_threads()
+         IF (omp_get_thread_num() .eq. 0) THEN
+            init_num_threads_dev(i) = omp_get_num_threads()
+         END IF
       END DO
 
       !$omp parallel do num_threads(OMPVV_NUM_THREADS_DEVICE)
-      DO i = 1, N 
-         init_num_threads_host(i) = omp_get_num_threads()
+      DO i = 1, N
+         IF (omp_get_thread_num() .eq. 0) THEN
+            init_num_threads_host(i) = omp_get_num_threads()
+         END IF
       END DO
 
       raiseWarningDevice = 0
       raiseWarningHost = 0
 
       DO i = 1, N
-         IF (init_num_threads_dev(i) .gt. 1) THEN
+         IF (init_num_threads_dev(i) .eq. 1) THEN
             raiseWarningDevice = raiseWarningDevice + 1
          END IF
-         IF (init_num_threads_host(i) > 1) THEN
+         IF (init_num_threads_host(i) .eq. 1) THEN
             raiseWarningHost = raiseWarningHost + 1
          END IF
       END DO
 
-      OMPVV_WARNING_IF(raiseWarningDevice .eq. 0, "Initial number of threads on device was 1. It is not possible to test the if for the parallel directive")
+      OMPVV_WARNING_IF(raiseWarningDevice .ne. 0, "Initial number of threads on device was 1. It is not possible to test the if for the parallel directive")
  
-      OMPVV_WARNING_IF(raiseWarningHost .eq. 0, "Initial number of threads on host was 1. It is not possible to test the if for the parallel directive")
+      OMPVV_WARNING_IF(raiseWarningHost .ne. 0, "Initial number of threads on host was 1. It is not possible to test the if for the parallel directive")
 
    checkPreconditions = isOffloading
    END FUNCTION checkPreconditions
@@ -84,12 +85,13 @@ CONTAINS
    INTEGER FUNCTION target_teams_distribute_if_parallel_modifier()
       INTEGER, DIMENSION(N) :: a, warning
       INTEGER :: attempt, errors, i, raiseWarning 
- 
+      LOGICAL :: testOffload
+
+      testOffload = checkPreconditions() 
+
       attempt = 0
       errors = 0 
  
-      ! checkPreconditions -> turn into a subroutine or set to isOffloading if
-      ! that doesnt work
 
       DO i = 1, N
          a(i) = 0
@@ -129,7 +131,10 @@ CONTAINS
       OMPVV_WARNING_IF(raiseWarning .eq. (N * (NUM_ATTEMPTS - ATTEMPT_THRESHOLD)), "The number of threads was 1 when a number > 1 was expected. if(parallel:true). Not a compliance error in the specs")
 
       OMPVV_ERROR_IF(errors .ne. 0, "error in if(parallel: modifier). Possible causes are: the execution occurred in the host even though it should not affect the target region. The number of threads was > 1 when if(false).")
-
+ 
+      OMPVV_WARNING_IF(testOffload .neqv. .TRUE.," Offloading is not enabled for this test, behavior of this test cannot be
+verified without offloading enabled.")
+   
    target_teams_distribute_if_parallel_modifier = errors
    END FUNCTION target_teams_distribute_if_parallel_modifier   
    
