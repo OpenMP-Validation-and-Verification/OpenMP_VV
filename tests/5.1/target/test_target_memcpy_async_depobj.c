@@ -24,8 +24,8 @@ int test_target_memcpy_async_depobj() {
 
     int h, t, i, x;
     errors = 0;
-    double *mem;
-    double *mem_dev_cpy;
+    int *mem;
+    int *mem_dev_cpy;
     h = omp_get_initial_device();
     t = omp_get_default_device();
 
@@ -46,21 +46,25 @@ int test_target_memcpy_async_depobj() {
                                 t,          h,
                                 1,          *obj);
 
-    #pragma omp target is_device_ptr(mem_dev_cpy) device(t) depend(depobj: *obj)
+    #pragma omp taskwait depend(depobj: obj)
+    #pragma omp target is_device_ptr(mem_dev_cpy) map(tofrom: x) device(t) depend(depobj: *obj)
     #pragma omp teams distribute parallel for
     for(i = 0;i<N;i++){
-        mem_dev_cpy[i] = cos((double)i); // initialize data
+        mem_dev_cpy[i] = i*2; // initialize data
+        x = 5;
     }
+    OMPVV_TEST_AND_SET(errors, x!=5);
     /* dst src */
     omp_target_memcpy_async(mem, mem_dev_cpy, sizeof(double)*N,
                                 0,          0,
                                 h,          t,
                                 1,          *obj);
 
+    #pragma omp taskwait depend(depobj: obj)
     for(int i=0;i<N;i++){
-        OMPVV_TEST_AND_SET(errors, mem_dev_cpy[i]!=cos((double)i));
+        OMPVV_TEST_AND_SET(errors, mem_dev_cpy[i]!=i*2);
     }
-    omp_target_free(mem_dev_cpy, def_dev);
+    omp_target_free(mem_dev_cpy, t);
     #pragma omp depobj(obj) destroy // frees resource
     return errors;
 }
