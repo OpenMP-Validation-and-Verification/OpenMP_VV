@@ -16,12 +16,11 @@ PROGRAM test_target_in_reduction
   USE omp_lib
   IMPLICIT NONE 
   INTEGER :: i, host_reduction_sum, device_reduction_sum
-  INTEGER :: sum, total, errors
+  INTEGER :: sum, errors
 
   host_reduction_sum = 0
   device_reduction_sum = 0
   sum = 0
-  total = 0
   errors = 0 
 
   OMPVV_TEST_OFFLOADING
