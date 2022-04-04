@@ -31,7 +31,7 @@ CONTAINS
     REAL(8),DIMENSION(N):: randoms
     REAL(8):: false_margin
     LOGICAL:: result, host_result, tested_true, tested_false
-    INTEGER:: x, y, errors, itr_count
+    INTEGER:: x, errors, itr_count
     errors = 0
 
     tested_true = .FALSE.

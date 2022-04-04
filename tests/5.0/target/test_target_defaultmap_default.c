@@ -31,7 +31,7 @@ int test_defaultmap_with_default() {
    int scalar; // scalar 
    int A[N]; // aggregate 
    struct test_struct new_struct; // aggregate
-   int *ptr; // scalar, pointer 
+   int *ptr = NULL; // scalar, pointer
 
    scalar = 1; 
    new_struct.s = 0;

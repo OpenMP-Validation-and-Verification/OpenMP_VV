@@ -257,7 +257,7 @@
             INTEGER, DIMENSION(N) :: my1DArray2
             INTEGER, DIMENSION(N) :: my1DArray3
             INTEGER, DIMENSION(N) :: myTmpArray
-            INTEGER :: errors, testVal, i
+            INTEGER :: errors, testVal
             OMPVV_INFOMSG("test array sections 1D")
             errors = 0
 

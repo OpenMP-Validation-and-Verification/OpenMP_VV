@@ -85,7 +85,7 @@ CONTAINS
    INTEGER FUNCTION target_teams_distribute_if_no_modifier()
       INTEGER, DIMENSION(N) :: a, warning 
       LOGICAL :: isOffloading  
-      INTEGER :: errors, attempt, i, raiseWarning, tempsum 
+      INTEGER :: errors, attempt, i, raiseWarning
       errors = 0 
       attempt = 0
 

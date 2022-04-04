@@ -140,6 +140,6 @@ int main() {
         }
     }
 
-    OMPVV_REPORT_AND_RETURN(error_sum);
+    OMPVV_REPORT_AND_RETURN(error_sum != 0.0);
 }
 
