@@ -23,6 +23,7 @@ int test_target_device_ancestor() {
     int i, which_device;
     int a[N];
     int errors = 0; 
+    which_device = 0;
 
     for (int i = 0; i < N; i++) {
         a[i] = i;
@@ -34,7 +35,7 @@ int test_target_device_ancestor() {
 
     if (omp_get_num_devices() > 0) {
 
-        #pragma omp target device(ancestor: 1) map(tofrom: a, which_device) 
+        #pragma omp target device(ancestor: 1) map(tofrom: a) map(to: which_device) 
 	{
 	    for (int i = 0; i < N; i++) {
                 a[i] = a[i] + 2;
@@ -47,8 +48,8 @@ int test_target_device_ancestor() {
 	}
     }
 
-    OMPVV_ERROR_IF(which_device != 75, "Target region was executed on device. Due to ancestor device-modifier,"
-                                         "this region should execute on host");
+    OMPVV_ERROR_IF(which_device != 75, "Target region was executed on a target device. Due to ancestor device-modifier,"
+                                         "this region should execute on a host device");
 
     return errors;
 
@@ -65,6 +66,7 @@ int test_target_device_device_num() {
     }
 
     host_device_num = omp_get_device_num(); 
+    target_device_num = host_device_num;
 
     
     OMPVV_TEST_AND_SET(errors, omp_get_num_devices() <= 0);

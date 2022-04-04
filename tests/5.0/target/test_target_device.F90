@@ -32,6 +32,7 @@ CONTAINS
     INTEGER, DIMENSION(N) :: a
 
     errors = 0
+    which_device = 0
 
     DO i = 1, N
        a(i) = i
@@ -42,7 +43,7 @@ CONTAINS
 
     IF ( omp_get_num_devices() .gt. 0 ) THEN
 
-    !$omp target device(ancestor: 1) map(tofrom: a, which_device)
+    !$omp target device(ancestor: 1) map(tofrom: a) map(to: which_device)
     DO i = 1, N
        a(i) = a(i) + 2
     END DO
@@ -50,7 +51,8 @@ CONTAINS
     !$omp end target
     END IF
 
-    OMPVV_ERROR_IF(which_device /= 75, "Target region was executed on device. Due to ancestor device-modifier this region should execute on host")
+    OMPVV_ERROR_IF(which_device /= 75, "Target region was executed on a target device. Due to ancestor device-modifier this region
+should execute on a host device")
 
     target_device_ancestor = errors
   END FUNCTION target_device_ancestor
@@ -66,6 +68,7 @@ CONTAINS
     END DO
 
     host_device_num = omp_get_device_num()
+    target_device_num = host_device_num
 
     OMPVV_TEST_AND_SET(errors, omp_get_num_devices() .le. 0) 
     OMPVV_ERROR_IF(omp_get_num_devices() .le. 0, "Since no target devices were found, this test will be skipped.")
