@@ -41,7 +41,7 @@ int test_target_memcpy_async_no_obj() {
     omp_target_memcpy_async(mem_dev_cpy, mem, sizeof(double)*N,
                                 0,          0,
                                 t,          h,
-                                0,          0);
+                                0,          NULL);
 
     #pragma omp target is_device_ptr(mem_dev_cpy) device(t)
     #pragma omp teams distribute parallel for
