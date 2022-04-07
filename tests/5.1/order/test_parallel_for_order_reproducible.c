@@ -2,13 +2,11 @@
 //
 // OpenMP API Version 5.1 Nov 2020
 //
-// This test uses the thread_limit clause on the teams construct. Specifically
-// testing if a thread_limit from a above target construct properly carries
-// down to the nested teams construct, as if it were directly on the construct
-// as defined in the spec. The test validates that only the specified 
-// threads are created by summing a shared variable across all threads 
-// (and teams). If the threads are correctedly limited this should produce the 
-// expected value. Additional warnings are sent if specific issues occur.
+// This test checks that the order(reproducible) clause is properly handled.
+// Leverages a shared variable to force a proper execution order to get proper
+// results. Creates two arrays, one the correct method executed in order and
+// the second executed from within the parallel for order pragma. Fails if
+// the array values are not calculated in the proper order.
 //
 ////===----------------------------------------------------------------------===//
 
@@ -23,7 +21,7 @@ int main() {
 	int errors = 0;
 	int arr[N];
 	int correct[N];
-	int shared = 0;
+	int shared = 1;
 
 	for (int i = 0; i < N; i++) {
 		arr[i] = 0;
@@ -31,21 +29,20 @@ int main() {
 
 	for (int i = 0; i < N; i++) {
 		correct[i] = shared;
-		shared = i;
-		printf("Correct %d: %d, Shared: %d\n", i, correct[i], shared);
+		shared += i;
 	}
 
-	shared = 0;
+	shared = 1;
 
 	OMPVV_TEST_OFFLOADING;
 
 	#pragma omp target map(tofrom:arr,errors,correct,shared)
 	{
-		#pragma parallel for thread_limit(OMPVV_NUM_THREADS_DEVICE) //order(reproducible)
+		#pragma parallel for thread_limit(OMPVV_NUM_THREADS_DEVICE) shared(arr, shared) order(concurrent)
 		{
 			for (int i = 0; i < N; i++) {
 				arr[i] = shared;
-				shared = i;	
+				shared += i;	
 			}
 			
 			for (int i = 0; i < N; i++) {
