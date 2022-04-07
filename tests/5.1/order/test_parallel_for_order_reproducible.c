@@ -22,24 +22,39 @@
 int main() {
 	int errors = 0;
 	int arr[N];
+	int correct[N];
+	int shared = 0;
 
 	for (int i = 0; i < N; i++) {
-		arr[i] = i;
+		arr[i] = 0;
   	}
+
+	for (int i = 0; i < N; i++) {
+		correct[i] = shared;
+		shared = i;
+		printf("Correct %d: %d, Shared: %d\n", i, correct[i], shared);
+	}
+
+	shared = 0;
 
 	OMPVV_TEST_OFFLOADING;
 
-	#pragma omp target map(tofrom:arr,errors)
+	#pragma omp target map(tofrom:arr,errors,correct,shared)
 	{
 		#pragma parallel for thread_limit(OMPVV_NUM_THREADS_DEVICE) //order(reproducible)
-		for (int i = 0; i < N; i++) {
+		{
+			for (int i = 0; i < N; i++) {
+				arr[i] = shared;
+				shared = i;	
+			}
 			
+			for (int i = 0; i < N; i++) {
+				OMPVV_TEST_AND_SET(errors, arr[i] != correct[i]);
+			}
+
 		}
 	
 	}
-
-	OMPVV_WARNING_IF(1, "The number of teams was unexpected, the test results are likely inconcuslive")
-	OMPVV_TEST_AND_SET(errors, 1 == 2);
 
 	OMPVV_REPORT_AND_RETURN(errors);
 }
