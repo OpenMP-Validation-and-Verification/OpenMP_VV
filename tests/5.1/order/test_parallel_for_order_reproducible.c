@@ -36,11 +36,15 @@ int main() {
 
 	OMPVV_TEST_OFFLOADING;
 
-	#pragma omp target map(tofrom:arr,errors,correct,shared)
-	{
-		#pragma parallel for thread_limit(OMPVV_NUM_THREADS_DEVICE) shared(arr, shared) order(concurrent)
+	//#pragma omp target map(tofrom:arr,errors,correct,shared)
+	//{
+		printf("%d\n", omp_get_num_threads());
+		#pragma parallel for shared(arr, shared) order(concurrent) 
 		{
+			printf("%d\n", OMPVV_NUM_THREADS_DEVICE);
+			printf("%d\n", omp_get_num_threads());
 			for (int i = 0; i < N; i++) {
+				printf("%d", omp_get_thread_num());
 				arr[i] = shared;
 				shared += i;	
 			}
@@ -51,7 +55,7 @@ int main() {
 
 		}
 	
-	}
+	//}
 
 	OMPVV_REPORT_AND_RETURN(errors);
 }
