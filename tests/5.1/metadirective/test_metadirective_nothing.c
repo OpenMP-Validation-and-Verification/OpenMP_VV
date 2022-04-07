@@ -4,6 +4,10 @@
 // 
 // Test for nothing directive within metadirectives. Runs a variety of
 // metadirectives that check if the nothing directive is properly rendered.
+// Primarily tests based on the fact that no matter what 'when' clause is 
+// rendered it should result in nothing, and thus no additional pragma should
+// be created. Thus, the threads should remain unchanged through this process
+// and the compiler should handle it properly.
 //
 ////===---------------------------------------------------------------------===//
 
@@ -22,17 +26,17 @@ int metadirective() {
 
    #pragma omp target map(from:base_threads,threads)  
    {
-	   	#pragma omp atomic write
 	 	base_threads = omp_get_num_threads();
       	 	
 		#pragma omp metadirective \
-                   when( device={arch("nvptx")}: nothing ) \
+                   when( device={kind(nohost)}: nothing ) \
+		   when( device={arch("nvptx")}: nothing ) \
 		   default( nothing )
 		#pragma omp metadirective \
 		   when( implementation={vendor(nvidia)}: nothing) \
+		   when( device={kind(nohost)}: nothing) \
 	           default( nothing )	
 
-		#pragma omp atomic write
 		threads = omp_get_num_threads();
    }
 
