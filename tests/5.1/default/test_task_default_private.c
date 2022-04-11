@@ -24,13 +24,11 @@ int test_task_default_private(){
 	int errors = 0;
 	int test_num= 1;
 	int sum = 0;
-	int *ptr1 = &test_num;
-
+	
+	#pragma omp task shared(sum) default(private)
+	{
 	#pragma omp target map(tofrom: sum, test_num)
 	{
-	#pragma omp task shared(sum) private(test_num)
-	{
-
 		int test_num = 2;
 		sum += test_num;
 		
