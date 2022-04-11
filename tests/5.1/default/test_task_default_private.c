@@ -23,20 +23,21 @@
 int test_task_default_private(){
 	int errors = 0;
 	int test_num= 1;
-	int temp_errors1 = 0;
+	int sum = 0;
 	int *ptr1 = &test_num;
 
-	#pragma omp task shared(temp_errors1) private(test_num)
+	#pragma omp target map(tofrom: sum, test_num)
+	{
+	#pragma omp task shared(sum) private(test_num)
 	{
 
 		int test_num = 2;
-		if (*ptr1 != 1){
-			temp_errors1 = 1;
-		}
+		sum += test_num;
 		
+	}
 	}	
-	OMPVV_TEST_AND_SET_VERBOSE(errors, temp_errors1 != 0);
-	OMPVV_INFOMSG_IF(temp_errors1 == 1, "Original value was overridden");
+	OMPVV_TEST_AND_SET_VERBOSE(errors, sum != 2);
+	OMPVV_INFOMSG_IF(sum == 1, "Did not use variable delcared in task region");
 	return errors;
 }
 
