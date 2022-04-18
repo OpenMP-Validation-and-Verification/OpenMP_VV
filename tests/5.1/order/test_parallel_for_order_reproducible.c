@@ -19,43 +19,34 @@
 
 int main() {
 	int errors = 0;
-	int arr[N];
-	int correct[N];
-	int shared = 1;
+	int x[N];
+	int y[N];
 
 	for (int i = 0; i < N; i++) {
-		arr[i] = 0;
-  	}
-
-	for (int i = 0; i < N; i++) {
-		correct[i] = shared;
-		shared += i;
+		x[i] = 0;
+		y[i] = 0;
 	}
-
-	shared = 1;
 
 	OMPVV_TEST_OFFLOADING;
 
-	//#pragma omp target map(tofrom:arr,errors,correct,shared)
-	//{
-		printf("%d\n", omp_get_num_threads());
-		#pragma parallel for shared(arr, shared) order(concurrent) 
-		{
-			printf("%d\n", OMPVV_NUM_THREADS_DEVICE);
-			printf("%d\n", omp_get_num_threads());
-			for (int i = 0; i < N; i++) {
-				printf("%d", omp_get_thread_num());
-				arr[i] = shared;
-				shared += i;	
-			}
-			
-			for (int i = 0; i < N; i++) {
-				OMPVV_TEST_AND_SET(errors, arr[i] != correct[i]);
-			}
+	#pragma omp target map(tofrom: x,y)
+	{
 
-		}
-	
-	//}
+	#pragma omp parallel for order(concurrent)
+	for (int i = 0; i < N; i++) {
+		x[i] = omp_get_thread_num();	
+	}
+
+	#pragma omp parallel for order(concurrent)
+	for (int i = 0; i < N; i++) {
+                y[i] = omp_get_thread_num();
+        }
+
+	}
+
+	for (int i = 0; i < N; i++) {
+        	OMPVV_TEST_AND_SET(errors, x[i] != y[i]);
+       	}
 
 	OMPVV_REPORT_AND_RETURN(errors);
 }
