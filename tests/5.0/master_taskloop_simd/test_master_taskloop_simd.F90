@@ -56,6 +56,6 @@ CONTAINS
     OMPVV_ERROR_IF(num_threads .lt. 1, "Test returned an invalid number of threads.")
     OMPVV_INFOMSG("This test does not guarantee vector instructions were generated for the simd construct.")
 
-    master_taskloop_simd= errors
+    master_taskloop_simd = errors
   END FUNCTION master_taskloop_simd
 END PROGRAM test_master_taskloop_simd
