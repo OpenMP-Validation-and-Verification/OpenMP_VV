@@ -48,7 +48,7 @@ fi
 app=$1
 output=$(for ((idx=0; $idx < ${#env_data[*]}; idx=$((idx+2)))); do export "${env_data[$idx]}"="${env_data[$((idx+1))]}"; done; timeout 60s "$app" 2>&1)
 status=$?
-output=$(printf "$output" | uniq)
+output=$(printf '%s\n' "${output}" | uniq)
 
 if [ -z $2 ]; then
   report $(basename $app) $status

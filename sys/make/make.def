@@ -61,11 +61,28 @@ endef
 #---------------------------------------------------------------------------
 # C compilers
 #---------------------------------------------------------------------------
-CCOMPILERS?="cc, clang, gcc, xlc, icx, nvc"
+CCOMPILERS?="amdclang, cc, clang, gcc, xlc, icx, nvc"
 C_VERSION?= echo "version unknown"
 CC?=none
 CPP?=none
 FC?=none
+
+ifeq ($(CC), amdclang)
+    ifeq ($(OMP_VERSION), 5.0)
+      COFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908 -fopenmp-version=50
+    else ifeq ($(OMP_VERSION), 5.1)
+      COFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908 -fopenmp-version=51
+    else
+      COFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908
+    endif
+    C_NO_OFFLOADING =
+    CFLAGS += $(COFFLOADING)
+    #Adding this to fix problem with math.h
+    CFLAGS +=  -D__NO_MATH_INLINES -U__SSE2_MATH__ -U__SSE_MATH__
+    CLINK = clang
+    CLINKFLAGS += -lm -O3 -fopenmp $(COFFLOADING)
+    C_VERSION = echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") amdclang --version | head -n 1)"
+endif
 
 # NVIDIA compiler
 ifeq ($(CC), nvc)
@@ -195,8 +212,25 @@ endif
 #---------------------------------------------------------------------------
 # C++ compilers
 #---------------------------------------------------------------------------
-CXXCOMPILERS?="CC, clang++, g++, xlc++, icpx, nvc++"
+CXXCOMPILERS?="amdclang++, CC, clang++, g++, xlc++, icpx, nvc++"
 CXX_VERSION?= echo "version unknown"
+
+ifeq ($(CXX), amdclang++)
+    ifeq ($(OMP_VERSION), 5.0)
+      CXXOFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908 -fopenmp-version=50
+    else ifeq ($(OMP_VERSION), 5.1)
+      CXXOFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908 -fopenmp-version=51
+    else
+      CXXOFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908 
+    endif
+    CXX_NO_OFFLOADING =
+    CXXFLAGS += -std=c++11 -lm -O3 -fopenmp $(CXXOFFLOADING)
+    #Adding this to fix problem with math.h
+    CXXFLAGS +=  -D__NO_MATH_INLINES -U__SSE2_MATH__ -U__SSE_MATH__
+    CXXLINK = amdclang++
+    CXXLINKFLAGS += -lm -O3 -fopenmp $(CXXOFFLOADING)
+    CXX_VERSION = echo "$(shell $(call loadModules,$(CXX_COMPILER_MODULE),"shut up") amdclang++ --version | head -n 1 | sed 's/amdclang++ version \([0-9]*\.[0-9]*\.[0-9]*\)/\1/g')"
+endif
 
 # NVIDIA compiler
 ifeq ($(CXX), nvc++)
@@ -326,9 +360,25 @@ endif
 #---------------------------------------------------------------------------
 # FORTRAN compilers
 #---------------------------------------------------------------------------
-FCOMPILERS?="gfortran, xlf, ifx, ftn, nvfortran"
+FCOMPILERS?="amdflang, gfortran, xlf, ifx, ftn, nvfortran"
 F_VERSION?= echo "version unknown"
 
+ifeq ($(FC), amdflang)
+    ifeq ($(OMP_VERSION), 5.0)
+      FOFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908 -fopenmp-version=50
+    else ifeq ($(OMP_VERSION), 5.1)
+      FOFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908 -fopenmp-version=51
+    else
+      FOFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908 
+    endif
+    F_NO_OFFLOADING =
+    FFLAGS += -O3 -fopenmp $(FOFFLOADING)
+    #Adding this to fix problem with math.h
+    FFLAGS +=  -D__NO_MATH_INLINES -U__SSE2_MATH__ -U__SSE_MATH__
+    FLINK = amdclang++
+    FLINKFLAGS += -lm -O3 -fopenmp $(FOFFLOADING)
+    F_VERSION = echo "$(shell $(call loadModules,$(CXX_COMPILER_MODULE),"shut up") amdflang --version | head -n 1 | sed 's/amdflang version \([0-9]*\.[0-9]*\.[0-9]*\)/\1/g')"
+endif
 
 # NVIDIA compiler
 ifeq ($(FC), nvfortran)

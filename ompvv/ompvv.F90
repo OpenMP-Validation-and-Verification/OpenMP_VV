@@ -105,14 +105,14 @@ module ompvv_lib
   use iso_fortran_env
   implicit none
 OMPVV_MODULE_REQUIRES_LINE
-    LOGICAL, PRIVATE :: ompvv_isHost
+    LOGICAL, PRIVATE :: ompvv_isHost = .true.
     INTEGER, PRIVATE :: ompvv_errors = 0
     LOGICAL, PRIVATE :: ompvv_sharedEnv
   contains
     function clean_fn(fn)
       CHARACTER(len = *) :: fn
       CHARACTER(len = 400) :: clean_fn
-      INTEGER :: ln, fn_cut_point
+      INTEGER :: fn_cut_point
 
       ! Avoid unused variables warning
       fn_cut_point = SCAN(fn, "/", .TRUE.)

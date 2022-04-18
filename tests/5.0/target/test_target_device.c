@@ -20,7 +20,7 @@
 
 int test_target_device_ancestor() {
 
-    int i, which_device;
+    int which_device;
     int a[N];
     int errors = 0; 
 
@@ -56,7 +56,7 @@ int test_target_device_ancestor() {
 
 int test_target_device_device_num() {
     
-    int i, target_device_num, host_device_num, first_device_num;
+    int target_device_num, host_device_num, first_device_num;
     int b[N];
     int errors = 0; 
 

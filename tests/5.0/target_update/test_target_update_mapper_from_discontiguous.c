@@ -22,7 +22,7 @@ typedef struct newvec {
   double *data;
 } newvec_t;
 
-int i;
+size_t i;
 int errors = 0;
 
 #pragma omp declare mapper(newvec_t v) map(v, v.data[0:v.len:2])
@@ -38,12 +38,12 @@ int target_update_from_mapper() {
   }
   #pragma omp target
   {
-    for (i = 0; i < s.len; i+2) {
+    for (i = 0; i < s.len; i += 2) {
       s.data[i] = i;
     }
   }//end target
   #pragma omp target update from(s)
-  for (i =0; i < s.len; i+2) {
+  for (i =0; i < s.len; i += 2) {
     OMPVV_TEST_AND_SET(errors, s.data[i] != i);
   } 
   return errors;

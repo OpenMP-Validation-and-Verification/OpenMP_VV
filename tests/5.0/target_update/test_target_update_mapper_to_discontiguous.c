@@ -22,7 +22,7 @@ typedef struct newvec {
   double *data;
 } newvec_t;
 
-int i;
+size_t i;
 int errors;
 
 #pragma omp declare mapper(newvec_t v) map(v, v.data[0:v.len])

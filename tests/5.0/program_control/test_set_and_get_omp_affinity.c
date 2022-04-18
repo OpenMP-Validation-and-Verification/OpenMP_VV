@@ -20,14 +20,13 @@
 
 int main () {
 
-   int i, errors, n, thrd_num;
+   int errors;
    size_t nchars;
    size_t set_nchars;
    errors = 0;
     
    char default_format[FORMAT_STORE];
    char my_format[] = "host=%20H thrd_num=%0.4n binds_to=%A";
-   char **buffer;
 
    // Display Default Affinity Format using omp_get_affinity_format and omp_display_affinity
    nchars = omp_get_affinity_format(default_format,(size_t)FORMAT_STORE);

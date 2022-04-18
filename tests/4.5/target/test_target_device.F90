@@ -21,7 +21,7 @@
 
         CONTAINS 
           INTEGER FUNCTION test_target_device_clause()
-            INTEGER:: i, dev
+            INTEGER:: dev
             INTEGER:: num_dev
             INTEGER:: array(N)
             CHARACTER(len=100):: message

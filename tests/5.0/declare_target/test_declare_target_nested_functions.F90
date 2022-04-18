@@ -22,45 +22,48 @@ PROGRAM test_declare_target_nested_functions
     USE omp_lib
     implicit none
     INTEGER :: errors
+    LOGICAL :: is_offloading
     
     !$omp declare target to(outer_fn)
     
     errors = 0 
      
-    OMPVV_TEST_OFFLOADING
+    OMPVV_TEST_AND_SET_OFFLOADING(is_offloading)
 
     OMPVV_TEST_VERBOSE(test_declared_functions() .ne. 0)
 
     OMPVV_REPORT_AND_RETURN()
 
 CONTAINS  
-    INTEGER FUNCTION inner_fn(a)
+    INTEGER FUNCTION inner_fn(a, on_device)
       INTEGER:: a
-      
-      OMPVV_ERROR_IF(omp_is_initial_device(), "Target region executed on host&
-      & instead of device, test fails on the host")
-     
-       inner_fn = 1 + a
+      LOGICAL :: on_device
+
+      if (omp_is_initial_device()) on_device = .false.
+      inner_fn = 1 + a
     END FUNCTION inner_fn
 
-    INTEGER FUNCTION outer_fn(a)
+    INTEGER FUNCTION outer_fn(a, on_device)
       INTEGER:: a
+      LOGICAL :: on_device
       
-      OMPVV_ERROR_IF(omp_is_initial_device(), "Target region executed on host&
-      & instead of device, test fails on the host")
-
-      outer_fn = 1 + inner_fn(a)
+      if (omp_is_initial_device()) on_device = .false.
+      outer_fn = 1 + inner_fn(a, on_device)
     END FUNCTION outer_fn
     
     INTEGER FUNCTION test_declared_functions() 
       INTEGER:: outcome, errors
+      LOGICAL :: on_device
       errors = 0
       outcome = 0
+      on_device = .false.
 
-      !$omp target map (tofrom: outcome)
-      outcome = outer_fn(outcome)
+      !$omp target map (tofrom: outcome, on_device)
+      on_device = .true.
+      outcome = outer_fn(outcome, on_device)
       !$omp end target
-    
+
+      OMPVV_TEST_AND_SET_VERBOSE(errors, on_device .neqv. is_offloading)
       OMPVV_TEST_AND_SET_VERBOSE(errors, outcome .ne. 2)
 
       test_declared_functions = errors

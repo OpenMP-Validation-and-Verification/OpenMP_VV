@@ -35,15 +35,15 @@ int test_default_firstprivate_task(){
 			test_arr[i] = 1;
 		}
 	}
-	int new_sum;
-	int wrong_sum;
+	int new_sum = 0;
+	int wrong_sum = 0;
 	for (int i = 0; i<N; i++){
 		new_sum += test_arr[i];
 		wrong_sum += 1;
 	}
-	OMPVV_TEST_AND_SET(errors, test_num != 1);
+	OMPVV_TEST_AND_SET_VERBOSE(errors, test_num != 1);
 	OMPVV_INFOMSG_IF(test_num == 2, "Scalar was not firstprivate, changes made in task affected original copy");
-	OMPVV_TEST_AND_SET(errors, sum != new_sum);
+	OMPVV_TEST_AND_SET_VERBOSE(errors, sum != new_sum);
 	OMPVV_INFOMSG_IF(new_sum == wrong_sum, "Array was not first private, changes made in task affected original copy");
 	return errors;
 }

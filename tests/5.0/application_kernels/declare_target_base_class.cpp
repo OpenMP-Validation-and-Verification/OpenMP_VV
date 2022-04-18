@@ -37,7 +37,6 @@ private:
 #pragma omp end declare target
 
 int main() {
-  int i;
   int errors = 0;
   
   OMPVV_TEST_OFFLOADING;
