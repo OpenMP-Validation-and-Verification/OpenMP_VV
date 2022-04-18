@@ -32,7 +32,7 @@ int test_defaultmap_present_pointer() {
 
 
    #pragma omp target enter data map(to: pointer1)
-   #pragma omp target map(tofrom: errors, pointer1) defaultmap(present: pointer)
+   #pragma omp target map(tofrom: errors) defaultmap(present: pointer)
    {
       for (i = 0; i < N; i++) {
 	 if (pointer1[i] != i) {errors++;}
