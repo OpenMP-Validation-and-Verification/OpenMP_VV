@@ -39,8 +39,12 @@ int metadirective() {
 		#pragma omp metadirective \
 		   when( implementation={vendor(amd)}: nothing) \
                    when( device={kind(nohost)}: nothing) \
-		   default( nothing )	
-                #pragma omp metadirective \
+		   default( nothing )
+		#pragma omp metadirective \
+                   when( implementation={arch("amd")}: nothing) \
+                   when( device={kind(nohost)}: nothing) \
+                   default( nothing )	
+		#pragma omp metadirective \
                    when( construct={target}: nothing) \
 		   default( nothing ) 
 
