@@ -1,4 +1,4 @@
-!===--- test_loop_reduction_add.F90 -------------------------------------===//
+!===--- test_loop_reduction_add_device.F90 -------------------------------------===//
 !
 ! OpenMP API Version 5.0 Nov 2018
 !
@@ -12,7 +12,7 @@
 
 #define N 1024
 
-PROGRAM test_loop_reduction_add
+PROGRAM test_loop_reduction_add_device
   USE iso_fortran_env
   USE ompvv_lib
   USE omp_lib
@@ -69,4 +69,4 @@ CONTAINS
 
     test_add = errors
   END FUNCTION test_add
-END PROGRAM test_loop_reduction_add
+END PROGRAM test_loop_reduction_add_device
