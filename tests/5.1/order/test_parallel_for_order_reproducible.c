@@ -3,10 +3,9 @@
 // OpenMP API Version 5.1 Nov 2020
 //
 // This test checks that the order(reproducible) clause is properly handled.
-// Leverages a shared variable to force a proper execution order to get proper
-// results. Creates two arrays, one the correct method executed in order and
-// the second executed from within the parallel for order pragma. Fails if
-// the array values are not calculated in the proper order.
+// Leverages the thread id to determine if the same threads executed in the
+// same order over the array. If both arrays match the test passes, if not
+// it fails as the reproducible clause failed.
 //
 ////===----------------------------------------------------------------------===//
 
@@ -32,15 +31,15 @@ int main() {
 	#pragma omp target map(tofrom: x,y)
 	{
 
-	#pragma omp parallel for order(concurrent)
-	for (int i = 0; i < N; i++) {
-		x[i] = omp_get_thread_num();	
-	}
+		#pragma omp parallel for order(concurrent)
+		for (int i = 0; i < N; i++) {
+			x[i] = omp_get_thread_num();	
+		}
 
-	#pragma omp parallel for order(concurrent)
-	for (int i = 0; i < N; i++) {
-                y[i] = omp_get_thread_num();
-        }
+		#pragma omp parallel for order(concurrent)
+		for (int i = 0; i < N; i++) {
+                	y[i] = omp_get_thread_num();
+        	}
 
 	}
 
