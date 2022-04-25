@@ -5,7 +5,7 @@
 // Tests the behavior of taskwait when nowait is specified.
 // The behavior of this should be similar to that of using task construct.
 // It is important to note that all depenend tasks must be finished first.
-
+//-----------------------------------------------------------------------//
 
 
 #include <omp.h>
@@ -29,7 +29,7 @@ int test_task_nowait(){
 	{
 		test_scaler += 1;
 	}
-	#pragma omp taskwait
+	#pragma omp taskwait nowait
 	#pragma omp task private(test_arr)
 	{
 		for (int i=0; i<N; i++){
