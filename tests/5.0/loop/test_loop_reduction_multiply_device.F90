@@ -68,7 +68,7 @@ CONTAINS
       !$omp end do
       !$omp end target parallel
       host_result = 1
-      DO y = 1, 16
+      DO y = 0, 15
          host_result = host_result * a(x + y)
       END DO
       OMPVV_TEST_AND_SET_VERBOSE(errors, host_result .ne. device_result)
