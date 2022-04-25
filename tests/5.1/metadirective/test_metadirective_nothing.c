@@ -35,17 +35,17 @@ int metadirective() {
 		#pragma omp metadirective \
 		   when( implementation={vendor(nvidia)}: nothing) \
 		   when( device={kind(nohost)}: nothing) \
-	           default( nothing )
-		#pragma omp metadirective \
-		   when( implementation={vendor(amd)}: nothing) \
-                   when( device={kind(nohost)}: nothing) \
 		   default( nothing )
 		#pragma omp metadirective \
-                   when( implementation={arch("amd")}: nothing) \
-                   when( device={kind(nohost)}: nothing) \
-                   default( nothing )	
+		   when( implementation={vendor(amd)}: nothing) \
+		   when( device={kind(nohost)}: nothing) \
+		   default( nothing )
 		#pragma omp metadirective \
-                   when( construct={target}: nothing) \
+		   when( implementation={arch("amd")}: nothing) \
+		   when( device={kind(nohost)}: nothing) \
+		   default( nothing )	
+		#pragma omp metadirective \
+		   when( construct={target}: nothing) \
 		   default( nothing ) 
 
 		threads = omp_get_num_threads();
