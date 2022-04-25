@@ -57,12 +57,12 @@ CONTAINS
       device_result = 1
       !$omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE) map(tofrom: device_result, a, num_threads)
       !$omp loop reduction(*:device_result)
-      DO y = 1, 16
+      DO y = 0, 15
          device_result = device_result * a(x + y)
       END DO
       !$omp end loop
       !$omp do
-      DO y = 1, 16
+      DO y = 0, 15
          num_threads(x + y) = omp_get_num_threads()
       END DO
       !$omp end do
