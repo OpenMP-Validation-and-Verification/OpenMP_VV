@@ -55,7 +55,7 @@ CONTAINS
       device_result = 1
       !$omp parallel num_threads(OMPVV_NUM_THREADS_HOST)
       !$omp loop reduction(*:device_result)
-      DO y = 1, 16
+      DO y = 0, 15
          device_result = device_result * a(x + y)
       END DO
       !$omp end loop
