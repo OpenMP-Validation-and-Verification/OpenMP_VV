@@ -60,7 +60,7 @@ CONTAINS
       END DO
       !$omp end loop
       !$omp do
-      DO y = 1, 16
+      DO y = 0, 15
          num_threads(x + y) = omp_get_num_threads()
       END DO
       !$omp end do
