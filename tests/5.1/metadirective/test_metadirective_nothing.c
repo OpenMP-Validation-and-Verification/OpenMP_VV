@@ -29,7 +29,7 @@ int metadirective() {
 	 	base_threads = omp_get_num_threads();
       	 	
 		#pragma omp metadirective \
-                   when( device={kind(nohost)}: nothing ) \
+		   when( device={kind(nohost)}: nothing ) \
 		   when( device={arch("nvptx")}: nothing ) \
 		   default( nothing )
 		#pragma omp metadirective \
