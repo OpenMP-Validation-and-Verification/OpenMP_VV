@@ -305,8 +305,10 @@ OMPVV_MODULE_REQUIRES_LINE
       CHARACTER(len=*) :: fn
       CHARACTER(len=500) :: clean
       INTEGER :: ln
+#ifdef VERBOSE_MODE
       CHARACTER(len=*), PARAMETER :: msg = "This tests is running on a shared &
         & data environment between host and device. This may cause errors"
+#endif
 
       clean = TRIM(clean_fn(fn))
       ! Avoid unused variables warning
