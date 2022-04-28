@@ -79,7 +79,7 @@ ifeq ($(CC), amdclang)
     CFLAGS += $(COFFLOADING)
     #Adding this to fix problem with math.h
     CFLAGS +=  -D__NO_MATH_INLINES -U__SSE2_MATH__ -U__SSE_MATH__
-    CLINK = clang
+    CLINK = amdclang
     CLINKFLAGS += -lm -O3 -fopenmp $(COFFLOADING)
     C_VERSION = echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") amdclang --version | head -n 1)"
 endif
