@@ -18,6 +18,39 @@
 
 #define N 1024
 
+int metadirectiveOffload() {
+   int errors = 0;
+   int scalar = 0;
+   int A[N];
+   for (i = 0; i < N; i++) {
+      A[i] = 0;
+   }
+
+   #pragma omp metadirective \
+      when( device={kind(nohost)}: nothing ) \
+      when( device={arch("nvptx")}: nothing) \
+      when( device={arch("amd")}: nothing ) \
+      default( target map(to:from scalar, A) )
+      {
+         scalar = 10;
+         for (i = 0; i < N; i++) {
+            A[i] = i + 2;
+         }
+      }
+
+
+
+   for (i = 0; i < N; i++) {
+	if (A[i] != 0) {
+		errors++;
+	}
+   }
+
+
+   OMPVV_TEST_AND_SET_VERBOSE(errors)
+
+}
+
 int metadirective() {
 
    int errors = 0;
@@ -60,8 +93,8 @@ int main () {
    
    int errors = 0;
    OMPVV_TEST_OFFLOADING;
- 
-   OMPVV_TEST_AND_SET_VERBOSE(errors, metadirective());
+
+   metadirectiveOffload();
   
    OMPVV_REPORT_AND_RETURN(errors);
 
