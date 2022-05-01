@@ -38,6 +38,22 @@ int metadirectiveOffload() {
          }
       }
 
+   #pragma omp metadirective \
+      when( implementation={vendor(amd)}: nothing) \
+      when( implementation={vendor(nvidia)}: nothing) \
+      when( device={kind(nohost)}: nothing) \
+      default( target map(to:from scalar, A) )
+      {
+         scalar = 10;
+         for (i = 0; i < N; i++) {
+            A[i] = i + 2;
+         }
+      }
+
+
+  #pragma omp metadirective \
+      when( device={kind(nohost)}: nothing) \
+      default( nothing )
 
 
    for (i = 0; i < N; i++) {
@@ -49,44 +65,6 @@ int metadirectiveOffload() {
 
    OMPVV_TEST_AND_SET_VERBOSE(errors)
 
-}
-
-int metadirective() {
-
-   int errors = 0;
-   int base_threads = 0;
-   int threads = 0;
-
-   #pragma omp target map(from:base_threads,threads)  
-   {
-	 	base_threads = omp_get_num_threads();
-      	 	
-		#pragma omp metadirective \
-		   when( device={kind(nohost)}: nothing ) \
-		   when( device={arch("nvptx")}: nothing ) \
-		   default( nothing )
-		#pragma omp metadirective \
-		   when( implementation={vendor(nvidia)}: nothing) \
-		   when( device={kind(nohost)}: nothing) \
-		   default( nothing )
-		#pragma omp metadirective \
-		   when( implementation={vendor(amd)}: nothing) \
-		   when( device={kind(nohost)}: nothing) \
-		   default( nothing )
-		#pragma omp metadirective \
-		   when( implementation={arch("amd")}: nothing) \
-		   when( device={kind(nohost)}: nothing) \
-		   default( nothing )	
-		#pragma omp metadirective \
-		   when( construct={target}: nothing) \
-		   default( nothing ) 
-
-		threads = omp_get_num_threads();
-   }
-
-   OMPVV_TEST_AND_SET(errors, base_threads != threads);
-
-   return errors;
 }
 
 int main () {
