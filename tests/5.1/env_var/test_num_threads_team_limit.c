@@ -13,7 +13,8 @@
 #define N 1024
 
 int main(){
-	setenv("OMP_NUM_TEAMS",2);
-	int num_teams = omp_get_num_teams();
-	printf("NUM TEAMS = %d", num_teams);
+	setenv("OMP_NUM_TEAMS", "2", 1);
+	char * num_teams = getenv("OMP_NUM_TEAMS");
+	printf("NUM TEAMS = %s", num_teams);
+	unsetenv("OMP_NUM_TEAMS");
 }
