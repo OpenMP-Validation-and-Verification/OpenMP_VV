@@ -59,7 +59,6 @@ CONTAINS
           !random_number() generates a real number, r, uniformly distributed in 0 <= r < 1.
           CALL random_number(randomNumber)
           a(x) = (randomNumber .lt. false_margin)
-          CALL random_number(randomNumber)
           num_threads(x) = -1 * x
        END DO
 
