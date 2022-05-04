@@ -35,7 +35,6 @@ CONTAINS
     INTEGER :: seedSize
     INTEGER,ALLOCATABLE :: seed(:)
     DOUBLE PRECISION:: randomNumber
-    INTEGER:: randomInteger
 
     errors = 0
     tested_true = .FALSE.
