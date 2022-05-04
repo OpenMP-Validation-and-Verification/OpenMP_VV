@@ -15,8 +15,8 @@
 
 #define N 1024
 
-int test_master_taskloop_simd() {
-  OMPVV_INFOMSG("test_master_taskloop_simd");
+int test_master_taskloop_simd_device() {
+  OMPVV_INFOMSG("test_master_taskloop_simd_device");
   int errors = 0;
   int num_threads = -1;
   int x[N];
@@ -47,6 +47,7 @@ int test_master_taskloop_simd() {
   OMPVV_WARNING_IF(num_threads == 1, "Test ran with one thread, so parallelism of taskloop can't be guaranteed.");
   OMPVV_ERROR_IF(num_threads < 1, "Test returned an invalid number of threads.");
   OMPVV_TEST_AND_SET_VERBOSE(errors, num_threads < 1);
+  OMPVV_INFOMSG("This test does not guarantee vector instructions were generated for the simd construct.");
 
   return errors;
 }
@@ -57,7 +58,7 @@ int main() {
 
   int errors = 0;
 
-  OMPVV_TEST_AND_SET_VERBOSE(errors, test_master_taskloop_simd());
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_master_taskloop_simd_device());
 
   OMPVV_REPORT_AND_RETURN(errors);
 }
