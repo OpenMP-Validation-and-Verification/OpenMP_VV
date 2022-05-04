@@ -67,7 +67,7 @@ CONTAINS
        host_result = .TRUE.
 
        !$omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE) map(tofrom: test_result, a, num_threads)
-       !$omp loop reduction(and:test_result)
+       !$omp loop reduction(.and.:test_result)
        DO x = 1, N
          test_result = test_result .and. a(x)
        END DO
