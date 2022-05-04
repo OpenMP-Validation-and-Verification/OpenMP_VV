@@ -15,12 +15,13 @@
 
 #define N 1024
 
-int test_parallel_master_taskloop() {
-  OMPVV_INFOMSG("test_parallel_master_taskloop");
+int test_parallel_master_taskloop_simd_device() {
+  OMPVV_INFOMSG("test_parallel_master_taskloop_simd_device");
   int errors = 0;
   int x[N];
   int y[N];
   int z[N];
+  int num_threads = -1;
 
   for (int i = 0; i < N; i++) {
     x[i] = 1;
@@ -28,11 +29,14 @@ int test_parallel_master_taskloop() {
     z[i] = 2*(i + 1);
   }
 
-#pragma omp target map(tofrom: x) map(to: y, z)
+#pragma omp target map(tofrom: x, num_threads) map(to: y, z)
   {
-#pragma omp parallel master taskloop simd num_threads(OMPVV_NUM_THREADS_DEVICE) shared(x, y, z)
+#pragma omp parallel master taskloop simd num_threads(OMPVV_NUM_THREADS_DEVICE) shared(x, y, z, num_threads)
     for (int i = 0; i < N; i++) {
       x[i] += y[i]*z[i];
+      if (i == 0) {
+         num_threads = omp_get_num_threads();
+      }
     }
   }
 
@@ -40,7 +44,9 @@ int test_parallel_master_taskloop() {
     OMPVV_TEST_AND_SET_VERBOSE(errors, x[i] != 1 + (y[i]*z[i]));
   }
 
-  OMPVV_INFOMSG("This test does not guarantee thread parallelism of the clause.");
+  OMPVV_WARNING_IF(num_threads == 1, "Test ran with one thread, so parallelism of parallel master with taskloop can't be guaranteed.");
+  OMPVV_ERROR_IF(num_threads < 1, "Test returned an invalid number of threads.");
+  OMPVV_INFOMSG("This test does not guarantee vector instructions were generated for the simd construct.");
 
   return errors;
 }
@@ -51,7 +57,7 @@ int main() {
 
   int errors = 0;
 
-  OMPVV_TEST_AND_SET_VERBOSE(errors, test_parallel_master_taskloop());
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_parallel_master_taskloop_simd_device());
 
   OMPVV_REPORT_AND_RETURN(errors);
 }
