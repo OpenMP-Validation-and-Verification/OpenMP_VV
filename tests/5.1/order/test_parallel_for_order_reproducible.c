@@ -38,7 +38,7 @@ int main() {
 
 		#pragma omp parallel for order(concurrent)
 		for (int i = 1; i < N; i++) {
-                	y[i] = y[i-1] + y[i];
+			y[i] = y[i-1] + y[i];
         	}
 
 	}
