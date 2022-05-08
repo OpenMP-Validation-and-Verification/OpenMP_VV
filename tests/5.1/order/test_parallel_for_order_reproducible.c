@@ -3,9 +3,9 @@
 // OpenMP API Version 5.1 Nov 2020
 //
 // This test checks that the order(reproducible) clause is properly handled.
-// Leverages the thread id to determine if the same threads executed in the
-// same order over the array. If both arrays match the test passes, if not
-// it fails as the reproducible clause failed.
+// Leverages the previous array item to determine if the same threads executed
+// in the same order over the array. If both arrays match the test passes, 
+// if not it fails as the reproducible clause failed.
 //
 ////===----------------------------------------------------------------------===//
 
@@ -22,8 +22,8 @@ int main() {
 	int y[N];
 
 	for (int i = 0; i < N; i++) {
-		x[i] = 0;
-		y[i] = 0;
+		x[i] = i;
+		y[i] = i;
 	}
 
 	OMPVV_TEST_OFFLOADING;
@@ -32,13 +32,13 @@ int main() {
 	{
 
 		#pragma omp parallel for order(concurrent)
-		for (int i = 0; i < N; i++) {
-			x[i] = omp_get_thread_num();	
+		for (int i = 1; i < N; i++) {
+			x[i] = x[i-1] + x[i];	
 		}
 
 		#pragma omp parallel for order(concurrent)
-		for (int i = 0; i < N; i++) {
-                	y[i] = omp_get_thread_num();
+		for (int i = 1; i < N; i++) {
+                	y[i] = y[i-1] + y[i];
         	}
 
 	}
