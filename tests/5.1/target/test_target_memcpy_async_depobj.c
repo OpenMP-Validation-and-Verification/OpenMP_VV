@@ -1,7 +1,5 @@
 //===--- test_target_memcpy_async_depobj.c ----------------------------===//
 //
-//  OpenMP API Version 5.1 Aug 2021
-//
 //  Inspired from OpenMP 5.1 Examples Doc, 5.16.4 & 8.9
 //  This test utilizes the omp_target_memcpy_async construct to
 //  allocate memory on the device asynchronously. The construct
@@ -24,42 +22,42 @@ int test_target_memcpy_async_depobj() {
 
     int h, t, i;
     errors = 0;
-    int *mem;
-    int *mem_dev_cpy;
+    double *mem;
+    double *mem_dev_cpy;
     h = omp_get_initial_device();
     t = omp_get_default_device();
 
-    OMPVV_TEST_AND_SET_VERBOSE(errors, omp_get_num_devices() < 1 || t < 0); //errors if device not available
 
     mem = (double *)malloc( sizeof(double)*N);
     mem_dev_cpy = (double *)omp_target_alloc( sizeof(double)*N, t);
 
     OMPVV_TEST_AND_SET_VERBOSE(errors, mem_dev_cpy == NULL);
-    
+
     for(i = 0; i < N; i++){
         mem[i] = i;
     }
-    omp_depend_t obj[1];
+    omp_depend_t obj;
+    omp_depend_t obj_arr[1] = {obj};
 
     #pragma omp depobj(obj) depend(inout: mem_dev_cpy)
-    
+
     /* copy to device memory */
     omp_target_memcpy_async(mem_dev_cpy, mem, sizeof(double)*N,
                                 0,          0,
                                 t,          h,
-                                1,          obj);
+                                1,          obj_arr[0]);
 
     #pragma omp taskwait depend(depobj: obj)
     #pragma omp target is_device_ptr(mem_dev_cpy) device(t) depend(depobj: obj)
     for(i = 0; i < N; i++){
         mem_dev_cpy[i] = mem_dev_cpy[i]*2; // initialize data
     }
-    
+
     /* copy to host memory */
     omp_target_memcpy_async(mem, mem_dev_cpy, sizeof(double)*N,
                                 0,          0,
                                 h,          t,
-                                1,          obj);
+                                1,          obj_arr[0]);
 
     #pragma omp taskwait depend(depobj: obj)
     for(int i=0; i < N; i++){
@@ -67,7 +65,7 @@ int test_target_memcpy_async_depobj() {
     }
     // free resources
     omp_target_free(mem_dev_cpy, t);
-    #pragma omp depobj(obj) destroy 
+    #pragma omp depobj(obj) destroy
     return errors;
 }
 
@@ -76,4 +74,4 @@ int main() {
    OMPVV_TEST_OFFLOADING;
    OMPVV_TEST_AND_SET_VERBOSE(errors, test_target_memcpy_async_depobj() != 0);
    OMPVV_REPORT_AND_RETURN(errors);
-}           
+}
