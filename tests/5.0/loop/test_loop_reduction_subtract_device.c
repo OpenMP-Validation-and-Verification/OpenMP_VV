@@ -1,4 +1,4 @@
-//===--- test_loop_reduction_subtract.c --------------------------------------===//
+//===--- test_loop_reduction_subtract_device.c --------------------------------------===//
 //
 // OpenMP API Version 5.0 Nov 2018
 //
