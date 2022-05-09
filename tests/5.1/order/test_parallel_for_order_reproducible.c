@@ -2,7 +2,7 @@
 //
 // OpenMP API Version 5.1 Nov 2020
 //
-// This test checks that the order(reproducible) clause is properly handled.
+// This test checks that the order(reproducible:concurrent) clause is properly handled.
 // Leverages the previous array item to determine if the same threads executed
 // in the same order over the array. If both arrays match the test passes, 
 // if not it fails as the reproducible clause failed.
@@ -31,12 +31,12 @@ int main() {
 	#pragma omp target map(tofrom: x,y)
 	{
 
-		#pragma omp parallel for order(reproducible)
+		#pragma omp parallel for order(reproducible:concurrent)
 		for (int i = 1; i < N; i++) {
 			x[i] = x[i-1] + x[i];	
 		}
 
-		#pragma omp parallel for order(reproducible)
+		#pragma omp parallel for order(reproducible:concurrent)
 		for (int i = 1; i < N; i++) {
 			y[i] = y[i-1] + y[i];
     }
@@ -44,7 +44,7 @@ int main() {
 	}
 
 	for (int i = 0; i < N; i++) {
-        	OMPVV_TEST_AND_SET(errors, x[i] != y[i]);
+    OMPVV_TEST_AND_SET(errors, x[i] != y[i]);
 	}
 
 	OMPVV_REPORT_AND_RETURN(errors);
