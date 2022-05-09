@@ -1,12 +1,14 @@
-//===--- test_target_enter_data_map.c ------------------------------===//
+//===--- test_target_enter_data_map.c -----------------------------------===//
 //
 // OpenMP API Version 5.2 May 2022
 //
 // This is a test of the target enter data map construct with global arrays.
 // The 'to' map-type-modifier is not specified on the map clause.
 // The 'from' map-type-modifier is not specified on the map clause.
-// Specification update 5.1 -> 5.2 target enter data has a default map type that perfroms the same behavior as 'to' or 'from' map types
-//===------------------------------------------------------------------------===//
+// Specification update 5.1 -> 5.2 target enter data has a default map type 
+// that perfroms the same behavior as 'to' or 'from' map types
+//
+//===--------------------------------------------------------------------===//
 
 #include "ompvv.h"
 #include <stdio.h>
