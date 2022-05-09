@@ -7,7 +7,8 @@
 // Primarily tests based on the fact that no matter what 'when' clause is 
 // rendered it should result in nothing, and thus no additional pragma should
 // be created. Thus, the threads should remain unchanged through this process
-// and the compiler should handle it properly.
+// and the compiler should handle it properly. Handles both device and host
+// based tests.
 //
 ////===---------------------------------------------------------------------===//
 
