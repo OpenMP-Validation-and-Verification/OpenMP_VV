@@ -37,9 +37,8 @@ int test_target_memcpy_async_depobj() {
         mem[i] = i;
     }
     omp_depend_t obj;
-    omp_depend_t obj_arr[1] = {obj};
-
     #pragma omp depobj(obj) depend(inout: mem_dev_cpy)
+    omp_depend_t obj_arr[1] = {obj};
 
     /* copy to device memory */
     omp_target_memcpy_async(mem_dev_cpy, mem, sizeof(double)*N,
