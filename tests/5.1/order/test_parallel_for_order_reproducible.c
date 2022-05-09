@@ -31,15 +31,15 @@ int main() {
 	#pragma omp target map(tofrom: x,y)
 	{
 
-		#pragma omp parallel for order(concurrent)
+		#pragma omp parallel for order(reproducible)
 		for (int i = 1; i < N; i++) {
 			x[i] = x[i-1] + x[i];	
 		}
 
-		#pragma omp parallel for order(concurrent)
+		#pragma omp parallel for order(reproducible)
 		for (int i = 1; i < N; i++) {
 			y[i] = y[i-1] + y[i];
-        	}
+    }
 
 	}
 
