@@ -44,11 +44,11 @@ PROGRAM test_loop_private_device
         privatized = privatized + 1 
      END DO
      d(x) = c(x) * privatized
-     IF (omp_get_thread_num() .eq. 0 ) THEN
-        num_threads = omp_get_num_threads()
-     END IF
   END DO
   !$omp end loop
+  IF (omp_get_thread_num() .eq. 0 ) THEN
+     num_threads = omp_get_num_threads()
+  END IF
   !$omp end target parallel
 
   DO x = 1, NSIZE
