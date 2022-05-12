@@ -29,7 +29,7 @@ CONTAINS
     INTEGER,DIMENSION(N):: a
     INTEGER,DIMENSION(N):: num_threads
     INTEGER:: b, host_b
-    INTEGER:: errors, x, y
+    INTEGER:: errors, x
     CHARACTER(len=400) :: msgHelper
     INTEGER :: seedSize
     INTEGER,ALLOCATABLE :: seed(:)
