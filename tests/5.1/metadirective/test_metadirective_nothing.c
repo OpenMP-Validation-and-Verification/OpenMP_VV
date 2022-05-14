@@ -57,9 +57,7 @@ int metadirectiveOnDevice() {
    OMPVV_WARNING_IF(A[0] == 2 || A[0] == 4, "Test could not recognize if device was of arch/vendor/kind nvidia, amd or, nohost, even though there are devices available.");
 
    for (int i = 0; i < N; i++) {
-	    OMPVV_TEST_AND_SET(A[i] == 0 && A[i] != 2 && A[i] != 4 ) {
-	      errors++;
-	    }
+	    OMPVV_TEST_AND_SET(errors, A[i] == 0 && A[i] != 2 && A[i] != 4 )
    }
 
 
