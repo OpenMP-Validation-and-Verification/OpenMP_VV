@@ -91,9 +91,7 @@ int metadirectiveOnHost() {
   
 
   for (int i = 0; i < N; i++) {
-     OMPVV_TEST_AND_SET(A[i] == 0 && A[i] != 2) {
-       errors++;
-     }
+     OMPVV_TEST_AND_SET(errors, A[i] == 0 && A[i] != 2)
   }
 
   return 0;
