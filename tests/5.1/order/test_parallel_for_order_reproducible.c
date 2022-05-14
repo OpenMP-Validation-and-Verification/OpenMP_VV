@@ -32,13 +32,13 @@ int main() {
 	{
 
 		#pragma omp parallel for order(reproducible:concurrent)
-		for (int i = 1; i < N; i++) {
-			x[i] = x[i-1] + x[i];	
+		for (int i = 0; i < N; i++) {
+			x[i] = x[i] + 2;	
 		}
 
 		#pragma omp parallel for order(reproducible:concurrent)
-		for (int i = 1; i < N; i++) {
-			y[i] = y[i-1] + y[i];
+		for (int i = 0; i < N; i++) {
+			y[i] = y[i] + 2;
 		}
 
 	}
