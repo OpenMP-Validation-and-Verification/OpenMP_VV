@@ -21,7 +21,6 @@
 
 int metadirectiveOnDevice() {
    int errors = 0;
-   int scalar = 0;
    int A[N];
 
    for (int i = 0; i < N; i++) {
@@ -32,9 +31,8 @@ int metadirectiveOnDevice() {
       when( device={kind(nohost)}: nothing ) \
       when( device={arch("nvptx")}: nothing) \
       when( device={arch("amd")}: nothing ) \
-      default( target map(to:from scalar, A) )
+      default( target map(tofrom: A) )
       {
-         scalar = 10;
          for (int i = 0; i < N; i++) {
             A[i] = i + 2;
          }
@@ -44,9 +42,8 @@ int metadirectiveOnDevice() {
       when( implementation={vendor(amd)}: nothing) \
       when( implementation={vendor(nvidia)}: nothing) \
       when( device={kind(nohost)}: nothing) \
-      default( target map(to:from scalar, A) )
+      default( target map(tofrom: A) )
       {
-         scalar = 10;
          for (int i = 0; i < N; i++) {
             A[i] = i + 2;
          }
@@ -62,12 +59,11 @@ int metadirectiveOnDevice() {
 
 
   
-   return 0;
+   return errors;
 }
 
 int metadirectiveOnHost() {
   int errors = 0;
-  int scalar = 0;
   int A[N];
 
   for (int i = 0; i < N; i++) {
@@ -80,7 +76,6 @@ int metadirectiveOnHost() {
      when( device={arch("amd")}: nothing ) \
      default( parallel )
      {
-        scalar = 10;
         for (int i = 0; i < N; i++) {
            A[i] = i + 2;
         }
@@ -94,16 +89,17 @@ int metadirectiveOnHost() {
      OMPVV_TEST_AND_SET(errors, A[i] == 0 && A[i] != 2)
   }
 
-  return 0;
+  return errors;
 } 
 
 int main () {
+  int errors = 0;
   OMPVV_TEST_OFFLOADING;
 
   if (omp_get_num_devices() > 0) {
-    metadirectiveOnDevice();
+    errors = metadirectiveOnDevice();
   } else {
-    metadirectiveOnHost();
+    errors = metadirectiveOnHost();
   }
 
   OMPVV_REPORT_AND_RETURN(errors);
