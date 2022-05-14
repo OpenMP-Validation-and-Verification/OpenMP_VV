@@ -52,16 +52,19 @@ int metadirectiveOnDevice() {
          }
       }
 
+   OMPVV_INFOMSG("Test ran with a number of available devices greater than 0");
+   OMPVV_INFOMSG_IF(A[0] == 0, "Test recognized device was of arch/vendor/kind nvidia, amd, or nohost");
+   OMPVV_WARNING_IF(A[0] == 2 || A[0] == 4, "Test could not recognize if device was of arch/vendor/kind nvidia, amd or, nohost, even though there are devices available.");
 
-  for (int i = 0; i < N; i++) {
-     if (A[i] != 0) {
-       errors++;
-     }
-  }
+   for (int i = 0; i < N; i++) {
+	    OMPVV_TEST_AND_SET(A[i] == 0 && A[i] != 2 && A[i] != 4 ) {
+	      errors++;
+	    }
+   }
 
 
-  OMPVV_TEST_AND_SET_VERBOSE(errors)
-
+  
+   return 0;
 }
 
 int metadirectiveOnHost() {
@@ -87,11 +90,18 @@ int metadirectiveOnHost() {
 
 
   OMPVV_WARNING_IF(A[0] == 0,"Even though no devices were available the test recognized kind/arch equal to nohost or nvptx or amd");
-  OMPVV_ERROR_IF(A[0] != 0 && A[0] != 2, errors)
+  
+
+  for (int i = 0; i < N; i++) {
+     OMPVV_TEST_AND_SET(A[i] == 0 && A[i] != 2) {
+       errors++;
+     }
+  }
+
+  return 0;
 } 
 
 int main () {
-  int errors = 0;
   OMPVV_TEST_OFFLOADING;
 
   if (omp_get_num_devices() > 0) {
@@ -102,4 +112,5 @@ int main () {
 
   OMPVV_REPORT_AND_RETURN(errors);
 
+  return 0;
 }
