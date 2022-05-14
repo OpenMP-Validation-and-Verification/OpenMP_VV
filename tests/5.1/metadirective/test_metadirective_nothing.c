@@ -24,7 +24,7 @@ int metadirectiveOnDevice() {
    int scalar = 0;
    int A[N];
 
-   for (i = 0; i < N; i++) {
+   for (int i = 0; i < N; i++) {
       A[i] = 0;
    }
 
@@ -35,7 +35,7 @@ int metadirectiveOnDevice() {
       default( target map(to:from scalar, A) )
       {
          scalar = 10;
-         for (i = 0; i < N; i++) {
+         for (int i = 0; i < N; i++) {
             A[i] = i + 2;
          }
       }
@@ -47,13 +47,13 @@ int metadirectiveOnDevice() {
       default( target map(to:from scalar, A) )
       {
          scalar = 10;
-         for (i = 0; i < N; i++) {
+         for (int i = 0; i < N; i++) {
             A[i] = i + 2;
          }
       }
 
 
-  for (i = 0; i < N; i++) {
+  for (int i = 0; i < N; i++) {
      if (A[i] != 0) {
        errors++;
      }
@@ -69,7 +69,7 @@ int metadirectiveOnHost() {
   int scalar = 0;
   int A[N];
 
-  for (i = 0; i < N; i++) {
+  for (int i = 0; i < N; i++) {
      A[i] = 0;
   }
 
@@ -80,7 +80,7 @@ int metadirectiveOnHost() {
      default( parallel )
      {
         scalar = 10;
-        for (i = 0; i < N; i++) {
+        for (int i = 0; i < N; i++) {
            A[i] = i + 2;
         }
      }
