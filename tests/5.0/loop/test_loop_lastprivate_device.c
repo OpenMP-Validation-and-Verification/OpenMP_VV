@@ -32,7 +32,7 @@ int test_one_loop_level() {
     b[x] = x;
   }
 
-#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_HOST) map(tofrom: a, b, x)
+#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE) map(tofrom: a, b, x)
   {
 #pragma omp loop lastprivate(x)
     for (x = 0; x < SIZE; ++x) {
@@ -66,7 +66,7 @@ int test_two_loop_levels() {
     }
   }
 
-#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_HOST) map(tofrom: a, b, x, y)
+#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE) map(tofrom: a, b, x, y)
   {
 #pragma omp loop lastprivate(x, y) collapse(2)
     for (x = 0; x < SIZE; ++x) {
