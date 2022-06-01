@@ -20,17 +20,23 @@
 #define N 1024
 
 int main() {
-	int errors = [OMPVV_NUM_THREADS_DEVICE/OMPVV_NUM_TEAMS_DEVICE];
-	int shared = 0;
+	int errors[OMPVV_NUM_THREADS_DEVICE/OMPVV_NUM_TEAMS_DEVICE];
 	int num_teams = 0;
-
+        int sum_errors = 0;
+        int i;
 	int testing_thread_limit = OMPVV_NUM_THREADS_DEVICE/OMPVV_NUM_TEAMS_DEVICE;
 
 	OMPVV_TEST_OFFLOADING;
+      
 
+         for (i = 0; i<testing_thread_limit; i++){
+              errors[i] = 0;
+         }
+ 
 	#pragma omp target map(tofrom:num_teams,errors) thread_limit(testing_thread_limit)
 	{
-		#pragma omp teams num_teams(OMPVV_NUM_TEAMS_DEVICE)
+		#pragma omp teams num_teams(OMPVV_NUM_TEAMS_DEVICE) 
+
 		{
 
 			if (omp_get_team_num() == 0 && omp_get_thread_num() == 0) {
@@ -48,12 +54,12 @@ int main() {
 		}
 
 	}
-	
+	for (i = 0; i<num_teams; i++){
+             sum_errors += errors[i];
+        }
 
 	OMPVV_WARNING_IF(num_teams != OMPVV_NUM_TEAMS_DEVICE, "The number of teams was unexpected, the test results are likely inconcuslive")
-	OMPVV_WARNING_IF(shared > (num_teams * testing_thread_limit), "The sum was higher than expected. This likely means thread_limit isn't capping the maximum threads created");
 	OMPVV_WARNING_IF(testing_thread_limit == 1, "Only one thread was allocated to each team, the test results are likely inconclusive");
-	
 
-	OMPVV_REPORT_AND_RETURN(errors);
+	OMPVV_REPORT_AND_RETURN(sum_errors);
 }
