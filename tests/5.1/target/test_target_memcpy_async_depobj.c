@@ -56,7 +56,7 @@ int test_target_memcpy_async_depobj() {
     omp_target_memcpy_async(mem, mem_dev_cpy, sizeof(double)*N,
                                 0,          0,
                                 h,          t,
-                                1,          obj_arr[0]);
+                                1,          obj_arr);
 
     #pragma omp taskwait depend(depobj: obj)
     for(int i=0; i < N; i++){
