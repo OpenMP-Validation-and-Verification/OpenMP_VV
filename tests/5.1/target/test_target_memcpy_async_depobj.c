@@ -44,7 +44,7 @@ int test_target_memcpy_async_depobj() {
     omp_target_memcpy_async(mem_dev_cpy, mem, sizeof(double)*N,
                                 0,          0,
                                 t,          h,
-                                1,          obj_arr[0]);
+                                1,          obj_arr);
 
     #pragma omp taskwait depend(depobj: obj)
     #pragma omp target is_device_ptr(mem_dev_cpy) device(t) depend(depobj: obj)
