@@ -29,7 +29,7 @@ int test_task_nowait(){
 	{
 		test_scaler += 1;
 	}
-	#pragma omp taskwait wait depend(out:test_scalar)
+	#pragma omp taskwait nowait depend(out:test_scalar)
 	#pragma omp task private(test_arr)
 	{
 		for (int i=0; i<N; i++){
