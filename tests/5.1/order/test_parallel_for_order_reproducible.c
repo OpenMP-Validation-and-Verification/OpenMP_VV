@@ -31,20 +31,22 @@ int main() {
 	#pragma omp target map(tofrom: x,y)
 	{
 
-		#pragma omp parallel for order(reproducible:concurrent)
-		for (int i = 0; i < N; i++) {
+	#pragma omp parallel 
+	  {
+		#pragma omp for order(reproducible:concurrent) nowait
+		  for (int i = 0; i < N; i++) {
 			x[i] = x[i] + 2;	
-		}
+		  }
 
-		#pragma omp parallel for order(reproducible:concurrent)
+		#pragma omp for order(reproducible:concurrent)
 		for (int i = 0; i < N; i++) {
-			y[i] = y[i] + 2;
+			y[i] = x[i] + 2;
 		}
-
+	  }
 	}
 
 	for (int i = 0; i < N; i++) {
-    		OMPVV_TEST_AND_SET(errors, x[i] != y[i]);
+    		OMPVV_TEST_AND_SET(errors, y[i] != i + 4);
 	}
 
 	OMPVV_REPORT_AND_RETURN(errors);
