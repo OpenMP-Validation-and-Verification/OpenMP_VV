@@ -20,7 +20,7 @@
 #define N 1024
 
 int main() {
-	int errors = 0;
+	int errors = [OMPVV_NUM_THREADS_DEVICE/OMPVV_NUM_TEAMS_DEVICE];
 	int shared = 0;
 	int num_teams = 0;
 
@@ -40,7 +40,7 @@ int main() {
 			if (omp_get_thread_num() == 0) {
 			
 			     if (omp_get_num_threads() > testing_thread_limit) {
-					errors++;				
+					errors[omp_get_team_num()] += 1;				
 			     }		
 			     
 			}
