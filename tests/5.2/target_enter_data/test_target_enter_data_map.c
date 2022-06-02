@@ -38,8 +38,7 @@ int main (){
   #pragma omp target enter data map(A[:N], B[:N], D[:N])
   //should default to map to
   #pragma omp target map(tofrom: errors)
-  { //start of gpu
-
+  { 
     for (i = 0; i < N; i++){
       if(B[i] != 50){errors++;}
       if(A[i] != 10){errors++;}
@@ -53,7 +52,6 @@ int main (){
       B[i] = 120;
       A[i] = 1000;
     }
-    //end of gpu
   }
 
   for (i = 0; i < N; i++){
