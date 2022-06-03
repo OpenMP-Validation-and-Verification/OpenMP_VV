@@ -30,8 +30,8 @@ int metadirectiveOnDevice() {
    #pragma omp metadirective \
       when( device={kind(nohost)}: nothing ) \
       when( device={arch("nvptx")}: nothing) \
-      when( device={arch("amd")}: nothing ) \
-      default( target map(tofrom: A) parallel )
+      when( implementation={vendor(amd)}: nothing ) \
+      default( target parallel map(tofrom: A) )
       {
          for (int i = 0; i < N; i++) {
             A[i] += omp_in_parallel();
@@ -46,7 +46,7 @@ int metadirectiveOnDevice() {
       when( implementation={vendor(amd)}: nothing) \
       when( implementation={vendor(nvidia)}: nothing) \
       when( device={kind(nohost)}: nothing) \
-      default( target map(tofrom: A) parallel )
+      default( target parallel map(tofrom: A) )
       {
          for (int i = 0; i < N; i++) {
             A[i] += omp_in_parallel();
@@ -75,7 +75,7 @@ int metadirectiveOnHost() {
   #pragma omp metadirective \
      when( device={kind(nohost)}: nothing ) \
      when( device={arch("nvptx")}: nothing ) \
-     when( device={arch("amd")}: nothing ) \
+     when( implementation={vendor(amd)}: nothing ) \
      default( parallel )
      {
         for (int i = 0; i < N; i++) {
