@@ -31,34 +31,34 @@ int metadirectiveOnDevice() {
       when( device={kind(nohost)}: nothing ) \
       when( device={arch("nvptx")}: nothing) \
       when( device={arch("amd")}: nothing ) \
-      default( target map(tofrom: A) )
+      default( target map(tofrom: A) parallel )
       {
          for (int i = 0; i < N; i++) {
-            A[i] = i + 2;
+            A[i] += omp_in_parallel();
          }
       }
 
    for (int i = 0; i < N; i++) {
-      OMPVV_TEST_AND_SET(errors, A[i] == 0 && A[i] != 2 )
+      OMPVV_TEST_AND_SET(errors, A[i] == 0 && A[i] != 1 )
    }
 
    #pragma omp metadirective \
       when( implementation={vendor(amd)}: nothing) \
       when( implementation={vendor(nvidia)}: nothing) \
       when( device={kind(nohost)}: nothing) \
-      default( target map(tofrom: A) )
+      default( target map(tofrom: A) parallel )
       {
          for (int i = 0; i < N; i++) {
-            A[i] = i + 2;
+            A[i] += omp_in_parallel();
          }
       }
 
    OMPVV_INFOMSG("Test ran with a number of available devices greater than 0");
    OMPVV_INFOMSG_IF(A[0] == 0, "Test recognized device was of arch/vendor/kind nvidia, amd, or nohost");
-   OMPVV_WARNING_IF(A[0] == 2 || A[0] == 4, "Test could not recognize if device was of arch/vendor/kind nvidia, amd or, nohost, even though there are devices available.");
+   OMPVV_WARNING_IF(A[0] == 1 || A[0] == 2, "Test could not recognize if device was of arch/vendor/kind nvidia, amd or, nohost, even though there are devices available.");
 
    for (int i = 0; i < N; i++) {
-	    OMPVV_TEST_AND_SET(errors, A[i] == 0 && A[i] != 4 )
+	    OMPVV_TEST_AND_SET(errors, A[i] == 0 && A[i] != 1 && A[i] != 2 )
    }
 
    return errors;
