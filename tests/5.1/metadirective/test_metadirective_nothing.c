@@ -79,16 +79,15 @@ int metadirectiveOnHost() {
      default( parallel )
      {
         for (int i = 0; i < N; i++) {
-           A[i] = i + 2;
+           A[i] += omp_in_parallel();
         }
      }
 
 
-  OMPVV_WARNING_IF(A[0] == 0,"Even though no devices were available the test recognized kind/arch equal to nohost or nvptx or amd");
+  OMPVV_WARNING_IF(A[0] == 0, "Even though no devices were available the test recognized kind/arch equal to nohost or nvptx or amd");
   
-
   for (int i = 0; i < N; i++) {
-     OMPVV_TEST_AND_SET(errors, A[i] == 0 && A[i] != 2)
+     OMPVV_TEST_AND_SET(errors, A[i] == 0 && A[i] != 1)
   }
 
   return errors;
