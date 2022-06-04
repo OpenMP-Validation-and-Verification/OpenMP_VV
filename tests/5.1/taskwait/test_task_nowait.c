@@ -25,16 +25,20 @@ int test_task_nowait(){
 		test_arr[i] = 1;
 		sum += i;
 	}
-	#pragma omp task private(test_scaler)
+	#pragma omp target map(to: test_scaler, test_arr) map(from: test_scaler, test_arr)
+	{
+	#pragma omp task private(test_scaler) depend(out: test_scaler)
 	{
 		test_scaler += 1;
 	}
-	#pragma omp taskwait nowait depend(out:test_scalar)
-	#pragma omp task private(test_arr)
+	#pragma omp task private(test_arr) depend(in : test_scaler)
 	{
+		test_scaler += 1;
 		for (int i=0; i<N; i++){
 			test_arr[i] = i;
 		}
+	}
+	#pragma omp taskwait
 	}
 	int new_sum;
 	for (int i = 0; i < N; i++){
