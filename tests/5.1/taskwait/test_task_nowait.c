@@ -4,6 +4,7 @@
 //
 // Tests the behavior of taskwait when nowait is specified.
 // The behavior of this should be similar to that of using task construct.
+// Test was adapted to use the depend clauses which the nowait clause should ignore
 // It is important to note that all depenend tasks must be finished first.
 //-----------------------------------------------------------------------//
 
@@ -25,30 +26,25 @@ int test_task_nowait(){
 		test_arr[i] = 1;
 		sum += i;
 	}
-	#pragma omp target map(to: test_scaler, test_arr) map(from: test_scaler, test_arr)
-	{
-	#pragma omp task private(test_scaler) depend(out: test_scaler)
+	#pragma omp task depend(out: test_scaler) shared(test_scaler)
 	{
 		test_scaler += 1;
 	}
-	#pragma omp task private(test_arr) depend(in : test_scaler)
+	#pragma omp task depend(in : test_arr) shared(test_arr)
 	{
-		test_scaler += 1;
 		for (int i=0; i<N; i++){
-			test_arr[i] = i;
+			test_arr[i] += 1;
 		}
 	}
-	#pragma omp taskwait
-	}
+	#pragma omp taskwait nowait
 	int new_sum;
 	for (int i = 0; i < N; i++){
 		new_sum += test_arr[i];
 	}
-	OMPVV_TEST_AND_SET(errors, test_scaler != 1);
-	OMPVV_INFOMSG_IF(test_scaler == 2, "Scalar test was not private");
-	OMPVV_INFOMSG_IF(test_scaler > 2, "Scalar taskwait region was ran more than once");
-	OMPVV_TEST_AND_SET(errors, new_sum != 1024);
-	OMPVV_INFOMSG_IF(sum == new_sum, "Array taskwait region was not private");
+	OMPVV_TEST_AND_SET(errors, test_scaler != 2);
+	OMPVV_INFOMSG_IF(test_scaler == 1, "Scaler task region failed");
+	OMPVV_TEST_AND_SET(errors, new_sum != 2048);
+	OMPVV_INFOMSG_IF(sum == new_sum, "Array taskwait region failed");
 	return errors;
 
 }
