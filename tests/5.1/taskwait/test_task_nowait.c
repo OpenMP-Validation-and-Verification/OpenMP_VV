@@ -36,7 +36,7 @@ int test_task_nowait(){
 			test_arr[i] += 1;
 		}
 	}
-	#pragma omp taskwait nowait
+	#pragma omp taskwait nowait depend(in : test_scaler, test_arr)
 	int new_sum;
 	for (int i = 0; i < N; i++){
 		new_sum += test_arr[i];
