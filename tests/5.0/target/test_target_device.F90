@@ -11,10 +11,9 @@
 
 #define N 1024
 
-! Required for device(ancestor: 1)
-!$omp requires reverse_offload
-
 PROGRAM test_target_device
+  ! Required for device(ancestor: 1)
+  !$omp requires reverse_offload
   USE iso_fortran_env
   USE ompvv_lib
   USE omp_lib
