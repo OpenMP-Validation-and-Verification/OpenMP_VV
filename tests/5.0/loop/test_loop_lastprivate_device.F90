@@ -53,9 +53,9 @@ CONTAINS
     !$omp end loop
     !$omp end target parallel
 
-    OMPVV_TEST_AND_SET_VERBOSE(lp_errors, x .ne. NSIZE)
+    OMPVV_TEST_AND_SET_VERBOSE(lp_errors, x .ne. (NSIZE + 1))
     WRITE(msgHelper, *) "Loop iteration variable in loop construct ended with invalid value."
-    OMPVV_ERROR_IF(x .ne. NSIZE, msgHelper)
+    OMPVV_ERROR_IF(x .ne. (NSIZE + 1), msgHelper)
 
     DO x = 1, NSIZE
       OMPVV_TEST_AND_SET_VERBOSE(errors, a(x) - b(x) .ne. 1)
@@ -92,12 +92,12 @@ CONTAINS
     !$omp end loop
     !$omp end target parallel
 
-    OMPVV_TEST_AND_SET_VERBOSE(lp_errors_x, x .ne. NSIZE)
-    OMPVV_TEST_AND_SET_VERBOSE(lp_errors_y, y .ne. NSIZE2)
+    OMPVV_TEST_AND_SET_VERBOSE(lp_errors_x, x .ne. (NSIZE + 1))
+    OMPVV_TEST_AND_SET_VERBOSE(lp_errors_y, y .ne. (NSIZE2 + 1))
     WRITE(msgHelper, *) "Outer loop iteration variable in loop directive with collapse ended with invalid value."
-    OMPVV_ERROR_IF(x .ne. NSIZE, msgHelper)
+    OMPVV_ERROR_IF(x .ne. (NSIZE + 1), msgHelper)
     WRITE(msgHelper, *) "Inner loop iteration variable in loop directive with collapse ended with invalid value."
-    OMPVV_ERROR_IF(y .ne. NSIZE2, msgHelper)
+    OMPVV_ERROR_IF(y .ne. (NSIZE2 + 1), msgHelper)
 
     DO x = 1, NSIZE
        DO y = 1, NSIZE2
