@@ -7,6 +7,7 @@
 ! present, the behavior is the same as if device_num were present.
 ! 
 !//===----------------------------------------------------------------------===//
+#define OMPVV_MODULE_REQUIRES_LINE !$omp requires reverse_offload
 #include "ompvv.F90"
 
 #define N 1024
