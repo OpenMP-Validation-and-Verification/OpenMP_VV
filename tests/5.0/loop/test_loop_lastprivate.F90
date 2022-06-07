@@ -50,9 +50,9 @@ CONTAINS
     !$omp end loop
     !$omp end parallel
 
-    OMPVV_TEST_AND_SET_VERBOSE(lp_errors, x .ne. NSIZE)
+    OMPVV_TEST_AND_SET_VERBOSE(lp_errors, x .ne. (NSIZE + 1))
     WRITE(msgHelper, *) "Loop iteration variable in loop construct ended with invalid value."
-    OMPVV_ERROR_IF(x .ne. NSIZE, msgHelper)
+    OMPVV_ERROR_IF(x .ne. (NSIZE + 1), msgHelper)
 
     DO x = 1, NSIZE
       OMPVV_TEST_AND_SET_VERBOSE(errors, a(x) - b(x) .ne. 1)
