@@ -30,13 +30,13 @@ int test_task_nowait(){
 	#pragma omp parallel
 	#pragma omp single
 	{
-		#pragma omp task depend(out: test_scaler) shared(test_scaler)
+		#pragma omp task depend(inout: test_scaler) shared(test_scaler)
 		{
 			usleep(10);
 			test_scaler += 1;
 		}
 		#pragma omp taskwait nowait depend(inout: test_scaler) depend(out: test_arr)
-		#pragma omp task depend(in : test_arr) shared(test_arr)
+		#pragma omp task depend(inout : test_arr) shared(test_arr)
 		{
 			for (int i=0; i<N; i++){
 				test_arr[i] += 1;
