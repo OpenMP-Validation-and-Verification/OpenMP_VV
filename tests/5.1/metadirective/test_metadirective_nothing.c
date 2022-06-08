@@ -39,7 +39,7 @@ int metadirectiveOnDevice() {
       }
 
    for (int i = 0; i < N; i++) {
-      OMPVV_TEST_AND_SET(errors, A[i] == 0 && A[i] != 1 )
+      OMPVV_TEST_AND_SET(errors, A[i] == 1 )
    }
 
    #pragma omp metadirective \
@@ -58,7 +58,7 @@ int metadirectiveOnDevice() {
    OMPVV_WARNING_IF(A[0] == 1 || A[0] == 2, "Test could not recognize if device was of arch/vendor/kind nvidia, amd or, nohost, even though there are devices available.");
 
    for (int i = 0; i < N; i++) {
-	    OMPVV_TEST_AND_SET(errors, A[i] == 0 && A[i] != 1 && A[i] != 2 )
+	    OMPVV_TEST_AND_SET(errors, A[i] == 2 )
    }
 
    return errors;
@@ -87,7 +87,7 @@ int metadirectiveOnHost() {
   OMPVV_WARNING_IF(A[0] == 0, "Even though no devices were available the test recognized kind/arch equal to nohost or nvptx or amd");
   
   for (int i = 0; i < N; i++) {
-     OMPVV_TEST_AND_SET(errors, A[i] == 0 && A[i] != 1)
+     OMPVV_TEST_AND_SET(errors, A[i] == 1)
   }
 
   return errors;
