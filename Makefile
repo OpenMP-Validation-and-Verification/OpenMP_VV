@@ -485,6 +485,7 @@ tidy: clean
 	- rm -rf $(RESULTS_HTML_OUTPUT_FOLDER)
 	- rm -rf $(RESULTS_JSON_OUTPUT_FILE)
 	- rm -rf $(RESULTS_CSV_OUTPUT_FILE)
+	- rm -rf ./*.exitstatus*
 
 .PHONY: compilers
 compilers:
