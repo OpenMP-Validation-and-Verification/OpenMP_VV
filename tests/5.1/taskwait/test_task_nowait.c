@@ -20,7 +20,7 @@
 
 int test_task_nowait(){
 	int errors = 0;
-	int test_scaler = 1;
+	int test_scalar = 1;
 	int test_arr[N];
 	int sum = 0;
 	for (int i =0; i<N; i++){
@@ -30,12 +30,12 @@ int test_task_nowait(){
 	#pragma omp parallel
 	#pragma omp single
 	{
-		#pragma omp task depend(inout: test_scaler) shared(test_scaler)
+		#pragma omp task depend(inout: test_scalar) shared(test_scalar)
 		{
 			usleep(10);
-			test_scaler += 1;
+			test_scalar += 1;
 		}
-		#pragma omp taskwait nowait depend(inout: test_scaler) depend(out: test_arr)
+		#pragma omp taskwait nowait depend(inout: test_scalar) depend(out: test_arr)
 		#pragma omp task depend(inout : test_arr) shared(test_arr)
 		{
 			for (int i=0; i<N; i++){
@@ -47,9 +47,9 @@ int test_task_nowait(){
 	for (int i = 0; i < N; i++){
 		new_sum += test_arr[i];
 	}
-	OMPVV_TEST_AND_SET(errors, test_scaler != 2);
-	OMPVV_INFOMSG_IF(test_scaler == 1, "Scaler task region failed");
-	OMPVV_TEST_AND_SET(errors, new_sum != 2048);
+	OMPVV_TEST_AND_SET_VERBOSE(errors, test_scalar != 2);
+	OMPVV_INFOMSG_IF(test_scalar == 1, "Scalar task region failed");
+	OMPVV_TEST_AND_SET_VERBOSE(errors, new_sum != 2048);
 	OMPVV_INFOMSG_IF(sum == new_sum, "Array taskwait region failed");
 	return errors;
 
