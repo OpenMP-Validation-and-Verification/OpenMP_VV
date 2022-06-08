@@ -32,7 +32,7 @@ void update() {
 
 #pragma omp declare target enter(update) device_type(any) 
 
-int test_declare_target_device_type_any() { 
+int test_declare_target_enter_device_type_any() { 
   
   #pragma omp target update to(a,b,c) 
   #pragma omp target 
