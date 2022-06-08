@@ -24,7 +24,7 @@ int test_case(){
 	env = omp_get_teams_thread_limit();
 	OMPVV_TEST_AND_SET(errors, env != 2);
 	OMPVV_INFOMSG_IF(env == 0, "Environment variable not set");
-	OMPVV_INFOMSG_IF(env == 10, "Test variable not overwritten");
+	OMPVV_INFOMSG_IF(env == 10, "Call to omp_get_teams_thread_limit() did not update local var.");
 	return errors;
 }
 
