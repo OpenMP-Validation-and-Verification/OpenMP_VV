@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include "ompvv.h"
 #include <math.h>
+#include <unistd.h>
 
 #define N 1024
 
@@ -26,18 +27,23 @@ int test_task_nowait(){
 		test_arr[i] = 1;
 		sum += i;
 	}
-	#pragma omp task depend(out: test_scaler) shared(test_scaler)
+	#pragma omp parallel
+	#pragma omp single
 	{
-		test_scaler += 1;
-	}
-	#pragma omp task depend(in : test_arr) shared(test_arr)
-	{
-		for (int i=0; i<N; i++){
-			test_arr[i] += 1;
+		#pragma omp task depend(out: test_scaler) shared(test_scaler)
+		{
+			usleep(10);
+			test_scaler += 1;
+		}
+		#pragma omp taskwait nowait depend(inout: test_scaler) depend(out: test_arr)
+		#pragma omp task depend(in : test_arr) shared(test_arr)
+		{
+			for (int i=0; i<N; i++){
+				test_arr[i] += 1;
+			}
 		}
 	}
-	#pragma omp taskwait nowait depend(in : test_scaler, test_arr)
-	int new_sum;
+	int new_sum = 0;
 	for (int i = 0; i < N; i++){
 		new_sum += test_arr[i];
 	}
