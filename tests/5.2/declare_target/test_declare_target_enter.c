@@ -15,10 +15,9 @@
 #define N 1024
 int errors = 0;
 
-#pragma omp declare target 
 int a[N], b[N], c[N];  
 int i = 0;
-#pragma omp end declare target
+#pragma omp declare target enter(a,b,c,i)
 
 void update() { 
   for (i = 0; i < N; i++) {
