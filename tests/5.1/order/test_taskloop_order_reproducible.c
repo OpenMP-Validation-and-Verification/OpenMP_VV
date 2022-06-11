@@ -31,18 +31,18 @@ int main() {
 	#pragma omp target map(tofrom: x,y)
 	{
 
-	#pragma omp parallel
-	{
-		#pragma omp taskloop order(reproducible:concurrent)
-		for (int i = 0; i < N; i++) {
-		  x[i] = x[i] + 2;	
-	  }
+		#pragma omp parallel
+		{
+		   #pragma omp taskloop order(reproducible:concurrent)
+		      for (int i = 0; i < N; i++) {
+			 x[i] = x[i] + 2;	
+		      }
 
-		#pragma omp taskloop order(reproducible:concurrent)
-		for (int i = 0; i < N; i++) {
+		   #pragma omp taskloop order(reproducible:concurrent)
+		      for (int i = 0; i < N; i++) {
 			y[i] = x[i] + 2;
-  	}
-	}
+		      }
+		}
 
 	}
 
