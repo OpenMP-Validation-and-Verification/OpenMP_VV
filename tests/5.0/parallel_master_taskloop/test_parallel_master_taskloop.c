@@ -51,6 +51,8 @@ int test_parallel_master_taskloop() {
 int main() {
   int errors = 0;
 
+  OMPVV_TEST_OFFLOADING;
+
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_parallel_master_taskloop());
 
   OMPVV_REPORT_AND_RETURN(errors);
