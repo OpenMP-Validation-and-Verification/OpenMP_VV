@@ -50,13 +50,13 @@ CONTAINS
     CALL random_seed(put=seed)
     DEALLOCATE(seed)
 
+    DO x = 1, N
+       a(x) = 0
+    END DO
     DO WHILE ( ((.not. have_true) .or. (.not. have_false)) .and. (num_attempts .lt. THRESHOLD) ) 
        have_true = .FALSE.
        have_false = .FALSE.
        DO x = 1, N
-          IF (num_attempts .eq. 0) THEN
-             a(x) = 0
-          END IF
           DO y = 0, 15
              !random_number() generates a real number, r, uniformly distributed in 0 <= r < 1.
              CALL random_number(randomNumber)

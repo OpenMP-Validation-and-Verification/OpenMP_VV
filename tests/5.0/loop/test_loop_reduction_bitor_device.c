@@ -27,13 +27,13 @@ int test_bitor() {
   int have_true = 0, have_false = 0;
   srand(1);
 
+  for (int x = 0; x < N; ++x) {
+    a[x] = 0;
+  }
   while ((!have_true || !have_false) && (num_attempts < THRESHOLD)) {
     have_true = 0;
     have_false = 0;
     for (int x = 0; x < N; ++x) {
-      if( num_attempts == 0 ) {
-        a[x] = 0;
-      }
       for (int y = 0; y < 16; ++y) {
         if (rand() / (double) RAND_MAX > true_margin) {
           a[x] += (1 << y);
