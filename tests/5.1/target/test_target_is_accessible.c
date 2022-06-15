@@ -29,7 +29,7 @@ int check_device(){
 	free(ptr);
 	OMPVV_TEST_AND_SET_VERBOSE(errors, check_test != 1);
 	OMPVV_INFOMSG_IF(check_test == 0, "Omp_target_is_accessible is 0");
-	OMPVV_INFOMSG_IF(check_test == 2, "call to omp_target_is_accessible() did not update local variable");
+	OMPVV_ERROR_IF(check_test == 2, "omp_target_is_accessible did not return true or false");
 	return errors;
 }
 
