@@ -74,6 +74,7 @@ CONTAINS
       END IF
     END DO
     
+    DEALLOCATE(anArray)
     unified_shared_memory_heap = errors
   END FUNCTION unified_shared_memory_heap
 END PROGRAM test_requires_unified_shared_memory_heap
