@@ -2,11 +2,11 @@
 //
 // OpenMP API Version 5.0 Nov 2018
 // 
-// This test Checks for unified shared memory of an array that is allocated on 
-// the heap and that is accessed from host and device with the same pointer
+// This test checks for unified shared memory of an array that is allocated on 
+// the heap and that is accessed from host and device with the same pointer.
 //
 // The mapping of a pointer under shared memory should allow for the pointer to
-// have the same value as in the host
+// have the same value as in the host.
 //
 ////===----------------------------------------------------------------------===//
 #include <omp.h>
@@ -18,7 +18,7 @@
 
 #pragma omp requires unified_shared_memory
 
-int unified_shared_memory_heap() {
+int unified_shared_memory_heap_map() {
   OMPVV_INFOMSG("Unified shared memory testing - Array on heap");
   int errors = 0;
   
@@ -66,7 +66,7 @@ int main() {
   OMPVV_WARNING_IF(!isOffloading, "With no offloading, unified shared memory is guaranteed due to host execution");
   int errors = 0;
   
-  OMPVV_TEST_AND_SET_VERBOSE(errors, unified_shared_memory_heap());
+  OMPVV_TEST_AND_SET_VERBOSE(errors, unified_shared_memory_heap_map());
 
   OMPVV_REPORT_AND_RETURN(errors);
 }
