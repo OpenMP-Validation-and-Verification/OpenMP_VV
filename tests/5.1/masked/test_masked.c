@@ -26,7 +26,7 @@ int test_masked() {
   }
   int threads = OMPVV_NUM_THREADS_HOST;
 
-#pragma omp parallel num_threads(threads);
+#pragma omp parallel num_threads(threads)
 while(total > 0){
     #pragma omp for
     for(i=0; i<N; i++){ // give threads work
@@ -36,6 +36,7 @@ while(total > 0){
     {
         OMPVV_TEST_AND_SET_VERBOSE(errors, omp_get_thread_num() != 0); // primary thread
         ct++;
+        total = total-1;
     }
 }
   OMPVV_TEST_AND_SET_VERBOSE(errors, ct != 10);

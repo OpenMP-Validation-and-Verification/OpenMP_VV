@@ -1,4 +1,4 @@
-//===------ test_masked.c ------------------------------------===//
+//===------ test_masked_filter.c ------------------------------------===//
 //
 // OpenMP API Version 5.1 Nov 2020
 //
@@ -15,7 +15,7 @@
 
 #define N 1024
 
-int test_masked() {
+int test_masked_filter() {
   int errors = 0;
   int i;
   int x[N];
@@ -26,7 +26,7 @@ int test_masked() {
   }
   int threads = OMPVV_NUM_THREADS_HOST;
 
-#pragma omp parallel num_threads(threads);
+#pragma omp parallel num_threads(threads)
 while(total > 0){
     #pragma omp for
     for(i=0; i<N; i++){ // give threads work
@@ -36,6 +36,7 @@ while(total > 0){
     {
         OMPVV_TEST_AND_SET_VERBOSE(errors, omp_get_thread_num() != 3); // filter thread 3
         ct++;
+        total = total-1;
     }
 }
   OMPVV_TEST_AND_SET_VERBOSE(errors, ct != 10);
@@ -45,6 +46,6 @@ while(total > 0){
 int main() {
   OMPVV_TEST_OFFLOADING;
   int errors = 0;
-  OMPVV_TEST_AND_SET_VERBOSE(errors, test_masked() != 0);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_masked_filter() != 0);
   OMPVV_REPORT_AND_RETURN(errors);
 }
