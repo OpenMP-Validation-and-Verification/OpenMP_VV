@@ -41,11 +41,6 @@ CONTAINS
 
     !$omp parallel num_threads(threads)
     DO WHILE (total>0)
-        !$omp do
-        DO i = 0, N
-            x(i) = x(i) + 1
-        END DO
-        !$omp end do
         !$omp masked filter(3)
             OMPVV_TEST_AND_SET_VERBOSE(errors, omp_get_thread_num() .ne. 3) ! primary thread
             ct = ct + 1

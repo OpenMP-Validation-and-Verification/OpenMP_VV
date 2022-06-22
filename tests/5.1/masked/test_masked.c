@@ -28,15 +28,11 @@ int test_masked() {
 
 #pragma omp parallel num_threads(threads)
 while(total > 0){
-    #pragma omp for
-    for(i=0; i<N; i++){ // give threads work
-        x[i] += 1;
-    }
     #pragma omp masked
     {
-        OMPVV_TEST_AND_SET_VERBOSE(errors, omp_get_thread_num() != 0); // primary thread
-        ct++;
-        total = total-1;
+      OMPVV_TEST_AND_SET_VERBOSE(errors, omp_get_thread_num() != 0); // primary thread
+      ct++;
+      total = total-1;
     }
 }
   OMPVV_TEST_AND_SET_VERBOSE(errors, ct != 10);
