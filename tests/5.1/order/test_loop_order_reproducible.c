@@ -31,18 +31,18 @@ int main() {
 	#pragma omp target map(tofrom: x,y)
 	{
 
-	#pragma omp parallel 
-	  {
+	   #pragma omp parallel 
+	   {
 		#pragma omp loop order(reproducible:concurrent) nowait
-		  for (int i = 0; i < N; i++) {
+		for (int i = 0; i < N; i++) {
 			x[i] = x[i] + 2;	
-		  }
+		}
 
 		#pragma omp loop order(reproducible:concurrent)
 		for (int i = 0; i < N; i++) {
 			y[i] = x[i] + 2;
 		}
-	  }
+	    }
 	}
 
 	for (int i = 0; i < N; i++) {
