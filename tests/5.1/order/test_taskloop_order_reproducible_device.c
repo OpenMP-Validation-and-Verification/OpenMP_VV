@@ -1,4 +1,4 @@
-//===------------ test_target_taskloop_order_reproducible.c -------------===//
+//===------------ test_target_taskloop_order_reproducible_device.c ----------===//
 //
 // OpenMP API Version 5.1 Nov 2020
 //
