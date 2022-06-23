@@ -27,6 +27,9 @@ int test_bitor() {
   int have_true = 0, have_false = 0;
   srand(1);
 
+  for (int x = 0; x < N; ++x) {
+    a[x] = 0;
+  }
   while ((!have_true || !have_false) && (num_attempts < THRESHOLD)) {
     have_true = 0;
     have_false = 0;
