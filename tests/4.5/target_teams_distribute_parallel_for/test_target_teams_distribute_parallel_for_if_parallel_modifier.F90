@@ -132,8 +132,7 @@ CONTAINS
 
       OMPVV_ERROR_IF(errors .ne. 0, "error in if(parallel: modifier). Possible causes are: the execution occurred in the host even though it should not affect the target region. The number of threads was > 1 when if(false).")
  
-      OMPVV_WARNING_IF(testOffload .neqv. .TRUE.," Offloading is not enabled for this test, behavior of this test cannot be
-verified without offloading enabled.")
+      OMPVV_WARNING_IF(testOffload .neqv. .TRUE.," Offloading is not enabled for this test, behavior of this test cannot be verified without offloading enabled.")
    
    target_teams_distribute_if_parallel_modifier = errors
    END FUNCTION target_teams_distribute_if_parallel_modifier   
