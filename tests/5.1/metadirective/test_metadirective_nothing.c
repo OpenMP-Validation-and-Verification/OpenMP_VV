@@ -27,6 +27,7 @@ int metadirectiveOnDevice() {
       A[i] = 0;
    }
 
+   // We expect at least one of these when conditons to eval to true, thus having the nothing directive utilized
    #pragma omp metadirective \
       when( device={kind(nohost)}: nothing ) \
       when( device={arch("nvptx")}: nothing) \
@@ -39,27 +40,12 @@ int metadirectiveOnDevice() {
       }
 
    for (int i = 0; i < N; i++) {
-      OMPVV_TEST_AND_SET(errors, A[i] == 1 )
+      OMPVV_TEST_AND_SET(errors, A[i] != 0 && A[i] != 1);
    }
-
-   #pragma omp metadirective \
-      when( implementation={vendor(amd)}: nothing) \
-      when( implementation={vendor(nvidia)}: nothing) \
-      when( device={kind(nohost)}: nothing) \
-      default( target parallel map(tofrom: A) )
-      {
-         for (int i = 0; i < N; i++) {
-            A[i] += omp_in_parallel();
-         }
-      }
 
    OMPVV_INFOMSG("Test ran with a number of available devices greater than 0");
    OMPVV_INFOMSG_IF(A[0] == 0, "Test recognized device was of arch/vendor/kind nvidia, amd, or nohost");
-   OMPVV_WARNING_IF(A[0] == 1 || A[0] == 2, "Test could not recognize if device was of arch/vendor/kind nvidia, amd or, nohost, even though there are devices available.");
-
-   for (int i = 0; i < N; i++) {
-	    OMPVV_TEST_AND_SET(errors, A[i] == 2 )
-   }
+   OMPVV_WARNING_IF(A[0] == 1, "Test could not recognize if device was of arch/vendor/kind nvidia, amd or, nohost, even though there are devices available.");
 
    return errors;
 }
@@ -72,6 +58,7 @@ int metadirectiveOnHost() {
      A[i] = 0;
   }
 
+  // We expect all of these when statements to eval to false, causing body of code to run in parallel
   #pragma omp metadirective \
      when( device={kind(nohost)}: nothing ) \
      when( device={arch("nvptx")}: nothing ) \
@@ -87,7 +74,7 @@ int metadirectiveOnHost() {
   OMPVV_WARNING_IF(A[0] == 0, "Even though no devices were available the test recognized kind/arch equal to nohost or nvptx or amd");
   
   for (int i = 0; i < N; i++) {
-     OMPVV_TEST_AND_SET(errors, A[i] == 1)
+     OMPVV_TEST_AND_SET(errors, A[i] != 0 && A[i] != 1);
   }
 
   return errors;
