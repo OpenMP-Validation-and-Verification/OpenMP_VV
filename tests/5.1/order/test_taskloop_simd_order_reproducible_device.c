@@ -1,4 +1,4 @@
-//===------------ test_target_taskloop_order_reproducible_device.c ----------===//
+//===------------ test_target_taskloop_simd_order_reproducible_device.c ------===//
 //
 // OpenMP API Version 5.1 Nov 2020
 //
@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include "ompvv.h"
 
-#define N 1024
+#define N 24
 
 int main() {
 	int errors = 0;
@@ -30,15 +30,16 @@ int main() {
 
 	#pragma omp target map(tofrom: x,y)
 	{
-
 		#pragma omp parallel
 		{
-		   #pragma omp taskloop order(reproducible:concurrent)
+		   #pragma omp single
+		   #pragma omp taskloop simd order(reproducible:concurrent)
 		      for (int i = 0; i < N; i++) {
 			 x[i] = x[i] + 2;	
 		      }
 
-		   #pragma omp taskloop order(reproducible:concurrent)
+		   #pragma omp single
+		   #pragma omp taskloop simd order(reproducible:concurrent)
 		      for (int i = 0; i < N; i++) {
 			y[i] = x[i] + 2;
 		      }
