@@ -33,7 +33,7 @@ int main() {
 
 	   #pragma omp parallel 
 	   {
-		#pragma omp loop order(reproducible:concurrent) nowait
+		#pragma omp loop order(reproducible:concurrent) 
 		for (int i = 0; i < N; i++) {
 			x[i] = x[i] + 2;	
 		}
