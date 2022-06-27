@@ -29,15 +29,10 @@ CONTAINS
     INTEGER:: errors = 0
     INTEGER:: total = 10
     INTEGER:: ct = 0
-    INTEGER, DIMENSION(N):: x
     INTEGER:: i
 
     OMPVV_INFOMSG("test_masked")
-
-    DO i = 0, N
-       x(i) = 0
-    END DO
-    threads = omp_get_num_threads()
+    threads = OMPVV_NUM_THREADS_HOST
 
     !$omp parallel num_threads(threads)
     DO WHILE (total>0)
@@ -47,6 +42,7 @@ CONTAINS
             total = total - 1
         !$omp end masked
     END DO
+    !$omp end parallel
     
     OMPVV_TEST_AND_SET_VERBOSE(errors, ct .ne. 10)
     masked = errors

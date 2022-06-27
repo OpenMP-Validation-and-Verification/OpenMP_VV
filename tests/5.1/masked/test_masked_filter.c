@@ -18,12 +18,8 @@
 int test_masked_filter() {
   int errors = 0;
   int i;
-  int x[N];
   int ct = 0;
   int total = 10;
-  for(i=0; i<N; i++){
-    x[i] = 0;
-  }
   int threads = OMPVV_NUM_THREADS_HOST;
 
 #pragma omp parallel num_threads(threads)
