@@ -29,8 +29,6 @@ int main () {
    long int long_one = 194834345;
    unsigned long int unsigned_long = 1777444;
    long long int long_long = 282828293898;
-   unsigned char unsigned_char = 200;
-
 
    #pragma omp target map(tofrom: integer, floater, doubler, single_char, shortie, unsigned_shortie, long_one, unsigned_long, long_long) 
    {
