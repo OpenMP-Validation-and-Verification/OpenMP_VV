@@ -32,7 +32,7 @@ int metadirectiveOnDevice() {
       when( device={kind(nohost)}: nothing ) \
       when( device={arch("nvptx")}: nothing) \
       when( implementation={vendor(amd)}: nothing ) \
-      default( target parallel map(tofrom: A) )
+      default( target parallel for map(tofrom: A) )
       {
          for (int i = 0; i < N; i++) {
             A[i] += omp_in_parallel();
@@ -40,7 +40,7 @@ int metadirectiveOnDevice() {
       }
 
    for (int i = 0; i < N; i++) {
-      OMPVV_TEST_AND_SET(errors, A[i] != 0 && A[i] != 1);
+      OMPVV_TEST_AND_SET(errors, A[i] != 0 || A[i] != 1);
    }
 
    OMPVV_INFOMSG("Test ran with a number of available devices greater than 0");
@@ -63,7 +63,7 @@ int metadirectiveOnHost() {
      when( device={kind(nohost)}: nothing ) \
      when( device={arch("nvptx")}: nothing ) \
      when( implementation={vendor(amd)}: nothing ) \
-     default( parallel )
+     default( parallel for )
      {
         for (int i = 0; i < N; i++) {
            A[i] += omp_in_parallel();
@@ -74,7 +74,7 @@ int metadirectiveOnHost() {
   OMPVV_WARNING_IF(A[0] == 0, "Even though no devices were available the test recognized kind/arch equal to nohost or nvptx or amd");
   
   for (int i = 0; i < N; i++) {
-     OMPVV_TEST_AND_SET(errors, A[i] != 0 && A[i] != 1);
+     OMPVV_TEST_AND_SET(errors, A[i] != 0 || A[i] != 1);
   }
 
   return errors;
