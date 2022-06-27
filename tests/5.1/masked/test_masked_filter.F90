@@ -18,10 +18,7 @@ PROGRAM test_masked
   USE omp_lib
   implicit none
 
-  OMPVV_TEST_OFFLOADING
-
   OMPVV_TEST_VERBOSE(masked() .ne. 0)
-
   OMPVV_REPORT_AND_RETURN()
 
 CONTAINS
@@ -29,18 +26,18 @@ CONTAINS
     INTEGER:: errors = 0
     INTEGER:: total = 10
     INTEGER:: ct = 0
-    INTEGER:: i
+    INTEGER:: threads
 
     OMPVV_INFOMSG("test_masked")
     threads = OMPVV_NUM_THREADS_HOST
 
     !$omp parallel num_threads(threads)
     DO WHILE (total>0)
-        !$omp masked filter(3)
-            OMPVV_TEST_AND_SET_VERBOSE(errors, omp_get_thread_num() .ne. 3) ! primary thread
-            ct = ct + 1
-            total = total - 1
-        !$omp end masked
+      !$omp masked filter(3)
+        OMPVV_TEST_AND_SET_VERBOSE(errors, omp_get_thread_num() .ne. 3) ! primary thread
+        ct = ct + 1
+        total = total - 1
+      !$omp end masked
     END DO
     !$omp end parallel
     

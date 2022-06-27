@@ -17,19 +17,18 @@
 
 int test_masked_filter() {
   int errors = 0;
-  int i;
   int ct = 0;
   int total = 10;
   int threads = OMPVV_NUM_THREADS_HOST;
 
 #pragma omp parallel num_threads(threads)
 while(total > 0){
-    #pragma omp masked filter(3)
-    {
-      OMPVV_TEST_AND_SET_VERBOSE(errors, omp_get_thread_num() != 3); // filter thread 3
-      ct++;
-      total = total-1;
-    }
+  #pragma omp masked filter(3)
+  {
+    OMPVV_TEST_AND_SET_VERBOSE(errors, omp_get_thread_num() != 3); // filter thread 3
+    ct++;
+    total = total-1;
+  }
 }
   OMPVV_TEST_AND_SET_VERBOSE(errors, ct != 10);
   return errors;
