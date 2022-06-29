@@ -27,17 +27,20 @@ int metadirectiveOnDevice() {
       A[i] = 0;
    }
 
-   // We expect at least one of these when conditons to eval to true, thus having the nothing directive utilized
-   #pragma omp metadirective \
-      when( device={kind(nohost)}: nothing ) \
-      when( device={arch("nvptx")}: nothing) \
-      when( implementation={vendor(amd)}: nothing ) \
-      default( target parallel for map(tofrom: A) )
-      {
-         for (int i = 0; i < N; i++) {
-            A[i] += omp_in_parallel();
+   #pragma omp target map(tofrom: A)
+   {
+      // We expect at least one of these when conditons to eval to true, thus having the nothing directive utilized
+      #pragma omp metadirective \
+         when( device={kind(nohost)}: nothing ) \
+         when( device={arch("nvptx")}: nothing) \
+         when( implementation={vendor(amd)}: nothing ) \
+         default( parallel for map(tofrom: A) )
+         {
+            for (int i = 0; i < N; i++) {
+               A[i] += omp_in_parallel();
+            }
          }
-      }
+   }
 
    for (int i = 0; i < N; i++) {
       OMPVV_TEST_AND_SET(errors, A[i] != 0 || A[i] != 1);
