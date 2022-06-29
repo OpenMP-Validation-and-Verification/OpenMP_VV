@@ -26,6 +26,12 @@ int unified_shared_memory_heap_map() {
   int anArrayCopy[N];
 
   anArray = (int*)malloc(sizeof(int)*N);
+  if (anArray == NULL){
+    OMPVV_INFOMSG("Memory allocation for anArray failed");
+    errors++;
+    return errors;
+  }
+    
 
   for (int i = 0; i < N; i++) {
     anArray[i] = i;
