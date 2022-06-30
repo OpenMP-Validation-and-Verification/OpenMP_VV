@@ -4,8 +4,8 @@
 //
 // This test checks that the omp_target_is_accessible device routine.
 // In this test the output of the target_is_accessible call should return
-// true because the storage indicated by the first and second arguements
-// is accessible by the targeted device. This test is closely adapdted
+// true because the storage indicated by the first and second arguments
+// is accessible by the targeted device. This test is closely adapted
 // from the 5.1 OpenMP example sheet.
 //-----------------------------------------------------------------------//
 
@@ -22,13 +22,13 @@ int check_device(){
 	const int buf_size = sizeof(int) * N;
 	const int dev = omp_get_default_device();
 
-	int *ptr = (int *) malloc(buf_size);
+	int *ptr = (int *) omp_target_malloc(buf_size, dev);
 
 	check_test = omp_target_is_accessible(ptr, buf_size, dev);
 	
-	free(ptr);
+	omp_target_free(omp_ptr, dev);
 	OMPVV_TEST_AND_SET_VERBOSE(errors, check_test != 1);
-	OMPVV_INFOMSG_IF(check_test == 0, "Omp_target_is_accessible is 0");
+	OMPVV_INFOMSG_IF(check_test == 0, "omp_target_is_accessible is 0");
 	OMPVV_ERROR_IF(check_test == 2, "omp_target_is_accessible did not return true or false");
 	return errors;
 }
