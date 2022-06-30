@@ -49,8 +49,7 @@ CONTAINS
 
     !$omp target map(alloc: scalar, a, test_struct) map(to: scalar, a, &
     !$omp& test_struct) map(tofrom: errors)
-    OMPVV_TEST_AND_SET_VERBOSE(errors, scalar .ne. 80 .OR. a(2) .ne. 2 .OR. test_struct%var .ne. 1 &
-         & .OR. test_struct%b(2) .ne. 2)
+    OMPVV_TEST_AND_SET_VERBOSE(errors, scalar .ne. 80 .OR. a(2) .ne. 2 .OR. test_struct%var .ne. 1 .OR. test_struct%b(2) .ne. 2)
     !$omp end target
 
     to_before_alloc = errors
