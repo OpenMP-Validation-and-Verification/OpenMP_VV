@@ -15,30 +15,33 @@
 #include <math.h>
 
 #define N 5
+#define M 10
 
 int errors, i, j;
 
 int test_target_memcpy_async_depobj() {
 
+    const size_t volume[2] = {5, 10};
+    const size_t offsets[2] = {0, 0};
+    const size_t dimensions[2] = {N, M};
+
     int h, t;
     errors = 0;
-    double *devRect;
+    //double **devRect;
     h = omp_get_initial_device();
     t = omp_get_default_device();
 
-    double* hostRect[N];
-    for(i = 0; i < N; i++){
-        hostRect[i] = (double *)malloc( sizeof(double)*N); 
-    } // 5x5 2D array
-    devRect = (double *)omp_target_alloc( sizeof(double)*N, t);
-    for(i = 0; i < N; i++){
-        devRect[i] = (double *)omp_target_alloc( sizeof(double)*N, t);
-    }
+    double hostRect[N][M]; // 5x10 2D array
+    //double devRect = (double **)omp_target_alloc( sizeof(double)*N, t);
+    /*for(i = 0; i < N; i++){
+        devRect[i] = (double **)omp_target_alloc( sizeof(double)*M, t);
+    }*/
+    double *devRect = (double *)omp_target_alloc(sizeof(double)*N*M, t);
 
     OMPVV_TEST_AND_SET_VERBOSE(errors, devRect == NULL);
 
-    for(i = 0; i < N; i++){
-        for (j = 0; j < N; j++){
+    for(i = 0; i < N; i++){             //each index is set to number of their row
+        for (j = 0; j < M; j++){
             hostRect[i][j] = i;
         }
     }
@@ -48,9 +51,10 @@ int test_target_memcpy_async_depobj() {
 
     /* copy to device memory */
     omp_target_memcpy_rect_async(devRect, hostRect, 
-                                32 /*number of bits??*/, 2, 5, //5 by 5
-                                0,          0,
-                                sizeof(double)*N*N, sizeof(double)*N*N,
+                                sizeof(double), 2, 
+                                volume, //5 by 10
+                                offsets,          offsets,
+                                dimensions, dimensions,
                                 t,          h,
                                 1,          obj_arr);
 
@@ -58,17 +62,18 @@ int test_target_memcpy_async_depobj() {
     #pragma omp target is_device_ptr(devRect) device(t) depend(depobj: obj)
     {
         for(i = 0; i < N; i++){
-            for (j = 0; j < N; j++){
-                devRect[i][j] = devRect[i][j]*2; // initialize data
+            for (j = 0; j < M; j++){
+                devRect[i*N + j] = devRect[i*N + j]*2; // initialize data
             }
         }
     }
 
     /* copy to host memory */
     omp_target_memcpy_rect_async(hostRect, devRect,
-                                32, 2, 5
-                                0,          0,
-                                sizeof(double)*N*N, sizeof(double)*N*N,
+                                sizeof(double), 2,
+                                volume, //5 by 10
+                                offsets,          offsets,
+                                dimensions, dimensions,
                                 h,          t,
                                 1,          obj_arr);
 
