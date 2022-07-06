@@ -40,7 +40,7 @@ CONTAINS
                         B(i) = 50
                         D(i) = 0
                 end do
-                !$omp target enter data map(to:A, B, D)
+                !$omp target enter data map(A, B, D)
                         !$omp target map(tofrom: errors)
                                 do i = 1, 10
                                         IF (A(i) /= 10) THEN
@@ -64,7 +64,7 @@ CONTAINS
                                         OMPVV_TEST_AND_SET_VERBOSE(errors, D(i) /= 70)
                                  end do
                         !$omp end target
-                !$omp target exit data map(from: A, B, D)
+                !$omp target exit data map(A, B, D)
                 do i = 1,10
                         OMPVV_TEST_AND_SET_VERBOSE(errors, B(i) /= 120)
                         OMPVV_TEST_AND_SET_VERBOSE(errors, A(i) /= 1000)
