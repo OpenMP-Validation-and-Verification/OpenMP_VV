@@ -2,7 +2,7 @@
 //
 //  Inspired from OpenMP 5.1 Examples Doc, 5.16.4 & 8.9
 //  This test utilizes the omp_target_memcpy_rect_async construct to
-//  allocate memory on the device asynchronously. The construct
+//  allocate 2D memory on the device asynchronously. The construct
 //  uses 'obj' for dependency, so that memory is only copied once
 //  the variable listed in the depend clause is changed.
 //
@@ -27,22 +27,17 @@ int test_target_memcpy_async_depobj() {
 
     int h, t;
     errors = 0;
-    //double **devRect;
     h = omp_get_initial_device();
     t = omp_get_default_device();
 
     double hostRect[N][M]; // 5x10 2D array
-    //double devRect = (double **)omp_target_alloc( sizeof(double)*N, t);
-    /*for(i = 0; i < N; i++){
-        devRect[i] = (double **)omp_target_alloc( sizeof(double)*M, t);
-    }*/
     double *devRect = (double *)omp_target_alloc(sizeof(double)*N*M, t);
 
     OMPVV_TEST_AND_SET_VERBOSE(errors, devRect == NULL);
 
     for(i = 0; i < N; i++){             //each index is set to number of their row
         for (j = 0; j < M; j++){
-            hostRect[i][j] = i;
+            hostRect[i][j] = i + j;
         }
     }
     omp_depend_t obj;
@@ -63,7 +58,7 @@ int test_target_memcpy_async_depobj() {
     {
         for(i = 0; i < N; i++){
             for (j = 0; j < M; j++){
-                devRect[i*N + j] = devRect[i*N + j]*2; // initialize data
+                devRect[i*M + j] = devRect[i*M + j]*2; // initialize data
             }
         }
     }
@@ -80,7 +75,7 @@ int test_target_memcpy_async_depobj() {
     #pragma omp taskwait depend(depobj: obj)
     for(i = 0; i < N; i++){
         for(j = 0; j < N; j++){
-            OMPVV_TEST_AND_SET(errors, hostRect[i][j]!=i*2);
+            OMPVV_TEST_AND_SET(errors, hostRect[i][j]!=(i+j)*2);
         }
     }
     // free resources

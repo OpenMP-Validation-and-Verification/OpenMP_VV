@@ -55,10 +55,11 @@ int test_target_memcpy_async_no_obj() {
                                 0,          NULL);
 
     #pragma omp taskwait
-    
     for(i = 0; i < N; i++){
         OMPVV_TEST_AND_SET(errors, mem[i]!=i*2);
     }
+    // free resources
+    free(mem);
     omp_target_free(mem_dev_cpy, t);
     return errors;
 }
