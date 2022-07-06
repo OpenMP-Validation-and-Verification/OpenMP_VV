@@ -43,7 +43,7 @@ int metadirectiveOnDevice() {
    }
 
    for (int i = 0; i < N; i++) {
-      OMPVV_TEST_AND_SET(errors, A[i] != 0 || A[i] != 1);
+      OMPVV_TEST_AND_SET(errors, A[i] != 0);
    }
 
    OMPVV_INFOMSG("Test ran with a number of available devices greater than 0");
@@ -63,7 +63,7 @@ int metadirectiveOnHost() {
 
   // We expect all of these when statements to eval to false, causing body of code to run in parallel
   #pragma omp metadirective \
-     when( device={kind(nohost)}: nothing ) \
+     when( device={kind(host)}: nothing ) \
      when( device={arch("nvptx")}: nothing ) \
      when( implementation={vendor(amd)}: nothing ) \
      default( parallel for )
