@@ -22,13 +22,13 @@ int check_device(){
 	const int buf_size = sizeof(int) * N;
 	const int dev = omp_get_default_device();
 
-	int *ptr = (int *) malloc(buf_size);
+	int *ptr = (int *) omp_target_malloc(buf_size,dev);
 
 	check_test = omp_target_is_accessible(ptr, buf_size, dev);
 	
-	free(ptr);
-	OMPVV_TEST_AND_SET_VERBOSE(errors, check_test != 1);
-	OMPVV_INFOMSG_IF(check_test == 0, "Omp_target_is_accessible is 0");
+	omp_target_free(ptr, dev);
+	OMPVV_TEST_AND_SET_VERBOSE(errors, check_test != 0);
+	OMPVV_INFOMSG_IF(check_test == 1, "Omp_target_is_accessible is 1");
 	OMPVV_ERROR_IF(check_test == 2, "omp_target_is_accessible did not return true or false");
 	return errors;
 }
