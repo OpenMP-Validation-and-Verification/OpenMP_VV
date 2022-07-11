@@ -41,7 +41,7 @@ CONTAINS
     INTEGER, DIMENSION(N):: anArrayCopy
     INTEGER, POINTER:: aPtr(:)
 
-    OMPVV_INFOMSG("Unified shared memory testing - Array on stack")
+    OMPVV_INFOMSG("Unified shared memory testing - Static Array")
 
     errors = 0
     aPtr => anArray
