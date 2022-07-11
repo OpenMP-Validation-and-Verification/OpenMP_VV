@@ -17,11 +17,13 @@
 int errors, i;
 
 int test_error_message() {
+    char msg[] = "Success! Error message works properly"
     i = 0;
     printf("Test should print a 'Success!' error message: \n");
-    #pragma omp error message("Success! Error message works properly")
+    #pragma omp error message(msg)
     i+=5;
     OMPVV_WARNING_IF("Error directive caused runtime error", i!=5);
+    return errors;
 }
 
 int main() {
