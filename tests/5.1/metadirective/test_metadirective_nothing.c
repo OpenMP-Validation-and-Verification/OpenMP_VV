@@ -64,7 +64,6 @@ int metadirectiveOnHost() {
   // We expect all of these when statements to eval to false, causing body of code to run in parallel
   #pragma omp metadirective \
      when( device={kind(host)}: nothing ) \
-     when( device={arch("nvptx")}: nothing ) \
      when( implementation={vendor(amd)}: nothing ) \
      default( parallel for )
      {
@@ -77,7 +76,7 @@ int metadirectiveOnHost() {
   OMPVV_WARNING_IF(A[0] == 0, "Even though no devices were available the test recognized kind/arch equal to nohost or nvptx or amd");
   
   for (int i = 0; i < N; i++) {
-     OMPVV_TEST_AND_SET(errors, A[i] != 0 || A[i] != 1);
+     OMPVV_TEST_AND_SET(errors, A[i] != 0);
   }
 
   return errors;
