@@ -2,10 +2,10 @@
 //
 // OpenMP API Version 5.0 Nov 2018
 // 
-// This test Checks for unified shared memory of an array that is allocated on 
-// the heap and that is accessed from host and device with the same pointer
+// This test checks for unified shared memory of an array that is allocated on 
+// the heap and that is accessed from host and device with the same pointer.
 //
-// It uses the default mapping of pointers to access the array
+// It uses the default mapping of pointers to access the array.
 //
 ////===----------------------------------------------------------------------===//
 #include <omp.h>
