@@ -22,11 +22,17 @@ int test_masked_filter() {
   int threads = OMPVV_NUM_THREADS_HOST;
 
 #pragma omp parallel num_threads(threads)
-while(total > 0){
+while(1){
+  int tot;
+  #pragma omp atomic read
+  tot = total;
+  if (tot <= 0)
+    break;
   #pragma omp masked filter(3)
   {
     OMPVV_TEST_AND_SET_VERBOSE(errors, omp_get_thread_num() != 3); // filter thread 3
     ct++;
+    #pragma omp atomic
     total = total-1;
   }
 }
