@@ -32,6 +32,7 @@ int check_device(){
 	OMPVV_TEST_AND_SET_VERBOSE(errors, check_test == 0);
 
 	OMPVV_ERROR_IF(check_test == -57, "Call to omp_target_is_accessible did not return true or false");
+	OMPVV_ERROR_IF(check_test == 0, "Call to omp_target_is_accessible did not return true when using USM.");
 	OMPVV_INFOMSG_IF((check_test != 0 && check_test != -57), "The host memory is accessible from the default device.");
 
 	return errors;
