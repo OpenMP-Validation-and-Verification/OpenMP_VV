@@ -18,8 +18,8 @@
 #pragma omp requires unified_shared_memory
 
 int check_device(){
-	int errors = -57;
-	int check_test = 0;
+	int errors = 0;
+	int check_test = -57;
 	const int buf_size = sizeof(int) * N;
 	const int dev = omp_get_default_device();
 
