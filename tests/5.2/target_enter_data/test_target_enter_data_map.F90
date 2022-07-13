@@ -3,7 +3,8 @@
 ! 
 ! OpenMP API Version 5.2 June 2022
 ! 
-! Testing target enter data map construct
+! Testing implict behavior of target enter 
+! and exit data map construct
 ! with global arrays
 !
 ! 'target enter data' generates a target task
@@ -57,11 +58,6 @@ CONTAINS
                                         A(i) = 1000
                                         B(i) = 120
                                         D(i) = 70
-                                 end do
-                                 do i = 1, 10
-                                        OMPVV_TEST_AND_SET_VERBOSE(errors, B(i) /= 120)
-                                        OMPVV_TEST_AND_SET_VERBOSE(errors, A(i) /= 1000)
-                                        OMPVV_TEST_AND_SET_VERBOSE(errors, D(i) /= 70)
                                  end do
                         !$omp end target
                 !$omp target exit data map(A, B, D)
