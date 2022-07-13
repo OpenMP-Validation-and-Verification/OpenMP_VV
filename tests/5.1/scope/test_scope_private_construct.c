@@ -15,7 +15,7 @@
 #include <math.h>
 
 int test_scope(){
-	int errors;
+	int errors = 0;
 	int test_int = 1;
 	#pragma omp parallel firstprivate(test_int)
 	{
@@ -30,9 +30,8 @@ int test_scope(){
 }
 
 int main(){
-	int errors;
+	int errors = 0;
 	OMPVV_TEST_OFFLOADING;
 	OMPVV_TEST_AND_SET_VERBOSE(errors, test_scope() != 0);
 	OMPVV_REPORT_AND_RETURN(errors);
-	return errors;
 }
