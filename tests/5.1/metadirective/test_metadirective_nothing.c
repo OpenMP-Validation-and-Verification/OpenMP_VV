@@ -34,7 +34,7 @@ int metadirectiveOnDevice() {
          when( device={kind(nohost)}: nothing ) \
          when( device={arch("nvptx")}: nothing) \
          when( implementation={vendor(amd)}: nothing ) \
-         default( parallel for map(tofrom: A) )
+         default( parallel for)
          {
             for (int i = 0; i < N; i++) {
                A[i] += omp_in_parallel();
@@ -61,11 +61,12 @@ int metadirectiveOnHost() {
      A[i] = 0;
   }
 
-  // We expect all of these when statements to eval to false, causing body of code to run in parallel
+  // We expect all of these when statements to eval to false, causing body of code to run using 'nothing' as the default pragma
   #pragma omp metadirective \
-     when( device={kind(host)}: nothing ) \
-     when( implementation={vendor(amd)}: nothing ) \
-     default( parallel for )
+     when( device={kind(nohost)}: parallel for ) \
+     when( device={arch("nvptx")}: parallel for) \
+     when( implementation={vendor(amd)}: parallel for ) \
+     default( nothing )
      {
         for (int i = 0; i < N; i++) {
            A[i] += omp_in_parallel();
@@ -73,7 +74,7 @@ int metadirectiveOnHost() {
      }
 
 
-  OMPVV_WARNING_IF(A[0] == 0, "Even though no devices were available the test recognized kind/arch equal to nohost or nvptx or amd");
+  OMPVV_WARNING_IF(A[0] == 1, "Even though no devices were available the test recognized kind/arch equal to nohost or nvptx or amd");
   
   for (int i = 0; i < N; i++) {
      OMPVV_TEST_AND_SET(errors, A[i] != 0);
