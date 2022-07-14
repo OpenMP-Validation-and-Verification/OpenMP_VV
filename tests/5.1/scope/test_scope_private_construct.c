@@ -17,7 +17,7 @@
 int test_scope(){
 	int errors = 0;
 	int test_int = 1;
-	#pragma omp parallel firstprivate(test_int)
+	#pragma omp task shared(test_int)
 	{
 		#pragma omp scope private(test_int)
 		{
