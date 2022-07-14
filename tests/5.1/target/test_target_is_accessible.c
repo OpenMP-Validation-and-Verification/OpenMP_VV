@@ -23,11 +23,11 @@ int check_device(){
 	const int buf_size = sizeof(int) * N;
 	const int dev = omp_get_default_device();
 	
-	/*Assumes taht one shared-memory systems, no copy is done*/
+	/*Assumes that one shared-memory systems, no copy is done*/
 	#pragma omp target map(to: isSharedMemory)
 		isSharedMemory = 1;
 
-	int *ptr = (int *) omp_target_malloc(buf_size,dev);
+	int *ptr = (int *) malloc(buf_size);
 
 	check_test = omp_target_is_accessible(ptr, buf_size, dev);
 	
@@ -35,15 +35,15 @@ int check_device(){
 		{
 		#pragma omp target firstprivate(ptr)
 			for (int i=0; i<N; i++)
-				ptr[i] = 5*i
+				ptr[i] = 5*i;
 		for (int i = 0; i < N; i++)
 			OMPVV_TEST_AND_SET(errors, ptr[i] != 5*i);
 		}
 
 	free(ptr);
 	OMPVV_TEST_AND_SET_VERBOSE(errors, check_test != isSharedMemory);
-	OMPVV_INFOMSG_IF(check_test == 1, "Omp_target_is_accessible is 1");
-	OMPVV_INFOMSG_IF(check_test == 0, "Omp_target_is_accessible is 0");
+	OMPVV_INFOMSG_IF(check_test == 1, "Omp_target_is_accessible returning true");
+	OMPVV_INFOMSG_IF(check_test == 0, "Omp_target_is_accessible returning false");
 	OMPVV_ERROR_IF(check_test == 2, "omp_target_is_accessible did not return true or false");
 	return errors;
 }
