@@ -20,7 +20,7 @@
 
 #define N 1024
 
-#pragma omp assumes contains(parallel)
+#pragma omp assumes contains(target, parallel, for)
 
 int errors, i;
 

@@ -18,7 +18,7 @@
 
 #define N 1024
 
-#pragma omp begin assumes contains(parallel)
+#pragma omp begin assumes contains(target, parallel, for)
 int test_begin_end_assumes();
 #pragma omp end assumes
 

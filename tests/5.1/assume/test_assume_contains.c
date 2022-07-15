@@ -25,7 +25,7 @@ int test_assume_contains() {
     for(i = 0; i < N; i++){
         arr[i] = i;
     }
-    #pragma omp assume contains(parallel)
+    #pragma omp assume contains(target, parallel, for)
     {
         #pragma omp target map(tofrom: arr)
         #pragma omp parallel
