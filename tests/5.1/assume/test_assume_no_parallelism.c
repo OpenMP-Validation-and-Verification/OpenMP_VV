@@ -20,9 +20,10 @@ int errors, i;
 int test_assume_no_parallelism() {
     #pragma omp assume no_parallelism
     {
+        int x = omp_get_thread_num(); // OMP runtime routine; should be 0
         int arr[N];
         for(i = 0; i < N; i++){
-            arr[i] = i;
+            arr[i] = i + x;
         }
     }
     #pragma omp target parallel for map(tofrom: arr)
@@ -31,7 +32,7 @@ int test_assume_no_parallelism() {
     }
     // Test that no issues were caused from using assume directive
     for(i = 0; i < N; i++){
-        OMPVV_TEST_AND_SET(errors, arr[i] != i*2);
+        OMPVV_TEST_AND_SET(errors, arr[i] != (i+x)*2);
     }
     return errors;
 }

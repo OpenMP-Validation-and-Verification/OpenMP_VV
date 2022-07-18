@@ -31,7 +31,7 @@ int test_begin_end_assumes() {
     }
 
     #pragma omp target map(tofrom: arr)
-    #pragma omp parallel
+    #pragma omp parallel num_threads(OMPVV_NUM_THREADS_DEVICE)
     #pragma omp for
     for(i = 0; i < N; i++){
         arr[i] = arr[i]*2;
