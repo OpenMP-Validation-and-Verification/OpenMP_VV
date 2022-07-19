@@ -19,13 +19,9 @@
 int test_scope_nowait(){
 	int errors = 0;
 	int test_scalar = 1;
-	for (int i=0; i<N; i++){
-		test_arr[i] = 1;
-		sum += 1;
-	}
 	#pragma omp task shared(test_int)
 	{
-		#pragma omp scope privatee(test_int) nowait
+		#pragma omp scope private(test_int) nowait
 		{
 			test_int += 1;
 		}
