@@ -1,4 +1,4 @@
-//--------------- test_scope_construct.c---------------------------------//
+//--------------- test_scope_reduction_construct.c-----------------------//
 //
 // OpenMP API Version 5.1 Aug 2021
 //
@@ -23,10 +23,8 @@ int test_scope(int n, int a[], int s){
 	{
 		int loc_s = 0;
 		#pragma omp for
-		{
 			for (int i = 0; i < n; i++)
 				loc_s += a[i];
-		}
 		#pragma omp single
 		{
 			s = 0;
@@ -49,9 +47,8 @@ int main(){
 		a[i] = 1;
 	}
 	OMPVV_TEST_OFFLOADING;
-	OMPVV_TEST_AND_SET_VERBOSE(errors, test_scope() != 0);
+	OMPVV_TEST_AND_SET_VERBOSE(errors, test_scope(N,a,s) != 0);
 	OMPVV_REPORT_AND_RETURN(errors);
-	return s;
 }
 
 

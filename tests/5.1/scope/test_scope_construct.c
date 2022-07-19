@@ -18,15 +18,13 @@
 #define N 1024
 
 int test_scope(int n, int a[], int s){
-	int errors;
-	#pragma omp parallel firstprivate(s)
+	int errors = 0;
+	#pragma omp parallel shared(s)
 	{
 		int loc_s = 0;
 		#pragma omp for
-		{
 			for (int i = 0; i < n; i++)
 				loc_s += a[i];
-		}
 		#pragma omp single
 		{
 			s = 0;
@@ -45,14 +43,12 @@ int main(){
 	int a[N];
 	int s = 0;
 	int errors = 0;
-	for (int i; i < N; i++){
+	for (int i = 0; i < N; i++){
 		a[i] = 1;
 	}
 	OMPVV_TEST_OFFLOADING;
-	OMPVV_TEST_AND_SET_VERBOSE(errors, test_scope() != 0);
+	OMPVV_TEST_AND_SET_VERBOSE(errors, test_scope(N,a,s) != 0);
 	OMPVV_REPORT_AND_RETURN(errors);
-	test_scope(N,a,s);
-	return s;
 }
 
 
