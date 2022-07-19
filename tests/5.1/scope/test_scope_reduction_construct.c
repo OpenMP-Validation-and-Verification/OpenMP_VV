@@ -18,8 +18,8 @@
 #define N 1024
 
 int test_scope(int n, int a[], int s){
-	int errors;
-	#pragma omp parallel firstprivate(s)
+	int errors = 0;
+	#pragma omp parallel shared(s)
 	{
 		int loc_s = 0;
 		#pragma omp for
