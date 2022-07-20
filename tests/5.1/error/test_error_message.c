@@ -19,10 +19,13 @@ int errors, i;
 int test_error_message() {
     char msg[] = "Success! Error message works properly"
     i = 0;
-    printf("Test should print a 'Success!' error message: \n");
-    #pragma omp error message(msg)
-    i+=5;
-    OMPVV_WARNING_IF("Error directive caused runtime error", i!=5);
+    OMPVV_INFOMSG("Test should print a 'Success!' error message: \n");
+    #pragma omp parallel
+    {
+        #pragma omp error message(msg)
+        i+=5;
+    }
+    OMPVV_TEST_AND_SET("Error directive caused execution error", i!=5);
     return errors;
 }
 

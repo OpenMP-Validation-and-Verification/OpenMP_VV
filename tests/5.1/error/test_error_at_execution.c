@@ -18,13 +18,13 @@ int errors, i;
 
 int test_error_at_execution() {
     i = 0;
-    printf("Test should print a 'execution' error message: \n");
+    OMPVV_INFOMSG("Test should print a 'execution' error message: \n");
     #pragma omp parallel
     {
         #pragma omp error at(execution) severity(warning)
         i+=5;
     }
-    OMPVV_WARNING_IF("Error directive cause execution error", i!=5);
+    OMPVV_TEST_AND_SET_VERBOSE("Error directive cause execution error", i!=5);
     return errors;
 }
 

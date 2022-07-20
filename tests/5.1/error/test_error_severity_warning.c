@@ -18,10 +18,13 @@ int errors, i;
 
 int test_error_severity_warning() {
     i = 0;
-    printf("Test should print a 'warning' error message");
-    #pragma omp error severity(warning)
-    i+=5;
-    OMPVV_WARNING_IF("Error directive caused runtime error", i!=5);
+    OMPVV_INFOMSG("Test should print a 'warning' error message");
+    #pragma omp parallel
+    {
+        #pragma omp error severity(warning)
+        i+=5;
+    }
+    OMPVV_TEST_AND_SET_VERBOSE("Error directive caused execution error", i!=5);
     return errors;
 }
 
