@@ -46,10 +46,11 @@ int test_target_device_ancestor() {
 	    // Instead, check that scalar is mapped back properly after exiting target region
 	    which_device = 75;
 	}
-    }
 
     OMPVV_ERROR_IF(which_device != 75, "Target region was executed on a target device. Due to ancestor device-modifier,"
                                          "this region should execute on a host device");
+
+    }
 
     return errors;
 
@@ -84,11 +85,13 @@ int test_target_device_device_num() {
  
             target_device_num = omp_get_device_num();
         }
+
+        OMPVV_ERROR_IF(target_device_num == host_device_num, "Target region was executed on host," 
+                   "this region should execute on specified target device number");   
+
     }
 
     OMPVV_TEST_AND_SET(errors, target_device_num == host_device_num);
-    OMPVV_ERROR_IF(target_device_num == host_device_num, "Target region was executed on host," 
-                   "this region should execute on specified target device number");   
 
     return errors;
 

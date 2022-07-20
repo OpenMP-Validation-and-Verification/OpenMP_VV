@@ -49,10 +49,11 @@ CONTAINS
     END DO
     which_device = 75
     !$omp end target
+
+    OMPVV_ERROR_IF(which_device /= 75, "Target region was executed on a target device. Due to ancestor device-modifier this region should execute on a host device")
+
     END IF
 
-    OMPVV_ERROR_IF(which_device /= 75, "Target region was executed on a target device. Due to ancestor device-modifier this region
-should execute on a host device")
 
     target_device_ancestor = errors
   END FUNCTION target_device_ancestor
@@ -83,10 +84,11 @@ should execute on a host device")
     target_device_num = omp_get_device_num()
     !$omp end target
 
+    OMPVV_ERROR_IF(target_device_num .eq. host_device_num, "Target region was executed on host, this region should execute on specified target device number")
+
     END IF
 
     OMPVV_TEST_AND_SET(errors, target_device_num .eq. host_device_num)
-    OMPVV_ERROR_IF(target_device_num .eq. host_device_num, "Target region was executed on host, this region should execute on specified target device number")
 
     target_device_device_num = errors
   END FUNCTION target_device_device_num
