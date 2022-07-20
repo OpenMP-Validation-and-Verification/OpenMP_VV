@@ -59,10 +59,10 @@ CONTAINS
        temp_total = 0
        DO y = 1, N+1
           OMPVV_TEST_AND_SET(errors, (temp_total - b(y,x)) .ne. 0)
+          IF ( y .ne. N+1 ) THEN
+             temp_total = temp_total + a(y,x)
+          END IF
        END DO
-       IF ( y .ne. N+1 ) THEN
-          temp_total = temp_total + a(y,x)
-       END IF
     END DO
 
     test_collapse1 = errors
