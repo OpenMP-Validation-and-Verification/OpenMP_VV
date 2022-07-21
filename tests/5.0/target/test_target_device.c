@@ -23,6 +23,7 @@ int test_target_device_ancestor() {
     int which_device;
     int a[N];
     int errors = 0; 
+    int is_shared_env = 0;
     which_device = 0;
 
     for (int i = 0; i < N; i++) {
@@ -30,8 +31,10 @@ int test_target_device_ancestor() {
     }
 
     OMPVV_TEST_AND_SET(errors, omp_get_num_devices() <= 0);
-    OMPVV_ERROR_IF(omp_get_num_devices() <= 0, "Since no target devices were found, this test"
+    OMPVV_WARNING_IF(omp_get_num_devices() <= 0, "[SKIPPED] Since no target devices were found, this test"
                                                  "will be skipped.");
+    OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(is_shared_env);
+    OMPVV_WARNING_IF(is_shared_env != 0, "[WARNING] target_device_ancestor() test may not be able to detect errors if the target system supports shared memory.")
 
     if (omp_get_num_devices() > 0) {
 
@@ -71,7 +74,7 @@ int test_target_device_device_num() {
 
     
     OMPVV_TEST_AND_SET(errors, omp_get_num_devices() <= 0);
-    OMPVV_ERROR_IF(omp_get_num_devices() <= 0, "Since no target devices were found, this test"
+    OMPVV_WARNING_IF(omp_get_num_devices() <= 0, "[SKIPPED] Since no target devices were found, this test"
                                                  "will be skipped");
 	
     if (omp_get_num_devices() > 0) {

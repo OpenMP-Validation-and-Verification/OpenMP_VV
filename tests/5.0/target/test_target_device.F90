@@ -19,6 +19,7 @@ PROGRAM test_target_device
   USE ompvv_lib
   USE omp_lib
   implicit none
+
   OMPVV_TEST_OFFLOADING
 
   OMPVV_TEST_VERBOSE(target_device_ancestor() .ne. 0)
@@ -30,16 +31,20 @@ CONTAINS
   INTEGER FUNCTION target_device_ancestor()
     INTEGER :: errors, i, which_device
     INTEGER, DIMENSION(N) :: a
+    INTEGER :: is_shared_env
 
     errors = 0
     which_device = 0
+    is_shared_env = 0
 
     DO i = 1, N
        a(i) = i
     END DO
 
     OMPVV_TEST_AND_SET(errors, omp_get_num_devices() .le. 0) 
-    OMPVV_ERROR_IF(omp_get_num_devices() .le. 0, "Since no target devices were found, this test will be skipped.")
+    OMPVV_WARNING_IF(omp_get_num_devices() .le. 0, "[SKIPPED] Since no target devices were found, this test will be skipped.")
+    OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(is_shared_env)
+    OMPVV_WARNING_IF(is_shared_env .ne. 0, "[WARNING] target_device_ancestor() test may not be able to detect errors if the target system supports shared memory.")
 
     IF ( omp_get_num_devices() .gt. 0 ) THEN
 
@@ -72,7 +77,7 @@ CONTAINS
     target_device_num = host_device_num
 
     OMPVV_TEST_AND_SET(errors, omp_get_num_devices() .le. 0) 
-    OMPVV_ERROR_IF(omp_get_num_devices() .le. 0, "Since no target devices were found, this test will be skipped.")
+    OMPVV_WARNING_IF(omp_get_num_devices() .le. 0, "[SKIPPED] Since no target devices were found, this test will be skipped.")
 
     IF ( omp_get_num_devices() .gt. 0 ) THEN
 
