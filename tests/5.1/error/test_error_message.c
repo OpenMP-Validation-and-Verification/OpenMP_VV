@@ -25,7 +25,8 @@ int test_error_message() {
         #pragma omp error message(msg)
         i+=5;
     }
-    OMPVV_TEST_AND_SET("Error directive caused execution error", i!=5);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, i != 5);
+    OMPVV_ERROR_IF(errors > 0, "Error directive caused execution error");
     return errors;
 }
 

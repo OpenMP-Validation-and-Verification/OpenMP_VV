@@ -24,7 +24,8 @@ int test_error_severity_warning() {
         #pragma omp error severity(warning)
         i+=5;
     }
-    OMPVV_TEST_AND_SET_VERBOSE("Error directive caused execution error", i!=5);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, i != 5);
+    OMPVV_ERROR_IF(errors > 0, "Error directive caused execution error")
     return errors;
 }
 
