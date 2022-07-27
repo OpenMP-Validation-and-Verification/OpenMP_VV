@@ -27,12 +27,13 @@ int main()
     int isOffloading;
     int errors;
     int device_num;
+    int is_shared_env = 0;
 
     errors = 0;
    
     OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
 
-    OMPVV_WARNING_IF(!isOffloading, "Without offloading enabled, host execution is already guaranteed")
+    OMPVV_WARNING_IF(!isOffloading, "Without offloading enabled, host execution is already guaranteed");
 
     device_num = omp_get_num_devices();
 
@@ -41,6 +42,8 @@ int main()
     }
 
     OMPVV_WARNING_IF(device_num <= 0, "Cannot properly properly test reverse offload if no devices are available");
+    OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(is_shared_env);
+    OMPVV_WARNING_IF(is_shared_env != 0, "[WARNING] May not be able to detect errors if the target system supports shared memory.")
     
     #pragma omp target enter data map(to: A) 
 
