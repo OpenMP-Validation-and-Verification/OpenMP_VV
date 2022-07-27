@@ -54,16 +54,16 @@ int test_wrapper() {
    for(i = 0; i < N; i++){
       OMPVV_TEST_AND_SET_VERBOSE(errors, arr[i] != i+1);
    }
-   OMPVV_ERROR_IF(errors > 0, "Dispatch w/ novariants false is not working properly");
+   OMPVV_ERROR_IF(errors > 0, "Dispatch w/ novariants true is not working properly");
 
-   use_context = true;
+   use_context = false;
    #pragma omp dispatch nocontext(use_context)
       add(arr);
 
    for(i = 0; i < N; i++){
       OMPVV_TEST_AND_SET_VERBOSE(errors, arr[i] != i+2);
    }
-   OMPVV_ERROR_IF(errors > 0, "Dispatch w/ novariants true is not working properly");
+   OMPVV_ERROR_IF(errors > 0, "Dispatch w/ novariants false is not working properly");
    return errors;
 }
 
