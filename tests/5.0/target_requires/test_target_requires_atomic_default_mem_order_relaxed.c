@@ -41,9 +41,10 @@ int test_target_requires_atomic_relaxed() {
             tmp = y;
           }
           #pragma omp flush
-          OMPVV_TEST_AND_SET_VERBOSE(errors, x != 10);
+          OMPVV_TEST_AND_SET(errors, x != 10);
        }
    }
+   OMPVV_ERROR_IF(errors > 0, "Requires atomic_default_mem_order(relaxed) test failed");
    return errors;
 }
 

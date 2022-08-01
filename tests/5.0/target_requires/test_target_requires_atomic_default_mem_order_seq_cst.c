@@ -42,6 +42,7 @@ int test_target_atomic_seq_cst() {
           OMPVV_TEST_AND_SET_VERBOSE(errors, x != 10);
        }
    }
+   OMPVV_ERROR_IF(errors > 0, "Requires atomic_default_mem_order(seq_cst) test failed");
    return errors;
 }
 

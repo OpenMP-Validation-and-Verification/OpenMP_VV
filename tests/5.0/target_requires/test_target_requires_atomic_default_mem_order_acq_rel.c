@@ -38,9 +38,10 @@ int test_target_requires_atomic_acq_rel() {
             #pragma omp atomic read 
             tmp = y;
           }
-          OMPVV_TEST_AND_SET_VERBOSE(errors, x != 10);
+          OMPVV_TEST_AND_SET(errors, x != 10);
        }
    }
+   OMPVV_ERROR_IF(errors > 0; "Requires atomic_default_mem_order(acq_rel) test failed");
    return errors;
 }
 
