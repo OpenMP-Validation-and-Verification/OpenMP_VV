@@ -48,10 +48,11 @@ int test_target_memcpy_async_depobj() {
 
     #pragma omp taskwait depend(depobj: obj)
     #pragma omp target is_device_ptr(mem_dev_cpy) device(t) depend(depobj: obj)
-    for(i = 0; i < N; i++){
-        mem_dev_cpy[i] = mem_dev_cpy[i]*2; // initialize data
+    {
+        for(i = 0; i < N; i++){
+            mem_dev_cpy[i] = mem_dev_cpy[i]*2; // initialize data
+        }
     }
-
     /* copy to host memory */
     omp_target_memcpy_async(mem, mem_dev_cpy, sizeof(double)*N,
                                 0,          0,
@@ -59,10 +60,11 @@ int test_target_memcpy_async_depobj() {
                                 1,          obj_arr);
 
     #pragma omp taskwait depend(depobj: obj)
-    for(int i=0; i < N; i++){
+    for(i = 0; i < N; i++){
         OMPVV_TEST_AND_SET(errors, mem[i]!=i*2);
     }
     // free resources
+    free(mem);
     omp_target_free(mem_dev_cpy, t);
     #pragma omp depobj(obj) destroy
     return errors;

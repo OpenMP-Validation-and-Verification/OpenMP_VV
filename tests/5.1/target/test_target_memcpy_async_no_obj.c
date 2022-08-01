@@ -45,7 +45,7 @@ int test_target_memcpy_async_no_obj() {
 
     #pragma omp target is_device_ptr(mem_dev_cpy) device(t)
     #pragma omp teams distribute parallel for
-    for(i = 0;i<N;i++){
+    for(i = 0; i < N; i++){
         mem_dev_cpy[i] = i*2; // initialize data on device
     }
     /* copy to host */
@@ -55,10 +55,11 @@ int test_target_memcpy_async_no_obj() {
                                 0,          NULL);
 
     #pragma omp taskwait
-    
-    for(int i=0;i<N;i++){
+    for(i = 0; i < N; i++){
         OMPVV_TEST_AND_SET(errors, mem[i]!=i*2);
     }
+    // free resources
+    free(mem);
     omp_target_free(mem_dev_cpy, t);
     return errors;
 }
