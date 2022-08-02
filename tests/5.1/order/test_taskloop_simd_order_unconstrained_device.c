@@ -33,7 +33,7 @@ int main() {
 		#pragma omp parallel
 		{
 		   #pragma omp single
-		   #pragma omp taskloop simd order(reproducible:unconstrained)
+		   #pragma omp taskloop simd order(unconstrained:concurrent)
 		   for (int i = 0; i < N; i++) {
 			   x[i] = x[i] + 2;	
 		   }
