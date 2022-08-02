@@ -39,7 +39,7 @@ int main() {
 		   }
 
 		   #pragma omp single
-		   #pragma omp taskloop simd order(reproducible:unconstrained)
+		   #pragma omp taskloop simd order(unconstrained:concurrent)
 		   for (int i = 0; i < N; i++) {
 			   y[i] = y[i] + 2;
 		   }
