@@ -39,7 +39,7 @@ int test_target_atomic_seq_cst() {
             #pragma omp atomic read 
             tmp = y;
           }
-          OMPVV_TEST_AND_SET_VERBOSE(errors, x != 10);
+          OMPVV_TEST_AND_SET(errors, x != 10);
        }
    }
    OMPVV_ERROR_IF(errors > 0, "Requires atomic_default_mem_order(seq_cst) test failed");
