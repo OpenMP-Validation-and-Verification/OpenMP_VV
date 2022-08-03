@@ -31,11 +31,11 @@ CONTAINS
   INTEGER FUNCTION target_device_ancestor()
     INTEGER :: errors, i, which_device
     INTEGER, DIMENSION(N) :: a
-    INTEGER :: is_shared_env
+    LOGICAL :: is_shared_env
 
     errors = 0
     which_device = 0
-    is_shared_env = 0
+    is_shared_env = .false.
 
     DO i = 1, N
        a(i) = i
@@ -44,7 +44,7 @@ CONTAINS
     OMPVV_TEST_AND_SET(errors, omp_get_num_devices() .le. 0) 
     OMPVV_WARNING_IF(omp_get_num_devices() .le. 0, "[SKIPPED] Since no target devices were found, this test will be skipped.")
     OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(is_shared_env)
-    OMPVV_WARNING_IF(is_shared_env .ne. 0, "[WARNING] target_device_ancestor() test may not be able to detect errors if the target system supports shared memory.")
+    OMPVV_WARNING_IF(is_shared_env, "[WARNING] target_device_ancestor() test may not be able to detect errors if the target system supports shared memory.")
 
     IF ( omp_get_num_devices() .gt. 0 ) THEN
 
