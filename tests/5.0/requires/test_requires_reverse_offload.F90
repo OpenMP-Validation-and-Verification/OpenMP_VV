@@ -54,7 +54,7 @@ PROGRAM test_requires_reverse_offload
   END IF
 
   DO i = 1, N
-     OMPVV_TEST(A[i] .ne. 2*i)
+     OMPVV_TEST(A(i) .ne. 2*i)
   END DO
 
   OMPVV_REPORT_AND_RETURN()
