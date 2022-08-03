@@ -39,7 +39,7 @@ PROGRAM test_requires_reverse_offload
      A(i) = i
   END DO
 
-  OMPVV_WARNING_IF(device_num .le. 0, "Cannot properly properly test reverse offload if no devices are available")
+  OMPVV_WARNING_IF(device_num .le. 0, "Cannot properly test reverse offload if no devices are available")
   OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(is_shared_env)
   OMPVV_WARNING_IF(is_shared_env, "[WARNING] May not be able to detect errors if the target system supports shared memory.")
 

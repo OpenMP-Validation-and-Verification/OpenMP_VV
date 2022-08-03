@@ -41,7 +41,7 @@ int main()
         A[i] = i;
     }
 
-    OMPVV_WARNING_IF(device_num <= 0, "Cannot properly properly test reverse offload if no devices are available");
+    OMPVV_WARNING_IF(device_num <= 0, "Cannot properly test reverse offload if no devices are available");
     OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(is_shared_env);
     OMPVV_WARNING_IF(is_shared_env != 0, "[WARNING] May not be able to detect errors if the target system supports shared memory.")
     
