@@ -18,16 +18,26 @@
 
 int test_scope_nowait(){
 	int errors = 0;
-	int test_scalar = 1;
-	#pragma omp task shared(test_int)
+	int test_arr[N];
+	for (int i=0; i<N, i++){
+		test_arr[i] = 1;
+		sum += i;
+	}
+	#pragma omp parallel shared(test_int)
 	{
-		#pragma omp scope private(test_int) nowait
+		#pragma omp scope nowait
 		{
-			test_int += 1;
+			for (int i=0; i<N; i++){
+				test_arr[i] += 1;
+			}
 		}
 	}
-	OMPVV_TEST_AND_SET_VERBOSE(errors, test_int != 1);
-        OMPVV_INFOMSG_IF(test_int == 2, "test was not private");
+	int sum = 0;
+	for (int i = 0; i < N; i++){
+		sum += test_arr[i];
+	}
+	OMPVV_TEST_AND_SET_VERBOSE(errors, sum != 2048);
+        OMPVV_INFOMSG_IF(test_int == 1024, "scope region was not accessed");
 	return errors;
 }
 
