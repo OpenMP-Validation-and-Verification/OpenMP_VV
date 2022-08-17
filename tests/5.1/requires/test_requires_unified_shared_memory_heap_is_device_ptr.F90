@@ -70,15 +70,18 @@ CONTAINS
 
     ! Modify again on the host
     DO i = 1, N
-      aPtr(i) = aPtr(i) + 10
+      anArray(i) = anArray(i) + 10
     END DO
 
     ! Get the value the device is seeing
     !$omp target is_device_ptr(aPtr)
+    BLOCK
+      integer, pointer :: anPtr(:)
+      call c_f_pointer(aPtr, anPtr, [N])
     DO i = 1, N
-      anArrayCopy(i) = aPtr(i)
+      anArrayCopy(i) = anPtr(i)
     END DO
-    !$omp end target
+    END BLOCK
 
     DO i = 1, N
       OMPVV_TEST_AND_SET_VERBOSE(errors, anArray(i) .NE. (i + 20))
