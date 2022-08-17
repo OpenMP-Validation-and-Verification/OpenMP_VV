@@ -28,7 +28,7 @@ void test_func1(){
 	return;
 }
 
-int test_func2(){
+void test_func2(){
 	sum2 = c+d;
 	return;
 }
