@@ -60,10 +60,13 @@ CONTAINS
 
     ! Modify in the device
     !$omp target is_device_ptr(aPtr)
-    DO i = 1, N
-      aPtr(i) = aPtr(i) + 10
-    END DO
-    !$omp end target
+    BLOCK
+      integer, pointer :: anPtr(:)
+      call c_f_pointer(aPtr, anPtr, [N])
+      DO i = 1, N
+        anPtr(i) = anPtr(i) + 10
+      END DO
+    END BLOCK  ! note: no '!$omp end target' as this is a 'strictly structured block'
 
     ! Modify again on the host
     DO i = 1, N
