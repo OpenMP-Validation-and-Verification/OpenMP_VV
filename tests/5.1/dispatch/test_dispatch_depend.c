@@ -21,7 +21,7 @@
 int arr[N]; // implicit map array 
 int errors;
 int i = 0;
-int a;
+int a = 0;
 
 void add_two(int *arr);
 
@@ -30,15 +30,14 @@ void add(int *arr){
     for (int i = 0; i < N; i++){ // Base function adds 1 to array values
         arr[i] = i+1;
     }
-    #pragma omp task depend(out: a)
-        a = 3;
+    a = 3;
 }
 
 void add_two(int *arr){
     OMPVV_TEST_AND_SET_VERBOSE(errors, a != 3);
     OMPVV_ERROR_IF(errors > 0, "Depend clause on dispatch directive not working properly");
     for (int i = 0; i < N; i++){
-        arr[i] = i+2; // Variant function adds 2 to array values
+        arr[i] = i+a; // Variant function adds 2 to array values
     }
 }
 
@@ -54,7 +53,7 @@ int test_wrapper() {
         add(arr);
 
     for(i = 0; i < N; i++){
-        OMPVV_TEST_AND_SET_VERBOSE(errors, arr[i] != i+2);
+        OMPVV_TEST_AND_SET_VERBOSE(errors, arr[i] != i+3);
     }
     OMPVV_ERROR_IF(errors > 0, "Dispatch w/ depend is not working properly");
     return errors;
@@ -64,4 +63,4 @@ int main () {
     OMPVV_TEST_OFFLOADING;
     OMPVV_TEST_AND_SET_VERBOSE(errors, test_wrapper());
     OMPVV_REPORT_AND_RETURN(errors);
-}  
+}
