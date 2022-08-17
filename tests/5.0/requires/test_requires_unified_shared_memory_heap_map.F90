@@ -37,14 +37,18 @@ CONTAINS
     INTEGER:: errors, i
     INTEGER, ALLOCATABLE:: anArray(:)
     INTEGER, DIMENSION(N):: anArrayCopy
+    INTEGER:: ERR
 
     OMPVV_INFOMSG("Unified shared memory testing - Array on heap")
 
     errors = 0
 
-    ALLOCATE(anArray(N))
+    ALLOCATE(anArray(N), STAT=ERR)
 
-    OMPVV_ERROR_IF(.NOT. ALLOCATED(anArray), "Memory was not properly allocated")
+    IF( .NOT. ALLOCATED(anArray) ) THEN
+      OMPVV_ERROR("Memory was not properly allocated")
+      OMPVV_RETURN(ERR)
+    END IF
 
     DO i = 1, N
       anArray(i) = i
