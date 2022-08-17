@@ -61,7 +61,7 @@ CONTAINS
     ! Modify in the device
     !$omp target is_device_ptr(aPtr)
     BLOCK
-      integer, pointer :: anPtr(:)
+      INTEGER, POINTER :: anPtr(:)
       call c_f_pointer(aPtr, anPtr, [N])
       DO i = 1, N
         anPtr(i) = anPtr(i) + 10
@@ -76,11 +76,11 @@ CONTAINS
     ! Get the value the device is seeing
     !$omp target is_device_ptr(aPtr)
     BLOCK
-      integer, pointer :: anPtr(:)
+      INTEGER, POINTER :: anPtr(:)
       call c_f_pointer(aPtr, anPtr, [N])
-    DO i = 1, N
-      anArrayCopy(i) = anPtr(i)
-    END DO
+      DO i = 1, N
+        anArrayCopy(i) = anPtr(i)
+      END DO
     END BLOCK
 
     DO i = 1, N
