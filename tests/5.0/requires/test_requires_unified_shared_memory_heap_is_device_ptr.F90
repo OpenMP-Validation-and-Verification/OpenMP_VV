@@ -16,7 +16,6 @@
 
 PROGRAM test_requires_unified_shared_memory_heap_is_device_ptr
    USE iso_fortran_env
-   USE iso_c_binding
    USE ompvv_lib
    USE omp_lib
    implicit none
