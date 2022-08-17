@@ -61,7 +61,7 @@ CONTAINS
   END SUBROUTINE test_is_device_ptr
 
   INTEGER FUNCTION unified_shared_memory_static_is_device_ptr()
-    INTEGER:: errors, i, ERR
+    INTEGER:: errors, i
     INTEGER, DIMENSION(N):: anArrayCopy
 
     OMPVV_INFOMSG("Unified shared memory testing - Static Array")
