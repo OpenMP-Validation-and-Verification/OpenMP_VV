@@ -20,7 +20,7 @@ PROGRAM test_ompx
 
         OMPVV_TEST_OFFLOADING
 
-        OMPVV_TEST_VERBOSE(test_fixed_ompx() .ne. 1)
+        OMPVV_TEST_VERBOSE(test_fixed_ompx() .ne. 2)
 
         OMPVV_REPORT_AND_RETURN()
 CONTAINS
@@ -32,9 +32,8 @@ CONTAINS
                 INTEGER, DIMENSION(10) :: D
                 errors = 0
                 !$omp parallel num_threads(2)
-                !$ompx single
+                !$ompx test_nonexistant
                         errors = errors + 1
-                !$ompx end single
                 !$omp end parallel
                 test_fixed_ompx = errors
         END FUNCTION test_fixed_ompx
