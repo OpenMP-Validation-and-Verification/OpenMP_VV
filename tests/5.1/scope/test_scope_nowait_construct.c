@@ -16,28 +16,38 @@
 
 #define N 1024
 
+int a = 1;
+int b = 2;
+int c = 3;
+int d = 4;
+int sum1 = 0;
+int sum2 = 0;
+
+void test_func1(){
+	sum1 = a+b;
+	return;
+}
+
+int test_func2(){
+	sum2 = c+d;
+	return;
+}
+
 int test_scope_nowait(){
 	int errors = 0;
-	int test_arr[N];
-	for (int i=0; i<N, i++){
-		test_arr[i] = 1;
-		sum += i;
-	}
-	#pragma omp parallel shared(test_int)
+	#pragma omp scope
 	{
-		#pragma omp scope nowait
-		{
-			for (int i=0; i<N; i++){
-				test_arr[i] += 1;
-			}
-		}
+		test_func1();
 	}
-	int sum = 0;
-	for (int i = 0; i < N; i++){
-		sum += test_arr[i];
+	#pragma omp scope nowait
+	#pragma omp scope
+	{
+		test_func2();
 	}
-	OMPVV_TEST_AND_SET_VERBOSE(errors, sum != 2048);
-        OMPVV_INFOMSG_IF(test_int == 1024, "scope region was not accessed");
+	int total = sum1 + sum2
+	OMPVV_TEST_AND_SET_VERBOSE(errors, total != 10);
+        OMPVV_INFOMSG_IF(sum1 == 0, "first function was not called");
+	OMPVV_INFOMSG_IF(sum2 == 0, "second function was not called");
 	return errors;
 }
 
