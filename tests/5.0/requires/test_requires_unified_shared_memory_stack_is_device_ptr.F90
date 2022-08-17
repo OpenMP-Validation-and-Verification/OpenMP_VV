@@ -33,40 +33,46 @@ PROGRAM test_requires_unified_shared_memory_stack_is_device_ptr
   OMPVV_REPORT_AND_RETURN()
 
 CONTAINS
+  SUBROUTINE test_is_device_ptr(anArrayDummy, anArrayCopyDummy)
+    INTEGER, DIMENSION(N):: anArrayDummy
+    INTEGER, DIMENSION(N):: anArrayCopyDummy
+    INTEGER:: i
+
+    ! Modify in the device
+    !$omp target is_device_ptr(anArrayDummy)
+    DO i = 1, N
+      anArrayDummy(i) = anArrayDummy(i) + 10
+    END DO
+    !$omp end target
+
+    ! Modify again on the host
+    DO i = 1, N
+      anArrayDummy(i) = anArrayDummy(i) + 10
+    END DO
+
+    ! Get the value the device is seeing
+    !$omp target is_device_ptr(anArrayDummy)
+    DO i = 1, N
+      anArrayCopyDummy(i) = anArrayDummy(i)
+    END DO
+    !$omp end target
+  END SUBROUTINE test_is_device_ptr
+
   INTEGER FUNCTION unified_shared_memory_stack_is_device_ptr()
     INTEGER:: errors, i
     INTEGER, TARGET, DIMENSION(N):: anArray
     INTEGER, DIMENSION(N):: anArrayCopy
-    INTEGER, POINTER:: aPtr(:)
 
     OMPVV_INFOMSG("Unified shared memory testing - Array on stack")
 
     errors = 0
-    aPtr => anArray
 
     DO i = 1, N
       anArray(i) = i
       anArrayCopy(i) = 0
     END DO
 
-    ! Test for writes to this varriable from device
-    !$omp target is_device_ptr(aPtr)
-    DO i = 1, N
-      aPtr(i) = aPtr(i) + 10
-    END DO
-    !$omp end target
-
-    ! Modify again on the host
-    DO i = 1, N
-      aPtr(i) = aPtr(i) + 10
-    END DO
-
-    ! Test for reads to this variable from device
-    !$omp target is_device_ptr(aPtr)
-    DO i = 1, N
-      anArrayCopy(i) = aPtr(i)
-    END DO
-    !$omp end target
+    CALL test_is_device_ptr(anArray, anArrayCopy)
 
     DO i = 1, N
       OMPVV_TEST_AND_SET_VERBOSE(errors, anArray(i) .NE. (i + 20))
