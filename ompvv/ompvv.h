@@ -80,14 +80,14 @@ _Pragma("omp target map (from: _ompvv_isOffloadingOn)") \
 #define OMPVV_REPORT(err) { \
   OMPVV_INFOMSG("The value of " #err " is %d.", err); \
   if (_ompvv_isOffloadingOn == -1) \
-    printf("[OMPVV_RESULT: %s] Test %s.\n", __FILENAME__, (err == 0)? "passed":"failed"); \
+    printf("[OMPVV_RESULT: %s] Test %s.\n", __FILENAME__, ((err) == 0)? "passed":"failed"); \
   else \
-    printf("[OMPVV_RESULT: %s] Test %s on the %s.\n", __FILENAME__, (err == 0)? "passed":"failed", (_ompvv_isOffloadingOn)? "device" : "host"); \
+    printf("[OMPVV_RESULT: %s] Test %s on the %s.\n", __FILENAME__, ((err) == 0)? "passed":"failed", (_ompvv_isOffloadingOn)? "device" : "host"); \
 }
 
 // Macro for correct exit code
 #define OMPVV_RETURN(err) { \
-  return (err == 0) ? EXIT_SUCCESS : EXIT_FAILURE; \
+  return ((err) == 0) ? EXIT_SUCCESS : EXIT_FAILURE; \
 }
 
 // Macro for report and exit
