@@ -37,7 +37,7 @@ void add(int *arr){
 void add_two(int *arr){
     #pragma omp target parallel for
     for (int i = 0; i < N; i++){
-        arr[i] = i+3; // Variant function adds 2 to array values
+        arr[i] = i+3; // Variant function adds 3 to array values
     }
 }
 
@@ -51,7 +51,7 @@ int test_wrapper() {
 
     #pragma omp dispatch
         add(arr);  
-        /* array should be converted to device ptr; i.e. spec statessince it is not a device ptr, "the argument
+        /* array should be converted to device ptr; i.e. spec states since it is not a device ptr, "the argument
         will be converted in the same manner that a use_device_ptr clause on a target data construct converts 
         its pointer list items into device pointers." */
     
