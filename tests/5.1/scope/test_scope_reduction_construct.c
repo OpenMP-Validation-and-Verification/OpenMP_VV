@@ -43,13 +43,10 @@ int main(){
 	int a[N];
 	int s = 0;
 	int errors = 0;
-	for (int i; i < N; i++){
+	for (int i = 0; i < N; i++){
 		a[i] = 1;
 	}
 	OMPVV_TEST_OFFLOADING;
 	OMPVV_TEST_AND_SET_VERBOSE(errors, test_scope(N,a,s) != 0);
 	OMPVV_REPORT_AND_RETURN(errors);
 }
-
-
-
