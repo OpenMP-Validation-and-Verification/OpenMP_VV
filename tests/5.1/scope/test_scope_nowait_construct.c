@@ -16,38 +16,44 @@
 
 #define N 1024
 
-int a = 1;
-int b = 2;
-int c = 3;
-int d = 4;
-int sum1 = 0;
-int sum2 = 0;
+int test1[N];
+int test2[N];
 
-void test_func1(){
-	sum1 = a+b;
-	return;
-}
-
-void test_func2(){
-	sum2 = c+d;
-	return;
-}
 
 int test_scope_nowait(){
 	int errors = 0;
-	#pragma omp scope
-	{
-		test_func1();
+	for (int i = 0; i <N; i++){
+		test1[i] = 0;
+		test2[i] = 0;
 	}
-	#pragma omp scope nowait
-	#pragma omp scope
+	#pragma omp parallel shared(test1, test2)
 	{
-		test_func2();
+		#pragma omp scope
+		{
+			#pragma omp for
+			for (int i = 0; i < N; i++){
+				test1[i] = 1;
+			}
+		}
+		#pragma omp scope nowait
+		#pragma omp scope
+		{
+			#pragma omp for
+			for (int i = 0; i < N; i++){
+				test2[i] = 1;
+			}
+		}
 	}
-	int total = sum1 + sum2
-	OMPVV_TEST_AND_SET_VERBOSE(errors, total != 10);
-        OMPVV_INFOMSG_IF(sum1 == 0, "first function was not called");
-	OMPVV_INFOMSG_IF(sum2 == 0, "second function was not called");
+	int sum1 = 0;
+	int sum2 = 0;
+	for (int i = 0; i <N; i++){
+		sum1 += test1[i];
+		sum2 += test2[i];
+	}
+	int total = sum1 + sum2;
+	OMPVV_TEST_AND_SET_VERBOSE(errors, total != 2048);
+        OMPVV_INFOMSG_IF(sum1 != 1024, "first function was not called");
+	OMPVV_INFOMSG_IF(sum2 != 1024, "second function was not called");
 	return errors;
 }
 
