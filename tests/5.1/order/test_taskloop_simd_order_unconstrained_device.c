@@ -1,11 +1,11 @@
-//===------------ test_target_taskloop_simd_order_reproducible_device.c ------===//
+//===------ test_target_taskloop_simd_order_unconstrained_concurrent.c ------===//
 //
 // OpenMP API Version 5.1 Nov 2020
 //
-// This test checks that the order(reproducible:unconstrained) clause is properly handled.
-// As per the definition the order in which they are executed does not matter. 
-// Instead focus on that the correct result is calculated, regardless of execution
-// order. 
+// This test checks that the order(reproducible:unconstrained) clause is 
+// properly handled. As per the definition the order in which they are executed 
+// does not matter. Instead focus on that the correct result is calculated, 
+// regardless of execution order. 
 //
 ////===----------------------------------------------------------------------===//
 
