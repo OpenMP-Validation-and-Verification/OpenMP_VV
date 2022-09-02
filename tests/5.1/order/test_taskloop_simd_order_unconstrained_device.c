@@ -49,7 +49,7 @@ int main() {
 
 	for (int i = 0; i < N; i++) {
     		OMPVV_TEST_AND_SET(errors, y[i] != i + 2);
-        OMPVV_TEST_AND_SET(errors, x[i] != i + 2)
+        	OMPVV_TEST_AND_SET(errors, x[i] != i + 2)
 	}
 
 	OMPVV_REPORT_AND_RETURN(errors);
