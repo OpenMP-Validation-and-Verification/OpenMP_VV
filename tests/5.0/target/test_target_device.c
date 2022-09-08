@@ -29,8 +29,8 @@ int test_target_device_ancestor() {
     }
 
     OMPVV_TEST_AND_SET(errors, omp_get_num_devices() <= 0);
-    OMPVV_ERROR_IF(omp_get_num_devices() <= 0, "Since no target devices were found, this test"
-                                                 "will be skipped.");
+    OMPVV_ERROR_IF(omp_get_num_devices() <= 0, "Since no target devices were found, this test "
+                                               "will be skipped.");
 
     if (omp_get_num_devices() > 0) {
 
