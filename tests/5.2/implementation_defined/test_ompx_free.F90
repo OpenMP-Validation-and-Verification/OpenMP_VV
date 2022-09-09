@@ -20,11 +20,11 @@ PROGRAM test_ompx
 
         OMPVV_TEST_OFFLOADING
 
-        OMPVV_TEST_VERBOSE(test_fixed_ompx() .ne. 2)
+        OMPVV_TEST_VERBOSE(test_free_ompx() .ne. 2)
 
         OMPVV_REPORT_AND_RETURN()
 CONTAINS
-        INTEGER FUNCTION test_fixed_ompx() 
+        INTEGER FUNCTION test_free_ompx() 
                 INTEGER :: i
                 INTEGER :: n
                 INTEGER :: errors
@@ -39,6 +39,6 @@ CONTAINS
                 do n = 1,2
                         errors = errors + ARR_ERR(n)
                 end do
-                test_fixed_ompx = errors
-        END FUNCTION test_fixed_ompx
+                test_free_ompx = errors
+        END FUNCTION test_free_ompx
 END PROGRAM test_ompx
