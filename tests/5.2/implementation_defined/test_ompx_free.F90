@@ -26,15 +26,19 @@ PROGRAM test_ompx
 CONTAINS
         INTEGER FUNCTION test_fixed_ompx() 
                 INTEGER :: i
+                INTEGER :: n
                 INTEGER :: errors
-                INTEGER, DIMENSION(10) :: A
-                INTEGER, DIMENSION(10) :: B
-                INTEGER, DIMENSION(10) :: D
+                INTEGER, DIMENSION(2) :: ARR_ERR
                 errors = 0
-                !$omp parallel num_threads(2)
+                !$omp parallel shared(ARR_ERR) private(i)  num_threads(2)
                 !$ompx test_nonexistant
-                        errors = errors + 1
+                        i = omp_get_thread_num()
+                        i = i + 1
+                        ARR_ERR(i) = 1
                 !$omp end parallel
+                do n = 1,2
+                        errors = errors + ARR_ERR(n)
+                end do
                 test_fixed_ompx = errors
         END FUNCTION test_fixed_ompx
 END PROGRAM test_ompx
