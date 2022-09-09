@@ -7,7 +7,7 @@
 !
 ! 'ompx' sentinel is reserved for
 ! implementation-defined extensions to
-! fixed source form OpenMP directives.
+! free source form OpenMP directives.
 !===-------------------------------===//
 #include "ompvv.F90"
 
