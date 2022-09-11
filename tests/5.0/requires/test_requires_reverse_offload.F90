@@ -45,13 +45,13 @@ PROGRAM test_requires_reverse_offload
 
   !$omp target enter data map(to: A)
 
-  IF (device_num .gt. 0) THEN
+  !$omp target   ! Run on the default device, which is the host for device_num = 0
     !$omp target device(ancestor: 1) map(always, to: A)
     DO i = 1, N
        A(i) = 2*i
     END DO
     !$omp end target
-  END IF
+  !$omp end target
 
   DO i = 1, N
      OMPVV_TEST(A(i) .ne. 2*i)
