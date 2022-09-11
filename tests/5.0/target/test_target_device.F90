@@ -46,8 +46,8 @@ CONTAINS
     OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(is_shared_env)
     OMPVV_WARNING_IF(is_shared_env, "[WARNING] target_device_ancestor() test may not be able to detect errors if the target system supports shared memory.")
 
-    IF ( omp_get_num_devices() .gt. 0 ) THEN
 
+  !$omp target
     !$omp target device(ancestor: 1) map(tofrom: a) map(to: which_device)
     DO i = 1, N
        a(i) = a(i) + 2
