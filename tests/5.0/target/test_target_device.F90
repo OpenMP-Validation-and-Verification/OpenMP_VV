@@ -47,17 +47,16 @@ CONTAINS
     OMPVV_WARNING_IF(is_shared_env, "[WARNING] target_device_ancestor() test may not be able to detect errors if the target system supports shared memory.")
 
 
-  !$omp target
+  !$omp target ! Run on the default device, which is the host for device_num = 0
     !$omp target device(ancestor: 1) map(tofrom: a) map(to: which_device)
     DO i = 1, N
        a(i) = a(i) + 2
     END DO
     which_device = 75
     !$omp end target
+  !$omp end target
 
     OMPVV_ERROR_IF(which_device /= 75, "Target region was executed on a target device. Due to ancestor device-modifier this region should execute on a host device")
-
-    END IF
 
 
     target_device_ancestor = errors

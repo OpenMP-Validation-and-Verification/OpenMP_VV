@@ -36,7 +36,8 @@ int test_target_device_ancestor() {
     OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(is_shared_env);
     OMPVV_WARNING_IF(is_shared_env != 0, "[WARNING] target_device_ancestor() test may not be able to detect errors if the target system supports shared memory.")
 
-    if (omp_get_num_devices() > 0) {
+    #pragma omp target //Run on the default device, which is the host for device_num = 0
+    {
 
         #pragma omp target device(ancestor: 1) map(tofrom: a) map(to: which_device) 
 	{
@@ -49,11 +50,11 @@ int test_target_device_ancestor() {
 	    // Instead, check that scalar is mapped back properly after exiting target region
 	    which_device = 75;
 	}
+    }
 
     OMPVV_ERROR_IF(which_device != 75, "Target region was executed on a target device. Due to ancestor device-modifier,"
                                          "this region should execute on a host device");
 
-    }
 
     return errors;
 
