@@ -47,7 +47,8 @@ int main()
     
     #pragma omp target enter data map(to: A) 
 
-    if (device_num > 0) {
+    #pragma omp target // Run on the default device, which is the host for device_num = 0
+    {
        #pragma omp target device(ancestor:1) map(always, to: A)
        for (int j = 0; j < N; j++) {
           A[j] = 2*j;
