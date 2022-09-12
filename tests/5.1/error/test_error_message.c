@@ -19,7 +19,7 @@ int errors, i;
 int test_error_message() {
     char msg[] = "error message"
     i = 0;
-    OMPVV_INFOMSG("Test should print a warning 'error message': ");
+    OMPVV_INFOMSG("If successful, should print "error message": ");
     #pragma omp parallel
     {
         #pragma omp error message(msg)
