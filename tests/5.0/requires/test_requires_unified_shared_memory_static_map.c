@@ -2,12 +2,12 @@
 //
 // OpenMP API Version 5.0 Nov 2018
 //
-// We request the use of unified_shared_memory in this proogram.
+// We request the use of unified_shared_memory in this program.
 // Checking for static arrays. The array is global and then accessed through 
 // a pointer from the host and the device.
 //
 // We use the map clause on the pointer, with zero lenght array, to use the host
-// pointer on the device
+// pointer on the device.
 ////===----------------------------------------------------------------------===//
 #include <omp.h>
 #include <stdio.h>
@@ -21,7 +21,7 @@
 // STATIC ARRAY 
 int anArray[N];
 
-int unified_shared_memory_static() {
+int unified_shared_memory_static_map() {
   OMPVV_INFOMSG("Unified shared memory testing - Static Array");
   int errors = 0;
   
@@ -65,7 +65,7 @@ int main() {
   OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
   OMPVV_WARNING_IF(!isOffloading, "With no offloading, unified shared memory is guaranteed due to host execution");
   int errors = 0;
-  OMPVV_TEST_AND_SET_VERBOSE(errors, unified_shared_memory_static());
+  OMPVV_TEST_AND_SET_VERBOSE(errors, unified_shared_memory_static_map());
 
   OMPVV_REPORT_AND_RETURN(errors);
 }
