@@ -37,7 +37,7 @@ void add_two(int *arr){
     OMPVV_TEST_AND_SET_VERBOSE(errors, a != 3);
     OMPVV_ERROR_IF(errors > 0, "Depend clause on dispatch directive not working properly");
     for (int i = 0; i < N; i++){
-        arr[i] = i+a; // Variant function adds 2 to array values
+        arr[i] = i+a; // Variant function adds 3 to array values
     }
 }
 
