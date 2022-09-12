@@ -55,7 +55,7 @@ int test_wrapper() {
         will be converted in the same manner that a use_device_ptr clause on a target data construct converts 
         its pointer list items into device pointers." */
     
-    #pragma omp target parallel for
+    #pragma omp target parallel for map(tofrom: errors)
     for(i = 0; i < N; i++){
         if(arr[i] != i+3){
             errors++;
