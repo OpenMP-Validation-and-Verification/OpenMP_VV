@@ -19,9 +19,9 @@ int errors, i, N;
 
 int test_assume_holds() {
     N = 1024;
+    int arr[N];
     #pragma omp assume holds(N == 1024)
     {
-        int arr[N];
         for(i = 0; i < N; i++){
             arr[i] = i;
         }
