@@ -18,8 +18,8 @@ int errors, i;
 
 int test_error_at_execution() {
     i = 0;
-    OMPVV_INFOMSG("Test should print a 'execution' error message: \n");
-    #pragma omp parallel
+    OMPVV_INFOMSG("If successful, test should print an \"execution\" error message: ");
+    #pragma omp single
     {
         #pragma omp error at(execution) severity(warning)
         i+=5;

@@ -18,8 +18,8 @@ int errors, i;
 
 int test_error_severity_warning() {
     i = 0;
-    OMPVV_INFOMSG("Test should print a 'warning' error message");
-    #pragma omp parallel
+    OMPVV_INFOMSG("If successful, test should print a warning error message: ");
+    #pragma omp single
     {
         #pragma omp error severity(warning)
         i+=5;

@@ -17,10 +17,10 @@
 int errors, i;
 
 int test_error_message() {
-    char msg[] = "error message"
+    char msg[] = "error message success"
     i = 0;
-    OMPVV_INFOMSG("If successful, should print "error message": ");
-    #pragma omp parallel
+    OMPVV_INFOMSG("If successful, test should print an \"error message success\": ");
+    #pragma omp single
     {
         #pragma omp error message(msg)
         i+=5;
