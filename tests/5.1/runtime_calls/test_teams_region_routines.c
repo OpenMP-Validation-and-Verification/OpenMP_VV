@@ -1,16 +1,24 @@
-//===------------ test-teams-region-routines.c ----------------------------===//
+//===------------ test_teams_region_routines.c ----------------------------===//
 //
 // OpenMP API Version 5.1 Aug 2021
 //
-// Section 3.4.3 from
-// https://www.openmp.org/wp-content/uploads/OpenMP-API-Specification-5-1.pdf
+// Based on https://www.openmp.org/wp-content/uploads/OpenMP-API-Specification-5-1.pdf
+// Test Teams Region Routines added to 5.1. 
 //
-// Test for teams-region-routines added to 5.4. This routine sets number of
-// teams and threads to be used by default
-// in teams regions that do not specify them in the clause: 
-// omp_set_num_teams           and   omp_get_max_teams 
-// omp_set_teams_thread_limit  and   omp_get_teams_thread_limit
-// based on the 5.0/teams/test_teams.c test
+// omp_set_num_teams           (Section 3.4.3)
+//    * Sets nteams-var ICV of the current task
+//
+// omp_get_max_teams           (Section 3.4.4)
+//    * Returns the value of the nteams-var ICV of the current task
+//
+// omp_set_teams_thread_limit  (Section 3.4.5)
+//    * Sets the value of the teams-thread-limit-var ICV 
+//
+// omp_get_teams_thread_limit  (Section 3.4.6)
+//    * Returns the value of the teams-thread-limit-var ICV
+//
+// The test sets the ICV variables and reads their values
+// Furthermore, it checks that the number of teams and threads created were correct
 //
 //===----------------------------------------------------------------------===//
 
@@ -22,9 +30,8 @@
 int test_teams_region_routines()
 {
   int num_teams[OMPVV_NUM_TEAMS_DEVICE];
-  int num_threads[OMPVV_NUM_THREADS_DEVICE];
+  int num_threads[OMPVV_NUM_TEAMS_DEVICE];
   int errors[2] = {0,0};
-  int is_offloading;
 
 
   for (int x = 0; x < OMPVV_NUM_TEAMS_DEVICE; ++x) {
@@ -45,11 +52,12 @@ int test_teams_region_routines()
   //thread error if the max teams doesn't get the set value
   OMPVV_TEST_AND_SET_VERBOSE(errors[1], omp_get_teams_thread_limit() != OMPVV_NUM_THREADS_DEVICE);
 
-  // The test will also check if the correct team and thread values are passed
-#pragma omp teams 
+  // The test check if the correct team and thread numbers were created
+  
+  #pragma omp teams 
   {
     num_teams[omp_get_team_num()] = omp_get_num_teams();
-#pragma omp parallel master
+    #pragma omp parallel
     num_threads[omp_get_team_num()]= omp_get_num_threads();
   }
 
@@ -59,11 +67,11 @@ int test_teams_region_routines()
   OMPVV_ERROR_IF(num_threads[0] != OMPVV_NUM_THREADS_DEVICE, "Test returned an invalid number of threads.");
 
 
-  for (int x = 1; x < num_teams[0]; ++x) {
-    if (num_teams[x] != num_teams[x - 1]) {
+  for (int x = 0; x < OMPVV_NUM_TEAMS_DEVICE; ++x) {
+    if (num_teams[x] != num_teams[0]) {
       errors[0]++;
     }
-    if (num_threads[x] != num_threads[x - 1]) {
+    if (num_threads[x] != num_threads[0]) {
       errors[1]++;
     }
   }
