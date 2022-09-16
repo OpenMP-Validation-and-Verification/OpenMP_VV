@@ -57,8 +57,8 @@ int test_teams_region_routines()
   #pragma omp teams 
   {
     num_teams[omp_get_team_num()] = omp_get_num_teams();
-    #pragma omp parallel
-    num_threads[omp_get_team_num()]= omp_get_num_threads();
+    #pragma omp parallel masked
+      num_threads[omp_get_team_num()]= omp_get_num_threads();
   }
 
 
