@@ -1,3 +1,13 @@
+//-----------------test_scope_nowait_construct.c--------------//
+//
+//OpenMP API Version 5.1 Aug 2021
+//
+//Tests the omp_places environment variable. This test sets the
+//omp_places environment variable and then retrives it form the
+//environment. If the architecture supports the ll_caches 
+//argument then the retrived value will be ll_caches.
+//-------------------------------------------------------------
+
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
