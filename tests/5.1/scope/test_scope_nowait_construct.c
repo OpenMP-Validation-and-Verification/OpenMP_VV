@@ -36,7 +36,6 @@ int test_scope_nowait(){
 			}
 		}
 		#pragma omp scope nowait
-		#pragma omp scope
 		{
 			#pragma omp for
 			for (int i = 0; i < N; i++){
