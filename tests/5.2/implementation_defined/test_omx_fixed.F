@@ -9,9 +9,9 @@ C 'omx' sentinel is reserved for
 C implementation-defined extensions to
 C fixed source form OpenMP directives.
 C===-------------------------------===//
-        #include "ompvv.F90"
+#        include "ompvv.F90"
 
-        #define N 1024
+#        define N 1024
         PROGRAM test_omx
                 use iso_fortran_env
                 use ompvv_lib
