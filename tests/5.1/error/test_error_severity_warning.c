@@ -18,7 +18,7 @@ int errors, i;
 
 int test_error_severity_warning() {
     i = 0;
-    OMPVV_INFOMSG("If successful, test should print a warning error message: ");
+    OMPVV_INFOMSG("If successful, test should print a \"error directive encountered\" message at the beginning of output");
     #pragma omp single
     {
         #pragma omp error severity(warning)

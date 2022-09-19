@@ -17,12 +17,11 @@
 int errors, i;
 
 int test_error_message() {
-    char msg[] = "error message success"
     i = 0;
-    OMPVV_INFOMSG("If successful, test should print an \"error message success\": ");
+    OMPVV_INFOMSG("If successful, test should print an \"error message success\" at the beginning of the test");
     #pragma omp single
     {
-        #pragma omp error message(msg)
+        #pragma omp error message("error message success")
         i+=5;
     }
     OMPVV_TEST_AND_SET_VERBOSE(errors, i != 5);
