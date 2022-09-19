@@ -40,6 +40,7 @@ int test_places(){
 			t3 += 1;
 		}
 	} 
+	//TODO add test cases
 }
 
 
