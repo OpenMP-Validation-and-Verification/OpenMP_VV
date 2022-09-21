@@ -19,13 +19,39 @@
 int interopTestTarget() {
   int errors = 0;
   int A[N];
+  
+  int device = omp_get_default_device();
+  omp_interop_t obj = omp_interop_none;
+
+  // Associate a ptr with the target device
+  // Assume this is needed for interop?
+  omp_target_associate_ptr(&A[0], d_A, sizeof(int)*N, 0, device);
 
   for (int i = 0; i < N; i++) {
-    A[i] = 0
+    A[i] = 0;
   }
 
+  #pragma omp interop init(targetsync: obj) device(device) \
+      depend(inout: A[0:N]) // Pass array through to the interop
+  {
+    #pragma omp target depend(inout: A[0:N]) nowait \
+      map(tofrom: A[0:N]) device(device)
+    for (int j = 0; j < N; j++) {
+      #pragma omp atomic
+      A[j] += 5;
+    }
 
-  //OMPVV_TEST_AND_SET(errors, condition)
+  }
+
+  #pragma omp interop destroy(obj) nowait depend(out: A[0:N])
+
+  // Interop should be completed and cleaned up by here
+  
+  for (int i = 0; i < N; i++) {
+    OMPVV_TEST_AND_SET(errors, A[i] != 5);
+  }
+
+  return errors;
 }
 
 int main () {
