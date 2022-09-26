@@ -38,6 +38,7 @@ int depend_inoutset(){
     OMPVV_TEST_AND_SET_VERBOSE(errors, arr[i] != i + 6);
   }
   return errors;
+
 }
 
 int main() {
@@ -45,4 +46,5 @@ int main() {
    OMPVV_TEST_OFFLOADING;
    OMPVV_TEST_AND_SET_VERBOSE(errors, depend_inoutset() != 0);
    OMPVV_REPORT_AND_RETURN(errors);
+   
 }
