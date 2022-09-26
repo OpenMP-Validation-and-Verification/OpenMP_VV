@@ -2,8 +2,10 @@
 //
 //  OpenMP API Version 5.1 Aug 2021
 //
-//  This test verifies the use of inoutset in depend clause.
-//  Task T4 & T5 both rely on the use of c, and should run in any order.
+//  This test verifies the use of inoutset in depend clause. The 'mutexinoutset'
+//  clause is mutually exclusive when running, meaning that the tasks must be
+//  seperate from one another. Inoutset, on the other hand, is not mutually
+//  exclusive with itself. 
 //
 ////===----------------------------------------------------------------------===//
 
