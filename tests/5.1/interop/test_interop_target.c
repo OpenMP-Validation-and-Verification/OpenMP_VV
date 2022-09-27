@@ -64,7 +64,7 @@ int main () {
 
   errors = interopTestTarget();
 
-  OMPVV_REPORT_AND_RETURN(errors);:
+  OMPVV_REPORT_AND_RETURN(errors);
 
   return 0;
 }
