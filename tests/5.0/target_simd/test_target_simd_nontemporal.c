@@ -27,7 +27,7 @@ int test_simd_nontemporal() {
       c[i] = 2 * i;
    }   
 
-   #pragma simd target nontemporal (a, b, c)
+   #pragma omp target simd nontemporal (a, b, c)
       for (i = 0; i < N; i += STRIDE_LEN) {
          a[i] = b[i] * c[i];
       }   
