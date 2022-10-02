@@ -12,35 +12,13 @@
 #define N 1024
 int test_places(){
 	int errors = 0;
-	int arr[N];
-	for (int i = 0; i < N; i++){
-		arr[i] = -1;
-	}
-	setenv("OMP_PLACES", "numa_domains(2)",1);
-	omp_set_num_threads(4);
-	#pragma omp parallel shared(arr) 
-		for (int i = 0; i<N; i++){
-			arr[N] = omp_get_thread_num();
-		}
-	int to = 0;
-	int t1 = 0;
-	int t2 = 0;
-	int t3 = 0;
-	for (int i = 0; i < N; i++){
-		if (arr[i] == 0){
-			to += 1;
-		}
-		else if (arr[i] == 1){
-			t1 += 1;
-		}
-		else if (arr[i] == 2){
-			t2 += 1
-		}
-		else if (arr[i] == 3){
-			t3 += 1;
-		}
-	} 
-	//TODO add test cases
+	int test = 1;
+	char* ret_val = "";
+	setenv("OMP_PLACES", "numa_domains", 1);
+	ret_val = getenv("OMP_PLACES");
+	test = strcmp(ret_val, "numa_domains");
+	OMPVV_TEST_AND_SET(errors, test != 0);
+	return errors;
 }
 
 
