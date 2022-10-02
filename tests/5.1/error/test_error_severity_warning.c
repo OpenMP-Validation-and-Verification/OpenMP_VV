@@ -19,10 +19,13 @@ int errors, i;
 int test_error_severity_warning() {
     i = 0;
     OMPVV_INFOMSG("If successful, test should print a \"error directive encountered\" message at the beginning of output");
-    #pragma omp single
+    #pragma omp parallel
     {
-        #pragma omp error severity(warning)
-        i+=5;
+        #pragma omp single
+        {
+            #pragma omp error severity(warning)
+            i+=5;
+        }
     }
     OMPVV_TEST_AND_SET_VERBOSE(errors, i != 5);
     OMPVV_ERROR_IF(errors > 0, "Error directive caused execution error");
