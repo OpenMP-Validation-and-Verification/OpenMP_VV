@@ -1,4 +1,7 @@
 //---------------test_omp_places_numa_domain--------------------//
+//
+// OpenMP API Version 5.1 Nov 2020
+//
 //This test intends to test the omp_places numa domain option. 
 //First the test sets the value of omp_placesto numa_domain. 
 //Then the test checks for equal distribution in threads.
