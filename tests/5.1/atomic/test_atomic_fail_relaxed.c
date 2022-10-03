@@ -1,6 +1,6 @@
-//===--- test_atomic_fail_relaxed.c - test write release and read aquire--===//
+//===--- test_atomic_fail_relaxed.c -----------------------------------------===//
 //
-// OpenMP API Version 5.0 Nov 2018
+// OpenMP API Version 5.1 Nov 2020
 //
 // Utilizes an compare w/ an atomic release to ensure the implicit
 // setting of x=10. Restrictions on atomic fail state they must be used
