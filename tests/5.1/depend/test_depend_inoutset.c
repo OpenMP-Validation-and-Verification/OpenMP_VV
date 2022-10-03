@@ -20,6 +20,9 @@
 int errors;
 int arr[N];
 int depend_inoutset(){
+  for(int i = 0; i < N; i++){
+    arr[i] = 0;
+  }
   #pragma omp parallel
   #pragma omp single
   {
