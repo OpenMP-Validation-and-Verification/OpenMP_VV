@@ -23,12 +23,12 @@ int test_uses_allocators_pteam() {
   int result[N] = {0};
 
   for (int i = 0; i < N; i++) {
-    result[i] = 3 * i ;
+    result[i] = 2 * i ;
   }
 
-#pragma omp target teams distribute uses_allocators(omp_pteam_mem_alloc) allocate(omp_pteam_mem_alloc: x) private(x) map(from: device_result)
+#pragma omp target parallel for num_threads(8) uses_allocators(omp_pteam_mem_alloc) allocate(omp_pteam_mem_alloc: x) private(x) map(from: device_result)
   for (int i = 0; i < N; i++) {
-    x = 2 * i;
+    x = omp_get_thread_num();    
     device_result[i] = i + x;
   }
 
