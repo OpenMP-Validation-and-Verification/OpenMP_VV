@@ -1,18 +1,22 @@
 //===------ FILE_NAME.c ---------------------------------------------------===//
 // 
-// OpenMP API Version 4.5 Nov 2015
+// OpenMP API Version 4.5 Nov 2015 (Whichever OpenMP Version the test is in)
 // 
-// 
+// Description of what OMP feature this file is testing. 
+//
 //===----------------------------------------------------------------------===//
 
+//Generally helpful include statements
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "ompvv.h"
 
+// Function to test this OMP feature 
 int test_function() {
   int errors = 1;
 
+ // OMP Pragma 
 #pragma omp target map(from: errors)
   {
     errors = 0;
@@ -21,6 +25,7 @@ int test_function() {
   return errors;
 }
 
+// Main function to call test function
 int main() {
   OMPVV_TEST_OFFLOADING; // This should be at the beginning of all tests
 
@@ -47,6 +52,7 @@ int main() {
   OMPVV_TEST_AND_SET(errors, 1==0); // Errors will not be set, the result should still be 0
   OMPVV_TEST_AND_SET_VERBOSE(errors, 1==0); // Errors will not be set, the result should still be 0, NO ERROR SHOULD BE DISPLAYED
   
+  // Call your test function here
   errors = test_function();
   // CALL OTHER FUNCTIONS HERE
 
