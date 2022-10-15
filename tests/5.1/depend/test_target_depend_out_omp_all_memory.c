@@ -19,6 +19,7 @@
 int main() {
 	int errors = 0;
 	int x[N];
+  int y = 5;
 
 	for (int i = 0; i < N; i++) {
 		x[i] = i;
@@ -26,16 +27,24 @@ int main() {
 
 	OMPVV_TEST_OFFLOADING;
 
-	#pragma omp target map(tofrom: x)
+	#pragma omp target map(tofrom: x, y, errors)
 	{
-		#pragma omp parallel for order(unconstrained:concurrent)
-		for (int i = 0; i < N; i++) {
-			x[i] = x[i] + 2;	
-		}
-	}
-
-	for (int i = 0; i < N; i++) {
-    		OMPVV_TEST_AND_SET(errors, x[i] != i + 2);
+		#pragma omp parallel
+    #pragma omp single
+    {
+      #pragma omp task shared(x, y) depend(out: x, y)
+      {
+        for(int i = 0; i < N; i++) {
+          x[i] += y;   
+        }
+      }
+      #pragma omp task shared(x, y, errors) depend(out: omp_all_memory)
+      {
+        for (int i 0; i < N; i++) {
+          OMPVV_TEST_AND_SET(errors, x[i] != i + y);
+        }
+      }
+    }
 	}
 
 	OMPVV_REPORT_AND_RETURN(errors);
