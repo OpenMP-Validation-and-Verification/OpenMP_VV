@@ -2,7 +2,6 @@
 //
 // OpenMP API Version 5.1 Aug 2021
 //
-// Based on https://www.openmp.org/wp-content/uploads/OpenMP-API-Specification-5-1.pdf
 // Test Teams Region Routines added to 5.1. 
 //
 // omp_set_num_teams           (Section 3.4.3)
