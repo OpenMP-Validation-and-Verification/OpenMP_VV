@@ -4,7 +4,7 @@
 //
 // The tests checks the uses_allocators clause with omp_pteam_mem_alloc.
 // The variable allocated in the target region is modified and used to compute
-// result in device envioronment. Result is copied back to the host and checked
+// result in device environment. Result is copied back to the host and checked
 // with computed value on host.
 //
 //===----------------------------------------------------------------------===//
