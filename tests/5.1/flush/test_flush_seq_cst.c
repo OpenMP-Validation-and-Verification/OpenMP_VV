@@ -7,10 +7,7 @@
 // to specify memory ordering amongst the two threads.
 //
 // Based on OpenMP 5.0 Example aquire_release.3.c
-// 
-// OpenMP 5.1 states that "If neither memory-order-clause nor a list appears on 
-// the flush construct then the behavior is as if memory-order-clause is seq_cst,"
-// so tests is based on test_flush_no_memory_order_clause.c
+//
 //===------------------------------------------------------------------------===//
 
 #include <omp.h>
