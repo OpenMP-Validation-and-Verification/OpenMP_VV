@@ -33,7 +33,7 @@ int test_collapse1() {
     }
   }
 
-#pragma omp parallel num_threads(OMPVV_NUM_THREADS_DEVICE)
+#pragma omp parallel num_threads(OMPVV_NUM_THREADS_HOST)
   {
 #pragma omp loop collapse(1)
     for (int x = 0; x < N; ++x) {
@@ -77,7 +77,7 @@ int test_collapse2() {
     }
   }
 
-#pragma omp parallel num_threads(OMPVV_NUM_THREADS_DEVICE)
+#pragma omp parallel num_threads(OMPVV_NUM_THREADS_HOST)
   {
     if (omp_get_thread_num() == 0) {
       num_threads = omp_get_num_threads();
