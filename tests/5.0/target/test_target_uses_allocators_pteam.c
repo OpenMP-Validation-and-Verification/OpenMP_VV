@@ -3,7 +3,7 @@
 // OpenMP API Version 5.0 Nov 2018
 //
 // The tests checks the uses_allocators clause with omp_pteam_mem_alloc.
-// The variable allaocated in the target region is modified and used to compute
+// The variable allocated in the target region is modified and used to compute
 // result in device envioronment. Result is copied back to the host and checked
 // with computed value on host.
 //
