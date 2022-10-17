@@ -35,11 +35,9 @@ int metadirectiveOnDevice() {
          when( device={arch("nvptx")}: nothing) \
          when( implementation={vendor(amd)}: nothing ) \
          default( parallel for)
-         {
             for (int i = 0; i < N; i++) {
                A[i] += omp_in_parallel();
             }
-         }
    }
 
    for (int i = 0; i < N; i++) {
@@ -67,12 +65,9 @@ int metadirectiveOnHost() {
      when( device={arch("nvptx")}: parallel for) \
      when( implementation={vendor(amd)}: parallel for ) \
      default( nothing )
-     {
         for (int i = 0; i < N; i++) {
            A[i] += omp_in_parallel();
         }
-     }
-
 
   OMPVV_WARNING_IF(A[0] == 1, "Even though no devices were available the test recognized kind/arch equal to nohost or nvptx or amd");
   
