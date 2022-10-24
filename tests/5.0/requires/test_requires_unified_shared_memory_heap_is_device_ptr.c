@@ -22,9 +22,10 @@ int unified_shared_memory_heap() {
   int errors = 0;
   
   int *anArray;
-  int anArrayCopy[N];
+  int *anArrayCopy;
 
   anArray = (int*)malloc(sizeof(int)*N);
+  anArrayCopy = (int*)malloc(sizeof(int)*N);
 
   for (int i = 0; i < N; i++) {
     anArray[i] = i;
@@ -57,6 +58,7 @@ int unified_shared_memory_heap() {
   }
 
   free(anArray);
+  free(anArrayCopy);
   return errors;
 }
 int main() {

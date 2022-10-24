@@ -36,16 +36,16 @@ CONTAINS
   INTEGER FUNCTION unified_shared_memory_heap_map()
     INTEGER:: errors, i
     INTEGER, ALLOCATABLE:: anArray(:)
-    INTEGER, DIMENSION(N):: anArrayCopy
+    INTEGER, ALLOCATABLE:: anArrayCopy(:)
     INTEGER:: ERR
 
     OMPVV_INFOMSG("Unified shared memory testing - Array on heap")
 
     errors = 0
 
-    ALLOCATE(anArray(N), STAT=ERR)
+    ALLOCATE(anArray(N), anArrayCopy(N), STAT=ERR)
 
-    IF( .NOT. ALLOCATED(anArray) ) THEN
+    IF( ERR /= 0 ) THEN
       OMPVV_ERROR("Memory was not properly allocated")
       OMPVV_RETURN(ERR)
     END IF
@@ -82,7 +82,7 @@ CONTAINS
       END IF
     END DO
     
-    DEALLOCATE(anArray)
+    DEALLOCATE(anArray, anArrayCopy)
     unified_shared_memory_heap_map = errors
   END FUNCTION unified_shared_memory_heap_map
 END PROGRAM test_requires_unified_shared_memory_heap_map

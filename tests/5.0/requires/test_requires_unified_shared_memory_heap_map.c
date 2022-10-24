@@ -23,9 +23,10 @@ int unified_shared_memory_heap_map() {
   int errors = 0;
   
   int *anArray;
-  int anArrayCopy[N];
+  int *anArrayCopy;
 
   anArray = (int*)malloc(sizeof(int)*N);
+  anArrayCopy = (int*)malloc(sizeof(int)*N);
   if( anArray == NULL ) {
     OMPVV_ERROR("Memory was not properly allocated");
     OMPVV_RETURN(1);
@@ -62,6 +63,7 @@ int unified_shared_memory_heap_map() {
   }
 
   free(anArray);
+  free(anArrayCopy);
   return errors;
 }
 int main() {
