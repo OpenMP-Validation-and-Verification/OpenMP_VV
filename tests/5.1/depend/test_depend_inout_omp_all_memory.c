@@ -1,4 +1,4 @@
-//===------------ test_depend_inout_inomp_all_memory.c --------------------===//
+//===------------ test_depend_inout_omp_all_memory.c --------------------===//
 //
 // OpenMP API Version 5.1 Nov 2020
 //
@@ -19,7 +19,7 @@
 int main() {
 	int errors = 0;
 	int x[N];
-  int y = 5;
+        int y = 5;
 
 	for (int i = 0; i < N; i++) {
 		x[i] = i;
@@ -34,22 +34,22 @@ int main() {
 	    {
 	      #pragma omp task shared(x, y, errors) depend(inout: x, y)
 	      {
-          // Check that the variables with their initial state are copied
-          for(int i = 0; i < N; i++) {
-            OMPVV_TEST_AND_SET(errors, x[i] != i);
-          }
-          OMPVV_TEST_AND_SET(errors, y != 5)
+		  // Check that the variables with their initial state are copied
+		  for(int i = 0; i < N; i++) {
+		    OMPVV_TEST_AND_SET(errors, x[i] != i);
+		  }
+          	  OMPVV_TEST_AND_SET(errors, y != 5)
 
-		      for(int i = 0; i < N; i++) {
-		        x[i] += y;   
-		      }
+		  for(int i = 0; i < N; i++) {
+		     x[i] += y;   
+		  }
 	      }
 
 	      #pragma omp task shared(x, y, errors) depend(in: x, y)
 	      {
-		      for (int i = 0; i < N; i++) {
-		        OMPVV_TEST_AND_SET(errors, x[i] != i + y);
-		      }
+		  for (int i = 0; i < N; i++) {
+		    OMPVV_TEST_AND_SET(errors, x[i] != i + y);
+		  }
 	      }
 	      #pragma omp taskwait
 	    }
