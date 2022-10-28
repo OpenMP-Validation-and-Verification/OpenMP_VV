@@ -43,6 +43,7 @@ CONTAINS
   SUBROUTINE t_fn(arr)
     INTEGER,INTENT(inout) :: arr(N)
     INTEGER :: i
+    !$omp declare target
 
     !$omp distribute simd
     DO i = 1, N
