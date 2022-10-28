@@ -3,8 +3,8 @@
 // OpenMP API Version 5.0 Nov 2018
 //
 // The tests checks the uses_allocators clause with omp_pteam_mem_alloc.
-// The variable allaocated in the target region is modified and used to compute
-// result in device envioronment. Result is copied back to the host and checked
+// The variable allocated in the target region is modified and used to compute
+// result in device environment. Result is copied back to the host and checked
 // with computed value on host.
 //
 //===----------------------------------------------------------------------===//
@@ -23,12 +23,12 @@ int test_uses_allocators_pteam() {
   int result[N] = {0};
 
   for (int i = 0; i < N; i++) {
-    result[i] = 3 * i ;
+    result[i] = 2 * i ;
   }
 
-#pragma omp target teams distribute uses_allocators(omp_pteam_mem_alloc) allocate(omp_pteam_mem_alloc: x) private(x) map(from: device_result)
+#pragma omp target parallel for num_threads(8) uses_allocators(omp_pteam_mem_alloc) allocate(omp_pteam_mem_alloc: x) private(x) map(from: device_result)
   for (int i = 0; i < N; i++) {
-    x = 2 * i;
+    x = omp_get_thread_num();    
     device_result[i] = i + x;
   }
 
