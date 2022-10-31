@@ -31,9 +31,9 @@ int test_target_device_ancestor() {
     }
 
     //OMPVV_TEST_AND_SET(errors, omp_get_num_devices() <= 0);
-    OMPVV_WARNING_IF(omp_get_num_devices() <= 0, "[WARNING] target_device_ancestor() test may not be able to detect errors since the target system does not have a target device.");
+    OMPVV_WARNING_IF(omp_get_num_devices() <= 0, "[WARNING] may not be able to detect errors since the target system does not have a target device.");
     OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(is_shared_env);
-    OMPVV_WARNING_IF(is_shared_env != 0, "[WARNING] target_device_ancestor() test may not be able to detect errors if the target system supports shared memory.")
+    OMPVV_WARNING_IF(is_shared_env != 0, "[WARNING] may not be able to detect errors if the target system supports shared memory.")
 
     #pragma omp target map(tofrom: errors2) map(to:a, which_device, is_shared_env) //Run on the default device, which is the host for device_num = 0
     {

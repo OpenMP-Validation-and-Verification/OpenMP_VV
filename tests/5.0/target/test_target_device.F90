@@ -42,10 +42,9 @@ CONTAINS
     END DO
 
     !OMPVV_TEST_AND_SET(errors, omp_get_num_devices() .le. 0) 
-    OMPVV_WARNING_IF(omp_get_num_devices() .le. 0, "[WARNING] target_device_ancestor() test may not be able to detect errors since
-the target system does not have a target device.")
+    OMPVV_WARNING_IF(omp_get_num_devices() .le. 0, "[WARNING] may not be able to detect errors since the target system does not have a target device.")
     OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(is_shared_env)
-    OMPVV_WARNING_IF(is_shared_env, "[WARNING] target_device_ancestor() test may not be able to detect errors if the target system supports shared memory.")
+    OMPVV_WARNING_IF(is_shared_env, "[WARNING] may not be able to detect errors if the target system supports shared memory.")
 
 
   errors2 = 0  ! a second variable
