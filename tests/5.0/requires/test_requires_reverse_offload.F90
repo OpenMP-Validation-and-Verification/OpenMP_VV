@@ -26,7 +26,7 @@ PROGRAM test_requires_reverse_offload
 
   INTEGER, DIMENSION(N) :: A
   LOGICAL :: isOffloading
-  INTEGER :: device_num, i
+  INTEGER :: device_num, i, errors2
   LOGICAL :: is_shared_env
 
   OMPVV_TEST_AND_SET_OFFLOADING(isOffloading)
@@ -43,15 +43,19 @@ PROGRAM test_requires_reverse_offload
   OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(is_shared_env)
   OMPVV_WARNING_IF(is_shared_env, "[WARNING] May not be able to detect errors if the target system supports shared memory.")
 
-  !$omp target enter data map(to: A)
+  errors2 = 0
 
-  !$omp target   ! Run on the default device, which is the host for device_num = 0
-    !$omp target device(ancestor: 1) map(always, to: A)
+  !$omp target map(tofrom: errors2) map(to: A, is_shared_env) ! Run on the default device, which is the host for device_num = 0
+    !$omp target device(ancestor: 1) map(to: A)
     DO i = 1, N
        A(i) = 2*i
     END DO
     !$omp end target
+    if ((.NOT. omp_is_initial_device()) .AND. (.NOT. is_shared_env)) then
+      if (any (A /= [(i, i = 1, N)])) errors2 = errors2 + 1
+    end if  
   !$omp end target
+  OMPVV_TEST(errors2 /= 0)
 
   DO i = 1, N
      OMPVV_TEST(A(i) .ne. 2*i)
