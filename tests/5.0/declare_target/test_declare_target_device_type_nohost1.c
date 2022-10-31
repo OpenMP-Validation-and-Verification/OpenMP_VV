@@ -53,7 +53,7 @@ int test_declare_target_device_type_nohost() {
 
   #pragma omp target  
   {
-    update(); //Will call fun() on device OR host_function() in case of fall-back
+    fun(); //Will call fun() on device OR host_function() in case of fall-back
     dev = omp_get_device_num();
   }
 
