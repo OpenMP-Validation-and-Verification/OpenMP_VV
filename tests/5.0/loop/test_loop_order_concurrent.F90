@@ -59,7 +59,7 @@ CONTAINS
     DO x = 1, N
        a(x) = a(x) + b(x)*c(x)
     END DO
-    IF (a(rand_indexes(omp_get_thread_num())) .eq. 1) THEN
+    IF (a(rand_indexes(omp_get_thread_num() + 1)) .eq. 1) THEN
        !$omp atomic update
        wait_errors = wait_errors + 1
     END IF

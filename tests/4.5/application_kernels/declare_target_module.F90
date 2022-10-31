@@ -18,7 +18,7 @@
 MODULE module_declare
 CONTAINS
   SUBROUTINE test_declare(x)
-    INTEGER:: x, m
+    INTEGER:: x
     !$omp declare target
     x = x + 1
   END SUBROUTINE test_declare

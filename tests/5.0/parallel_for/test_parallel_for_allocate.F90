@@ -48,6 +48,8 @@ CONTAINS
        END DO
     END DO
 
+    x_alloc = omp_init_allocator(x_memspace, size(x_traits), x_traits)
+
     !$omp parallel do allocate(x_alloc: x) private(x) &
     !$omp& shared(result_arr) num_threads(OMPVV_NUM_THREADS_HOST)
     DO i = 1, N

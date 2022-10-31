@@ -2,12 +2,12 @@
 //
 // OpenMP API Version 5.0 Nov 2018
 //
-// We request the use of unified_shared_memory in this proogram.
+// We request the use of unified_shared_memory in this program.
 // Checking for static arrays. The array is global and then accessed through 
 // a pointer from the host and the device.
 //
 // We use default mapping of the pointer, which should result in mapping of a zero
-// lenght array
+// lenght array.
 //
 ////===----------------------------------------------------------------------===//
 #include <omp.h>

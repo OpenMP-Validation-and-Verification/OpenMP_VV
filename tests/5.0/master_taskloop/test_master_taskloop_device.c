@@ -15,8 +15,8 @@
 
 #define N 1024
 
-int test_master_taskloop() {
-  OMPVV_INFOMSG("test_master_taskloop");
+int test_master_taskloop_device() {
+  OMPVV_INFOMSG("test_master_taskloop_device");
   int errors = 0;
   int num_threads = -1;
   int x[N];
@@ -57,7 +57,7 @@ int main() {
 
   int errors = 0;
 
-  OMPVV_TEST_AND_SET_VERBOSE(errors, test_master_taskloop());
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_master_taskloop_device());
 
   OMPVV_REPORT_AND_RETURN(errors);
 }

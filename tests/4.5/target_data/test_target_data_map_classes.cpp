@@ -38,7 +38,7 @@ int test_map_tofrom_class_heap() {
 
   OMPVV_INFOMSG("test_map_tofrom_class_heap");
 
-  int sum = 0, errors = 0, isHost = 0;
+  int sum = 0, errors = 0;
 
   int *array = new int[N];
   A *obj = new A(array, N);

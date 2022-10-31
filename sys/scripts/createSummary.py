@@ -178,7 +178,7 @@ def parseFile(log_file):
       current_state = "END"
       current_buffer = ""
       current_test = testResult()
-      for line in open(log_file,'r'):
+      for line in open(log_file,'r', encoding='utf-8', errors='ignore'):
         if line.startswith("*-*-*"):
           # header line
           header_info = interpretHeader(line)

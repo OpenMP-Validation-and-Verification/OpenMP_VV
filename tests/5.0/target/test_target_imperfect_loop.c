@@ -3,7 +3,7 @@
 // OpenMP API Version 5.0 Nov 2018
 //
 // The test maps two arrays to the device and uses the collapse clause on the work 
-// sharing loop construct enclosing two loops. Accorging to 5.0 Spec if more than 
+// sharing loop construct enclosing two loops. According to 5.0 Spec if more than 
 // one loop is associated with the worksharing-loop construct then the number of 
 // times that any intervening code between any two associated loops will be executed 
 // is unspecified but will be at least once per iteration of the loop enclosing the 
@@ -21,17 +21,18 @@
 #include "ompvv.h"
 
 #define N 10
+#define M 16
 
 int test_target_imperfect_loop() {
   OMPVV_INFOMSG("test_target_imperfect_loop");
 
-  int data1[N], data2[N][N];
+  int data1[N], data2[N][M];
   int errors = 0;
 
 
   for( int i = 0; i < N; i++){
     data1[i] = 0;
-    for(int j = 0; j < N; j++){
+    for(int j = 0; j < M; j++){
       data2[i][j] = 0;
     }
   }
@@ -42,7 +43,7 @@ int test_target_imperfect_loop() {
 #pragma omp parallel for collapse(2)
       for( int i = 0; i < N; i++){
         data1[i] += i;
-        for(int j = 0; j < N; j++){
+        for(int j = 0; j < M; j++){
           data2[i][j] += i + j;
         }
       }
@@ -50,8 +51,8 @@ int test_target_imperfect_loop() {
 
   for( int i=0;i<N;i++){
     OMPVV_TEST_AND_SET(errors,data1[i] < i);
-    OMPVV_TEST_AND_SET(errors,data1[i] > i * N);
-    for(int j=0;j<N;j++){
+    OMPVV_TEST_AND_SET(errors,data1[i] > i * M);
+    for(int j=0;j<M;j++){
       OMPVV_TEST_AND_SET(errors,data2[i][j] != (i+j));
     }
   }

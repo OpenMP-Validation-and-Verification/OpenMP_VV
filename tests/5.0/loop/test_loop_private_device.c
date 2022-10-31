@@ -37,7 +37,7 @@ int main() {
     d[x] = 0;
   }
 
-#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_HOST) map(tofrom: a, b, c, d, num_threads)
+#pragma omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE) map(tofrom: a, b, c, d, num_threads)
   {
 #pragma omp loop private(privatized)
     for (int x = 0; x < SIZE; ++x) {

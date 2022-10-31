@@ -35,6 +35,7 @@ CONTAINS
   INTEGER FUNCTION test_dynamic_allocators()
     INTEGER:: errors = 0
     INTEGER,ALLOCATABLE:: x(:)
+    INTEGER:: x_save(N)
     INTEGER:: i
     INTEGER(omp_memspace_handle_kind):: x_memspace = omp_default_mem_space
     type(omp_alloctrait):: x_traits(1) = [omp_alloctrait(omp_atk_alignment,64)]
@@ -54,13 +55,18 @@ CONTAINS
     !$omp end parallel
 
     DO i = 1, N
-       OMPVV_TEST_AND_SET_VERBOSE(errors, x(i) .ne. i)
+       x_save(i) = x(i)
     END DO
-
-    !$omp end target
 
     deallocate(x)
     call omp_destroy_allocator(x_alloc)
+
+    !$omp end target
+
+    DO i = 1, N
+       OMPVV_TEST_AND_SET_VERBOSE(errors, x_save(i) .ne. i)
+    END DO
+
 
     test_dynamic_allocators = errors
   END FUNCTION test_dynamic_allocators

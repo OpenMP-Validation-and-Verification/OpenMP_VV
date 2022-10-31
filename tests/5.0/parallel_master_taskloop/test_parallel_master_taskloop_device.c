@@ -15,8 +15,8 @@
 
 #define N 1024
 
-int test_parallel_master_taskloop() {
-  OMPVV_INFOMSG("test_parallel_master_taskloop");
+int test_parallel_master_taskloop_device() {
+  OMPVV_INFOMSG("test_parallel_master_taskloop_device");
   int errors = 0;
   int num_threads = -1;
   int x[N];
@@ -31,7 +31,7 @@ int test_parallel_master_taskloop() {
 
 #pragma omp target map(tofrom: x, y, z, num_threads)
   {
-#pragma omp parallel master taskloop num_threads(OMPVV_NUM_THREADS_HOST) shared(x, y, z, num_threads)
+#pragma omp parallel master taskloop num_threads(OMPVV_NUM_THREADS_DEVICE) shared(x, y, z, num_threads)
     for (int i = 0; i < N; i++) {
       x[i] += y[i]*z[i];
       if (i == 0) {
@@ -57,7 +57,7 @@ int main() {
 
   int errors = 0;
 
-  OMPVV_TEST_AND_SET_VERBOSE(errors, test_parallel_master_taskloop());
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_parallel_master_taskloop_device());
 
   OMPVV_REPORT_AND_RETURN(errors);
 }

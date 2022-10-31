@@ -23,7 +23,7 @@ int errors, i;
 int test_default_firstprivate_parallel() {
   int scalar_var = 5;
   int arr[N];
-  int sum;
+  int sum = 0;
   for (int i=0; i<N; i++){
 	arr[i] = i;
 	sum += arr[i];
@@ -35,16 +35,16 @@ int test_default_firstprivate_parallel() {
 		arr[i] = i+2;
   	}	
   }
-  int newsum;
-  int wrongsum;
+  int newsum = 0;
+  int wrongsum = 0;
   for(int i=0; i<N; i++){
 	newsum += arr[i];
 	wrongsum += i+2;
   }
-  OMPVV_TEST_AND_SET(errors, scalar_var != 5);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_var != 5);
   OMPVV_INFOMSG_IF(scalar_var == 0, "Scalar was not initialized in parallel region & not updated");
   OMPVV_INFOMSG_IF(scalar_var == 15, "Scalar was not firstprivate, changes made in parallel affected original copy");
-  OMPVV_TEST_AND_SET(errors, sum != newsum);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, sum != newsum);
   OMPVV_INFOMSG_IF(newsum == 0, "Array was not initialized in parallel region properly");
   OMPVV_INFOMSG_IF(newsum == wrongsum, "Array was not first private, changes made in parallel affected original copy");
   return errors;
