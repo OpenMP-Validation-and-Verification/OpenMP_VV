@@ -29,8 +29,6 @@ PROGRAM test_declare_target_device_type_host
     implicit none
     INTEGER :: errors = 0
     
-    !$omp declare target to(update) device_type(host)
-    
     ! initialize arrays on host
     DO i = 1, N
       a(i) = 0
@@ -44,6 +42,7 @@ PROGRAM test_declare_target_device_type_host
 
 CONTAINS  
     SUBROUTINE update()
+      !$omp declare target to(update) device_type(host)
       DO i = 1, N
         a(i) = a(i) + 1
         b(i) = b(i) + 2
