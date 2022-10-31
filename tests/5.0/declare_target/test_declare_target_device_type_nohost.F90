@@ -30,8 +30,6 @@ PROGRAM test_declare_target_device_type_nohost
     implicit none
     INTEGER :: errors = 0
     
-    !$omp declare target to(target_function) device_type(nohost)
-    
     OMPVV_TEST_OFFLOADING
 
     ! initialize arrays on host
@@ -47,6 +45,7 @@ PROGRAM test_declare_target_device_type_nohost
 
 CONTAINS  
     SUBROUTINE target_function()
+      !$omp declare target to(target_function) device_type(nohost)
       DO i = 1, N
         a(i) = a(i) + 1
         b(i) = b(i) + 2
