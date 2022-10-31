@@ -31,8 +31,8 @@ PROGRAM test_pure_nothing
 
         OMPVV_REPORT_AND_RETURN()
 CONTAINS
-        !$omp nothing
         PURE INTEGER FUNCTION pure_nothing(a)
+                !$omp nothing
                 INTEGER, VALUE  :: a
                 a = 0
                 pure_nothing = a
