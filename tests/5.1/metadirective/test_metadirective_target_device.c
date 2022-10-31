@@ -26,7 +26,7 @@ int test_metadirective_target_device() {
    {
       #pragma omp parallel num_threads(4)
       {
-      // We expect at least one of these when conditons to eval to true, thus having the nothing directive utilized
+      // Except that one of these are true, so the array should be set to masked thread num (0)
       #pragma omp metadirective \
          when( target_device={kind(nohost)}: masked ) \
          when( target_device={arch("nvptx")}: masked ) \
