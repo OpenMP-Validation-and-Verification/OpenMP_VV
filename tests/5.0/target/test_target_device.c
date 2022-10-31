@@ -90,8 +90,8 @@ int test_target_device_device_num() {
             target_device_num = omp_get_device_num();
         }
 
-        OMPVV_ERROR_IF(target_device_num == host_device_num, "Target region was executed on host," 
-                   "this region should execute on specified target device number");   
+        OMPVV_ERROR_IF(target_device_num != first_device_num, "Target region was not executed " 
+                   "on the specified target device number");   
 
     }
 

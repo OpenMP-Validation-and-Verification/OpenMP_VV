@@ -93,7 +93,7 @@ CONTAINS
     target_device_num = omp_get_device_num()
     !$omp end target
 
-    OMPVV_ERROR_IF(target_device_num .eq. host_device_num, "Target region was executed on host, this region should execute on specified target device number")
+    OMPVV_ERROR_IF(target_device_num /= first_device_num, "Target region was not executed on the specified target device number")
 
     END IF
 
