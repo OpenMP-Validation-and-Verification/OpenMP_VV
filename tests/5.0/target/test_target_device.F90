@@ -29,7 +29,7 @@ PROGRAM test_target_device
 
 CONTAINS
   INTEGER FUNCTION target_device_ancestor()
-    INTEGER :: errors, i, which_device
+    INTEGER :: errors, errors2, i, which_device
     INTEGER, DIMENSION(N) :: a
     LOGICAL :: is_shared_env
 
@@ -41,22 +41,25 @@ CONTAINS
        a(i) = i
     END DO
 
-    OMPVV_TEST_AND_SET(errors, omp_get_num_devices() .le. 0) 
-    OMPVV_WARNING_IF(omp_get_num_devices() .le. 0, "[SKIPPED] Since no target devices were found, this test will be skipped.")
+    !OMPVV_TEST_AND_SET(errors, omp_get_num_devices() .le. 0) 
+    OMPVV_WARNING_IF(omp_get_num_devices() .le. 0, "[WARNING] target_device_ancestor() test may not be able to detect errors since
+the target system does not have a target device.")
     OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(is_shared_env)
     OMPVV_WARNING_IF(is_shared_env, "[WARNING] target_device_ancestor() test may not be able to detect errors if the target system supports shared memory.")
 
 
-  errors2 = 0  ! a second variable - needs to be declared
-  !$omp target map(tofrom: errors2) map(to:a, which_device) ! Run on the default device, which is the host for device_num = 0
-    !$omp target device(ancestor: 1) map(tofrom: a) map(to: which_device)
+  errors2 = 0  ! a second variable
+  !$omp target map(tofrom: errors2) map(to:a, which_device, is_shared_env) ! Run on the default device, which is the host for device_num = 0
+    !$omp target device(ancestor: 1) map(to: a) map(to: which_device)
     DO i = 1, N
        a(i) = a(i) + 2
     END DO
     which_device = 75
     !$omp end target
-    if (which_device /= 75) errors2 = errors2 + 1
-    if (any (a /= [(i, i = 1, N)])) errors2 = errors2 + 1
+    if ((.NOT. omp_is_initial_device()) .AND. (.NOT. is_shared_env)) then
+      if (which_device /= 0) errors2 = errors2 + 1
+      if (any (a /= [(i, i = 1, N)])) errors2 = errors2 + 1
+    end if
   !$omp end target
   OMPVV_TEST_AND_SET_VERBOSE(errors, errors2 /= 0)
   OMPVV_TEST_AND_SET_VERBOSE(errors, any (a /= [(i+2, i = 1, N)]))

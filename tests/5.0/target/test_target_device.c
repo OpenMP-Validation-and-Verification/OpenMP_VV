@@ -22,7 +22,7 @@ int test_target_device_ancestor() {
 
     int which_device;
     int a[N];
-    int errors = 0; 
+    int errors = 0, errors2 = 0; 
     int is_shared_env = 0;
     which_device = 0;
 
@@ -30,16 +30,15 @@ int test_target_device_ancestor() {
         a[i] = i;
     }
 
-    OMPVV_TEST_AND_SET(errors, omp_get_num_devices() <= 0);
-    OMPVV_WARNING_IF(omp_get_num_devices() <= 0, "[SKIPPED] Since no target devices were found, this test"
-                                                 "will be skipped.");
+    //OMPVV_TEST_AND_SET(errors, omp_get_num_devices() <= 0);
+    OMPVV_WARNING_IF(omp_get_num_devices() <= 0, "[WARNING] target_device_ancestor() test may not be able to detect errors since the target system does not have a target device.");
     OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(is_shared_env);
     OMPVV_WARNING_IF(is_shared_env != 0, "[WARNING] target_device_ancestor() test may not be able to detect errors if the target system supports shared memory.")
 
-    #pragma omp target //Run on the default device, which is the host for device_num = 0
+    #pragma omp target map(tofrom: errors2) map(to:a, which_device, is_shared_env) //Run on the default device, which is the host for device_num = 0
     {
 
-        #pragma omp target device(ancestor: 1) map(tofrom: a) map(to: which_device) 
+        #pragma omp target device(ancestor: 1) map(to: a) map(to: which_device) 
 	{
 	    for (int i = 0; i < N; i++) {
                 a[i] = a[i] + 2;
@@ -50,7 +49,11 @@ int test_target_device_ancestor() {
 	    // Instead, check that scalar is mapped back properly after exiting target region
 	    which_device = 75;
 	}
+        if( (omp_is_initial_device() == 0) && (is_shared_env == 0) ) {
+            if( which_device != 0 ) { errors2 = errors2 + 1; }
+        }
     }
+    OMPVV_TEST_AND_SET_VERBOSE(errors, errors2 != 0);
 
     OMPVV_ERROR_IF(which_device != 75, "Target region was executed on a target device. Due to ancestor device-modifier,"
                                          "this region should execute on a host device");
