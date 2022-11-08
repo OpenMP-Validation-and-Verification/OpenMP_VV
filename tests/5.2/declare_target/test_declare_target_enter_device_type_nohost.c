@@ -21,11 +21,11 @@
 #define N 10
 int errors = 0;
 int a[N], b[N], c[N];  
-int i = 0;
+int dev=-9, i = 0;
 
 void target_function();
 #pragma omp declare target enter(target_function) device_type(nohost)
-#pragma omp declare target enter(a,b,c,i)
+#pragma omp declare target enter(a,b,c,i,dev)
 
 #pragma omp declare variant(target_function) match(device={kind(nohost)})
 void update() {
@@ -53,11 +53,12 @@ int test_declare_target_enter_device_type_nohost() {
   #pragma omp target  
   {
     update();
+    dev = omp_get_device_num();
   }
 
   #pragma omp target update from (a,b,c)
   
-  if (OMPVV_TEST_OFFLOADING) {
+  if (dev != omp_get_initial_device()) {
     for (i = 0; i < N; i++) { //check array values on host
       if ( a[i] != 6 || b[i] != 7 || c[i] != 8 ) {
         errors++;
