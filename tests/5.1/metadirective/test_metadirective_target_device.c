@@ -28,9 +28,10 @@ int test_metadirective_target_device() {
       {
       // Except that one of these are true, so the array should be set to masked thread num (0)
       #pragma omp metadirective \
-         when( target_device={kind(nohost)}: masked ) \
          when( target_device={arch("nvptx")}: masked ) \
          when( implementation={vendor(amd)}: masked ) \
+         when (implementation={vendor(nvidia)}: masked) \
+         when( target_device={kind(nohost)}: masked ) \
          default( for)
             for (int i = 0; i < N; i++) {
                A[i] = omp_get_thread_num();
