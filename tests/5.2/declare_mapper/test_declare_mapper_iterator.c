@@ -6,7 +6,7 @@
 // "declare mapper Directive", and "OpenMP Directive Syntax -> complex iterator"
 // The declare mapper directive will be used to automatically mapp variable
 // according to its prescription:  full structure, plus the dynamic storage of the
-// data element. The mmaper can include an iterator modifier of map
+// data element. The mapper can include an iterator modifier of map
 //
 //===-------------------------------------------------------------------------------===//
 
