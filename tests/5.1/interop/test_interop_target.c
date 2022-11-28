@@ -4,7 +4,7 @@
 // 
 // Test for interop construct utilizing target as the interopability. Runs
 // a OpenMP target construct and treating it as an external operation to test
-// if the interop contrruct properly executes and returns the result. Test
+// if the interop construct properly executes and returns the result. Test
 // passes if the results are processed correctly and fails if not.
 //
 ////===---------------------------------------------------------------------===//
