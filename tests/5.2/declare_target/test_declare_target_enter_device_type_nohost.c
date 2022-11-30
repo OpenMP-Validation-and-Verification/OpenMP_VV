@@ -1,6 +1,6 @@
 //===---- test_declare_target_enter_device_type_nohost.c  ---------------------------===//
 // 
-// OpenMP API Version 5.0 
+// OpenMP API Version 5.2 
 //
 // The declare target directive specifies that variables, functions(C,C++ and Fortran),
 // and subroutines (Fortran) are mapped to a device. If a device_type
@@ -46,13 +46,13 @@ void target_function(){
 
 int test_declare_target_enter_device_type_nohost() { 
 
-  update();
+  update();         
 
   #pragma omp target update to(a,b,c)
 
   #pragma omp target  
   {
-    update();
+    update();     //Will call target_function() on device OR update() in case of fallback
     dev = omp_get_device_num();
   }
 
