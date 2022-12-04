@@ -32,26 +32,34 @@ int main() {
 	    #pragma omp parallel
 	    #pragma omp single
 	    {
-	      #pragma omp task shared(x, y, errors) depend(inout: x, y)
-	      {
-          // Check that the variables with their initial state are copied
-          for(int i = 0; i < N; i++) {
-            OMPVV_TEST_AND_SET(errors, x[i] != i);
+        #pragma omp task depend(out: x)
+        {
+          for (int i = 0; i < N; i++) {
+            x[i] += 1;
           }
-          OMPVV_TEST_AND_SET(errors, y != 5)
-
-		      for(int i = 0; i < N; i++) {
-		        x[i] += y;   
-		      }
-	      }
-
-	      #pragma omp task shared(x, y, errors) depend(in: x, y)
+        }
+        #pragma omp task depend(out: y)
+        {   
+          y += 5;
+        }
+	      #pragma omp task depend(inout: omp_all_memory)
 	      {
-		      for (int i = 0; i < N; i++) {
-		        OMPVV_TEST_AND_SET(errors, x[i] != i + y);
-		      }
+          for(int i = 0; i < N; i++) {
+            OMPVV_TEST_AND_SET(errors, x[i] != i + 1);
+          }
+        
+          OMPVV_TEST_AND_SET(errors, y != 10);
 	      }
-	      #pragma omp taskwait
+        #pragma omp task depend(out: x)
+        {
+          for (int i = 0; i < N; i++) {
+            x[i] += 1;
+          }
+        }
+        #pragma omp task depend(out: y)
+        {
+          y += 5;
+        }
 	    }
 	}
 
