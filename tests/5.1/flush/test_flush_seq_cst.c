@@ -24,6 +24,7 @@ int flush_seq_cst_result = 0;
 
 int flush_default() { // flush with no clause specified
    int x = 0, y = 0;
+   omp_set_dynamic(0);   // this is to help get required number of threads specified in num_threads clause
    #pragma omp parallel num_threads(2)
    {
       int thrd = omp_get_thread_num();
