@@ -19,7 +19,7 @@
 int main() {
 	int errors = 0;
 	int x[N];
-        int y = 5;
+  int y = 5;
 
 	for (int i = 0; i < N; i++) {
 		x[i] = i;
@@ -47,6 +47,8 @@ int main() {
           for(int i = 0; i < N; i++) {
             OMPVV_TEST_AND_SET(errors, x[i] != i + 1);
           }
+
+          OMPVV_TEST_AND_SET(errors, y != 10 );
 	      }
         #pragma omp task depend(out: x)
         {
@@ -59,6 +61,12 @@ int main() {
           y += 5;
         }
 	    }
+
+      for (int i = 0; i < N; i++) {
+        OMPVV_TEST_AND_SET(errors, x[i] != i + 2);
+      }
+
+      OMPVV_TEST_AND_SET(errors, y != 15);
 	}
 
 	OMPVV_REPORT_AND_RETURN(errors);
