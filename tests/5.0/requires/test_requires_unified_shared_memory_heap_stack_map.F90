@@ -1,12 +1,14 @@
-!===--- test_requires_unified_shared_memory_heap_map.F90 --------------------------===//
+!===--- test_requires_unified_shared_memory_heap_stack_map.F90 -------------------===//
 !
 ! OpenMP API Version 5.0 Nov 2018
 !
 ! This test checks for unified shared memory of an array that is allocated on 
 ! the heap and that is accessed from host and device with the same pointer.
 !
-! The mapping of a pointer under shared memory should allow for the pointer to
-! have the same value as in the host.
+! It uses the default mapping of pointers to access the array.
+!
+! Variant of test_requires_unified_shared_memory_heap_map.c
+! which uses an explicitly mapped stack variable for checking.
 !
 !===------------------------------------------------------------------------------===//
 
@@ -15,40 +17,33 @@
 
 #define N 1024
 
-PROGRAM test_requires_unified_shared_memory_heap_map
+PROGRAM test_requires_unified_shared_memory_heap
    USE iso_fortran_env
    USE ompvv_lib
    USE omp_lib
    implicit none
-   LOGICAL:: isOffloading
 
 !$omp requires unified_shared_memory
 
-  OMPVV_TEST_AND_SET_OFFLOADING(isOffloading)
+   OMPVV_TEST_OFFLOADING
 
-  OMPVV_WARNING_IF(.NOT. isOffloading, "With no offloading, unified shared memory is guaranteed due to host execution")
-
-   OMPVV_TEST_VERBOSE(unified_shared_memory_heap_map() .NE. 0)
+   OMPVV_TEST_VERBOSE(unified_shared_memory_heap() .NE. 0)
 
    OMPVV_REPORT_AND_RETURN()
 
 CONTAINS
-  INTEGER FUNCTION unified_shared_memory_heap_map()
+  INTEGER FUNCTION unified_shared_memory_heap()
     INTEGER:: errors, i
     INTEGER, ALLOCATABLE:: anArray(:)
-    INTEGER, ALLOCATABLE:: anArrayCopy(:)
-    INTEGER:: ERR
+    INTEGER, DIMENSION(N):: anArrayCopy
 
     OMPVV_INFOMSG("Unified shared memory testing - Array on heap")
 
     errors = 0
 
-    ALLOCATE(anArray(N), anArrayCopy(N), STAT=ERR)
+    ALLOCATE(anArray(N))
 
-    IF( ERR /= 0 ) THEN
-      OMPVV_ERROR("Memory was not properly allocated")
-      OMPVV_RETURN(ERR)
-    END IF
+    OMPVV_ERROR_IF(.NOT. ALLOCATED(anArray), "Memory was not properly allocated")
 
     DO i = 1, N
       anArray(i) = i
@@ -56,7 +51,7 @@ CONTAINS
     END DO
 
     ! Modify in the device
-    !$omp target map(anArray)
+    !$omp target
     DO i = 1, N
       anArray(i) = anArray(i) + 10
     END DO
@@ -68,7 +63,7 @@ CONTAINS
     END DO
 
     ! Get the value the device is seeing
-    !$omp target map(anArray)
+    !$omp target map(anArrayCopy)
     DO i = 1, N
       anArrayCopy(i) = anArray(i)
     END DO
@@ -82,9 +77,7 @@ CONTAINS
       END IF
     END DO
     
-    DEALLOCATE(anArray, anArrayCopy)
-    unified_shared_memory_heap_map = errors
-  END FUNCTION unified_shared_memory_heap_map
-END PROGRAM test_requires_unified_shared_memory_heap_map
-      
-   
+    DEALLOCATE(anArray)
+    unified_shared_memory_heap = errors
+  END FUNCTION unified_shared_memory_heap
+END PROGRAM test_requires_unified_shared_memory_heap

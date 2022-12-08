@@ -1,4 +1,4 @@
-!===--- test_requires_unified_shared_memory_heap_map.F90 --------------------------===//
+!===--- test_requires_unified_shared_memory_heap_map_stack_map.F90 ---------------===//
 !
 ! OpenMP API Version 5.0 Nov 2018
 !
@@ -7,6 +7,9 @@
 !
 ! The mapping of a pointer under shared memory should allow for the pointer to
 ! have the same value as in the host.
+!
+! Variant of test_requires_unified_shared_memory_heap_map.F90
+! which uses an explicitly mapped stack variable for checking.
 !
 !===------------------------------------------------------------------------------===//
 
@@ -36,14 +39,14 @@ CONTAINS
   INTEGER FUNCTION unified_shared_memory_heap_map()
     INTEGER:: errors, i
     INTEGER, ALLOCATABLE:: anArray(:)
-    INTEGER, ALLOCATABLE:: anArrayCopy(:)
+    INTEGER, DIMENSION(N):: anArrayCopy
     INTEGER:: ERR
 
     OMPVV_INFOMSG("Unified shared memory testing - Array on heap")
 
     errors = 0
 
-    ALLOCATE(anArray(N), anArrayCopy(N), STAT=ERR)
+    ALLOCATE(anArray(N), STAT=ERR)
 
     IF( ERR /= 0 ) THEN
       OMPVV_ERROR("Memory was not properly allocated")
@@ -68,7 +71,7 @@ CONTAINS
     END DO
 
     ! Get the value the device is seeing
-    !$omp target map(anArray)
+    !$omp target map(anArray, anArrayCopy)
     DO i = 1, N
       anArrayCopy(i) = anArray(i)
     END DO
@@ -82,7 +85,7 @@ CONTAINS
       END IF
     END DO
     
-    DEALLOCATE(anArray, anArrayCopy)
+    DEALLOCATE(anArray)
     unified_shared_memory_heap_map = errors
   END FUNCTION unified_shared_memory_heap_map
 END PROGRAM test_requires_unified_shared_memory_heap_map

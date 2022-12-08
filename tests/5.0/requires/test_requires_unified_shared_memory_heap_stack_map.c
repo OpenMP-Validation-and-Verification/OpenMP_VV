@@ -1,11 +1,14 @@
-//===---test_requires_unified_shared_memory_heap_is_device_ptr.c -----------===//
+//===---test_requires_unified_shared_memory_heap_stack_map.c ----------------===//
 //
 // OpenMP API Version 5.0 Nov 2018
 // 
-// This test Checks for unified shared memory of an array that is allocated on 
-// the heap and that is accessed from host and device with the same pointer
+// This test checks for unified shared memory of an array that is allocated on 
+// the heap and that is accessed from host and device with the same pointer.
 //
-// To guarantee the use of the device pointer, we use the is_device_ptr clause
+// It uses the default mapping of pointers to access the array.
+//
+// Variant of test_requires_unified_shared_memory_heap.c
+// which uses an explicitly mapped stack variable for checking.
 //
 ////===----------------------------------------------------------------------===//
 #include <omp.h>
@@ -22,17 +25,16 @@ int unified_shared_memory_heap() {
   int errors = 0;
   
   int *anArray;
-  int *anArrayCopy;
+  int anArrayCopy[N];
 
   anArray = (int*)malloc(sizeof(int)*N);
-  anArrayCopy = (int*)malloc(sizeof(int)*N);
 
   for (int i = 0; i < N; i++) {
     anArray[i] = i;
     anArrayCopy[i] = 0;
   }
   // Modify in the device
-#pragma omp target is_device_ptr(anArray)
+#pragma omp target 
   {
     for (int i = 0; i < N; i++) {
       anArray[i] += 10;
@@ -44,7 +46,7 @@ int unified_shared_memory_heap() {
   }
 
   // Get the value the device is seeing
-#pragma omp target is_device_ptr(anArray)
+#pragma omp target map(anArrayCopy)
   {
     for (int i = 0; i < N; i++) {
       anArrayCopy[i] = anArray[i];
@@ -58,7 +60,6 @@ int unified_shared_memory_heap() {
   }
 
   free(anArray);
-  free(anArrayCopy);
   return errors;
 }
 int main() {
