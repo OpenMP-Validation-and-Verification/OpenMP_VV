@@ -25,6 +25,10 @@ int unified_shared_memory_heap() {
   int anArrayCopy[N];
 
   anArray = (int*)malloc(sizeof(int)*N);
+  if( anArray == NULL ) {
+     OMPVV_ERROR("Memory was not properly allocated");
+     OMPVV_RETURN(1);
+  }
 
   for (int i = 0; i < N; i++) {
     anArray[i] = i;
