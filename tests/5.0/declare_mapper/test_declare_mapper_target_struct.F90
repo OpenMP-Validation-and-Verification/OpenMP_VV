@@ -68,5 +68,7 @@ SUBROUTINE init(s)
     use my_struct
     type(newvec) :: s
 
+    !$omp declare target
+
     s%data = [(i, i = 1, s%len)]
 END SUBROUTINE

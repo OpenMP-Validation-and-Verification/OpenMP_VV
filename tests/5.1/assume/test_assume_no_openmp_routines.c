@@ -18,9 +18,9 @@
 int errors, i;
 
 int test_assume_no_openmp_routines() {
+    int arr[N];
     #pragma omp assume no_openmp_routines
     {
-        int arr[N];
         for(i = 0; i < N; i++){
             arr[i] = i;
         }

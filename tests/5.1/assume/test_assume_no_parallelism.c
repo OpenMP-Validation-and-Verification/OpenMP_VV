@@ -18,10 +18,11 @@
 int errors, i;
 
 int test_assume_no_parallelism() {
+    int x;
+    int arr[N];
     #pragma omp assume no_parallelism
     {
-        int x = omp_get_thread_num(); // OMP runtime routine; should be 0
-        int arr[N];
+        x = omp_get_thread_num(); // OMP runtime routine; should be 0
         for(i = 0; i < N; i++){
             arr[i] = i + x;
         }

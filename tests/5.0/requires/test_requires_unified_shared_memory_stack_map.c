@@ -19,7 +19,7 @@
 
 #pragma omp requires unified_shared_memory
 
-int unified_shared_memory_stack() {
+int unified_shared_memory_stack_map() {
   OMPVV_INFOMSG("Unified shared memory testing - Array on stack");
   int errors = 0;
   
@@ -64,7 +64,7 @@ int main() {
   OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
   OMPVV_WARNING_IF(!isOffloading, "With no offloading, unified shared memory is guaranteed due to host execution");
   int errors = 0;
-  OMPVV_TEST_AND_SET_VERBOSE(errors, unified_shared_memory_stack());
+  OMPVV_TEST_AND_SET_VERBOSE(errors, unified_shared_memory_stack_map());
 
   OMPVV_REPORT_AND_RETURN(errors);
 }
