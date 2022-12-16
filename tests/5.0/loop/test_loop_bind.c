@@ -49,14 +49,14 @@ int test_loop_bind_teams() {
 
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
-      OMPVV_TEST_AND_SET_VERBOSE(errors, x[i][j] != 1 + (y[i]*z[i]));
+      OMPVV_TEST_AND_SET_VERBOSE(errors, x[i][j] != (1 + (y[i]*z[i])));
     }
   }
 
 
   OMPVV_WARNING_IF(num_teams == 1, "Test ran with one team, so parallelism of loop construct with bind(teams) can't be guaranteed.");
   OMPVV_TEST_AND_SET_VERBOSE(errors, num_teams < 1);
-  OMPVV_ERROR_IF(num_teams < 1, "omp_get_num_teams() returned an invalid value.");
+  OMPVV_ERROR_IF(num_teams < 1, "omp_get_num_teams() returned an invalid number of teams.");
 
   return errors;
 }
@@ -92,7 +92,7 @@ int test_loop_bind_parallel() {
 
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
-      OMPVV_TEST_AND_SET_VERBOSE(errors, x[i][j] != 1 + (y[i]*z[i]));
+      OMPVV_TEST_AND_SET_VERBOSE(errors, x[i][j] != (1 + (y[i]*z[i])));
     }
   }
 
