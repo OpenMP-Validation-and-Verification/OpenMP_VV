@@ -46,6 +46,10 @@ int test_omp_aligned_alloc() {
 
   }
 
+  omp_free(x, alloc);
+  omp_free(y, alloc);
+  omp_destroy_allocator(alloc);
+
   return errors;
 }
 
