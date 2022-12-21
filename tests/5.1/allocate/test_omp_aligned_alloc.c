@@ -20,7 +20,7 @@ int test_omp_aligned_alloc() {
   int errors = 0;
   int *x, *y;
 
-  omp_memspace_handle_t  memspace = omp_default_mem_sapce;
+  omp_memspace_handle_t  memspace = omp_default_mem_space;
   omp_alloctrait_t       traits[1] = {omp_atk_alignment, 64};
   omp_allocator_handle_t alloc = omp_init_allocator(memspace,1,traits);
 
@@ -30,7 +30,7 @@ int test_omp_aligned_alloc() {
   #pragma omp target map(tofrom:errors)
   {
     
-    OMPV_TEST_AND_SET_VERBOSE(errors, ((intptr_t)(y))%64 != 0 || ((intptr_t)(x))%64 != 0);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, ((intptr_t)(y))%64 != 0 || ((intptr_t)(x))%64 != 0);
 
     #pragma omp parallel for simd simdlen(16) aligned(x,y: 64)
     for (int i = 0; i < N; i++) {
