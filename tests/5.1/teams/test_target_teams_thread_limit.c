@@ -20,7 +20,7 @@
 #define N 1024
 
 int main() {
-	int errors[OMPVV_NUM_THREADS_DEVICE/OMPVV_NUM_TEAMS_DEVICE];
+	int errors[OMPVV_NUM_TEAMS_DEVICE];
 	int num_teams = 0;
         int sum_errors = 0;
         int i;
@@ -60,7 +60,7 @@ int main() {
              sum_errors += errors[i];
         }
 
-	OMPVV_WARNING_IF(num_teams != OMPVV_NUM_TEAMS_DEVICE, "The number of teams was unexpected, the test results are likely inconcuslive")
+	OMPVV_WARNING_IF(num_teams != OMPVV_NUM_TEAMS_DEVICE, "The number of teams was unexpected, the test results are likely inconclusive")
 	OMPVV_WARNING_IF(testing_thread_limit == 1, "Only one thread was allocated to each team, the test results are likely inconclusive");
 
 	OMPVV_REPORT_AND_RETURN(sum_errors);
