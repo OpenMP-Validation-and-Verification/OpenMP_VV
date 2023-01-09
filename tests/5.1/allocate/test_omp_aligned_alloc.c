@@ -12,6 +12,7 @@
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include "ompvv.h"
 
 #define N 1024
