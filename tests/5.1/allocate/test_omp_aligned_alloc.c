@@ -22,7 +22,7 @@ int test_omp_aligned_alloc() {
   int *x, *y;
 
   omp_memspace_handle_t  memspace = omp_default_mem_space;
-  omp_alloctrait_t       traits[1] = {omp_atk_alignment, 64};
+  omp_alloctrait_t       traits[1] = {{omp_atk_alignment, 64}};
   omp_allocator_handle_t alloc = omp_init_allocator(memspace,1,traits);
 
   x = (int *)omp_aligned_alloc(64, N*sizeof(int), alloc);
