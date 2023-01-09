@@ -38,7 +38,7 @@ CONTAINS
     default_device = omp_get_default_device()
 
     !$omp target map(to:v1,v2) map(from:v3,target_device_num) device(default_device)
-    !$omp begin metadirecitve when(device={arch("nvptx")}: teams distribute parallel do) default(parallel do)
+    !$omp begin metadirective when(device={arch("nvptx")}: teams distribute parallel do) default(parallel do)
     DO i = 1, N
     !$omp atomic write
        target_device_num = omp_get_device_num()
@@ -46,7 +46,7 @@ CONTAINS
        v3(i) = v1(i) * v2(2)
     END DO
     !$omp end metadirective
-    !$omp end target teams
+    !$omp end target
 
     OMPVV_TEST_AND_SET(errors, host_device_num .EQ. target_device_num)
     OMPVV_ERROR_IF(host_device_num .EQ. target_device_num, "Device number that executes target region is the same as the device number on the host")
