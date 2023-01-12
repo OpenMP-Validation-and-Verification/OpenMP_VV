@@ -14,22 +14,22 @@
 #include <stdlib.h>
 #include "ompvv.h"
 
-#define N 8
+#define N 256
 
 int test_uses_allocators_pteam() {
   int errors = 0;
   int x = 0;
+  int pteam_result[N] = {0};
   int device_result[N] = {0};
   int result[N] = {0};
 
   for (int i = 0; i < N; i++) {
     result[i] = 2 * i ;
   }
-
-#pragma omp target parallel for num_threads(8) uses_allocators(omp_pteam_mem_alloc) allocate(omp_pteam_mem_alloc: x) private(x) map(from: device_result)
+#pragma omp target parallel for map(from: device_result) uses_allocators(omp_pteam_mem_alloc) allocate(omp_pteam_mem_alloc: pteam_result) private(pteam_result)
   for (int i = 0; i < N; i++) {
-    x = omp_get_thread_num();    
-    device_result[i] = i + x;
+    pteam_result[i] = 2 * i ;
+    device_result[i] = pteam_result[i];
   }
 
   for (int i = 0; i < N; i++) {
