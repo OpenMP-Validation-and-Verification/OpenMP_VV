@@ -28,19 +28,19 @@ int test_omp_aligned_alloc_on_host() {
   x = (int *)omp_aligned_alloc(64, N*sizeof(int), alloc);
   y = (int *)omp_aligned_alloc(64, N*sizeof(int), alloc);
     
-    OMPVV_TEST_AND_SET_VERBOSE(errors, ((intptr_t)(y))%64 != 0 || ((intptr_t)(x))%64 != 0);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, ((intptr_t)(y))%64 != 0 || ((intptr_t)(x))%64 != 0);
 
-    #pragma omp parallel for simd simdlen(16) aligned(x,y: 64)
-    for (int i = 0; i < N; i++) {
-      x[i] = i;
-      y[i] = i+1;
-    }
+  #pragma omp parallel for simd simdlen(16) aligned(x,y: 64)
+  for (int i = 0; i < N; i++) {
+    x[i] = i;
+    y[i] = i+1;
+  }
 
-    #pragma omp parallel for simd simdlen(16) aligned(x,y: 64)
-    for (int i = 0; i < N; i++) {
-      OMPVV_TEST_AND_SET_VERBOSE(errors, x[i] != i);
-      OMPVV_TEST_AND_SET_VERBOSE(errors, y[i] != i+1);
-    }
+  #pragma omp parallel for simd simdlen(16) aligned(x,y: 64)
+  for (int i = 0; i < N; i++) {
+    OMPVV_TEST_AND_SET_VERBOSE(errors, x[i] != i);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, y[i] != i+1);
+  }
 
   omp_free(x, alloc);
   omp_free(y, alloc);
