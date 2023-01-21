@@ -16,7 +16,7 @@
 
 #define N 1024
 
-int test_omp_aligned_alloc() {
+int test_omp_aligned_alloc_on_host() {
   int errors = 0;
   int *x, *y;
 
@@ -26,9 +26,6 @@ int test_omp_aligned_alloc() {
 
   x = (int *)omp_aligned_alloc(64, N*sizeof(int), alloc);
   y = (int *)omp_aligned_alloc(64, N*sizeof(int), alloc);
-
-  #pragma omp target map(tofrom:errors)
-  {
     
     OMPVV_TEST_AND_SET_VERBOSE(errors, ((intptr_t)(y))%64 != 0 || ((intptr_t)(x))%64 != 0);
 
@@ -44,8 +41,6 @@ int test_omp_aligned_alloc() {
       OMPVV_TEST_AND_SET_VERBOSE(errors, y[i] != i+1);
     }
 
-  }
-
   omp_free(x, alloc);
   omp_free(y, alloc);
   omp_destroy_allocator(alloc);
@@ -57,7 +52,7 @@ int main() {
   OMPVV_TEST_OFFLOADING;
   int errors = 0;
 
-  OMPVV_TEST_AND_SET_VERBOSE(errors, test_omp_aligned_alloc() != 0);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_omp_aligned_alloc_on_host() != 0);
   OMPVV_REPORT_AND_RETURN(errors);
 }
 
