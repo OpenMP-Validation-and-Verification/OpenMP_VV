@@ -1,11 +1,11 @@
-//===------ test_omp_aligned_alloc.c ------------------------------------===//
+//===------ test_omp_aligned_alloc_host.c ------------------------------------===//
 //
 // OpenMP API Version 5.1 Nov 2020
 //
 // Tests the omp_aligned_alloc routine properly requests a memory allocation
 // aligned to the passed byte parameter. Starts by initializing some memory
 // in the omp_default_mem_space and then checks if this memory is aligned
-// and can be properly written to and read from.
+// and can be properly written to and read from. Checks on host.
 //
 //===----------------------------------------------------------------------===//
 
