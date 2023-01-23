@@ -23,7 +23,7 @@ int test_error_message() {
     {
         #pragma omp single
         {
-            #pragma omp error message("error message success")
+            #pragma omp error severity(warning) message("error message success")
             i+=5;
         }
     }

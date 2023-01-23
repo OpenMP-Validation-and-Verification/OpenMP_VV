@@ -3,7 +3,7 @@
 //  OpenMP API Version 5.1 Aug 2021
 //
 //  Test uses error directive with message clause to print a message,
-//  if error condition is reached then "runtime error!" is printed,
+//  if error condition is reached then a warning error is printed,
 //  otherwise is simply used to print a message. 
 //
 ////===----------------------------------------------------------------------===//
