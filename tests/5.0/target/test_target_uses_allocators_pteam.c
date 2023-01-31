@@ -18,7 +18,6 @@
 
 int test_uses_allocators_pteam() {
   int errors = 0;
-  int x = 0;
   int pteam_result[N] = {0};
   int device_result[N] = {0};
   int result[N] = {0};
