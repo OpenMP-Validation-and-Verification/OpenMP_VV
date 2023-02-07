@@ -43,18 +43,22 @@ int test_motion_present() {
   
    // Tests OpenMP 5.1 Specification pp. 207 lines 2-4
    #pragma omp target update to(scalar_var, A, new_struct) 
-   #pragma omp target map(tofrom: errors) defaultmap(none) map(from: scalar_var, A, new_struct)
-   {     
-        if(scalar_var == 1){errors++;}
-        if(A[0] == 0 || A[50] == 50){errors++;}
-        if(A[50] == 50 || A[51] == 51){errors++;}
-        if(new_struct.s == 10){errors++;}
-        if(new_struct.S[0] == 10){errors++;}
-   }
+   if (omp_target_is_present(&scalar_var, omp_get_default_device()))
+     errors++;
+   if (omp_target_is_present(&A, omp_get_default_device()))
+     errors++;
+   if (omp_target_is_present(&new_struct, omp_get_default_device()))
+     errors++;
 
    // Tests OpenMP 5.1 Specification pp. 207 lines 5-6
    #pragma omp target enter data map(alloc: scalar_var, A, new_struct)
    #pragma omp target update to(present: scalar_var, A, new_struct) 
+   if (!omp_target_is_present(&scalar_var, omp_get_default_device()))
+     errors++;
+   if (!omp_target_is_present(&A, omp_get_default_device()))
+     errors++;
+   if (!omp_target_is_present(&new_struct, omp_get_default_device()))
+     errors++;
    #pragma omp target map(tofrom: errors) defaultmap(none) map(from: scalar_var, A, new_struct)
    {     
         if(scalar_var != 1){errors++;}
@@ -63,6 +67,7 @@ int test_motion_present() {
         if(new_struct.s != 10){errors++;}
         if(new_struct.S[0] != 10){errors++;}
    }
+   #pragma omp target exit data map(release: scalar_var, A, new_struct)
    
    return errors;
 }
