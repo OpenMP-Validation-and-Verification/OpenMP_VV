@@ -16,8 +16,6 @@
 #include <stdlib.h>
 #include "ompvv.h"
 
-#define N 1024
-
 #pragma omp requires atomic_default_mem_order(relaxed)
 
 int test_requires_atomic_relaxed() {
