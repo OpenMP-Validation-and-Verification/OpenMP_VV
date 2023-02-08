@@ -16,8 +16,6 @@
 #include <stdlib.h>
 #include "ompvv.h"
 
-#define N 1024
-
 #pragma omp requires atomic_default_mem_order(seq_cst)
 
 int test_atomic_seq_cst() {

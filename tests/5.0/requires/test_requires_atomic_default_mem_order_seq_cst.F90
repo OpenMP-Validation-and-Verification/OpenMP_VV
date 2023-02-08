@@ -13,8 +13,6 @@
 
 #include "ompvv.F90"
 
-#define N 1024
-
 PROGRAM test_requires_default_mem_order_seq_cst
   USE iso_fortran_env
   USE ompvv_lib
