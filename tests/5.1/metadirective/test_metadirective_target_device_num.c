@@ -21,25 +21,22 @@ int test_metadirective_target_device() {
    for (int i = 0; i < N; i++) {
       A[i] = 1;
    }
+   int dev = omp_get_default_device();
 
-   #pragma omp target map(tofrom: A)
-   {
-      #pragma omp parallel num_threads(4)
-      {
-      // Expect that device_num is 0, so the array should be set to masked thread num (0)
-      #pragma omp metadirective \
-         when( target_device={device_num(0)}: masked ) \
-         default( for)
-            for (int i = 0; i < N; i++) {
-               A[i] = omp_get_thread_num() + omp_get_device_num(); // 0 + 0
-            }
+   #pragma omp enter data map(alloc: A)
+
+   // Expect that device_num is 0, so the array should be mapped back.
+   #pragma omp metadirective \
+      when( target_device={device_num(dev)}: target defaultmap(none) map(from: A)) \
+      default( target defaultmap(none))
+      for(int i = 0; i < N; i++){
+         A[i] = i;
       }
-   }
 
    for (int i = 0; i < N; i++) {
-      OMPVV_TEST_AND_SET(errors, A[i] != 0);
+      OMPVV_TEST_AND_SET(errors, A[i] != i);
    }
-
+   #pragma omp target exit data map(release: A)
    OMPVV_INFOMSG("Test ran with a number of available devices greater than 0");
 
    return errors;
