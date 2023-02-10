@@ -20,7 +20,7 @@
 int test_omp_aligned_alloc_on_device() {
   int errors = 0;
   
-  #pragma omp target map(tofrom: errors) 
+  #pragma omp target map(tofrom: errors) uses_allocators(omp_default_mem_alloc) 
   {
     int *x, *y;
 
