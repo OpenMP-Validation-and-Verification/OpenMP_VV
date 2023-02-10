@@ -4,7 +4,7 @@
 //
 // Tests the omp_calloc routine to make sure memory is properly allocated
 // on the host and is zero initialized. Allocates an array and makes sure
-// each value is set to 0 to start. Then adds 1 to each and validates the
+// each value is set to 0 to start. Then adds i to each index and validates the
 // changes persisted and were written correctly.
 //
 //===----------------------------------------------------------------------===//
