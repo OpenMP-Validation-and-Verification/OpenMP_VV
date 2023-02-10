@@ -17,7 +17,7 @@
 
 #define N 1024
 
-int test_omp_aligned_alloc_on_host() {
+int test_omp_calloc_host() {
   int errors = 0;
   int *x;
 
@@ -69,6 +69,6 @@ int main() {
   OMPVV_TEST_OFFLOADING;
   int errors = 0;
 
-  OMPVV_TEST_AND_SET_VERBOSE(errors, test_omp_aligned_alloc_on_host() != 0);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_omp_calloc_host() != 0);
   OMPVV_REPORT_AND_RETURN(errors);
 }
