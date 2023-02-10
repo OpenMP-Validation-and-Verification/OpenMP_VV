@@ -17,8 +17,13 @@
 
 #define N 1024
 
-int test_omp_calloc_host() {
+int test_omp_target_calloc() {
+
   int errors = 0;
+
+  #pragma omp target map(tofrom: errors) uses_allocators(omp_default_mem_alloc)
+  {
+
   int *x;
 
   omp_memspace_handle_t  memspace = omp_default_mem_space;
@@ -62,6 +67,8 @@ int test_omp_calloc_host() {
   omp_free(x, alloc);
   omp_destroy_allocator(alloc);
 
+  }
+
   return errors;
 }
 
@@ -69,6 +76,6 @@ int main() {
   OMPVV_TEST_OFFLOADING;
   int errors = 0;
 
-  OMPVV_TEST_AND_SET_VERBOSE(errors, test_omp_calloc_host() != 0);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_omp_target_calloc() != 0);
   OMPVV_REPORT_AND_RETURN(errors);
 }
