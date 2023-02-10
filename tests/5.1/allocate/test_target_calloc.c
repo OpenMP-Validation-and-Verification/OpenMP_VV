@@ -21,52 +21,51 @@ int test_omp_target_calloc() {
 
   int errors = 0;
 
-  #pragma omp target map(tofrom: errors) uses_allocators(omp_default_mem_alloc)
+  #pragma omp target map(tofrom: errors) map(to: N) uses_allocators(omp_default_mem_alloc)
   {
 
-  int *x;
+    int *x;
 
-  omp_memspace_handle_t  memspace = omp_default_mem_space;
-  omp_alloctrait_t       traits[0] = {};
-  omp_allocator_handle_t alloc = omp_init_allocator(memspace,0,traits);
+    omp_memspace_handle_t  memspace = omp_default_mem_space;
+    omp_alloctrait_t       traits[0] = {};
+    omp_allocator_handle_t alloc = omp_init_allocator(memspace,0,traits);
 
-  x = (int *)omp_calloc(64, N*sizeof(int), alloc);
+    x = (int *)omp_calloc(64, N*sizeof(int), alloc);
 
-  int not_init_to_zero = 0;
-  int not_correct_updated_values = 0;
+    int not_init_to_zero = 0;
+    int not_correct_updated_values = 0;
 
-  #pragma omp parallel for
-  for (int i = 0; i < N; i++) {
-    if (x[i] != 0) {
-      not_init_to_zero = 1;
-    }  
-  }
-
-  #pragma omp parallel for
-  for (int i = 0; i < N; i++) {
-    x[i] = i;
-  }
-
-  #pragma omp parallel for
-  for (int i = 0; i < N; i++) {
-    if (x[i] != i) {
-      not_correct_updated_values = 1;
+    #pragma omp parallel for
+    for (int i = 0; i < N; i++) {
+      if (x[i] != 0) {
+        not_init_to_zero = 1;
+      }  
     }
-  }
 
-  if (not_init_to_zero) {
-    OMPVV_ERROR("Values were not initialized to 0");
-    errors++;
-  }
+    #pragma omp parallel for
+    for (int i = 0; i < N; i++) {
+      x[i] = i;
+    }
 
-  if (not_correct_updated_values) {
-    OMPVV_ERROR("Values in the array did NOT match the expected values. Changes may not have persisted.");
-    errors++;
-  }
+    #pragma omp parallel for
+    for (int i = 0; i < N; i++) {
+      if (x[i] != i) {
+        not_correct_updated_values = 1;
+      }
+    }
 
-  omp_free(x, alloc);
-  omp_destroy_allocator(alloc);
+    if (not_init_to_zero) {
+      OMPVV_ERROR("Values were not initialized to 0");
+      errors++;
+    }
 
+    if (not_correct_updated_values) {
+      OMPVV_ERROR("Values in the array did NOT match the expected values. Changes may not have persisted.");
+      errors++;
+    }
+
+    omp_free(x, alloc);
+    omp_destroy_allocator(alloc);
   }
 
   return errors;
