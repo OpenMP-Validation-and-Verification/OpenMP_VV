@@ -19,31 +19,47 @@
 
 int test_omp_aligned_alloc_on_host() {
   int errors = 0;
-  int *x, *y;
+  int *x;
 
   omp_memspace_handle_t  memspace = omp_default_mem_space;
-  omp_alloctrait_t       traits[1] = {{omp_atk_alignment, 64}};
-  omp_allocator_handle_t alloc = omp_init_allocator(memspace,1,traits);
+  omp_alloctrait_t       traits[0] = {};
+  omp_allocator_handle_t alloc = omp_init_allocator(memspace,0,traits);
 
-  x = (int *)omp_aligned_alloc(64, N*sizeof(int), alloc);
-  y = (int *)omp_aligned_alloc(64, N*sizeof(int), alloc);
+  x = (int *)omp_calloc(64, N*sizeof(int), alloc);
 
-  OMPVV_TEST_AND_SET_VERBOSE(errors, ((intptr_t)(y))%64 != 0 || ((intptr_t)(x))%64 != 0);
+  int not_init_to_zero = 0;
+  int not_correct_updated_values = 0;
 
-  #pragma omp parallel for simd simdlen(16) aligned(x,y: 64)
+  #pragma omp parallel for
   for (int i = 0; i < N; i++) {
-    x[i] = i;
-    y[i] = i+1;
+    if (x[i] != 0) {
+      not_init_to_zero = 1;
+    }  
   }
 
-  #pragma omp parallel for simd simdlen(16) aligned(x,y: 64)
+  #pragma omp parallel for
   for (int i = 0; i < N; i++) {
-    OMPVV_TEST_AND_SET_VERBOSE(errors, x[i] != i);
-    OMPVV_TEST_AND_SET_VERBOSE(errors, y[i] != i+1);
+    x[i] = i;
+  }
+  
+  #pragma omp parallel for
+  for (int i = 0; i < N; i++) {
+    if (x[i] != i) {
+      not_correct_updated_values = 1;
+    }
+  }
+
+  if (not_init_to_zero) {
+    OMPVV_ERROR("Values were not initialized to 0");
+    errors++;
+  }
+
+  if (not_correct_updated_values) {
+    OMPVV_ERROR("Values in the array did NOT match the expected values. Changes may not have persisted.");
+    errors++;
   }
 
   omp_free(x, alloc);
-  omp_free(y, alloc);
   omp_destroy_allocator(alloc);
 
   return errors;
