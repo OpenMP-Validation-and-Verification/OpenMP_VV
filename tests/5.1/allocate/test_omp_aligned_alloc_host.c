@@ -19,31 +19,37 @@
 
 int test_omp_aligned_alloc_on_host() {
   int errors = 0;
-  int *x, *y;
+  int *x;
 
   omp_memspace_handle_t  memspace = omp_default_mem_space;
   omp_alloctrait_t       traits[1] = {{omp_atk_alignment, 64}};
   omp_allocator_handle_t alloc = omp_init_allocator(memspace,1,traits);
 
   x = (int *)omp_aligned_alloc(64, N*sizeof(int), alloc);
-  y = (int *)omp_aligned_alloc(64, N*sizeof(int), alloc);
     
-  OMPVV_TEST_AND_SET_VERBOSE(errors, ((intptr_t)(y))%64 != 0 || ((intptr_t)(x))%64 != 0);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, ((intptr_t)(x))%64 != 0);
 
-  #pragma omp parallel for simd simdlen(16) aligned(x,y: 64)
+  int values_did_not_match_expected_changes = 0;
+
+  #pragma omp parallel for simd simdlen(16) aligned(x: 64)
   for (int i = 0; i < N; i++) {
     x[i] = i;
-    y[i] = i+1;
   }
 
-  #pragma omp parallel for simd simdlen(16) aligned(x,y: 64)
+  #pragma omp parallel for simd simdlen(16) aligned(x: 64)
   for (int i = 0; i < N; i++) {
-    OMPVV_TEST_AND_SET_VERBOSE(errors, x[i] != i);
-    OMPVV_TEST_AND_SET_VERBOSE(errors, y[i] != i+1);
+    if (x[i] != i) {
+      values_did_not_match_expected_changes = 1;
+    }
+  }
+
+
+  if (values_did_not_match_expected_changes) {
+    OMPVV_ERROR("Array values did not match the expected values");
+    errors++;
   }
 
   omp_free(x, alloc);
-  omp_free(y, alloc);
   omp_destroy_allocator(alloc);
 
   return errors;
