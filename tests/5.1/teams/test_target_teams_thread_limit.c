@@ -2,7 +2,7 @@
 //
 // OpenMP API Version 5.1 Nov 2020
 //
-// This test uses the thread_limit clause on the teams construct. Specifically
+// This test uses the thread_limit clause on the target construct. Specifically
 // testing if a thread_limit from a above target construct properly carries
 // down to the nested teams construct, as if it were directly on the construct
 // as defined in the spec. The test validates that only the specified 
