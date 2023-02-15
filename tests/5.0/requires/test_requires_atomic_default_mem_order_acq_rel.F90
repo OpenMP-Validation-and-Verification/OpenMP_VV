@@ -34,8 +34,11 @@ CONTAINS
     errors = 0
 
     OMPVV_INFOMSG("test_requires_atomic_acq_rel")
+    
+    call omp_set_dynamic(.false.)
+    call omp_set_num_threads(2)
 
-    !$omp parallel num_threads(2) private(thrd, tmp)
+    !$omp parallel private(thrd, tmp)
        thrd = omp_get_thread_num()
        IF (thrd .EQ. 0) THEN
           x = 10 
