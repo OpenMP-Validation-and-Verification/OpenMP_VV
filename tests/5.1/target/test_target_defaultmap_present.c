@@ -40,7 +40,7 @@ int test_defaultmap_present() {
    ptr = &A[0]; 
    ptr[50] = 50; ptr[51] = 51;
    
-   #pragma omp target enter data map(to: scalar_var, A, new_struct)
+   #pragma omp target enter data map(to: scalar_var, A, new_struct, ptr)
    
    #pragma omp target map(tofrom: errors) defaultmap(present)
    {     
