@@ -79,8 +79,7 @@ endif
 ifeq ($(CC), amdclang)
     C_VERSION     =  $(CC) -dumpversion
     CLINK         =  $(CC)
-    COFFLOADING   =  -fopenmp 
-    COFFLOADING   += -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx90a
+    COFFLOADING   =  -fopenmp --offload-arch=native 
     COFFLOADING   +=  $(OMPV)
     CFLAGS        += -lm -O3 $(COFFLOADING)
     CLINKFLAGS    += -lm -O3 $(COFFLOADING)
@@ -99,11 +98,6 @@ ifeq ($(CC), cc)
   C_VERSION      = $(CC) -dumpversion
   CLINK          = $(CC)
   COFFLOADING    = -fopenmp
-  ifeq ($(DEVICE_TYPE), amd) 
-    COFFLOADING  += -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx90a
-  else ifeq ($(DEVICE_TYPE), nvidia)
-    COFFLOADING  += -fopenmp-targets=nvptx64-nvidia-cuda -Xopenmp-target -march=sm_80
-  endif
   CFLAGS         += -lm -O3 $(COFFLOADING)
   CLINKFLAGS     += -lm -O3 $(COFFLOADING)
 endif
@@ -142,12 +136,7 @@ endif
 ifeq ($(CC), clang)
   C_VERSION       =  $(CC) -dumpversion
   CLINK           =  $(CC)
-  COFFLOADING     =  -fopenmp
-  ifeq ($(DEVICE_TYPE),nvidia)
-    COFFLOADING   += -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_80 
-  else ifeq ($(DEVICE_TYPE),amd)
-    COFFLOADING   += -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx90a
-  endif
+  COFFLOADING     =  -fopenmp --offload-arch=native
   COFFLOADING     +=  $(OMPV)
   C_NO_OFFLOADING =
   CFLAGS          += -lm -O3 $(COFFLOADING)
@@ -164,8 +153,7 @@ CXX_VERSION?= echo "version unknown"
 ifeq ($(CXX), amdclang++)
     CXX_VERSION     =  $(CXX) -dumpversion
     CXXLINK         =  $(CXX)
-    CXXOFFLOADING   =  -fopenmp
-    CXXOFFLOADING   += -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx90a
+    CXXOFFLOADING   =  -fopenmp --offload-arch=native
     CXXOFFLOADING   +=  $(OMPV)
     CXXFLAGS        += -std=c++11 -lm -O3 $(CXXOFFLOADING)
     CXXLINKFLAGS    += -lm -O3 $(CXXOFFLOADING)
@@ -184,11 +172,6 @@ ifeq ($(CXX), CC)
   CXX_VERSION      = $(CXX) -dumpversion
   CXXLINK          = $(CXX)
   CXXOFFLOADING    = -fopenmp
-  ifeq ($(DEVICE_TYPE), amd) 
-    CXXOFFLOADING  += -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx90a
-  else ifeq ($(DEVICE_TYPE), nvidia)
-    CXXOFFLOADING  += -fopenmp-targets=nvptx64-nvidia-cuda -Xopenmp-target -march=sm_80
-  endif
   CXXFLAGS         += -lm -O3 $(CXXOFFLOADING)
   CXXLINKFLAGS     += -lm -O3 $(CXXOFFLOADING)
 endif
@@ -227,12 +210,7 @@ endif
 ifeq ($(CXX), clang++)
   CXX_VERSION       =  $(CXX) -dumpversion
   CXXLINK           =  $(CXX)
-  CXXOFFLOADING     =  -fopenmp
-  ifeq ($(DEVICE_TYPE),nvidia)
-    CXXOFFLOADING   += -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_80 
-  else ifeq ($(DEVICE_TYPE),amd)
-    CXXOFFLOADING   += -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx90a
-  endif
+  CXXOFFLOADING     =  -fopenmp --offload-arch=native
   CXXOFFLOADING     +=  $(OMPV)
   CXX_NO_OFFLOADING =
   CXXFLAGS          += -lm -std=c++11 -O3 $(CXXOFFLOADING)
@@ -245,11 +223,10 @@ endif
 FCOMPILERS?="amdflang, gfortran, xlf, ifx, ftn, nvfortran"
 F_VERSION?= echo "version unknown"
 
-ifeq ($(FC), amdfclang)
+ifeq ($(FC), amdflang)
     F_VERSION     =  $(FC) -dumpversion
     FLINK         =  amdclang++
-    FOFFLOADING   =  -fopenmp
-    FOFFLOADING   += -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx90a
+    FOFFLOADING   =  -fopenmp --offload-arch=native 
     FOFFLOADING   +=  $(OMPV)
     FFLAGS        += -lm -O3 $(FOFFLOADING)
     FLINKFLAGS    += -lm -O3 $(FOFFLOADING)
@@ -307,12 +284,7 @@ endif
 ifeq ($(FC), $(filter $(FC), flang flang-new))
   F_VERSION       =  $(FC) -dumpversion
   FLINK           =  clang
-  FOFFLOADING     =  -fopenmp
-  ifeq ($(DEVICE_TYPE),nvidia)
-    FOFFLOADING   += -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_80 
-  else ifeq ($(DEVICE_TYPE),amd)
-    FOFFLOADING   += -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx90a
-  endif
+  FOFFLOADING     =  -fopenmp --offload-arch=native
   FOFFLOADING     +=  $(OMPV)
   F_NO_OFFLOADING =
   FFLAGS          += -lm -O3 $(FOFFLOADING)
