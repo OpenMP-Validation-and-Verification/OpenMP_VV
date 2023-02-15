@@ -16,26 +16,29 @@
 
 #define N 1024
 
-int main(){
-	
-	OMPVV_TEST_OFFLOADING;
-
+int test_case(){
 	int errors = 0;
+	int sum = 0;
 	int test_lst[N];
-	for (int i; i < N; i++){
+	for (int i = 0; i<N; i++){
 		test_lst[i] = 1;
 	}
-	#pragma omp target map(iterator(it=1:N),tofrom: test_lst[it])
+	#pragma omp target map(iterator(it = 0:n), tofrom: test_lst[it])
 	{
-		for (int i = 0; i < N-1; i++){
+		for(int i = 0; i < N; i++){
 			test_lst[i] = 2;
 		}
-
 	}
-	OMPVV_WARNING_IF(test_lst[0] != 1, "list 0 was overwritten");
-	OMPVV_WARNING_IF(test_lst[1] != 2, "list 1 was not changed");
-	OMPVV_TEST_AND_SET(errors, (test_lst[1] != 2));
-	OMPVV_REPORTA_AND_RETURN(errors);
-	return errors;
+	for (int i = 0; i < N; i++){
+		sum += test_lst[i];
+	}
+	OMPVV_TEST_AND_SET(errors, (sum != 2048));
+	return (errors);
+}
 
+int main(){
+	int errors = 0;
+	OMPVV_TEST_OFFLOADING;
+	OMPVV_TEST_AND_SET_VERBOSE(errors,test_case() != 0);
+	OMPVV_REPORT_AND_RETURN(errors);
 }
