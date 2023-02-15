@@ -32,7 +32,7 @@ int test_case(){
 	for (int i = 0; i < N; i++){
 		sum += test_lst[i];
 	}
-	OMPVV_TEST_AND_SET(errors, (sum != 2048));
+	OMPVV_TEST_AND_SET(errors, (sum != 2*N));
 	return (errors);
 }
 
