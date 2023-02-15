@@ -48,7 +48,7 @@ int test_target_update_iterator() {
     test_struct_t new_struct;
 
     init(&new_struct);
-    #pragma omp target map(to: new_struct) map(from: A[:N])
+    #pragma omp target map(to: new_struct) map(tofrom: A[:N])
     {
         #pragma omp parallel for
         for(int i = 0; i < N; i++){
@@ -58,7 +58,7 @@ int test_target_update_iterator() {
     init_again(&new_struct);
     // update with new values, (i*2)+1
     #pragma omp target update to(iterator(it = 0:N): new_struct.data[it])
-    #pragma omp target map(from: A[:N])
+    #pragma omp target map(tofrom: A[:N])
     for(int i = 0; i < N; i++){
             A[i] += new_struct.data[i];
     }
