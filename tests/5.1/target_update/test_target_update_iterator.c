@@ -56,7 +56,7 @@ int test_target_update_iterator() {
         }
     }
     init_again(&new_struct);
-    // update with new values, i+i+1
+    // update with new values, (i*2)+1
     #pragma omp target update to(iterator(it = 0:N): new_struct.data[it])
     #pragma omp target map(from: A[:N])
     for(int i = 0; i < N; i++){
