@@ -28,7 +28,7 @@ int test_metadirective_target_device() {
    // Expect that device_num is 0, so the array should be mapped back.
    #pragma omp metadirective \
       when( target_device={device_num(dev)}: target defaultmap(none) map(tofrom: A)) \
-      default( target defaultmap(none) map(to: A)
+      default( target defaultmap(none) map(to: A))
       for(int i = 0; i < N; i++){
          A[i] = i;
       }
