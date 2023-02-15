@@ -25,12 +25,14 @@ typedef struct test_struct{
 } test_struct_t;
 
 void init(struct test_struct *s ){
+    s->len = N;
     for(size_t i = 0; i < s->len; i++){
         s->data[i] = i;
     }
 }
 
 void init_again(struct test_struct *s ){
+    s->len = N;
     for(size_t i = 0; i < s->len; i++){
         s->data[i] = i+1;
     }
@@ -58,7 +60,7 @@ int test_target_update_iterator() {
     #pragma omp target update to(iterator(it = 0:N): new_struct.data[it])
     #pragma omp target map(from: A[:N])
     for(int i = 0; i < N; i++){
-            A[i]+=new_struct.data[i];
+            A[i] += new_struct.data[i];
     }
     for(int i = 0; i < N; i++){
         OMPVV_TEST_AND_SET(errors, A[i] != (i*2)+1);
