@@ -23,7 +23,7 @@ int test_case(){
 	for (int i = 0; i<N; i++){
 		test_lst[i] = 1;
 	}
-	#pragma omp target map(iterator(it = 0:n), tofrom: test_lst[it])
+	#pragma omp target map(iterator(it = 0:N), tofrom: test_lst[it])
 	{
 		for(int i = 0; i < N; i++){
 			test_lst[i] = 2;
