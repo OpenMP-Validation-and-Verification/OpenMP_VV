@@ -15,8 +15,6 @@
 #include <stdlib.h>
 #include "ompvv.h"
 
-#define N 1024
-
 #pragma omp requires atomic_default_mem_order(acq_rel)
 
 int test_requires_atomic_acq_rel() {
@@ -24,8 +22,11 @@ int test_requires_atomic_acq_rel() {
 
   int x = 0, y = 0;
   int errors = 0;
+  
+  omp_set_dynamic(0);
+  omp_set_num_threads(2);
 
-#pragma omp parallel num_threads(2)
+#pragma omp parallel
    {
       int thrd = omp_get_thread_num();
        if (thrd == 0) {
