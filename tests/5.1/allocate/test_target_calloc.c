@@ -21,7 +21,7 @@ int test_omp_target_calloc() {
 
   int errors = 0;
 
-  #pragma omp target map(tofrom: errors) map(to: N) uses_allocators(omp_default_mem_alloc)
+  #pragma omp target map(tofrom: errors) uses_allocators(omp_default_mem_alloc)
   {
 
     int *x;
