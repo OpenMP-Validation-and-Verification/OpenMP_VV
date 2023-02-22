@@ -20,13 +20,13 @@
 int test_omp_aligned_alloc_on_device() {
   int errors = 0;
   
-  #pragma omp target map(tofrom: errors) uses_allocators(omp_default_mem_alloc) 
+  omp_memspace_handle_t  memspace = omp_default_mem_space;
+  omp_alloctrait_t       traits[1] = {{omp_atk_alignment, 64}};
+  omp_allocator_handle_t alloc = omp_init_allocator(memspace,1,traits);
+
+  #pragma omp target map(tofrom: errors) uses_allocators(alloc[traits]) 
   {
     int *x, *y;
-
-    omp_memspace_handle_t  memspace = omp_default_mem_space;
-    omp_alloctrait_t       traits[1] = {{omp_atk_alignment, 64}};
-    omp_allocator_handle_t alloc = omp_init_allocator(memspace,1,traits);
 
     x = (int *)omp_aligned_alloc(64, N*sizeof(int), alloc);
     y = (int *)omp_aligned_alloc(64, N*sizeof(int), alloc);
@@ -47,8 +47,9 @@ int test_omp_aligned_alloc_on_device() {
 
     omp_free(x, alloc);
     omp_free(y, alloc);
-    omp_destroy_allocator(alloc);
   }
+
+  omp_destory_allocator(alloc);
 
   return errors;
 }
