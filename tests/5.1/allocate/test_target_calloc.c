@@ -30,42 +30,42 @@ int test_omp_target_calloc() {
 
     if (x == NULL) { 
       OMPVV_ERROR("omp_calloc returned null"); 
-      return (1); 
-    }
+      errors++; 
+    } else {
+      int not_init_to_zero = 0;
+      int not_correct_updated_values = 0;
 
-    int not_init_to_zero = 0;
-    int not_correct_updated_values = 0;
-
-    #pragma omp parallel for
-    for (int i = 0; i < N; i++) {
-      if (x[i] != 0) {
-        not_init_to_zero = 1;
-      }  
-    }
-
-    #pragma omp parallel for
-    for (int i = 0; i < N; i++) {
-      x[i] = i;
-    }
-
-    #pragma omp parallel for
-    for (int i = 0; i < N; i++) {
-      if (x[i] != i) {
-        not_correct_updated_values = 1;
+      #pragma omp parallel for
+      for (int i = 0; i < N; i++) {
+        if (x[i] != 0) {
+          not_init_to_zero = 1;
+        }  
       }
-    }
 
-    if (not_init_to_zero) {
-      OMPVV_ERROR("Values were not initialized to 0");
-      errors++;
-    }
+      #pragma omp parallel for
+      for (int i = 0; i < N; i++) {
+        x[i] = i;
+      }
 
-    if (not_correct_updated_values) {
-      OMPVV_ERROR("Values in the array did NOT match the expected values. Changes may not have persisted.");
-      errors++;
-    }
+      #pragma omp parallel for
+      for (int i = 0; i < N; i++) {
+        if (x[i] != i) {
+          not_correct_updated_values = 1;
+        }
+      }
 
-    omp_free(x, omp_default_mem_alloc);
+      if (not_init_to_zero) {
+        OMPVV_ERROR("Values were not initialized to 0");
+        errors++;
+      }
+
+      if (not_correct_updated_values) {
+        OMPVV_ERROR("Values in the array did NOT match the expected values. Changes may not have persisted.");
+        errors++;
+      }
+      
+      omp_free(x, omp_default_mem_alloc);
+    }
   }
 
   return errors;
