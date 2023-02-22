@@ -26,11 +26,7 @@ int test_omp_target_calloc() {
 
     int *x;
 
-    omp_memspace_handle_t  memspace = omp_default_mem_space;
-    omp_alloctrait_t       traits[0] = {};
-    omp_allocator_handle_t alloc = omp_init_allocator(memspace,0,traits);
-
-    x = (int *)omp_calloc(64, N*sizeof(int), alloc);
+    x = (int *)omp_calloc(64, N*sizeof(int), omp_default_mem_alloc);
 
     int not_init_to_zero = 0;
     int not_correct_updated_values = 0;
@@ -64,8 +60,7 @@ int test_omp_target_calloc() {
       errors++;
     }
 
-    omp_free(x, alloc);
-    omp_destroy_allocator(alloc);
+    omp_free(x, omp_default_mem_alloc);
   }
 
   return errors;
