@@ -19,8 +19,6 @@ PROGRAM test_atomic_acquire_release_program
   USE omp_lib
   implicit none
 
-  OMPVV_TEST_OFFLOADING
-
   OMPVV_TEST_VERBOSE(test_atomic_acquire_release() .ne. 0)
 
   OMPVV_REPORT_AND_RETURN()
