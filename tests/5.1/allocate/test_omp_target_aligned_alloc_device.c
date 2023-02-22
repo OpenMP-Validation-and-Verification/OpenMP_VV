@@ -33,29 +33,29 @@ int test_omp_aligned_alloc_on_device() {
     
     if (x == NULL) { 
       OMPVV_ERROR("omp_aligned_alloc returned null"); 
-      return (1); 
-    }
-
-    OMPVV_TEST_AND_SET_VERBOSE(errors, ((intptr_t)(x))%64 != 0);
-
-    #pragma omp parallel for simd simdlen(16) aligned(x: 64)
-    for (int i = 0; i < N; i++) {
-      x[i] = i;
-    }
-
-    #pragma omp parallel for simd simdlen(16) aligned(x: 64)
-    for (int i = 0; i < N; i++) {
-      if (x[i] != i) {
-        not_correct_array_values = 1; 
-      }
-    }
-
-    if (not_correct_array_values) {
-      OMPVV_ERROR("Values in the array did NOT match the expected values. Changes may not have persisted.");
       errors++;
-    }
+    } else {
+      OMPVV_TEST_AND_SET_VERBOSE(errors, ((intptr_t)(x))%64 != 0);
 
-    omp_free(x, alloc);
+      #pragma omp parallel for simd simdlen(16) aligned(x: 64)
+      for (int i = 0; i < N; i++) {
+        x[i] = i;
+      }
+
+      #pragma omp parallel for simd simdlen(16) aligned(x: 64)
+      for (int i = 0; i < N; i++) {
+        if (x[i] != i) {
+          not_correct_array_values = 1; 
+        }
+      }
+
+      if (not_correct_array_values) {
+        OMPVV_ERROR("Values in the array did NOT match the expected values. Changes may not have persisted.");
+        errors++;
+      }
+
+      omp_free(x, alloc);
+    }
   }
 
   omp_destory_allocator(alloc);
