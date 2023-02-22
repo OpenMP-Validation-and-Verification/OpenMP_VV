@@ -34,6 +34,7 @@ int test_omp_calloc_host() {
   #pragma omp parallel for
   for (int i = 0; i < N; i++) {
     if (x[i] != 0) {
+      #pragma omp atomic
       not_init_to_zero = 1;
     }  
   }
@@ -46,6 +47,7 @@ int test_omp_calloc_host() {
   #pragma omp parallel for
   for (int i = 0; i < N; i++) {
     if (x[i] != i) {
+      #pragma omp atomic
       not_correct_updated_values = 1;
     }
   }
