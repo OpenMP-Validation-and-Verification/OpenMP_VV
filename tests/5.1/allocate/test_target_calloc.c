@@ -28,6 +28,11 @@ int test_omp_target_calloc() {
 
     x = (int *)omp_calloc(64, N*sizeof(int), omp_default_mem_alloc);
 
+    if (x == NULL) { 
+      OMPVV_ERROR("omp_calloc returned null"); 
+      return (1); 
+    }
+
     int not_init_to_zero = 0;
     int not_correct_updated_values = 0;
 
