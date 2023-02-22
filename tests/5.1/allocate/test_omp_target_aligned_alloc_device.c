@@ -45,6 +45,7 @@ int test_omp_aligned_alloc_on_device() {
       #pragma omp parallel for simd simdlen(16) aligned(x: 64)
       for (int i = 0; i < N; i++) {
         if (x[i] != i) {
+          #pragma omp atomic
           not_correct_array_values = 1; 
         }
       }
