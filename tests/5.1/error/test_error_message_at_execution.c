@@ -1,9 +1,9 @@
-//===--- test_error_severity_warning.c ----------------------------===//
+//===--- test_error_message_at_execution.c ----------------------------===//
 //
 //  OpenMP API Version 5.1 Aug 2021
 //
 //  Test uses error directive with message clause to print a message,
-//  if error condition is reached then a warning error is printed,
+//  if error condition is reached then "runtime error!" is printed,
 //  otherwise is simply used to print a message. 
 //
 ////===----------------------------------------------------------------------===//
@@ -16,14 +16,14 @@
 
 int errors, i;
 
-int test_error_severity_warning() {
+int test_error_message() {
     i = 0;
-    OMPVV_INFOMSG("If successful, test should print a \"error directive encountered\" message at the beginning of output");
+    OMPVV_INFOMSG("If successful, test should print an \"error message success\" at the beginning of the test");
     #pragma omp parallel
     {
         #pragma omp single
         {
-            #pragma omp error severity(warning)
+            #pragma omp error severity(warning) at(execution) message("error message success")
             i+=5;
         }
     }
@@ -35,6 +35,6 @@ int test_error_severity_warning() {
 int main() {
    errors = 0;
    OMPVV_TEST_OFFLOADING;
-   OMPVV_TEST_AND_SET_VERBOSE(errors, test_error_severity_warning() != 0);
+   OMPVV_TEST_AND_SET_VERBOSE(errors, test_error_message() != 0);
    OMPVV_REPORT_AND_RETURN(errors);
 }
