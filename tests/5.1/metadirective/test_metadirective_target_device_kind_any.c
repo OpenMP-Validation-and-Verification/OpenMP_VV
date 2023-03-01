@@ -24,22 +24,16 @@ int test_metadirective_target_device() {
       A[i] = 1;
    }
 
-   #pragma omp target map(tofrom: A)
-   {
-      #pragma omp parallel num_threads(4)
-      {
       // Expect that one of these are true, so the array should be set to masked thread num (0)
       #pragma omp metadirective \
-         when( target_device={kind(any)}: masked ) \
-         default( for)
-            for (int i = 0; i < N; i++) {
-               A[i] = omp_get_thread_num();
-            }
-      }
-   }
+         when( target_device={kind(any)}: target defaultmap(none) map(tofrom: A)) \
+         default( target defaultmap(none) map(to: A))
+         for(int i = 0; i < N; i++){
+            A[i] = i;
+         }
 
    for (int i = 0; i < N; i++) {
-      OMPVV_TEST_AND_SET(errors, A[i] != 0);
+      OMPVV_TEST_AND_SET(errors, A[i] != i);
    }
 
    OMPVV_INFOMSG("Test ran with a number of available devices greater than 0");
