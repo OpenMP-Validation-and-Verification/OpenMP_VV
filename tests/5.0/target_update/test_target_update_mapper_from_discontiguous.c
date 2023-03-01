@@ -44,11 +44,11 @@ int target_update_from_mapper() {
   #pragma omp target data map(mapper(S), to:s) 
   { 
     #pragma omp target defaultmap(none) map(to:s.len)
-    for (int i = 0; i < s.len; i+=2) {
+    for (int i = 0; i < s.len; i++) {       
       s.data[i] += i ;
     }
   
-  #pragma omp target update from(s.data[0:s.len:2])
+  #pragma omp target update from(s.data[0:s.len:2]) //only update even array elements
   } 
   
 
