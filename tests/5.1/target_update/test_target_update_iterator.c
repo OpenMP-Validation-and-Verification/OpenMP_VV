@@ -26,6 +26,7 @@ typedef struct test_struct{
 
 void init(struct test_struct *s ){
     s->len = N;
+    s->data = malloc(sizeof(int) * N);
     for(size_t i = 0; i < s->len; i++){
         s->data[i] = i;
     }
@@ -48,9 +49,10 @@ int test_target_update_iterator() {
     test_struct_t new_struct;
 
     init(&new_struct);
-    #pragma omp target map(to: new_struct) map(tofrom: A[:N])
+
+    #pragma omp target enter data map(to: new_struct.data[:N])
+    #pragma omp target map(to: new_struct, new_struct.data[:N]) map(tofrom: A[:N]) // pointer attachment
     {
-        #pragma omp parallel for
         for(int i = 0; i < N; i++){
             A[i] = new_struct.data[i];
         }
@@ -59,9 +61,14 @@ int test_target_update_iterator() {
     // update with new values, (i*2)+1
     #pragma omp target update to(iterator(it = 0:N): new_struct.data[it])
     #pragma omp target map(tofrom: A[:N])
-    for(int i = 0; i < N; i++){
+    {
+        for(int i = 0; i < N; i++){
             A[i] += new_struct.data[i];
+        }
     }
+
+    #pragma omp target exit data map(delete:new_struct.data[:N])
+
     for(int i = 0; i < N; i++){
         OMPVV_TEST_AND_SET(errors, A[i] != (i*2)+1);
     }
