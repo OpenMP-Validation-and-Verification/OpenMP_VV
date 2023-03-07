@@ -6,19 +6,56 @@
 
 typedef int(*funcptr)();
 
-int function1(){
-	return 0;
+int fun1(){
+	return 5;
 }
 
-int function2(){
-	return 0;
+int fun2(){
+	return 10;
+}
+
+int fun3(){
+	return 15;
+}
+
+int test_declare_target_indirect(){
+
+        funcptr fptr;
+	int errors = 0;
+        int fun_choice = rand() % 3; //will give either 0, 1 or 2
+	int ret_val, result;
+        
+	if(!fun_choice){
+	  fptr = &fun1;
+	  result = 5;
+	}
+	  
+	if(fun_choice == 1){
+	  fptr = &fun2;
+	  result = 10;
+	}
+	  
+	if(fun_choice == 3){
+	  fptr = &fun3;
+	  result = 15;
+	}
+	
+	  
+	#pragma omp target map(from: ret_val)
+	  ret_val = fptr();
+	  
+        OMPVV_TEST_AND_SET(errors, ret_val != result);
+	return errors;
 }
 
 #pragma omp begin declare enter(function1, function2) indirect
-//enter 5.2 feature?
 
 int main(){
-	funcptr fptr = (choice == 1) ? &fun1:&fun2;
-	#pragma omp target map(from: ret_val)
-		ret_val = fptr();
+
+  int errors = 0;
+  OMPVV_TEST_OFFLOADING;
+  
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_declare_target_indirect() != 0);
+  OMPVV_REPORT_AND_RETURN(errors);
+	
 }
