@@ -2,12 +2,12 @@
 //
 // OpenMP API Version 5.1 Nov 2020
 //
-// This test uses the thread_limit clause on the teams construct. Specifically
-// testing if a thread_limit from a above target construct properly carries
+// This test uses the thread_limit clause on the target construct. Specifically
+// testing if a thread_limit on a target construct properly carries
 // down to the nested teams construct, as if it were directly on the construct
 // as defined in the spec. The test validates that only the specified 
 // threads are created by summing a shared variable across all threads 
-// (and teams). If the threads are correctedly limited this should produce the 
+// (and teams). If the threads are correctly limited, this should produce the
 // expected value. Additional warnings are sent if specific issues occur.
 //
 ////===----------------------------------------------------------------------===//
@@ -20,7 +20,7 @@
 #define N 1024
 
 int main() {
-	int errors[OMPVV_NUM_THREADS_DEVICE/OMPVV_NUM_TEAMS_DEVICE];
+	int errors[OMPVV_NUM_TEAMS_DEVICE];
 	int num_teams = 0;
         int sum_errors = 0;
         int i;
@@ -60,7 +60,7 @@ int main() {
              sum_errors += errors[i];
         }
 
-	OMPVV_WARNING_IF(num_teams != OMPVV_NUM_TEAMS_DEVICE, "The number of teams was unexpected, the test results are likely inconcuslive")
+	OMPVV_WARNING_IF(num_teams != OMPVV_NUM_TEAMS_DEVICE, "The number of teams was unexpected, the test results are likely inconclusive")
 	OMPVV_WARNING_IF(testing_thread_limit == 1, "Only one thread was allocated to each team, the test results are likely inconclusive");
 
 	OMPVV_REPORT_AND_RETURN(sum_errors);
