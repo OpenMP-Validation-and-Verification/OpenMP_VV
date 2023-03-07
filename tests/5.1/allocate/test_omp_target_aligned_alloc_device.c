@@ -35,7 +35,10 @@ int test_omp_aligned_alloc_on_device() {
       OMPVV_ERROR("omp_aligned_alloc returned null"); 
       errors++;
     } else {
-      OMPVV_TEST_AND_SET_VERBOSE(errors, ((intptr_t)(x))%64 != 0);
+      // As OMPVV_TEST_AND_SET_VERBOSE uses printf,
+      // which is confused by the '%', use the following:
+      OMPVV_TEST_AND_SET(errors, ((intptr_t)(x))%64 != 0);
+      OMPVV_ERROR_IF(((intptr_t)(x))%64 != 0, " Condition ((intptr_t)(x))%%64 != 0 failed ");
 
       #pragma omp parallel for simd simdlen(16) aligned(x: 64)
       for (int i = 0; i < N; i++) {
@@ -45,7 +48,7 @@ int test_omp_aligned_alloc_on_device() {
       #pragma omp parallel for simd simdlen(16) aligned(x: 64)
       for (int i = 0; i < N; i++) {
         if (x[i] != i) {
-          #pragma omp atomic
+          #pragma omp atomic write
           not_correct_array_values = 1; 
         }
       }
@@ -59,7 +62,7 @@ int test_omp_aligned_alloc_on_device() {
     }
   }
 
-  omp_destory_allocator(alloc);
+  omp_destroy_allocator(alloc);
 
   return errors;
 }
