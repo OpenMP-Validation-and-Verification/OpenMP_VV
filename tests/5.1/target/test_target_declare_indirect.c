@@ -17,6 +17,7 @@ int fun2(){
 int fun3(){
 	return 15;
 }
+#pragma omp begin declare enter(fun1, fun2, fun3) indirect
 
 int test_declare_target_indirect(){
 
@@ -38,8 +39,7 @@ int test_declare_target_indirect(){
 	if(fun_choice == 3){
 	  fptr = &fun3;
 	  result = 15;
-	}
-	
+	}	
 	  
 	#pragma omp target map(from: ret_val)
 	  ret_val = fptr();
@@ -48,7 +48,7 @@ int test_declare_target_indirect(){
 	return errors;
 }
 
-#pragma omp begin declare enter(function1, function2) indirect
+
 
 int main(){
 
