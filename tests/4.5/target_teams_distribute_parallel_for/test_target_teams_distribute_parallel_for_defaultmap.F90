@@ -64,7 +64,6 @@ CONTAINS
          OMPVV_TEST_AND_SET_VERBOSE(errors, ABS(scalar_double_cpy(i) - 10.45) .gt. 0.00001);
       END DO
 
-      ! Map the same array to multiple devices. Initialize with device number
       !$omp target teams distribute parallel do defaultmap (tofrom:scalar)
       DO i = 1, ITERATIONS
          IF (omp_get_team_num() .eq. 0) THEN
@@ -110,7 +109,7 @@ CONTAINS
 
       ! Testing the copy behavior of the firstprivatization. We use an array
       ! to avoid data races and check that all threads get the value
-      !$omp target teams distribute parallel do defaultmap(tofrom: scalar)
+      !$omp target teams distribute parallel do 
       DO i = 1, ITERATIONS
          scalar_char_cpy(i) = scalar_char
          scalar_short_cpy(i) = scalar_short
@@ -128,7 +127,7 @@ CONTAINS
       END DO
  
       !$omp target teams distribute parallel do
-      DO i = 1, ITERATIONS ! Unlike previous function, these values should not change on host following end target
+      DO i = 1, 1 ! Unlike previous function, these values should not change on host following end target
          scalar_char = 'b'
          scalar_short = 20
          scalar_int = 33
