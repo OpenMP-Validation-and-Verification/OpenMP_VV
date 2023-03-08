@@ -104,7 +104,7 @@ int test_defaultmap_off() {
 
   // Testing the copy behavior of the firstprivatization. we use an array to avoid data
   // races and check that all threads get the value
-#pragma omp target teams distribute parallel for defaultmap(tofrom: scalar)
+#pragma omp target teams distribute parallel for 
   for (i = 0; i < ITERATIONS; ++i) {
     scalar_char_cpy[i] = scalar_char;
     scalar_short_cpy[i] = scalar_short;
@@ -122,9 +122,9 @@ int test_defaultmap_off() {
     OMPVV_TEST_AND_SET_VERBOSE(errors, fabs(scalar_double_cpy[i] - 10.45) > 0.00001);
     OMPVV_TEST_AND_SET_VERBOSE(errors, scalar_enum_cpy[i] != VAL1);
   }
-  // Map the same array to multiple devices. initialize with device number
+  
 #pragma omp target teams distribute parallel for
-  for (i = 0; i < ITERATIONS; ++i) {
+  for (i = 0; i < 1; ++i) {
       scalar_char = 'b';
       scalar_short = 20;
       scalar_int = 33;
