@@ -39,7 +39,7 @@ CONTAINS
        !$omp end atomic 
     !$omp end parallel
 
-    OMPVV_ERROR_IF(num_threads .LT. 0, "Test ran with invalid number of teams (less than zero)")
+    OMPVV_ERROR_IF(num_threads .LT. 0, "Test ran with invalid number of threads (less than zero)")
     OMPVV_WARNING_IF(num_threads .EQ. 1, "Test ran with one thread, so the results are not conclusive")
 
     OMPVV_TEST_AND_SET_VERBOSE(errors, x .NE. num_threads)
@@ -65,7 +65,7 @@ CONTAINS
        !$omp end atomic 
     !$omp end parallel
 
-    OMPVV_ERROR_IF(num_threads .LT. 0, "Test ran with invalid number of teams (less than zero)")
+    OMPVV_ERROR_IF(num_threads .LT. 0, "Test ran with invalid number of threads (less than zero)")
     OMPVV_WARNING_IF(num_threads .EQ. 1, "Test ran with one thread, so the results are not conclusive")
 
     OMPVV_TEST_AND_SET_VERBOSE(errors, x .NE. num_threads)
@@ -100,7 +100,7 @@ CONTAINS
     END DO
     !$omp end parallel do
 
-    OMPVV_ERROR_IF(num_threads .LT. 0, "Test ran with invalid number of teams (less than zero)")
+    OMPVV_ERROR_IF(num_threads .LT. 0, "Test ran with invalid number of threads (less than zero)")
     OMPVV_WARNING_IF(num_threads .EQ. 1, "Test ran with one thread, so the results are not conclusive")
 
     DO i = 1, N
