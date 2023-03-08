@@ -67,147 +67,82 @@ CC?=none
 CPP?=none
 FC?=none
 
+ifeq ($(OMP_VERSION), 5.0)
+   OMPV = -fopenmp-version=50
+else ifeq ($(OMP_VERSION), 5.1)
+   OMPV =  -fopenmp-version=51
+else ifeq ($(OMP_VERSION), 5.2)
+   OMPV = -fopenmp-version=52
+endif
+
+
 ifeq ($(CC), amdclang)
-    ifeq ($(OMP_VERSION), 5.0)
-      COFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908 -fopenmp-version=50
-    else ifeq ($(OMP_VERSION), 5.1)
-      COFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908 -fopenmp-version=51
-    else
-      COFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908
-    endif
-    C_NO_OFFLOADING =
-    CFLAGS += $(COFFLOADING)
-    #Adding this to fix problem with math.h
-    CFLAGS +=  -D__NO_MATH_INLINES -U__SSE2_MATH__ -U__SSE_MATH__
-    CLINK = amdclang
-    CLINKFLAGS += -lm -O3 -fopenmp $(COFFLOADING)
-    C_VERSION = echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") amdclang --version | head -n 1)"
+    C_VERSION     =  $(CC) -dumpversion
+    CLINK         =  $(CC)
+    COFFLOADING   =  -fopenmp --offload-arch=native 
+    COFFLOADING   +=  $(OMPV)
+    CFLAGS        += -lm -O3 $(COFFLOADING)
+    CLINKFLAGS    += -lm -O3 $(COFFLOADING)
 endif
 
 # NVIDIA compiler
 ifeq ($(CC), nvc)
-    CFLAGS += -fast -mp=gpu -gpu=cc70
-    CLINK = nvc
-    CLINKFLAGS += -fast -mp=gpu -gpu=cc70
+    C_VERSION    =  $(CC) -dumpversion
+    CLINK        =  $(CC)
+    CFLAGS       += -O3 -mp=gpu -gpu=cc80
+    CLINKFLAGS   += -O3 -mp=gpu -gpu=cc80
 endif
 
 # CRAY compilers
-ifeq ($(DEVICE_TYPE), amd)
-  # CRAY compiler (AMD)
-  ifeq ($(CC), cc)
-    CFLAGS += -g -Ofast -fopenmp 
-    CLINK = cc
-    CLINKFLAGS += -g -Ofast -fopenmp 
-  endif
-else ifeq ($(DEVICE_TYPE), nvidia)
-  # CRAY compiler (NVIDIA)
-  ifeq ($(CC), cc)
-    CFLAGS += -fopenmp -fopenmp-targets=nvptx64-nvidia-cuda -Xopenmp-target -march=sm_70
-    CLINK = cc
-    CLINKFLAGS += -fopenmp -fopenmp-targets=nvptx64-nvidia-cuda -Xopenmp-target -march=sm_70
-  endif
+ifeq ($(CC), cc)
+  C_VERSION      = $(CC) -dumpversion
+  CLINK          = $(CC)
+  COFFLOADING    = -fopenmp
+  CFLAGS         += -lm -O3 $(COFFLOADING)
+  CLINKFLAGS     += -lm -O3 $(COFFLOADING)
 endif
 
 # GCC compiler
 ifeq ($(CC), gcc)
-  COFFLOADING = -foffload="-lm" -lm
-  C_NO_OFFLOADING = -foffload=disable
-  CFLAGS += -O3 -std=c99 -fopenmp $(COFFLOADING)
-  CLINK = gcc
-  CLINKFLAGS += -O3 -fopenmp $(COFFLOADING)
-  C_VERSION = echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") gcc --version | head -n 1 | sed 's/.* \([0-9]*\.[0-9]*\.[0-9]*\).*/\1/g')"
+  C_VERSION       =  $(CC) -dumpversion
+  CLINK           =  $(CC)
+  COFFLOADING     =  -foffload="-lm" -lm -fopenmp
+  C_NO_OFFLOADING =  -foffload=disable
+  CFLAGS          += -O3 -std=c99 $(COFFLOADING)
+  CLINKFLAGS      += -O3 $(COFFLOADING)
 endif
 
 # IBM XL compiler
 ifeq ($(CC), xlc)
-  COFFLOADING = -qoffload
+  C_VERSION       =  $(CC) -dumpversion
+  CLINK           =  $(CC)
+  COFFLOADING     =  -qoffload -qsmp=omp
   C_NO_OFFLOADING =
-  CFLAGS += -O3 -qsmp=omp $(COFFLOADING)
-  CLINK = xlc
-  CLINKFLAGS += -O3 -qsmp=omp $(COFFLOADING)
+  CFLAGS          += -O3 $(COFFLOADING)
+  CLINKFLAGS      += -O3 $(COFFLOADING)
 endif
 
 # Intel ICX compiler
 ifeq ($(CC), icx)
-  COFFLOADING = -qopenmp -fopenmp-targets=spir64
+  C_VERSION       =  $(CC) -dumpversion
+  CLINK           =  $(CC)
+  COFFLOADING     =  -qopenmp -fopenmp-targets=spir64 -fiopenmp
   C_NO_OFFLOADING =
-  CFLAGS += -lm -O3 -fiopenmp $(COFFLOADING) -D__STRICT_ANSI__
-  CLINK = icx
-  CLINKFLAGS += -lm -O3 -fiopenmp $(COFFLOADING)
-  C_VERSION = echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") icx -dumpversion)"
+  CFLAGS          += -lm -O3 $(COFFLOADING)
+  CLINKFLAGS      += -lm -O3 $(COFFLOADING)
 endif
 
 # Clang compiler
-ifeq ($(DEVICE_TYPE),nvidia)
-  ifeq ($(CC), clang)
-    ifeq ($(OMP_VERSION), 5.0)
-      COFFLOADING = -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70 -fopenmp-version=50
-    else ifeq ($(OMP_VERSION), 5.1)
-      COFFLOADING = -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70 -fopenmp-version=51
-    else 
-      COFFLOADING = -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
-    endif
-    C_NO_OFFLOADING =
-    CFLAGS += -lm -O3 -fopenmp $(COFFLOADING)
-    #Adding this to fix problem with math.h
-    CFLAGS +=  -D__NO_MATH_INLINES -U__SSE2_MATH__ -U__SSE_MATH__
-    CLINK = clang
-    CLINKFLAGS += -lm -O3 -fopenmp $(COFFLOADING)
-    C_VERSION = echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") clang --version | head -n 1 | sed 's/clang version \([0-9]*\.[0-9]*\.[0-9]*\)/\1/g')"
-  endif
-else ifeq ($(DEVICE_TYPE),amd)
-  ifeq ($(CC), clang)
-    ifeq ($(OMP_VERSION), 5.0)
-      COFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908 -fopenmp-version=50
-    else ifeq ($(OMP_VERSION), 5.1)
-      COFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908 -fopenmp-version=51
-    else
-      COFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908
-    endif
-    C_NO_OFFLOADING =
-    CFLAGS += $(COFFLOADING)
-    #Adding this to fix problem with math.h
-    CFLAGS +=  -D__NO_MATH_INLINES -U__SSE2_MATH__ -U__SSE_MATH__
-    CLINK = clang
-    CLINKFLAGS += -lm -O3 -fopenmp $(COFFLOADING)
-    C_VERSION = echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") clang --version | head -n 1 | sed 's/clang version \([0-9]*\.[0-9]*\.[0-9]*\)/\1/g')"
-  endif
-endif
-
-# AOMP compiler
-ifeq ($(CC), aomp)
-  $(warning "AOMP is still experimental. AOMP uses clang front end, make sure the clang aomp is selected")
-  INSTALLED_GPU  = $(shell $(call loadModules, $(C_COMPILER_MODULE),"shut up") mygpu -d gfx900 2> /dev/null)
-  AOMP_GPU       ?= $(INSTALLED_GPU)
-  AOMP_CPUTARGET ?= x86_64-pc-linux-gnu
-  ifeq (sm_,$(findstring sm_,$(AOMP_GPU)))
-    $(warning "AOMP GPU NOT FOUND. USING HOST")
-    AOMP_GPUTARGET = nvptx64-nvidia-cuda
-  else
-    AOMP_GPUTARGET = amdgcn-amd-amdhsa
-  endif
-
-  ifeq (sm_,$(findstring sm_,$(AOMP_GPU)))
-    CUDA_PATH  ?= /usr/local/cuda
-    UNAMEP = $(shell uname -p)
-    CLINKFLAGS += -L$(CUDA)/targets/$(UNAMEP)-linux/lib -lcudart
-  endif
-  ifeq ("$(AOMP_GPUTARGET)", "")
-    $(error AOMP_GPUTARGET not specified or discovered.)
-  endif
-  ifeq ("$(AOMP_GPU)", "")
-    $(error AOMP_GPU not specified or discovered.)
-  endif
-
-  override CC = clang
-  COFFLOADING = -target $(AOMP_CPUTARGET) -fopenmp-targets=$(AOMP_GPUTARGET) -Xopenmp-target=$(AOMP_GPUTARGET) -march=$(AOMP_GPU)
+ifeq ($(CC), clang)
+  C_VERSION       =  $(CC) -dumpversion
+  CLINK           =  $(CC)
+  COFFLOADING     =  -fopenmp --offload-arch=native
+  COFFLOADING     +=  $(OMPV)
   C_NO_OFFLOADING =
-  CFLAGS += -lm -O3 -fopenmp $(COFFLOADING)
-  #Adding this to fix problem with math.h
-  CFLAGS +=  -D__NO_MATH_INLINES -U__SSE2_MATH__ -U__SSE_MATH__
-  CLINK = clang
-  CLINKFLAGS += -lm -O3 -fopenmp $(COFFLOADING)
+  CFLAGS          += -lm -O3 $(COFFLOADING)
+  CLINKFLAGS      += -lm -O3 $(COFFLOADING)
 endif
+
 
 #---------------------------------------------------------------------------
 # C++ compilers
@@ -216,145 +151,70 @@ CXXCOMPILERS?="amdclang++, CC, clang++, g++, xlc++, icpx, nvc++"
 CXX_VERSION?= echo "version unknown"
 
 ifeq ($(CXX), amdclang++)
-    ifeq ($(OMP_VERSION), 5.0)
-      CXXOFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908 -fopenmp-version=50
-    else ifeq ($(OMP_VERSION), 5.1)
-      CXXOFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908 -fopenmp-version=51
-    else
-      CXXOFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908 
-    endif
-    CXX_NO_OFFLOADING =
-    CXXFLAGS += -std=c++11 -lm -O3 -fopenmp $(CXXOFFLOADING)
-    #Adding this to fix problem with math.h
-    CXXFLAGS +=  -D__NO_MATH_INLINES -U__SSE2_MATH__ -U__SSE_MATH__
-    CXXLINK = amdclang++
-    CXXLINKFLAGS += -lm -O3 -fopenmp $(CXXOFFLOADING)
-    CXX_VERSION = echo "$(shell $(call loadModules,$(CXX_COMPILER_MODULE),"shut up") amdclang++ --version | head -n 1 | sed 's/amdclang++ version \([0-9]*\.[0-9]*\.[0-9]*\)/\1/g')"
+    CXX_VERSION     =  $(CXX) -dumpversion
+    CXXLINK         =  $(CXX)
+    CXXOFFLOADING   =  -fopenmp --offload-arch=native
+    CXXOFFLOADING   +=  $(OMPV)
+    CXXFLAGS        += -std=c++11 -lm -O3 $(CXXOFFLOADING)
+    CXXLINKFLAGS    += -lm -O3 $(CXXOFFLOADING)
 endif
 
 # NVIDIA compiler
 ifeq ($(CXX), nvc++)
-    CXXFLAGS += -fast -mp=gpu -gpu=cc70
-    CXXLINK = nvc
-    CXXLINKFLAGS += -fast -mp=gpu -gpu=cc70
+    CXX_VERSION    =  $(CXX) -dumpversion
+    CXXLINK        =  $(CXX)
+    CXXFLAGS       += -O3 -mp=gpu -gpu=cc80
+    CXXLINKFLAGS   += -O3 -mp=gpu -gpu=cc80
 endif
 
 # CRAY compilers
-ifeq ($(DEVICE_TYPE), amd)
-  # CRAY compiler (AMD)
-  ifeq ($(CXX), CC)
-    CXXFLAGS += -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908
-    CXXLINK = CC
-    CXXLINKFLAGS += -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908
-  endif
-else
-  # CRAY compiler (NVIDIA)
-  ifeq ($(CXX), CC)
-    CXXFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
-    CXXLINK = CC
-    CXXLINKFLAGS += -fopenmp -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
-  endif
+ifeq ($(CXX), CC)
+  CXX_VERSION      = $(CXX) -dumpversion
+  CXXLINK          = $(CXX)
+  CXXOFFLOADING    = -fopenmp
+  CXXFLAGS         += -lm -O3 $(CXXOFFLOADING)
+  CXXLINKFLAGS     += -lm -O3 $(CXXOFFLOADING)
 endif
 
 # GCC compiler
 ifeq ($(CXX), g++)
-  CXXOFFLOADING = -foffload="-lm" -lm
-  CXX_NO_OFFLOADING = -foffload=disable
-  CXXFLAGS += -std=c++11 -O3 -fopenmp $(CXXOFFLOADING)
-  CXXLINK = g++
-  CXXLINKFLAGS += -O3 -fopenmp $(CXXOFFLOADING)
-  CXX_VERSION = echo "$(shell $(call loadModules,$(CXX_COMPILER_MODULE),"shut up") g++ --version | head -n 1 | sed 's/.* \([0-9]*\.[0-9]*\.[0-9]*\).*/\1/g')"
+  CXX_VERSION       =  $(CXX) -dumpversion
+  CXXLINK           =  $(CXX)
+  CXXOFFLOADING     =  -foffload="-lm" -lm -fopenmp
+  CXX_NO_OFFLOADING =  -foffload=disable
+  CXXFLAGS          += -O3 -std=c++11 $(CXXOFFLOADING)
+  CXXLINKFLAGS      += -O3 $(CXXOFFLOADING)
 endif
 
 # IBM XL compiler
 ifeq ($(CXX), xlc++)
-  CXXOFFLOADING = -qoffload
+  CXX_VERSION       =  $(CXX) -dumpversion
+  CXXLINK           =  $(CXX)
+  CXXOFFLOADING     =  -qoffload -qsmp=omp
   CXX_NO_OFFLOADING =
-  CXXFLAGS += -std=c++11 -O3 -qsmp=omp $(CXXOFFLOADING)
-  CXXLINK = xlc++
-  CXXLINKFLAGS += -O3 -qsmp=omp $(CXXOFFLOADING)
+  CXXFLAGS          += -O3 -std=c++11 $(CXXOFFLOADING)
+  CXXLINKFLAGS      += -O3 $(CXXOFFLOADING)
 endif
 
-# Intel ICPX compiler
+# Intel ICX compiler
 ifeq ($(CXX), icpx)
-  CXXOFFLOADING = -qopenmp -fopenmp-targets=spir64
+  CXX_VERSION       =  $(CXX) -dumpversion
+  CXXLINK           =  $(CXX)
+  CXXOFFLOADING     =  -qopenmp -fopenmp-targets=spir64 -fiopenmp
   CXX_NO_OFFLOADING =
-  CXXFLAGS += -lm -O3 -fiopenmp $(CXXOFFLOADING) -D__STRICT_ANSI__
-  CXXLINK = icpx
-  CXXLINKFLAGS += -lm -O3 -fiopenmp $(CXXOFFLOADING)
-  CXX_VERSION = echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") icpx -dumpversion)"
+  CXXFLAGS          += -lm -O3 $(CXXOFFLOADING)
+  CXXLINKFLAGS      += -lm -O3 $(CXXOFFLOADING)
 endif
 
 # Clang compiler
-ifeq ($(DEVICE_TYPE),nvidia)
-  ifeq ($(CXX), clang++)
-    ifeq ($(OMP_VERSION), 5.0)
-      CXXOFFLOADING = -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70 -fopenmp-version=50
-    else ifeq ($(OMP_VERSION), 5.1)
-      CXXOFFLOADING = -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70 -fopenmp-version=51
-    else
-      CXXOFFLOADING = -fopenmp-targets=nvptx64 -Xopenmp-target -march=sm_70
-    endif 
-    CXX_NO_OFFLOADING =
-    CXXFLAGS += -std=c++11 -lm -O3 -fopenmp $(CXXOFFLOADING)
-    #Adding this to fix problem with math.h
-    CXXFLAGS +=  -D__NO_MATH_INLINES -U__SSE2_MATH__ -U__SSE_MATH__
-    CXXLINK = clang++
-    CXXLINKFLAGS += -lm -O3 -fopenmp $(CXXOFFLOADING)
-    CXX_VERSION = echo "$(shell $(call loadModules,$(CXX_COMPILER_MODULE),"shut up") clang++ --version | head -n 1 | sed 's/clang version \([0-9]*\.[0-9]*\.[0-9]*\)/\1/g')"
-  endif
-else ifeq ($(DEVICE_TYPE),amd)
-  ifeq ($(CXX), clang++)
-    ifeq ($(OMP_VERSION), 5.0)
-      CXXOFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908 -fopenmp-version=50
-    else ifeq ($(OMP_VERSION), 5.1)
-      CXXOFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908 -fopenmp-version=51
-    else
-      CXXOFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908 
-    endif
-    CXX_NO_OFFLOADING =
-    CXXFLAGS += -std=c++11 -lm -O3 -fopenmp $(CXXOFFLOADING)
-    #Adding this to fix problem with math.h
-    CXXFLAGS +=  -D__NO_MATH_INLINES -U__SSE2_MATH__ -U__SSE_MATH__
-    CXXLINK = clang++
-    CXXLINKFLAGS += -lm -O3 -fopenmp $(CXXOFFLOADING)
-    CXX_VERSION = echo "$(shell $(call loadModules,$(CXX_COMPILER_MODULE),"shut up") clang++ --version | head -n 1 | sed 's/clang version \([0-9]*\.[0-9]*\.[0-9]*\)/\1/g')"
-  endif
-endif
-
-# AOMP compiler
-ifeq ($(CXX), aomp)
-  $(warning "AOMP is still experimental. AOMP uses clang front end, make sure the clang aomp is selected")
-  INSTALLED_GPU  = $(shell $(call loadModules, $(C_COMPILER_MODULE),"shut up") mygpu -d gfx900 2> /dev/null)
-  AOMP_GPU       ?= $(INSTALLED_GPU)
-  AOMP_CPUTARGET ?= x86_64-pc-linux-gnu
-  ifeq (sm_,$(findstring sm_,$(AOMP_GPU)))
-    $(warning "AOMP GPU NOT FOUND. USING HOST")
-    AOMP_GPUTARGET = nvptx64-nvidia-cuda
-  else
-    AOMP_GPUTARGET = amdgcn-amd-amdhsa
-  endif
-
-  ifeq (sm_,$(findstring sm_,$(AOMP_GPU)))
-    CUDA_PATH  ?= /usr/local/cuda
-    UNAMEP = $(shell uname -p)
-    CLINKFLAGS += -L$(CUDA)/targets/$(UNAMEP)-linux/lib -lcudart
-  endif
-  ifeq ("$(AOMP_GPUTARGET)", "")
-    $(error AOMP_GPUTARGET not specified or discovered.)
-  endif
-  ifeq ("$(AOMP_GPU)", "")
-    $(error AOMP_GPU not specified or discovered.)
-  endif
-
-  override CXX = clang++
-  CXXOFFLOADING = -target $(AOMP_CPUTARGET) -fopenmp-targets=$(AOMP_GPUTARGET) -Xopenmp-target=$(AOMP_GPUTARGET) -march=$(AOMP_GPU)
+ifeq ($(CXX), clang++)
+  CXX_VERSION       =  $(CXX) -dumpversion
+  CXXLINK           =  $(CXX)
+  CXXOFFLOADING     =  -fopenmp --offload-arch=native
+  CXXOFFLOADING     +=  $(OMPV)
   CXX_NO_OFFLOADING =
-  CXXFLAGS += -lm -std=c++11 -O3 -fopenmp $(CXXOFFLOADING)
-  #Adding this to fix problem with math.h
-  CXXFLAGS +=  -D__NO_MATH_INLINES -U__SSE2_MATH__ -U__SSE_MATH__
-  CXXLINK = clang++
-  CXXLINKFLAGS += -lm -O3 -fopenmp $(CXXOFFLOADING)
+  CXXFLAGS          += -lm -std=c++11 -O3 $(CXXOFFLOADING)
+  CXXLINKFLAGS      += -lm -O3 $(CXXOFFLOADING)
 endif
 
 #---------------------------------------------------------------------------
@@ -364,76 +224,75 @@ FCOMPILERS?="amdflang, gfortran, xlf, ifx, ftn, nvfortran"
 F_VERSION?= echo "version unknown"
 
 ifeq ($(FC), amdflang)
-    ifeq ($(OMP_VERSION), 5.0)
-      FOFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908 -fopenmp-version=50
-    else ifeq ($(OMP_VERSION), 5.1)
-      FOFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908 -fopenmp-version=51
-    else
-      FOFFLOADING = -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908 
-    endif
-    F_NO_OFFLOADING =
-    FFLAGS += -O3 -fopenmp $(FOFFLOADING)
-    #Adding this to fix problem with math.h
-    FFLAGS +=  -D__NO_MATH_INLINES -U__SSE2_MATH__ -U__SSE_MATH__
-    FLINK = amdclang++
-    FLINKFLAGS += -lm -O3 -fopenmp $(FOFFLOADING)
-    F_VERSION = echo "$(shell $(call loadModules,$(CXX_COMPILER_MODULE),"shut up") amdflang --version | head -n 1 | sed 's/amdflang version \([0-9]*\.[0-9]*\.[0-9]*\)/\1/g')"
+    F_VERSION     =  $(FC) -dumpversion
+    FLINK         =  amdclang++
+    FOFFLOADING   =  -fopenmp --offload-arch=native 
+    FOFFLOADING   +=  $(OMPV)
+    FFLAGS        += -lm -O3 $(FOFFLOADING)
+    FLINKFLAGS    += -lm -O3 $(FOFFLOADING)
 endif
 
 # NVIDIA compiler
 ifeq ($(FC), nvfortran)
-    FFLAGS += -fast -mp=gpu -gpu=cc70 
-    FLINK = nvfortran
-    FLINKFLAGS += -fast -mp=gpu -gpu=cc70
+    F_VERSION    =  $(FC) -dumpversion
+    FLINK        =  $(FC)
+    FFLAGS       += -O3 -mp=gpu -gpu=cc80
+    FLINKFLAGS   += -O3 -mp=gpu -gpu=cc80
+endif
+
+# CRAY compilers
+ifeq ($(FC), ftn)
+  F_VERSION      = $(FC) -dumpversion
+  FLINK          = cc
+  FOFFLOADING    = -fopenmp
+  FFLAGS         += -lm -J./ompvv -O3 $(FOFFLOADING)
+  FLINKFLAGS     += -lm -O3 $(FOFFLOADING)
 endif
 
 # GCC compiler
 ifeq ($(FC), gfortran)
-  FOFFLOADING = -foffload="-lm" -lm
-  F_NO_OFFLOADING = -foffload=disable
-  FFLAGS += -O3 -fopenmp $(FOFFLOADING) -ffree-line-length-none -J./ompvv
-  FLINK = gcc
-  FLINKFLAGS += -O3 -fopenmp $(FOFFLOADING)
-  F_VERSION = echo "$(shell $(call loadModules,$(F_COMPILER_MODULE),"shut up") gfortran --version | head -n 1 | sed 's/.* \([0-9]*\.[0-9]*\.[0-9]*\).*/\1/g')"
+  F_VERSION       =  $(FC) -dumpversion
+  FLINK           =  gcc
+  FOFFLOADING     =  -foffload="-lm" -lm -fopenmp
+  F_NO_OFFLOADING =  -foffload=disable
+  FFLAGS          += -O3 $(FOFFLOADING) -ffree-line-length-none -J./ompvv
+  FLINKFLAGS      += -O3 $(FOFFLOADING)
 endif
+# GCC compiler
 
-# IBM XLF compiler
-# Summitdev happens to have a wrapper that without it we cannot execute
-# xlf with OMP 4.5 support. This wrapper is xlf_r
+# IBM XL compiler
 ifeq ($(FC), $(filter $(FC), xlf xlf_r))
-  FOFFLOADING = -qoffload
+  F_VERSION       =  $(FC) -dumpversion
+  FLINK           =  xlc
+  FOFFLOADING     =  -qoffload -qsmp=omp -qmoddir=./ompvv
   F_NO_OFFLOADING =
-  FFLAGS += -O3 -qsmp=omp $(FOFFLOADING) -qmoddir=./ompvv -DEXIT=EXIT_
-  FLINK = xlc
-  FLINKFLAGS += -O3 -qsmp=omp $(FOFFLOADING)
+  FFLAGS          += -O3 $(FOFFLOADING)
+  FLINKFLAGS      += -O3 $(FOFFLOADING)
 endif
 
-# Intel IFX compiler
+# Intel ICX compiler
 ifeq ($(FC), ifx)
-  FOFFLOADING = -qopenmp -fopenmp-targets=spir64
+  F_VERSION       =  $(FC) -dumpversion
+  FLINK           =  ifx
+  FOFFLOADING     =  -qopenmp -fopenmp-targets=spir64 -fiopenmp
   F_NO_OFFLOADING =
-  FFLAGS += -O3 -fiopenmp $(FOFFLOADING)
-  FLINK = ifx
-  FLINKFLAGS += -O3 -fiopenmp $(FOFFLOADING)
-  F_VERSION = echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") ifx --version | grep 'ifx' | grep -oh '[0-9.]\+[a-zA-Z0-9. ]*')"
+  FFLAGS          += -lm -O3 $(FOFFLOADING)
+  FLINKFLAGS      += -lm -O3 $(FOFFLOADING)
 endif
 
-# CRAY compilers
-ifeq ($(DEVICE_TYPE), amd)
-  # CRAY compiler (AMD)
-  ifeq ($(FC), ftn)
-    FFLAGS += -fopenmp -J./ompvv
-    FLINK = cc
-    FLINKFLAGS += -fopenmp
-  endif
-else
-  # CRAY compiler (NVIDIA)
-  ifeq ($(FC), ftn)
-    FFLAGS += -fopenmp -J./ompvv
-    FLINK = cc
-    FLINKFLAGS += -fopenmp
-  endif
+# Flang compiler
+ifeq ($(FC), $(filter $(FC), flang flang-new))
+  F_VERSION       =  $(FC) -dumpversion
+  FLINK           =  clang
+  FOFFLOADING     =  -fopenmp --offload-arch=native
+  FOFFLOADING     +=  $(OMPV)
+  F_NO_OFFLOADING =
+  FFLAGS          += -lm -O3 $(FOFFLOADING)
+  FLINKFLAGS      += -lm -O3 $(FOFFLOADING)
 endif
+
+
+
 
 #---------------------------------------------------------------------------
 # These macros are passed to the linker
