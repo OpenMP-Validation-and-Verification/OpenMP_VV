@@ -38,7 +38,7 @@ int test_omp_target_calloc() {
       #pragma omp parallel for
       for (int i = 0; i < N; i++) {
         if (x[i] != 0) {
-          #pragma omp atomic
+          #pragma omp atomic write
           not_init_to_zero = 1;
         }  
       }
@@ -51,7 +51,7 @@ int test_omp_target_calloc() {
       #pragma omp parallel for
       for (int i = 0; i < N; i++) {
         if (x[i] != i) {
-          #pragma omp atomic
+          #pragma omp atomic write
           not_correct_updated_values = 1;
         }
       }
