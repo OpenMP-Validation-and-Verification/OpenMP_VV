@@ -24,7 +24,7 @@ int test_aligned_calloc_on_device() {
   omp_alloctrait_t       traits[1] = {{omp_atk_alignment, 64}};
   omp_allocator_handle_t alloc = omp_init_allocator(memspace,1,traits);
 
-  #pragma omp target map(tofrom: errors) uses_allocators(alloc[traits]) 
+  #pragma omp target map(tofrom: errors) uses_allocators(alloc(traits)) 
   {
     int *x;
     int not_correct_array_values = 0;
@@ -36,7 +36,8 @@ int test_aligned_calloc_on_device() {
       OMPVV_ERROR("omp_aligned_alloc returned null"); 
       errors++;
     } else {
-      OMPVV_TEST_AND_SET_VERBOSE(errors, ((intptr_t)(x))%64 != 0);
+      OMPVV_TEST_AND_SET(errors, ((intptr_t)(x))%64 != 0);
+      OMPVV_ERROR_IF(((intptr_t)(x))%64 != 0, " Condition ((intptr_t)(x))%%64 != 0 failed ");
 
       #pragma omp parallel for simd simdlen(16) aligned(x: 64)
       for (int i =0; i < N; i++) {
@@ -75,7 +76,7 @@ int test_aligned_calloc_on_device() {
     }
   }
 
-  omp_destory_allocator(alloc);
+  omp_destroy_allocator(alloc);
 
   return errors;
 }
