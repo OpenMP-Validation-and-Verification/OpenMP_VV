@@ -28,8 +28,7 @@ int test_aligned_calloc_on_device() {
   {
     int *x;
     int not_correct_array_values = 0;
-    int not_init_to_1 = 0;
-
+  
     x = (int *)omp_aligned_calloc(64, N, N*sizeof(int), alloc);
     
     if (x == NULL) { 
@@ -39,15 +38,6 @@ int test_aligned_calloc_on_device() {
       OMPVV_TEST_AND_SET(errors, ((intptr_t)(x))%64 != 0);
       OMPVV_ERROR_IF(((intptr_t)(x))%64 != 0, " Condition ((intptr_t)(x))%%64 != 0 failed. The memory does not seem to be properly aligned.");
 
-      #pragma omp parallel for simd simdlen(16) aligned(x: 64)
-      for (int i =0; i < N; i++) {
-        if (x[i] != 1) {
-          #pragma omp atomic write
-          not_init_to_1 = 1;
-        }
-      }
-
-      
       #pragma omp parallel for simd simdlen(16) aligned(x: 64)
       for (int i = 0; i < N; i++) {
         x[i] = i;
