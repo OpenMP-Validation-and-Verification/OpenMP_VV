@@ -38,7 +38,7 @@ CONTAINS
        IF (omp_get_thread_num() .EQ. 0) THEN
           num_threads = omp_get_num_threads()
        END IF
-       !$omp atomic hint(4) ! corrosponds to omp_sync_hint_nonspeculative
+       !$omp atomic hint(4) ! corresponds to omp_sync_hint_nonspeculative
           x = x + 1
        !$omp end atomic 
     !$omp end parallel
