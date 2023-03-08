@@ -24,7 +24,7 @@ int test_omp_aligned_alloc_on_device() {
   omp_alloctrait_t       traits[1] = {{omp_atk_alignment, 64}};
   omp_allocator_handle_t alloc = omp_init_allocator(memspace,1,traits);
 
-  #pragma omp target map(tofrom: errors) uses_allocators(alloc[traits]) 
+  #pragma omp target map(tofrom: errors) uses_allocators(alloc(traits)) 
   {
     int *x;
     int not_correct_array_values = 0;
