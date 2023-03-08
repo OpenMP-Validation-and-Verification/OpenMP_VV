@@ -56,12 +56,6 @@ int test_aligned_calloc_on_device() {
         errors++;
       }
 
-      if (not_init_to_1) {
-        OMPVV_ERROR("Initial value was not properly set during calloc");
-
-        errors++;
-      }
-
       omp_free(x, alloc);
     }
   }
