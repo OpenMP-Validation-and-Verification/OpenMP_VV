@@ -17,7 +17,7 @@ int fun2(){
 int fun3(){
 	return 15;
 }
-#pragma omp begin declare enter(fun1, fun2, fun3) indirect
+#pragma omp declare target enter(fun1, fun2, fun3) indirect
 
 int test_declare_target_indirect(){
 
