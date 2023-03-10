@@ -14,7 +14,6 @@
 #include <stdlib.h>
 #include "ompvv.h"
 
-#define N 1024
 
 int test_atomic_with_used_enum_value() {
   OMPVV_INFOMSG("test_atomic_with_used_enum_value");
@@ -30,7 +29,7 @@ int test_atomic_with_used_enum_value() {
     x++;
   }
 
-  OMPVV_ERROR_IF(num_threads < 0, "Test ran with invalid number of teams (less than zero)");
+  OMPVV_ERROR_IF(num_threads < 0, "Test ran with invalid number of threads (less than zero)");
   OMPVV_WARNING_IF(num_threads == 1, "Test ran with one thread, so the results are not conclusive");
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, x != num_threads);
@@ -52,7 +51,7 @@ int test_atomic_with_unused_enum_value() {
     x++;
   }
 
-  OMPVV_ERROR_IF(num_threads < 0, "Test ran with invalid number of teams (less than zero)");
+  OMPVV_ERROR_IF(num_threads < 0, "Test ran with invalid number of threads (less than zero)");
   OMPVV_WARNING_IF(num_threads == 1, "Test ran with one thread, so the results are not conclusive");
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, x != num_threads);
