@@ -20,33 +20,35 @@
 #define N 1024
 
 int test_defaultmap_present_pointer() {
-
+   
    int errors = 0;
    int i;
-
-   int *pointer1 = malloc(N * sizeof(int));
-
+   
+   int *ptr;
+   int A[N];
+   
    for (i = 0; i < N; i++) {
-      pointer1[i] = i;
+      A[i] = i;
    }
-
-
-   #pragma omp target enter data map(to: pointer1)
+   
+   
+   #pragma omp target enter data map(to: ptr)
    #pragma omp target map(tofrom: errors) defaultmap(present: pointer)
-   {
+   {  
+      ptr = &A[0];
       for (i = 0; i < N; i++) {
-	 if (pointer1[i] != i) {errors++;}
-	 pointer1[i] = 2+i;
+         if (ptr[i] != i) {
+           errors++;
+         }
+         ptr[i] = 2+i;
       }
    }
-
+   
    OMPVV_ERROR_IF(errors > 0, "Values were not mapped to the device properly");
-
+   
    for (i = 0; i < N; i++) {
-      OMPVV_TEST_AND_SET_VERBOSE(errors, pointer1[i] == 2+i);
+      OMPVV_TEST_AND_SET_VERBOSE(errors, A[i] != 2+i);
    }
-
-   OMPVV_INFOMSG_IF(pointer1[1] == 3, "Values were mapped back to the device, inproper behavior");
 
    return errors;
 }
