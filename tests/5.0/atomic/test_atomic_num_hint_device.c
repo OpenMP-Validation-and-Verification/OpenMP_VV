@@ -1,4 +1,4 @@
-//===--- test_atomic_hint_device.c -------------------------------------------------===//
+//===--- test_atomic_num_hint_device.c ------------------------------------===//
 //
 // OpenMP API Version 5.0 Nov 2018
 //
@@ -6,7 +6,7 @@
 //  are processed correctly for device execution. If the sync hint is not
 //  yet defined in the specification, it defaults to 
 //  omp_sync_hint_none (0x0). 
-////===----------------------------------------------------------------------===//
+////===--------------------------------------------------------------------===//
 
 #include <assert.h>
 #include <omp.h>
@@ -14,10 +14,9 @@
 #include <stdlib.h>
 #include "ompvv.h"
 
-#define N 1024
 
 int test_atomic_with_used_enum_value() {
-  OMPVV_INFOMSG("test_atomic_by_used_enum_value");
+  OMPVV_INFOMSG("test_atomic_with_used_enum_value");
   int errors = 0, x = 0, num_threads = -1;
 
 #pragma omp target map(tofrom: num_threads,x)  
@@ -30,7 +29,7 @@ int test_atomic_with_used_enum_value() {
     x++;
   }
 
-  OMPVV_ERROR_IF(num_threads < 0, "Test ran with invalid number of teams (less than zero)");
+  OMPVV_ERROR_IF(num_threads < 0, "Test ran with invalid number of threads (less than zero)");
   OMPVV_WARNING_IF(num_threads == 1, "Test ran with one thread, so the results are not conclusive");
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, x != num_threads);
@@ -52,7 +51,7 @@ int test_atomic_with_unused_enum_value() {
     x++;
   }
 
-  OMPVV_ERROR_IF(num_threads < 0, "Test ran with invalid number of teams (less than zero)");
+  OMPVV_ERROR_IF(num_threads < 0, "Test ran with invalid number of threads (less than zero)");
   OMPVV_WARNING_IF(num_threads == 1, "Test ran with one thread, so the results are not conclusive");
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, x != num_threads);
