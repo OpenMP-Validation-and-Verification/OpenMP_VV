@@ -1,3 +1,12 @@
+//----------------test_target_declare_indirect.c-----------------
+//
+// OpenMP API Version 5.1 Mar 2023
+//
+// This test intends to test the functionality of an indirect
+// declare target region. A random int is chosen that correlates
+// to a function pointer. That function is then chosen and the 
+// test ensures it runs as expected.
+// --------------------------------------------------------------
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
