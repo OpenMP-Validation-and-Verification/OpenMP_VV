@@ -24,7 +24,7 @@ typedef struct{
 int i;
 int errors = 0;
 
-#pragma omp declare mapper(S: T v) map(v, v.len, v.data[0:v.len])
+#pragma omp declare mapper(S: T v) map(to: v, v.len, v.data[0:v.len])
 
 int target_update_from_mapper() {
   
@@ -43,7 +43,7 @@ int target_update_from_mapper() {
   
   #pragma omp target data map(mapper(S), to:s) 
   { 
-    #pragma omp target defaultmap(none) map(to:s.len)
+    #pragma omp target map(mapper(S), to:s)
     for (int i = 0; i < s.len; i++) {       
       s.data[i] += i ;
     }
