@@ -32,7 +32,9 @@ int ordered_doacross(){
   int a[N];
   int b[N];
   int c[N];
-  a[0], b[0], c[0] = 0;
+  a[0] = 0;
+  b[0] = 0;
+  c[0] = 0;
 
   #pragma omp parallel for ordered
   for(int i = 1; i < N; i++){
