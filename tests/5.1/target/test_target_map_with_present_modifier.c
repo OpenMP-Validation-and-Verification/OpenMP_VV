@@ -34,8 +34,9 @@ int test_present_modifier() {
     a[i] = i;
     member.b[i] = i;
   }
-
-#pragma omp target map (present, tofrom: scalar, a, member) 
+# pragma omp target data map(tofrom:scalar, a, member) 
+  {
+#pragma omp target map(present, tofrom: scalar, a, member) 
   {
     scalar += 1;
     member.var += 2;
@@ -44,6 +45,7 @@ int test_present_modifier() {
       a[i] += i;
       member.b[i] += i;
     }
+  }
   }
 
   for (i = 0; i < N; i++) {
