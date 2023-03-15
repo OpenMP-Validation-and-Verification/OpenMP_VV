@@ -24,38 +24,38 @@ int test_aligned_calloc() {
   omp_alloctrait_t       traits[1] = {{omp_atk_alignment, 64}};
   omp_allocator_handle_t alloc = omp_init_allocator(memspace,1,traits);
 
-    int *x;
-    int not_correct_array_values = 0;
-  
-    x = (int *)omp_aligned_calloc(64, N, N*sizeof(int), alloc);
-    
-    if (x == NULL) { 
-      OMPVV_ERROR("omp_aligned_calloc returned null"); 
-      errors++;
-    } else {
-      OMPVV_TEST_AND_SET(errors, ((intptr_t)(x))%64 != 0);
-      OMPVV_ERROR_IF(((intptr_t)(x))%64 != 0, " Condition ((intptr_t)(x))%%64 != 0 failed. The memory does not seem to be properly aligned.");
+  int *x;
+  int not_correct_array_values = 0;
 
-      #pragma omp parallel for simd simdlen(16) aligned(x: 64)
-      for (int i = 0; i < N; i++) {
-        x[i] = i;
-      }
+  x = (int *)omp_aligned_calloc(64, N, N*sizeof(int), alloc);
 
-      #pragma omp parallel for simd simdlen(16) aligned(x: 64)
-      for (int i = 0; i < N; i++) {
-        if (x[i] != i) {
-          #pragma omp atomic write
-          not_correct_array_values = 1; 
-        }
-      }
+  if (x == NULL) { 
+    OMPVV_ERROR("omp_aligned_calloc returned null"); 
+    errors++;
+  } else {
+    OMPVV_TEST_AND_SET(errors, ((intptr_t)(x))%64 != 0);
+    OMPVV_ERROR_IF(((intptr_t)(x))%64 != 0, " Condition ((intptr_t)(x))%%64 != 0 failed. The memory does not seem to be properly aligned.");
 
-      if (not_correct_array_values) {
-        OMPVV_ERROR("Values in the array did NOT match the expected values. Changes may not have persisted.");
-        errors++;
-      }
-
-      omp_free(x, alloc);
+    #pragma omp parallel for simd simdlen(16) aligned(x: 64)
+    for (int i = 0; i < N; i++) {
+      x[i] = i;
     }
+
+    #pragma omp parallel for simd simdlen(16) aligned(x: 64)
+    for (int i = 0; i < N; i++) {
+      if (x[i] != i) {
+        #pragma omp atomic write
+        not_correct_array_values = 1; 
+      }
+    }
+
+    if (not_correct_array_values) {
+      OMPVV_ERROR("Values in the array did NOT match the expected values. Changes may not have persisted.");
+      errors++;
+    }
+
+    omp_free(x, alloc);
+  }
 
   omp_destroy_allocator(alloc);
 
