@@ -1,3 +1,13 @@
+//---------------------test_omp_alloctrait_key.c---------------------
+//
+// OpenMP API Version 5.1 March 2023
+//
+// This check intends to check the function of omp_alloctrait_key
+// enum. The test creates two allocations which are then passed into
+// a parrallel region to enusre the allocations work as expected.
+//
+//-------------------------------------------------------------------
+
 #include <stdlib.h>
 #include <omp.h>
 #include <math.h>
