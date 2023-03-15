@@ -47,7 +47,7 @@ CONTAINS
        z(i) = 2*i
     END DO
 
-    !$omp teams num_teams(OMPVV_NUM_TEAMS_DEVICE) thread_limit(OMPVV_NUM_THREADS_HOST)
+    !$omp teams num_teams(OMPVV_NUM_TEAMS_HOST) thread_limit(OMPVV_NUM_THREADS_HOST)
     !$omp loop bind(teams)
     DO i = 1, N
        DO j = 1, N
