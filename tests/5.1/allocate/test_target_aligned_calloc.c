@@ -2,7 +2,7 @@
 //
 // OpenMP API Version 5.1 Nov 2020
 //
-// Tests the omp_aligned_calloc routine properly requests a memory allocation
+// Tests the omp_aligned_calloc routine. Requests a memory allocation
 // aligned to the passed byte parameter. Starts by initializing some memory
 // in the omp_default_mem_space and then checks if this memory is aligned
 // and can be properly written to and read from. Checks on the device.
