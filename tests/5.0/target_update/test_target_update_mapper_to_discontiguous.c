@@ -32,26 +32,35 @@ int target_update_to_mapper() {
   OMPVV_TEST_OFFLOADING;
 
   newvec_t s;
+  int errors;
 
   s.data = (double *)calloc(N,sizeof(double));
   s.len = N;
- 
-  //initalize the struct
-  for (i = 0; i < s.len; i++) {
-    s.data[i] = i;
-  }
+  #pragma target data map(tofrom: s)
+  { 
+    //update array in host values
+    for (i = 0; i < s.len; i++) {
+      s.data[i] = i;
+    }
+    // update even array position values from host
+    // This should set them to i  
+    #pragma omp target update to(s.data[0:s.len:2])
 
-#pragma omp target update to(s)
+    //update array on the device
+    #pragma omp target //map(alloc: result[0:N])
+    for (i = 0; i < s.len; i++) {
+      s.data[i] = i;
+    }
+  } //end target
 
-#pragma omp target map(tofrom: errors)
-{
-  for (i =0; i < s.len; i++) {
-    if(s.data[i] != i) {
-      errors++;
+  for (i =0; i < N; i++) { 
+    if(i%2){ //odd positions should be result[i] = i
+      OMPVV_TEST_AND_SET(errors, s.data[i] != i);
+    }
+    else{   //even positions should be result[i] = 2i
+      OMPVV_TEST_AND_SET(errors, s.data[i] != 2*i);
     }
   } 
-} //end target
-
   return errors;
   
 }
