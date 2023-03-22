@@ -18,7 +18,6 @@ int test_places(){
 	int errors = 0;
 	int test = 1;
 	char* ret_val = NULL;
-	setenv("OMP_PLACES", "ll_caches", 1 );
 	ret_val = getenv("OMP_PLACES");
 	test = ret_val == NULL || strcmp(ret_val, "ll_caches");
 	OMPVV_TEST_AND_SET(errors,test != 0);
