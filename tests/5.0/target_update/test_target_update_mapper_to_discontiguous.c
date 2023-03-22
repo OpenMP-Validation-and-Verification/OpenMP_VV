@@ -47,9 +47,9 @@ int target_update_to_mapper() {
     #pragma omp target update to(s.data[0:s.len:2])
 
     //update array on the device
-    #pragma omp target //map(alloc: result[0:N])
+    #pragma omp target 
     for (i = 0; i < s.len; i++) {
-      s.data[i] = i;
+      s.data[i] += i;
     }
   } //end target
 
