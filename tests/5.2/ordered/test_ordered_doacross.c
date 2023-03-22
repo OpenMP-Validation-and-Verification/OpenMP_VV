@@ -47,7 +47,7 @@ int ordered_doacross(){
   for(int i = 1; i < N; i++){
     OMPVV_TEST_AND_SET(errors, a[i] != i);
     OMPVV_TEST_AND_SET(errors, b[i] != i-1)
-    OMPVV_TEST_AND_SET_VERBOSE(errors, c[i] != (i-1) + i);
+    OMPVV_TEST_AND_SET(errors, c[i] != (i-1) + i);
   }
   return errors;
 
