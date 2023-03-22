@@ -17,7 +17,7 @@
 #define N 1024
 
 int test_taskloop_in_reduction() {
-  OMPVV_INFOMSG("test_taskloop_in_reduction");
+  OMPVV_INFOMSG("test_taskloop_in_reduction_device");
   int errors = 0;
   int num_threads = -1;
   int y[N];
