@@ -3,12 +3,13 @@
 // OpenMP API Version 5.1 Nov 2020
 //
 //This test intends to test the omp_places numa domain option. 
-//First the test sets the value of omp_placesto numa_domain. 
+//First the test sets the value of omp_places to numa_domain.
 //Then the test checks for equal distribution in threads.
 //-------------------------------------------------------------//
 
 #include <omp.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "ompvv.h"
 #include <math.h>
 
@@ -16,10 +17,9 @@
 int test_places(){
 	int errors = 0;
 	int test = 1;
-	char* ret_val = "";
-	setenv("OMP_PLACES", "numa_domains", 1);
+	char* ret_val = NULL;
 	ret_val = getenv("OMP_PLACES");
-	test = strcmp(ret_val, "numa_domains");
+	test = ret_val == NULL || strcmp(ret_val, "numa_domains");
 	OMPVV_TEST_AND_SET(errors, test != 0);
 	return errors;
 }
