@@ -41,29 +41,29 @@ void add_two(int *arr){
 
 int test_wrapper() { 
    errors = 0;
-   bool use_context;
+   bool nocontext_arg;
    add(arr);
    for(i = 0; i < N; i++){
       OMPVV_TEST_AND_SET_VERBOSE(errors, arr[i] != i+1);
    } 
    OMPVV_ERROR_IF(errors > 0, "Base function is not working properly");
-   use_context = true;
-   #pragma omp dispatch nocontext(use_context)
+   nocontext_arg = true;
+   #pragma omp dispatch nocontext(nocontext_arg)
       add(arr);
    
    for(i = 0; i < N; i++){
       OMPVV_TEST_AND_SET_VERBOSE(errors, arr[i] != i+1);
    }
-   OMPVV_ERROR_IF(errors > 0, "Dispatch w/ novariants true is not working properly");
+   OMPVV_ERROR_IF(errors > 0, "Dispatch w/ nocontext true is not working properly");
 
-   use_context = false;
-   #pragma omp dispatch nocontext(use_context)
+   nocontext_arg = false;
+   #pragma omp dispatch nocontext(nocontext_arg)
       add(arr);
 
    for(i = 0; i < N; i++){
       OMPVV_TEST_AND_SET_VERBOSE(errors, arr[i] != i+2);
    }
-   OMPVV_ERROR_IF(errors > 0, "Dispatch w/ novariants false is not working properly");
+   OMPVV_ERROR_IF(errors > 0, "Dispatch w/ nocontext false is not working properly");
    return errors;
 }
 

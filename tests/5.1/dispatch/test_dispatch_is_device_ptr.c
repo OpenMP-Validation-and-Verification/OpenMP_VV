@@ -25,10 +25,10 @@ int *arr;
 
 void add_dev(int *arr);
 
-#pragma omp declare variant(add_two) match(construct={dispatch}) // NOTE: necessary? append_params(interop: use_device_ptr)
+#pragma omp declare variant(add_dev) match(construct={dispatch}) 
 void add(int *arr){
     #pragma omp for
-    for (int i = 0; i < N; i++){ // Base function adds 1 to array values
+    for (int i = 0; i < N; i++){ // Base function adds 2 to array values
         arr[i] = arr[i]+2;
     }
 }
@@ -36,7 +36,7 @@ void add(int *arr){
 void add_dev(int *arr){
     #pragma omp target
     for (int i = 0; i < N; i++){
-        arr[i] = arr[i]+4; // Variant function adds 2 to array values
+        arr[i] = arr[i]+4; // Variant function adds 4 to array values
     }
 }
 
@@ -57,7 +57,7 @@ int test_wrapper() {
     
     #pragma omp target
     for(i = 0; i < N; i++){
-        OMPVV_TEST_AND_SET_VERBOSE(errors, arr[i] != i+1);
+        OMPVV_TEST_AND_SET_VERBOSE(errors, arr[i] != i+4);
         if(i == 5) {
             OMPVV_ERROR_IF(arr[i] == 5, "No function called or error in mapping");
             OMPVV_ERROR_IF(arr[i] == 7, "Non-target function was called");

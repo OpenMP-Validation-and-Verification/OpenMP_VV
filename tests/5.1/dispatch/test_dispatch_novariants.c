@@ -41,14 +41,14 @@ void add_two(int *arr){
 
 int test_wrapper() { 
    errors = 0;
-   bool use_variant;
+   bool novariant_arg;
    add(arr);
    for(i = 0; i < N; i++){
       OMPVV_TEST_AND_SET_VERBOSE(errors, arr[i] != i+1);
    } 
    OMPVV_ERROR_IF(errors > 0, "Base function is not working properly");
-   use_variant = true;
-   #pragma omp dispatch novariants(use_variant)
+   novariant_arg = true;
+   #pragma omp dispatch novariants(novariant_arg)
       add(arr);
    
    for(i = 0; i < N; i++){
@@ -56,8 +56,8 @@ int test_wrapper() {
    }
    OMPVV_ERROR_IF(errors > 0, "Dispatch w/ novariants true is not working properly");
 
-   use_variant = true;
-   #pragma omp dispatch novariants(use_variant)
+   novariant_arg = true;
+   #pragma omp dispatch novariants(novariant_arg)
       add(arr);
 
    for(i = 0; i < N; i++){
