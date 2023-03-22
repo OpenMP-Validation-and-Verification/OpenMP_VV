@@ -48,7 +48,7 @@ int test_defaultmap_present_aggregate() {
          a[i] += 2;
       }
       
-      if(new_struct.s != 10 && new_struct.S[0] != 100 && new_struct.S[1] != 1000) {errors++;}
+      if(new_struct.s != 10 || new_struct.S[0] != 100 || new_struct.S[1] != 1000) {errors++;}
       new_struct.s = 7; new_struct.S[0] = 70; new_struct.S[1] = 700;
    }
    }
@@ -59,7 +59,7 @@ int test_defaultmap_present_aggregate() {
       OMPVV_TEST_AND_SET(errors, a[i] != 2+i);
    }
 
-   OMPVV_TEST_AND_SET(errors, new_struct.s != 7 &&  new_struct.S[0] != 70 && new_struct.S[1] != 700);
+   OMPVV_TEST_AND_SET(errors, new_struct.s != 7 ||  new_struct.S[0] != 70 || new_struct.S[1] != 700);
  
    return errors;
 }
