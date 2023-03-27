@@ -48,5 +48,4 @@ int main() {
   int total_errors = 0;
   OMPVV_TEST_AND_SET_VERBOSE(total_errors, test_add() != 0);
   OMPVV_REPORT_AND_RETURN(total_errors);
-  return total_errors;
 }
