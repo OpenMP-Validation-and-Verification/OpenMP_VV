@@ -1,10 +1,11 @@
-//===--- test_loop_reduction_add-mod.c ------------------------------------------===//
+//===--- test_loop_reduction_add_device-mod.c ------------------------------------------===//
 //
 // OpenMP API Version 5.0 Nov 2018
 //
 // This test uses the reduction clause on a loop directive, testing that the
 // variables in the reduction clause are properly reduced using the add
-// operator. Test written in reference to test_loop_reduction_add.c.
+// operator. This test checks the above in a target context.
+// Test written in reference to test_loop_reduction_add_device.c.
 //
 //===----------------------------------------------------------------------------===//
 
@@ -46,6 +47,8 @@ int test_add() {
   return errors;
 }
 int main() {
+  OMPVV_TEST_OFFLOADING;
+
   int total_errors = 0;
 
   OMPVV_TEST_AND_SET_VERBOSE(total_errors, test_add() != 0);
