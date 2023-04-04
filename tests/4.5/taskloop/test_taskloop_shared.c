@@ -22,7 +22,7 @@ int taskloop_shared() {
 #pragma omp parallel
   {
     int s_val=0;
-
+    #pragma omp single
     #pragma omp taskloop shared(s_val)
       for (i = 0; i < N; i++){
         #pragma omp atomic

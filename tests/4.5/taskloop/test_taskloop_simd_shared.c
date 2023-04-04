@@ -31,7 +31,7 @@ int taskloop_shared() {
 
     #pragma omp taskloop simd shared(s_val)
       for (i = 0; i < N; i++){
-        A[i] = B[i] * C[i] * s_val;
+        A[i] *= B[i] * C[i] * s_val;
       }
     #pragma omp barrier
     #pragma omp single
