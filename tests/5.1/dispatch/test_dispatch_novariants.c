@@ -56,7 +56,7 @@ int test_wrapper() {
    }
    OMPVV_ERROR_IF(errors > 0, "Dispatch w/ novariants true is not working properly");
 
-   novariant_arg = true;
+   novariant_arg = false;
    #pragma omp dispatch novariants(novariant_arg)
       add(arr);
 
