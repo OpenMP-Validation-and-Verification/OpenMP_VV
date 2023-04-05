@@ -13,12 +13,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "ompvv.h"
+#define A -32 
+#define B -32.0 
+#define L '(' 
 
 int test_add() {
-  int n = -32, errors=0; 
-  float f = -32.0;
-  double d = -32.0;
-  char c = '(';
+  int n = A, errors=0; 
+  float f = B;
+  double d = B;
+  char c = L;
+  int exp_n = A + 64;
+  float exp_f = B + 64.0;
+  double exp_d = B + 64.0;
+  char exp_c = L + 64;
 
 #pragma omp target map(tofrom:n,f,d,c) 
   {
@@ -31,9 +38,9 @@ int test_add() {
     }
   }
 
-  OMPVV_TEST_AND_SET_VERBOSE(errors, (n != 32) || (f != 32.0) || (d != 32.0) || (c != 'h'));
+  OMPVV_TEST_AND_SET_VERBOSE(errors, (n != exp_n) || (f != exp_f) || (d != exp_d) || (c != exp_c));
 
-  OMPVV_ERROR_IF(errors, "\nn|EXPECTED:32, RECEIVED:%d\nf|EXPECTED:32.0, RECEIVED:%.1f\nd|EXPECTED:32.0, RECEIVED:%.1f\nc|EXPECTED:h, RECEIVED:%c\n",n,f,d,c); 
+  OMPVV_ERROR_IF(errors, "\nn|EXPECTED:%d, RECEIVED:%d\nf|EXPECTED:%.1f, RECEIVED:%.1f\nd|EXPECTED:%.1f, RECEIVED:%.1f\nc|EXPECTED:%c, RECEIVED:%c\n",exp_n,n,exp_f,f,exp_d,d,exp_c,c); 
 
   return errors;
 }
