@@ -23,7 +23,7 @@ typedef struct myvec{
 } myvec_t;
 
 
-#pragma omp declare mapper(myvec_t v) map(present, tofrom: v, v.data[0:v.len]) 
+#pragma omp declare mapper(default:myvec_t v) map(present, tofrom: v, v.data[0:v.len]) 
 
 void init( myvec_t *s )
 { 
