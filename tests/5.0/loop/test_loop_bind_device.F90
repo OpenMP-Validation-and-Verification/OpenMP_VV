@@ -95,7 +95,7 @@ CONTAINS
        z(i) = 2*i
     END DO
 
-    !$omp target parallel num_threads(OMPVV_NUM_THREADS_HOST) map(tofrom: x, y, z, num_threads)
+    !$omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE) map(tofrom: x, y, z, num_threads)
     !$omp loop bind(parallel)
     DO i = 1, N
        DO j = 1, N
@@ -143,7 +143,7 @@ CONTAINS
        z(i) = 2*i
     END DO
 
-    !$omp target teams num_teams(OMPVV_NUM_TEAMS_DEVICE) thread_limit(OMPVV_NUM_THREADS_HOST) private(x) map(tofrom: outData, y, z, num_teams)
+    !$omp target teams num_teams(OMPVV_NUM_TEAMS_DEVICE) thread_limit(OMPVV_NUM_THREADS_DEVICE) private(x) map(tofrom: outData, y, z, num_teams)
     DO i = 1, N
        DO j = 1, N
           x(j,i) = 1
@@ -205,7 +205,7 @@ CONTAINS
        z(i) = 2*i
     END DO
 
-    !$omp target parallel shared(outData) num_threads(OMPVV_NUM_THREADS_HOST) private(x) map(tofrom: outData, y, z, num_threads)
+    !$omp target parallel shared(outData) num_threads(OMPVV_NUM_THREADS_DEVICE) private(x) map(tofrom: outData, y, z, num_threads)
     DO i = 1, N
        DO j = 1, N
           x(j,i) = 1
