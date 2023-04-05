@@ -63,7 +63,6 @@ int test_aligned_calloc() {
 }
 
 int main() {
-  OMPVV_TEST_OFFLOADING;
   int errors = 0;
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_aligned_calloc() != 0);
