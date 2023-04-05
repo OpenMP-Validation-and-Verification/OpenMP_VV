@@ -28,7 +28,7 @@ int taskloop_shared() {
 #pragma omp parallel
   {
     int s_val=4;
-
+    #pragma omp single
     #pragma omp taskloop simd shared(s_val)
       for (i = 0; i < N; i++){
         A[i] *= B[i] * C[i] * s_val;
