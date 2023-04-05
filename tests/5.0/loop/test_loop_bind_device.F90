@@ -65,10 +65,10 @@ CONTAINS
 
     DO i = 1, N
        DO j = 1, N
-          OMPVV_TEST_AND_SET_VERBOSE(errors, x(j,i) .NE. (1 + y(i)*z(i)))
+          OMPVV_TEST_AND_SET(errors, x(j,i) .NE. (1 + y(i)*z(i)))
        END DO
     END DO
-
+    OMPVV_ERROR_IF(errors .NE. 0, "Test generated wrong results on the output array x.")
     OMPVV_WARNING_IF(num_teams .EQ. 1, "Test ran with one team, so parallelism of loop construct with bind(teams) can't be guaranteed.")
     OMPVV_TEST_AND_SET_VERBOSE(errors, num_teams .LT. 1)
     OMPVV_ERROR_IF(num_teams .LT. 1, "omp_get_num_teams() returned an invalid number of teams.")
