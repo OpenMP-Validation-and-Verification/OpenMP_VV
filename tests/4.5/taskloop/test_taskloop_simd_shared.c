@@ -1,10 +1,10 @@
-//===--test_taskloop_shared.c ----------------------------------------------------===//
+//===--test_taskloop_simd_shared.c ----------------------------------------------------===//
 //
 // OpenMP API Version 4.5 Nov 2015
 //
 // Test uses a value within a taskloop & an atomic construct to update the value of
-// s_val. The shared clause ensures that the s_val will be shared between threads,
-// and therefore should be equal to N After the taskloop region.
+// s_val. The taskloop then uses SIMD to update the A array using the values from the 
+// other 2 arrays & s_val.
 //
 ////===--------------------------------------------------------------------------===//
 
@@ -14,7 +14,7 @@
 
 #define N 1024
 
-int taskloop_shared() {
+int taskloop_simd_shared() {
 
   int errors = 0;
   int i, j;
@@ -46,6 +46,6 @@ int taskloop_shared() {
 int main() {
     int errors = 0;
     OMPVV_TEST_OFFLOADING;
-    OMPVV_TEST_AND_SET_VERBOSE(errors, taskloop_shared());
+    OMPVV_TEST_AND_SET_VERBOSE(errors, taskloop_simd_shared());
     OMPVV_REPORT_AND_RETURN(errors);
 }
