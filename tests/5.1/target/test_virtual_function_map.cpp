@@ -1,39 +1,37 @@
 #include <iostream>
+#include <omp.h>
+#include "ompvv.h"
+
 using namespace std;
 
 class base {
 public:
-	virtual void print()
+	virtual int test()
 	{
-		cout << "print base class\n";
+		return 1;
 	}
 
-	void show()
-	{
-		cout << "show base class\n";
-	}
 };
 
 class derived : public base {
 	public: 
-		void print()
+		int test()
 		{
-			cout << "print derived class\n";
+			return 2;
 		}
 
-		void show()
-		{
-			cout << "show derived class\n";
-		}
 };
 
+
+#pragma declare target to(test)
 int main(){
+	int errors = 0;
 	base *bptr;
 	derived d;
 	bptr = &d;
-
-	bptr->print();
-	bptr->show();
+	OMPVV_TEST_OFFLOADING;
+	OMPVV_TEST_AND_SET_VERBOSE(errors, bptr->test() != 2);
+	OMPVV_REPORT_AND_RETURN(errors)
 
 	return 0;
 }
