@@ -1,3 +1,14 @@
+//-----------test_map_virtual_function.cpp------------------
+//
+// OpenMP API Version 5.1 Mar 2023
+//
+//This test is designed to ensure that virtual functions 
+//are correctly passed into a target region. The class base
+//should use the derived classes test function instead of 
+//the virtual one declared in the base class
+//----------------------------------------------------------
+
+
 #include <iostream>
 #include <omp.h>
 #include "ompvv.h"
