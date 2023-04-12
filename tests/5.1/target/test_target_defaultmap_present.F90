@@ -1,6 +1,6 @@
 !===--- test_target_defaultmap_present.F90 -------------------------------===//
 !
-! OpenMP API Version 5.0 Nov 2018
+! OpenMP API Version 5.1 Nov 2021
 !
 ! This test checks behavior of the defaultmap clause when the specified 
 ! implicit-behavior is present. The variable-categories available for defaultmap
