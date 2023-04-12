@@ -44,7 +44,7 @@ int test_wrapper() {
    bool novariant_arg;
    add(arr);
    for(i = 0; i < N; i++){
-      OMPVV_TEST_AND_SET_VERBOSE(errors, arr[i] != i+1);
+      OMPVV_TEST_AND_SET(errors, arr[i] != i+1);
    } 
    OMPVV_ERROR_IF(errors > 0, "Base function is not working properly");
    novariant_arg = true;
@@ -52,7 +52,7 @@ int test_wrapper() {
       add(arr);
    
    for(i = 0; i < N; i++){
-      OMPVV_TEST_AND_SET_VERBOSE(errors, arr[i] != i+1);
+      OMPVV_TEST_AND_SET(errors, arr[i] != i+1);
    }
    OMPVV_ERROR_IF(errors > 0, "Dispatch w/ novariants true is not working properly");
 
@@ -61,7 +61,7 @@ int test_wrapper() {
       add(arr);
 
    for(i = 0; i < N; i++){
-      OMPVV_TEST_AND_SET_VERBOSE(errors, arr[i] != i+2);
+      OMPVV_TEST_AND_SET(errors, arr[i] != i+2);
    }
    OMPVV_ERROR_IF(errors > 0, "Dispatch w/ novariants false is not working properly");
    return errors;
