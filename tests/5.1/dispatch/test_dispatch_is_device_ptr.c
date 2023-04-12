@@ -57,7 +57,7 @@ int test_wrapper() {
     
     #pragma omp target map(tofrom: errors)
     for(i = 0; i < N; i++){
-        OMPVV_TEST_AND_SET_VERBOSE(errors, arr[i] != i+4);
+        OMPVV_TEST_AND_SET(errors, arr[i] != i+4);
         if(i == 5) {
             OMPVV_ERROR_IF(arr[i] == 5, "No function called or error in mapping");
             OMPVV_ERROR_IF(arr[i] == 7, "Non-target function was called");
