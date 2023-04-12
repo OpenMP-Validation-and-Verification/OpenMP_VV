@@ -20,14 +20,10 @@
 int test_aligned_calloc() {
   int errors = 0;
   
-  omp_memspace_handle_t  memspace = omp_default_mem_space;
-  omp_alloctrait_t       traits[1] = {{omp_atk_alignment, 64}};
-  omp_allocator_handle_t alloc = omp_init_allocator(memspace,1,traits);
-
   int *x;
   int not_correct_array_values = 0;
 
-  x = (int *)omp_aligned_calloc(64, N, N*sizeof(int), alloc);
+  x = (int *)omp_aligned_calloc(64, N, N*sizeof(int), omp_default_mem_alloc);
 
   if (x == NULL) { 
     OMPVV_ERROR("omp_aligned_calloc returned null"); 
@@ -54,10 +50,9 @@ int test_aligned_calloc() {
       errors++;
     }
 
-    omp_free(x, alloc);
+    omp_free(x, omp_default_mem_alloc);
   }
 
-  omp_destroy_allocator(alloc);
 
   return errors;
 }
