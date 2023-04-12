@@ -55,7 +55,6 @@ int ordered_doacross(){
 
 int main() {
    errors = 0;
-   OMPVV_TEST_OFFLOADING;
    OMPVV_TEST_AND_SET_VERBOSE(errors, ordered_doacross() != 0);
    OMPVV_REPORT_AND_RETURN(errors);
    
