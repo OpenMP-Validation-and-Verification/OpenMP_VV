@@ -27,7 +27,7 @@ void add_dev(int *arr);
 
 #pragma omp declare variant(add_dev) match(construct={dispatch}) 
 void add(int *arr){
-    #pragma omp for
+    #pragma omp parallel for
     for (int i = 0; i < N; i++){ // Base function adds 2 to array values
         arr[i] = arr[i]+2;
     }
@@ -47,7 +47,7 @@ int test_wrapper() {
     arr = (int *)omp_target_alloc( sizeof(int)*N, t);
     #pragma omp target
     {
-        #pragma omp for
+        #pragma omp parallel for
         for(int i = 0; i < N; i++){
             arr[i] = i;
         }
