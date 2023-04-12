@@ -55,7 +55,7 @@ int test_wrapper() {
     #pragma omp dispatch is_device_ptr(arr)
         add(arr);
     
-    #pragma omp target
+    #pragma omp target map(tofrom: errors)
     for(i = 0; i < N; i++){
         OMPVV_TEST_AND_SET_VERBOSE(errors, arr[i] != i+4);
         if(i == 5) {
