@@ -36,7 +36,7 @@ int target_update_to_mapper() {
 
   s.data = (double *)calloc(N,sizeof(double));
   s.len = N;
-  #pragma target data map(tofrom: s)
+  #pragma omp target data map(tofrom: s)
   { 
     //update array in host values
     for (i = 0; i < s.len; i++) {
