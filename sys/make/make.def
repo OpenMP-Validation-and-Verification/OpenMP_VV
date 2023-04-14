@@ -93,9 +93,9 @@ ifeq ($(CC), nvc)
     CLINKFLAGS   += -O3 -mp=gpu -gpu=cc80
 endif
 
-# CRAY compilers
+# CRAY and AMD compiler wrapers
 ifeq ($(CC), cc)
-  C_VERSION      = $(CC) -dumpversion
+  C_VERSION      = echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(FC) --version|head -n1)"
   CLINK          = $(CC)
   COFFLOADING    = -fopenmp
   CFLAGS         += -lm -O3 $(COFFLOADING)
@@ -167,9 +167,9 @@ ifeq ($(CXX), nvc++)
     CXXLINKFLAGS   += -O3 -mp=gpu -gpu=cc80
 endif
 
-# CRAY compilers
+# CRAY and AMD compiler wrappers
 ifeq ($(CXX), CC)
-  CXX_VERSION      = $(CXX) -dumpversion
+  CXX_VERSION      = echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(CXX) --version|head -n1)"
   CXXLINK          = $(CXX)
   CXXOFFLOADING    = -fopenmp
   CXXFLAGS         += -lm -O3 $(CXXOFFLOADING)
@@ -240,9 +240,9 @@ ifeq ($(FC), nvfortran)
     FLINKFLAGS   += -O3 -mp=gpu -gpu=cc80
 endif
 
-# CRAY compilers
+# CRAY and AMD compiler wrappers
 ifeq ($(FC), ftn)
-  F_VERSION      = $(FC) -dumpversion
+  F_VERSION      = echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(FC) --version|head -n1)"
   FLINK          = cc
   FOFFLOADING    = -fopenmp
   FFLAGS         += -lm -J./ompvv -O3 $(FOFFLOADING)

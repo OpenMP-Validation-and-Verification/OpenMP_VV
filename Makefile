@@ -314,7 +314,7 @@ $(CURDIR)/tests/4.5/application_kernels/qmcpack_target_static_lib.c.o: $(CURDIR)
 	  -$(call loadModules,$(C_COMPILER_MODULE)) \
 		 $(BSRUN)$(RUN_TEST) --env \
 		   $(shell echo "$@" | sed -e 's@.*/@@' -e 's@test_\(.*\)_env_.*@\1@' | tr 'a-z' 'A-Z') \
-		   $(shell echo "$@" | sed -e 's@.*/@@' -e 's@.*_env_\([^.]*\).*@\1@') \
+		   $(shell echo "$@" | sed -e 's@.*/@@' -e 's@.*_env_\([^.]*\).*@\1@'| sed 's/PERCENTAGE/%/') \
 		   $(@:.run=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.run=.log)) \
 		 && echo "PASS" > $(LOGTEMPFILE) \
 		 || echo "FAIL" > $(LOGTEMPFILE)), \
