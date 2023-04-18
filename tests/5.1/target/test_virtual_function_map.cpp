@@ -15,6 +15,7 @@
 
 using namespace std;
 
+#pragma omp begin declare target
 class base {
 public:
 	virtual int test()
@@ -23,7 +24,9 @@ public:
 	}
 
 };
+#pragma omp end declare target
 
+#pragma omp begin declare target
 class derived : public base {
 	public: 
 		int test()
@@ -32,17 +35,24 @@ class derived : public base {
 		}
 
 };
+#pragma omp end declare target
 
-
-#pragma declare target to(test)
-int main(){
+int test_case(){
 	int errors = 0;
 	base *bptr;
 	derived d;
 	bptr = &d;
-	OMPVV_TEST_OFFLOADING;
-	OMPVV_TEST_AND_SET_VERBOSE(errors, bptr->test() != 2);
-	OMPVV_REPORT_AND_RETURN(errors)
+	int test_val = 0;
+	#pragma omp target map (tofrom: test_val)
+	test_val = bptr->test();
+	
+	return test_val;
+}
 
-	return 0;
+int main(){
+	int errors = 0;
+	OMPVV_TEST_OFFLOADING;
+	OMPVV_TEST_AND_SET_VERBOSE(errors, test_case() != 2);
+	OMPVV_REPORT_AND_RETURN(errors)
+	return errors;
 }
