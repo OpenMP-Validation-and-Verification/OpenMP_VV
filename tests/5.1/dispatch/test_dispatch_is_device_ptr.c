@@ -45,7 +45,11 @@ int test_wrapper() {
     errors = 0;
     t = omp_get_default_device();
     arr = (int *)omp_target_alloc( sizeof(int)*N, t);
-    #pragma omp target
+    if(arr == NULL){
+        OMPVV_ERROR("Can't properly create device pointer");
+        return 1;
+    }
+    #pragma omp target is_device_ptr(arr)
     {
         #pragma omp parallel for
         for(int i = 0; i < N; i++){
@@ -57,11 +61,7 @@ int test_wrapper() {
     
     #pragma omp target map(tofrom: errors)
     for(i = 0; i < N; i++){
-        OMPVV_TEST_AND_SET(errors, arr[i] != i+4);
-        if(i == 5) {
-            OMPVV_ERROR_IF(arr[i] == 5, "No function called or error in mapping");
-            OMPVV_ERROR_IF(arr[i] == 7, "Non-target function was called");
-        }
+        OMPVV_TEST_AND_SET(errors, (arr[i] != i+4) || (arr[i] != i+2) );
     }
     OMPVV_ERROR_IF(errors > 0, "Dispatch w/ novariants true is not working properly");
     return errors;
