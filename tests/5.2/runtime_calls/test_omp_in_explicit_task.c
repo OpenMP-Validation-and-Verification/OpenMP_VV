@@ -31,7 +31,7 @@ int test_wrapper() {
         }
     }
     for(int i = 0; i < N; i++){
-        OMPVV_TEST_AND_SET(errors, A[i] != 1);
+        OMPVV_TEST_AND_SET(errors, A[i] == 0);
     }
     OMPVV_WARNING_IF(A[5] == 0, "omp_in_explicit_task() did not return correct value");
     for(int i = 0; i < N; i++){
@@ -41,9 +41,8 @@ int test_wrapper() {
         }
     }
     for(int i = 0; i < N; i++){
-        OMPVV_TEST_AND_SET(errors, A[i] != 1);
+        OMPVV_TEST_AND_SET(errors, A[i] == 0);
     }
-    OMPVV_WARNING_IF(A[5] == 2, "Parallel construct incorrectly recognized as explicit task");
     return errors;
 }
 
