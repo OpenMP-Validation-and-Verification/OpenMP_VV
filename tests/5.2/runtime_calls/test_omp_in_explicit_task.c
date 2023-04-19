@@ -1,6 +1,6 @@
 //===---- test_omp_in_explicit_task.c ----------------------------------------------===//
 // 
-// OpenMP API Version 5.1
+// OpenMP API Version 5.2 Nov 2021
 //
 // Uses omp_in_explicit_task() runtime call to ensure it is 1 when in an explicit
 // task and 0 otherwise.
