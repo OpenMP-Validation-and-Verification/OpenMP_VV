@@ -33,7 +33,7 @@ int test_wrapper() {
     for(int i = 0; i < N; i++){
         OMPVV_TEST_AND_SET(errors, A[i] != 1);
     }
-    OMPVV_WARNING_IF(A[5] == 0, "Task construct not recognized by omp_in_explicit_task()");
+    OMPVV_WARNING_IF(A[5] == 0, "omp_in_explicit_task() did not return correct value");
     for(int i = 0; i < N; i++){
         #pragma omp parallel for // creates IMPLICIT tasks, omp_in_explicit_task = 0
         for(int i = 0; i < N; i++){
