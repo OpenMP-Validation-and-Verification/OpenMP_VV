@@ -6,7 +6,7 @@
 //  implicit-behavior is present. The variable-categories available for defaultmap
 //  are scalar, aggregate, and pointer. If implicit-behavior is present, each 
 //  variable referenced in the construct in the category specified by 
-//  variable-category is treated as if it had been listed in a map clause wih the
+//  variable-category is treated as if it had been listed in a map clause with the
 //  map-type of alloc and map-type-modifier of present.
 //
 ////===----------------------------------------------------------------------===//
@@ -19,7 +19,7 @@
 
 #define N 1024
 
-int errors, i;
+int errors;
 
 int test_defaultmap_present_scalar() {
 
@@ -42,6 +42,9 @@ int test_defaultmap_present_scalar() {
       float_var = 20.1f;
       double_var = 55.55;
    }
+   #pragma omp target exit data map(delete: scalar_var, float_var, double_var)
+
+   OMPVV_ERROR_IF(errors > 0, "Values were not mapped to the device properly");
 
    OMPVV_TEST_AND_SET(errors, scalar_var == 7);
    OMPVV_TEST_AND_SET(errors, float_var == 20.1f);
