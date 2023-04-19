@@ -1,6 +1,6 @@
 //===--- test_target_defaultmap_present.c -----------------------------------===//
 //
-//  OpenMP API Version 5.1 Aug 2021
+//  OpenMP API Version 5.1 Aug 2020
 //
 //  This test checks behavior of the defaultmap clause when the specified 
 //  implicit-behavior is present. The variable-categories available for defaultmap
