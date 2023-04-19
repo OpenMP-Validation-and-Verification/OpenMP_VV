@@ -34,7 +34,7 @@ void add(int *arr){
 }
 
 void add_dev(int *arr){
-    #pragma omp target
+    #pragma omp target is_device_ptr(arr)
     for (int i = 0; i < N; i++){
         arr[i] = arr[i]+4; // Variant function adds 4 to array values
     }
