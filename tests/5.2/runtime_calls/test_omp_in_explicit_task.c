@@ -1,4 +1,4 @@
-//===---- test_omp_in_explicit_task.c -----------------------------------------===//
+//===---- test_omp_in_explicit_task.c ----------------------------------------------===//
 // 
 // OpenMP API Version 5.1
 //
@@ -45,7 +45,6 @@ int test_wrapper() {
 }
 
 int main () {
-   OMPVV_TEST_OFFLOADING;
    OMPVV_TEST_AND_SET_VERBOSE(errors, test_wrapper());
    OMPVV_REPORT_AND_RETURN(errors);
 }  
