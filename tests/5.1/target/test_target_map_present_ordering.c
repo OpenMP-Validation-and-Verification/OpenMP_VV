@@ -28,14 +28,12 @@ int test_present_map_reordering() {
 
   #pragma omp target data map(tofrom: x) 
   {
-
-  #pragma omp target map(present, to: x) map(from: x)
-  {
-    for (int i = 0; i < N; i++) {
-      x[i] += i;
+    #pragma omp target map(present, to: x) map(from: x)
+    {
+      for (int i = 0; i < N; i++) {
+        x[i] += i;
+      }
     }
-  }
-
   }
 
   for (int i = 0; i < N; i++) {
