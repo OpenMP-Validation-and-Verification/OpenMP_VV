@@ -22,6 +22,7 @@ int errors;
 
 int test_loop_unroll() {
 	int arr[N];
+	int parallel_arr[N];
 	int sum = 0;
 	int parallel_sum = 0;
 
@@ -34,7 +35,12 @@ int test_loop_unroll() {
 	// omp unroll loop
 # pragma omp unroll
 	for (int i = 0; i < N; i++) {
-		parallel_sum += arr[i];
+		parallel_arr[i] = i;
+	}
+
+	// sequential sum of parallel array
+	for (int i = 0; i < N; i++) {
+		parallel_sum += parallel_arr[i];
 	}
 	OMPVV_TEST_AND_SET_VERBOSE(errors, parallel_sum != sum);
 	OMPVV_INFOMSG_IF(sum == 0, "Array was not initialized.");
