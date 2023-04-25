@@ -1,0 +1,108 @@
+#include <stdio.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <omp.h>
+#include "ompvv.h"
+
+/**
+  This is a basic test to demonstrate how a shared resource
+  can be accessed and written to in multiple thread environment.
+*/
+int testTaskWithCriticalBasic(int numThreads) {
+  int errors = 0;
+  int count = 0;
+  omp_set_num_threads(numThreads);
+#pragma omp parallel
+  {
+#pragma omp task
+    {
+#pragma omp critical
+    {
+      count = count + 1;
+    }
+    }
+  }
+  int ret = 0;
+  if (count == numThreads) {
+    ret = 0;
+  } else {
+    ret = -1;
+  }
+  OMPVV_TEST_AND_SET_VERBOSE(errors, ret != 0);
+  return errors;
+}
+
+/**
+  Local Function check if number is prime
+*/
+int isPrime(unsigned int number) {
+  int ret = 0;
+  if (number < 2) {
+    return 1;
+  }
+  for (int num = 2; (num*num) <= number; num++) {
+    if ((number % num) == 0) {
+      ret = 1;
+      break;
+    }
+  }
+  return ret;
+}
+
+/**
+  This is a advanced test to demonstrate how a shared resource
+  can be accessed and written to in multiple thread environment.
+  In this a buffer is filled with random integers. The parallel
+  region counts the number of prime integers.
+*/
+int testTaskWithCriticalAdvanced(int numThreads, int expectedVal) {
+  int errors = 0;
+  int countPrime = 0, count = 0;
+  unsigned int *A = (unsigned int*) (malloc(numThreads*sizeof(unsigned int)));
+  omp_set_num_threads(numThreads);
+  // fill data
+  for (int i = 0; i < numThreads; i++) {
+    A[i] = i;
+  }
+  // Calculate number of prime numbers 
+#pragma omp parallel
+  {
+#pragma omp task
+    {
+      int idx = 0;
+#pragma omp critical
+      {
+        count++;
+        idx = count - 1;
+      }
+      int ret = isPrime(A[idx]);
+#pragma omp critical
+      {
+        if (ret == 0) {
+          countPrime++;
+        }
+      }
+    }
+  }
+  free(A);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, countPrime != expectedVal);
+  return errors;
+}
+
+int main() {
+  int errors = 0;
+  OMPVV_TEST_AND_SET_VERBOSE(errors, testTaskWithCriticalBasic(4));
+  OMPVV_TEST_AND_SET_VERBOSE(errors, testTaskWithCriticalBasic(8));
+  OMPVV_TEST_AND_SET_VERBOSE(errors, testTaskWithCriticalBasic(16));
+  OMPVV_TEST_AND_SET_VERBOSE(errors, testTaskWithCriticalBasic(32));
+  OMPVV_TEST_AND_SET_VERBOSE(errors, testTaskWithCriticalBasic(64));
+
+  OMPVV_TEST_AND_SET_VERBOSE(errors, testTaskWithCriticalAdvanced(1, 0));
+  OMPVV_TEST_AND_SET_VERBOSE(errors, testTaskWithCriticalAdvanced(4, 2));
+  OMPVV_TEST_AND_SET_VERBOSE(errors, testTaskWithCriticalAdvanced(8, 4));
+  OMPVV_TEST_AND_SET_VERBOSE(errors, testTaskWithCriticalAdvanced(16, 6));
+  OMPVV_TEST_AND_SET_VERBOSE(errors, testTaskWithCriticalAdvanced(32, 11));
+  OMPVV_TEST_AND_SET_VERBOSE(errors, testTaskWithCriticalAdvanced(64, 18));
+
+  OMPVV_REPORT_AND_RETURN(errors);
+}
