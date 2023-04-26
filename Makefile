@@ -361,7 +361,7 @@ $(CURDIR)/tests/4.5/application_kernels/qmcpack_target_static_lib.c.o: $(CURDIR)
 		   $(shell echo "$@" | sed -e 's@.*/@@' -e 's@.*_env_\([^.]*\).*@\1@') \
 		   $(@:.runonly=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.runonly=.log))\
 		 && echo "PASS" > $(LOGTEMPFILE) \
-		 || echo "FAIL" > $(LOGTEMPFILE)) \
+		 || echo "FAIL" > $(LOGTEMPFILE)), \
 	  $(call loadModules,$(C_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.runonly=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.runonly=.log))\
 		 && echo "PASS" > $(LOGTEMPFILE) \
 		 || echo "FAIL" > $(LOGTEMPFILE)) \
