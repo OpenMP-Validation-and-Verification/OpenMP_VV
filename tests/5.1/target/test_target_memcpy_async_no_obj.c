@@ -1,6 +1,6 @@
-//===--- test_target_memcpy_async_no_obj.c ----------------------------===//
+//===--- test_target_memcpy_async_no_obj.c --------------------------------===//
 //
-//  OpenMP API Version 5.1 Aug 2021
+//  OpenMP API Version 5.1 Nov 2020
 //
 //  Inspired from OpenMP 5.1 Examples Doc, 5.16.4 & 8.9
 //  This test utilizes the omp_target_memcpy_async construct to
@@ -8,7 +8,7 @@
 //  uses 0 for 'depobj_count', so that the clause is not dependent
 //  and memory is therefore copied synchronously.
 //
-////===----------------------------------------------------------------------===//
+////===--------------------------------------------------------------------===//
 
 #include <omp.h>
 #include <stdio.h>
@@ -36,6 +36,10 @@ int test_target_memcpy_async_no_obj() {
     mem_dev_cpy = (double *)omp_target_alloc( sizeof(double)*N, t);
 
     OMPVV_TEST_AND_SET_VERBOSE(errors, mem_dev_cpy == NULL);
+
+    for(i = 0; i < N; i++){
+        mem[i] = i;
+    }   
 
     /* copy to target */
     omp_target_memcpy_async(mem_dev_cpy, mem, sizeof(double)*N,
