@@ -56,7 +56,7 @@ int test_loop_nested_teams() {
 
   OMPVV_WARNING_IF(num_teams == 1, "Test ran with one team, so parallelism of loop construct can't be guaranteed.");
   OMPVV_TEST_AND_SET_VERBOSE(errors, num_teams < 1);
-  OMPVV_ERROR_IF(num_teams < 1, "omp_get_num_teams() returned an invalid value.");
+  OMPVV_ERROR_IF(num_teams < 1, "omp_get_num_teams() returned an invalid number of teams.");
 
   return errors;
 }
