@@ -1,12 +1,12 @@
-//===--- test_target_defaultmap_default.c -----------------------------------===//
+//===--- test_target_defaultmap_present.c -----------------------------------===//
 //
-//  OpenMP API Version 5.1 Aug 2021
+//  OpenMP API Version 5.1 Aug 2020
 //
 //  This test checks behavior of the defaultmap clause when the specified 
 //  implicit-behavior is present. The variable-categories available for defaultmap
 //  are scalar, aggregate, and pointer. If implicit-behavior is present, each 
 //  variable referenced in the construct in the category specified by 
-//  variable-category is treated as if it had been listed in a map clause wih the
+//  variable-category is treated as if it had been listed in a map clause with the
 //  map-type of alloc and map-type-modifier of present.
 //
 ////===----------------------------------------------------------------------===//
@@ -57,13 +57,13 @@ int test_defaultmap_present() {
       ptr[50] = 150; ptr[51] = 151;
    }
    
-  for (i = 0; i < N; i++) {
-      OMPVV_TEST_AND_SET(errors, scalar_var == 7);
-      OMPVV_TEST_AND_SET(errors, A[0] == 70 || A[50] == 150 || A[51] == 151);
-      OMPVV_TEST_AND_SET(errors, new_struct.s == 110 || new_struct.S[0] == 110 || new_struct.S[1] == 110);
-  }
+   OMPVV_TEST_AND_SET(errors, scalar_var == 7);
+   OMPVV_TEST_AND_SET(errors, A[0] == 70 || A[50] == 150 || A[51] == 151);
+   OMPVV_TEST_AND_SET(errors, new_struct.s == 110 || new_struct.S[0] == 110 || new_struct.S[1] == 110);
+
+   #pragma omp target exit data map(delete: scalar_var, A, new_struct, ptr)
       
-  return errors;
+   return errors;
 }
 
 int main() {
