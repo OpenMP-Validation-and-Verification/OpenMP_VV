@@ -37,11 +37,11 @@ int test_wrapper() {
     for(int i = 0; i < N; i++){
         #pragma omp parallel for // creates IMPLICIT tasks, omp_in_explicit_task = 0
         for(int i = 0; i < N; i++){
-            A[i] += omp_in_explicit_task();
+            A[i] = omp_in_explicit_task();
         }
     }
     for(int i = 0; i < N; i++){
-        OMPVV_TEST_AND_SET(errors, A[i] == 0);
+        OMPVV_TEST_AND_SET(errors, A[i] != 0);
     }
     return errors;
 }
