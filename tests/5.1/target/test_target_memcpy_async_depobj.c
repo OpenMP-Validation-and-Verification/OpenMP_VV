@@ -1,4 +1,6 @@
-//===--- test_target_memcpy_async_depobj.c ----------------------------===//
+//===--- test_target_memcpy_async_depobj.c --------------------------------===//
+//
+//  OpenMP API Version 5.1 Nov 2020
 //
 //  Inspired from OpenMP 5.1 Examples Doc, 5.16.4 & 8.9
 //  This test utilizes the omp_target_memcpy_async construct to
@@ -6,7 +8,7 @@
 //  uses 'obj' for dependency, so that memory is only copied once
 //  the variable listed in the depend clause is changed.
 //
-////===----------------------------------------------------------------------===//
+////===--------------------------------------------------------------------===//
 
 #include <omp.h>
 #include <stdio.h>
