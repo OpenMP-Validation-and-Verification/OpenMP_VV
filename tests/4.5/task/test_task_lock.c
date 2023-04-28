@@ -1,13 +1,27 @@
+//===-- test_task_lock.c ------------------------------------------------===//
+//
+// OpenMP API Version 4.5 Nov 2015
+//
+// Description
+// testTaskWithLockBasic()
+// This is a basic test to demonstrate how a shared resource
+// can be accessed and written to in multiple thread environment.
+// 
+// testTaskWithLockAdvanced()
+// This is a advanced test to demonstrate how a shared resource
+// can be accessed and written to in multiple thread environment.
+// In this a buffer is filled with random integers. The parallel
+// region counts the number of prime integers.
+//===----------------------------------------------------------------------===//
+
+
+
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <omp.h>
 #include "ompvv.h"
 
-/**
-  This is a basic test to demonstrate how a shared resource
-  can be accessed and written to in multiple thread environment.
-*/
 int testTaskWithLockBasic(int numThreads) {
   int errors = 0;
   int count = 0;
@@ -53,12 +67,6 @@ int isPrime(unsigned int number) {
   return ret;
 }
 
-/**
-  This is a advanced test to demonstrate how a shared resource
-  can be accessed and written to in multiple thread environment.
-  In this a buffer is filled with random integers. The parallel
-  region counts the number of prime integers.
-*/
 int testTaskWithLockAdvanced(int numThreads, int expectedVal) {
   int errors = 0;
   omp_lock_t lock;

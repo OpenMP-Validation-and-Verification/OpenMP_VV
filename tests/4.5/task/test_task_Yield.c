@@ -1,9 +1,13 @@
-/*Test Description: launch 100 threads. Each thread launches 2 wait Functions
- * with conditional yield between them. Measure the time difference between
- * the two runs one with taskyield enabled and one without.
- * Expectation: The run with taskyield enabled should take more time.
- *
- * */
+//===-- test_task_Yield.c ------------------------------------------------===//
+//
+// OpenMP API Version 4.5 Nov 2015
+//
+// Description
+// launch 100 threads. Each thread launches 2 wait Functions
+// with conditional yield between them. Measure the time difference between
+// the two runs one with taskyield enabled and one without.
+// Expectation: The run with taskyield enabled should take more time.
+//===----------------------------------------------------------------------===//
 
 #include <stdio.h>
 #include <time.h>
@@ -34,11 +38,11 @@ double LaunchThreads () {
   t = clock();
 #pragma omp parallel for
   for (int i = 0; i < THREADS; ++i) {
-    #pragma omp task untied
+#pragma omp task untied
       {
         WaitFunc();
         if (YIELD_TASK) {
-          #pragma omp taskyield
+#pragma omp taskyield
         }
         WaitFunc();
       }
@@ -50,7 +54,7 @@ double LaunchThreads () {
 }
 
 int main() {
-  int errors = 0, IfTstFailed = 0;
+  int errors = 0;
   omp_set_num_threads(THREADS);  
   double Run1 = 0, Run2 = 0;
   Run1 = LaunchThreads();
@@ -58,10 +62,6 @@ int main() {
   YIELD_TASK = false;
   Run2 = LaunchThreads();
 
-  // Note: The below condition is true almost always only when threads = 100
-  if (Run2 > Run1) {
-    IfTstFailed++;
-  }
-  OMPVV_TEST_AND_SET_VERBOSE(errors, (IfTstFailed != 0));
+  OMPVV_TEST_AND_SET_VERBOSE(errors, (Run2 > Run1));
   OMPVV_REPORT_AND_RETURN(errors);
 }

@@ -1,11 +1,14 @@
-/*Test Description: 100 threads are launched each of which inturn launches
- * a task in untied mode. All the threads but the last thread updates the
- * global array with values equal to the i value corresponding to the for loop.
- * The last thread sleeps for 2 seconds allowing all the threads to finish the
- * execution and updates each element with its corresponding position value.
- * 
- *
- * */
+//===-- test_task_Untied.c ------------------------------------------------===//
+//
+// OpenMP API Version 4.5 Nov 2015
+//
+// Description
+// 100 threads are launched each of which inturn launches
+// a task in untied mode. All the threads but the last thread updates the
+// global array with values equal to the i value corresponding to the for loop.
+// The last thread sleeps for 2 seconds allowing all the threads to finish the
+// execution and updates each element with its corresponding position value.
+//===----------------------------------------------------------------------===//
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -35,7 +38,7 @@ int main() {
   omp_set_num_threads(THREADS);  
 #pragma omp parallel for
   for (int i = 0; i < THREADS; ++i) {
-    #pragma omp task untied if (i == (THREADS - 1))
+#pragma omp task untied if (i == (THREADS - 1))
       {
 	if (i == (THREADS - 1)) {
           WaitFunc(); // Just to give some time for other threads to

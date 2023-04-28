@@ -1,14 +1,22 @@
+//===-- test_task_if.c ------------------------------------------------===//
+//
+// OpenMP API Version 4.5 Nov 2015
+//
+// Description
+// testTaskWithIf():
+// Create an undeferred task followed by a deferred task
+// in a parallel code section. Ensure that the undeferred
+// task is always executed before deferred task.
+//===----------------------------------------------------------------------===//
+
+
+
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <omp.h>
 #include "ompvv.h"
 
-/**
-  Create an undeferred task followed by a deferred task
-  in a parallel code section. Ensure that the undeferred
-  task is always executed before deferred task.
-*/
 int testTaskWithIf(int num_threads, int val, int inc) {
   int errors = 0;
   int *A = (int*) (malloc(num_threads*sizeof(int)));

@@ -1,11 +1,14 @@
-/*
- *Test case description: This test case demonstrates that mergeable clause
- * help thread avoid task creation can queing. The if condition turns out
- * false for thread 10, this enables the thread 10 acquire more tasks from
- * the queue and run resulting in higher count value.
- *
- *
- * */
+//===-- test_task_Mergeable.c ------------------------------------------------===//
+//
+// OpenMP API Version 4.5 Nov 2015
+//
+// Description
+// Test case description: This test case demonstrates that mergeable clause
+// help thread avoid task creation can queing. The if condition turns out
+// false for thread 10, this enables the thread 10 acquire more tasks from
+// the queue and run resulting in higher count value.
+// 
+//===----------------------------------------------------------------------===//
 
 
 #include <stdio.h>
@@ -56,9 +59,7 @@ int main() {
 #pragma omp parallel
   foo();
 
-  //printf("count: %d\n",count);
   if (count < (THREADS * 0.75)) {
-    //printf("Test Passed!!\n");
     TstFailed++;
   }
   OMPVV_TEST_AND_SET_VERBOSE(errors, (TstFailed != 0));
