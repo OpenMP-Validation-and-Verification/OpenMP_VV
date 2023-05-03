@@ -58,6 +58,7 @@ CONTAINS
     ! copy to target
     omp_target_memcpy_async(mem_dev_cpy, mem, csize, dst_offset, src_offset, t, h, depobj_count)
 
+    !$omp taskwait
     !$omp target is_device_ptr(mem_dev_cpy) device(t)
     !$omp teams distribute parallel do
     DO i=1, N
