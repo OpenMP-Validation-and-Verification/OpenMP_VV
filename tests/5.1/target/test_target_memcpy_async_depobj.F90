@@ -47,7 +47,7 @@ CONTAINS
     mem = c_loc(arr(1))
     csize = c_sizeof(arr(1)) * N
     mem_dev_cpy = omp_target_alloc(csize, t)
-
+ 
     OMPVV_TEST_AND_SET_VERBOSE(errors, .NOT. c_associated(mem_dev_cpy))
 
     DO i=1, N
@@ -58,7 +58,7 @@ CONTAINS
     obj_arr(1) = obj
 
     ! copy to device memory
-    omp_target_memcpy_async(mem_dev_cpy, mem, csize, dst_offset, src_offset, t, h, depobj_count, obj_arr)
+    errors = omp_target_memcpy_async(mem_dev_cpy, mem, csize, dst_offset, src_offset, t, h, depobj_count, obj_arr)
 
     !$omp taskwait depend(depobj: obj)
     !$omp target is_device_ptr(mem_dev_cpy) device(t) depend(depobj: obj)
@@ -69,7 +69,7 @@ CONTAINS
     !$omp end target
 
     ! copy to host memory
-    omp_target_memcpy_async(mem, mem_dev_cpy, csize, dst_offset, src_offset, h, t, depobj_count, obj_arr)
+    errors = omp_target_memcpy_async(mem, mem_dev_cpy, csize, dst_offset, src_offset, h, t, depobj_count, obj_arr)
 
     !$omp taskwait depend(depobj: obj)
     DO i=1, N
@@ -78,7 +78,7 @@ CONTAINS
 
     ! free resources
     DEALLOCATE(arr)
-    omp_target_free(mem_dev_cpy, t)
+    CALL omp_target_free(mem_dev_cpy, t)
     !$omp depobj(obj) destroy
 
     test_memcpy_async_depobj = errors
