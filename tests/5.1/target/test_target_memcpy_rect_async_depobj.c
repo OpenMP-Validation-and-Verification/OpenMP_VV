@@ -1,5 +1,7 @@
 //===--- test_target_memcpy_rect_async_depobj.c ----------------------------===//
 //
+//  OpenMP API Version 5.1 Nov 2020
+//
 //  Inspired from OpenMP 5.1 Examples Doc, 5.16.4 & 8.9
 //  This test utilizes the omp_target_memcpy_rect_async construct to
 //  allocate 2D memory on the device asynchronously. The construct
