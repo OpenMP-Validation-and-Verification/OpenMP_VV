@@ -1,5 +1,7 @@
 //===--- test_target_memcpy_rect_async_no_obj.c ----------------------------===//
 //
+//  OpenMP API Version 5.1 Nov 2020
+//
 //  Inspired from OpenMP 5.1 Examples Doc, 5.16.4 & 8.9
 //  This test utilizes the omp_target_memcpy_rect_async construct to
 //  allocate 2D memory on the device asynchronously. The construct
@@ -50,6 +52,7 @@ int test_target_memcpy_async_depobj() {
                                 t,          h,
                                 0,          NULL);  // no dependent objects, 'depobj_list' i.e. NULL is ignored
 
+    #pragma omp taskwait
     #pragma omp target is_device_ptr(devRect) device(t)
     {
         for(i = 0; i < N; i++){
@@ -68,8 +71,9 @@ int test_target_memcpy_async_depobj() {
                                 h,          t,
                                 0,          NULL);
 
+    #pragma omp taskwait
     for(i = 0; i < N; i++){
-        for(j = 0; j < N; j++){
+        for(j = 0; j < M; j++){
             OMPVV_TEST_AND_SET(errors, hostRect[i][j]!=(i+j)*2);
         }
     }
