@@ -26,10 +26,16 @@ int test_defaultmap_present_scalar() {
    int scalar_var; 
    float float_var;
    double double_var;
+   int is_shared_env;
+
    errors = 0;
+   is_shared_env = 0;
    scalar_var = 1;
    float_var = 10.7f;
    double_var = 12.22;
+
+   OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(is_shared_env);
+   OMPVV_WARNING_IF(is_shared_env != 0, "[WARNING] may not be able to detect errors if the target system supports shared memory.");
 
    #pragma omp target enter data map(to: scalar_var, float_var, double_var)
    #pragma omp target map(tofrom: errors) defaultmap(present: scalar)
@@ -46,9 +52,11 @@ int test_defaultmap_present_scalar() {
 
    OMPVV_ERROR_IF(errors > 0, "Values were not mapped to the device properly");
 
-   OMPVV_TEST_AND_SET(errors, scalar_var == 7);
-   OMPVV_TEST_AND_SET(errors, float_var == 20.1f);
-   OMPVV_TEST_AND_SET(errors, double_var == 55.55);
+   if( is_shared_env == 0 ) {
+      OMPVV_TEST_AND_SET(errors, scalar_var == 7);
+      OMPVV_TEST_AND_SET(errors, float_var == 20.1f);
+      OMPVV_TEST_AND_SET(errors, double_var == 55.55);
+   }
 
    return errors;
 }

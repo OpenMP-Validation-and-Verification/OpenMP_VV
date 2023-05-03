@@ -31,11 +31,16 @@ CONTAINS
     INTEGER :: errors, scalar_var
     REAL :: float_var
     DOUBLE PRECISION :: double_var
+    LOGICAL :: is_shared_env
 
     errors = 0
+    is_shared_env = .false.
     scalar_var = 1
     float_var = 10.7
     double_var = 1.222D1
+
+    OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(is_shared_env)
+    OMPVV_WARNING_IF(is_shared_env, "[WARNING] may not be able to detect errors if the target system supports shared memory.")
 
     !$omp target enter data map(to: scalar_var, float_var, double_var)
     !$omp target map(tofrom: errors) defaultmap(present:scalar)
@@ -57,9 +62,11 @@ CONTAINS
 
     OMPVV_ERROR_IF(errors .GT. 0, "Values were not mapped to the device properly")
 
-    OMPVV_TEST_AND_SET(errors, scalar_var .EQ. 7)
-    OMPVV_TEST_AND_SET(errors, float_var .EQ. 20.1)
-    OMPVV_TEST_AND_SET(errors, double_var .EQ. 5.555D1)
+    IF ( .NOT. is_shared_env ) THEN
+      OMPVV_TEST_AND_SET(errors, scalar_var .EQ. 7)
+      OMPVV_TEST_AND_SET(errors, float_var .EQ. 20.1)
+      OMPVV_TEST_AND_SET(errors, double_var .EQ. 5.555D1)
+    END IF
 
     defaultmap_present_scalar = errors
   END FUNCTION defaultmap_present_scalar
