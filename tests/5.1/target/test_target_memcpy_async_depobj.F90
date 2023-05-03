@@ -30,7 +30,7 @@ CONTAINS
   INTEGER FUNCTION test_memcpy_async_depobj()
     INTEGER :: errors, i
     DOUBLE PRECISION, TARGET, ALLOCATABLE :: arr(:)
-    DOUBLE PRECISION, POINTER :: fptr
+    DOUBLE PRECISION, POINTER :: fptr(:)
     TYPE (C_PTR) :: mem, mem_dev_cpy
     INTEGER (C_SIZE_T) :: csize, dst_offset, src_offset
     INTEGER (C_INT) :: h, t, depobj_count
@@ -62,7 +62,7 @@ CONTAINS
 
     !$omp taskwait depend(depobj: obj)
     !$omp target is_device_ptr(mem_dev_cpy) device(t) depend(depobj: obj)
-    CALL c_f_pointer(mem_dev_cpy, fptr)
+    CALL c_f_pointer(mem_dev_cpy, fptr, [N])
     DO i=1, N
       fptr(i) = fptr(i) * 2 ! initialize data
     END DO
