@@ -22,7 +22,8 @@ int main(int argc, char** argv) {
 #pragma omp target parallel for shared(count, IfTstPassed) default(none)
   for (int i = 0; i < N; ++i) {
     if (count != 123) {
-      IfTstPassed = 0;
+#pragma omp atomic
+      IfTstPassed--;
     }  
   }
 
@@ -30,13 +31,11 @@ int main(int argc, char** argv) {
 #pragma omp target parallel for default(shared)
   for (int i = 0; i < N; ++i) {
     if (count != 123) {
-      IfTstPassed = 0;
+#pragma omp atomic
+      IfTstPassed--;
     }
   }
-  
-  if (!IfTstPassed) {
-    errors++;
-  }
+
   OMPVV_TEST_AND_SET_VERBOSE(errors, IfTstPassed != 1);
   OMPVV_REPORT_AND_RETURN(errors);
 }
