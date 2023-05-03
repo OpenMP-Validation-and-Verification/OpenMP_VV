@@ -103,6 +103,7 @@ int testTargetTeamsDeviceWithMod() {
 }
 
 int main() {
+  OMPVV_TEST_OFFLOADING;
   int errors = 0;
   OMPVV_TEST_AND_SET_VERBOSE(errors, testTargetTeamsDeviceDefault());
   OMPVV_TEST_AND_SET_VERBOSE(errors, testTargetTeamsDeviceWithMod());

@@ -16,6 +16,7 @@
 #define NUM_THREADS_TO_SET 16
 
 int main() {
+  OMPVV_TEST_OFFLOADING;
   int numThreads[NUM_TEAMS_TO_SET];
   int errors = 0;
   // Inititalize

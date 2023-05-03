@@ -38,6 +38,7 @@ int testTargetTeamsIf(int isTrue) {
 }
 
 int main() {
+  OMPVV_TEST_OFFLOADING;
   int errors = 0;
   OMPVV_TEST_AND_SET_VERBOSE(errors, testTargetTeamsIf(0));
   OMPVV_TEST_AND_SET_VERBOSE(errors, testTargetTeamsIf(1));

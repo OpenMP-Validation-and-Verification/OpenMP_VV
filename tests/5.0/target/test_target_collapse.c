@@ -15,15 +15,15 @@
 
 int Runtst(int gpu) {
   omp_set_num_threads(N*N);
-  int A[N], B[N], C[N] = {0};
+  int A[N], B[N] = {0};
   int errors = 0;
   for (int i = 0; i < N; ++i) {
     A[i] = 0;
     B[i] = i;
   }
   int ThrdTrack[N] = {0};
-#pragma omp target data map(tofrom: A, B, C, ThrdTrack) device(gpu)
-#pragma omp target parallel for collapse(2) shared(A, B, C, ThrdTrack) device(gpu)
+#pragma omp target data map(tofrom: A, B, ThrdTrack) device(gpu)
+#pragma omp target parallel for collapse(2) shared(A, B, ThrdTrack) device(gpu)
   for (int i = 0; i < N; ++i) {
     for (int j = 0; j < N; ++j) {
       int ThrdId = omp_get_thread_num();
@@ -47,11 +47,12 @@ int Runtst(int gpu) {
 }
 
 int main() {
+  OMPVV_TEST_OFFLOADING;
 
   int TotGpus = omp_get_num_devices();
   int errors = 0;
   for (int gpu = 0; gpu < TotGpus; ++gpu) {
-    OMPVV_TEST_AND_SET_VERBOSE(errors, Runtst(gpu) != 0);
+    OMPVV_TEST_AND_SET(errors, Runtst(gpu) != 0);
   }
   OMPVV_REPORT_AND_RETURN(errors);
 } 

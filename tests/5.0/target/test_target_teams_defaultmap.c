@@ -119,6 +119,7 @@ int testDefaultMapDefault() {
 }
 
 int main() {
+  OMPVV_TEST_OFFLOADING;
   int errors = 0;
   OMPVV_TEST_AND_SET_VERBOSE(errors, testDefaultMapToFrom());
   OMPVV_TEST_AND_SET_VERBOSE(errors, testDefaultMapFrom());

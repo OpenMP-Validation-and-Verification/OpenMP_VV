@@ -47,6 +47,7 @@ int Runtst(int gpu, int Proc) { // Proc = 0(host), 1(gpu)
 
 
 int main() {
+  OMPVV_TEST_OFFLOADING;
   int TotGpus = omp_get_num_devices();
   int errors = 0;
   for (int gpu = 0; gpu < TotGpus; ++gpu) {

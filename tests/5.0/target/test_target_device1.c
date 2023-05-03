@@ -42,6 +42,7 @@ int Runtst(int gpu) {
 
 
 int main() {
+  OMPVV_TEST_OFFLOADING;
   int TotGpus = omp_get_num_devices();
   printf("TotGpus: %d\n", TotGpus);
   int errors = 0;

@@ -44,6 +44,7 @@ int testNumTeamsDefaut() {
 }
 
 int main() {
+  OMPVV_TEST_OFFLOADING;
   int errors = 0;
   OMPVV_TEST_AND_SET_VERBOSE(errors, testNumTeamsDefaut());
   OMPVV_REPORT_AND_RETURN(errors);

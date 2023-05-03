@@ -20,6 +20,7 @@
   clause with target teams construct.
 */
 int main() {
+  OMPVV_TEST_OFFLOADING;
   int errors = 0;
   int device_data[N], host_data[N];
   for (int i = 0; i < N; i++) {

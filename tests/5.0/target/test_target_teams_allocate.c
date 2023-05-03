@@ -83,6 +83,7 @@ uses_allocators(omp_default_mem_alloc) allocate(omp_default_mem_alloc: local) pr
 }
 
 int main() {
+  OMPVV_TEST_OFFLOADING;
   int errors = 0;
   OMPVV_TEST_AND_SET_VERBOSE(errors, testTargetTeamsAllocateCl());
   OMPVV_TEST_AND_SET_VERBOSE(errors, testTargetTeamsAllocateArrayCl());

@@ -16,6 +16,7 @@
 int IfTstPassed = 1; // 1 is passed 0 is failed
 
 int main(int argc, char** argv) {
+  OMPVV_TEST_OFFLOADING;
   int count = 123, errors = 0;
 #pragma omp target data map(tofrom: count)
 #pragma omp target parallel for shared(count, IfTstPassed) default(none)
