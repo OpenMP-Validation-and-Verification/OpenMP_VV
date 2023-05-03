@@ -56,7 +56,7 @@ CONTAINS
     END DO
 
     ! copy to target
-    omp_target_memcpy_async(mem_dev_cpy, mem, csize, dst_offset, src_offset, t, h, depobj_count)
+    errors = omp_target_memcpy_async(mem_dev_cpy, mem, csize, dst_offset, src_offset, t, h, depobj_count)
 
     !$omp taskwait
     !$omp target is_device_ptr(mem_dev_cpy) device(t)
@@ -69,7 +69,7 @@ CONTAINS
     !$omp end target
 
     ! copy to host memory
-    omp_target_memcpy_async(mem, mem_dev_cpy, csize, dst_offset, src_offset, h, t, depobj_count)
+    errors = omp_target_memcpy_async(mem, mem_dev_cpy, csize, dst_offset, src_offset, h, t, depobj_count)
 
     !$omp taskwait
     DO i=1, N
@@ -78,7 +78,7 @@ CONTAINS
 
     ! free resources
     DEALLOCATE(arr)
-    omp_target_free(mem_dev_cpy, t)
+    CALL omp_target_free(mem_dev_cpy, t)
 
     test_memcpy_async_no_obj = errors
   END FUNCTION test_memcpy_async_no_obj
