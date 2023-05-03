@@ -62,7 +62,7 @@ CONTAINS
 
     csize = c_sizeof(hostRect(1,1))
     ! copy to device memory
-    omp_target_memcpy_async(devRect, mem, csize, num_dims, volume, offsets, offsets, dimensions, dimensions, t, h, depobj_count)
+    errors = omp_target_memcpy_rect_async(devRect, mem, csize, num_dims, volume, offsets, offsets, dimensions, dimensions, t, h, depobj_count)
 
     !$omp taskwait
     !$omp target is_device_ptr(devRect) device(t)
@@ -75,7 +75,7 @@ CONTAINS
     !$omp end target
 
     ! copy to host memory
-    omp_target_memcpy_async(mem, devRect, csize, num_dims, volume, offsets, offsets, dimensions, dimensions, h, t, depobj_count)
+    errors = omp_target_memcpy_rect_async(mem, devRect, csize, num_dims, volume, offsets, offsets, dimensions, dimensions, h, t, depobj_count)
 
     !$omp taskwait
     DO i=1, N
@@ -85,7 +85,7 @@ CONTAINS
     END DO
 
     ! free resources
-    omp_target_free(devRect, t)
+    CALL omp_target_free(devRect, t)
 
     test_memcpy_rect_async_no_obj = errors
   END FUNCTION test_memcpy_rect_async_no_obj
