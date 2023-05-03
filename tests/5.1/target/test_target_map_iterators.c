@@ -1,6 +1,6 @@
-//-------------------------test_map_iterator.c-----------------------------
+//-------------------------test_target_map_iterator.c----------------------
 //
-//OpenMP API Version 5.1 Jan 2023
+//OpenMP API Version 5.1 Nov 2020
 //
 // This test is designed to test the iterator map-type-modifier for the map
 // clause. The test should create a list of size N and then pass to the 
