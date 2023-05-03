@@ -1,4 +1,4 @@
-//--------------- test_scope_firstprivate_construct_mod.c -----------------------------//
+//--------------- test_scope_firstprivate_construct.c -----------------------------//
 //
 // OpenMP API Version 5.2 Nov 2021 
 //
