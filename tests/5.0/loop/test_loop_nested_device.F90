@@ -47,7 +47,7 @@ CONTAINS
     END DO
 
     !$omp target teams num_teams(OMPVV_NUM_TEAMS_DEVICE) thread_limit(OMPVV_NUM_THREADS_DEVICE) map(tofrom: x, y, z, num_teams)
-    !$omp loop
+    !$omp loop private(j)
     DO i = 1, N
        DO j = 1, N
           x(j,i) = x(j,i) + y(i)*z(i)
