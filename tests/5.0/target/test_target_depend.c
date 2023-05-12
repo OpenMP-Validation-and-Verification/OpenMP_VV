@@ -13,7 +13,7 @@
 
 #define ELMTS 1024*1024
 
-void Runtst(int gpu) {
+int Runtst(int gpu) {
   int errors = 0;
   int *A1 = malloc(sizeof(int) * ELMTS);
   int *A2 = malloc(sizeof(int) * ELMTS);

@@ -1,6 +1,6 @@
 //===------test_target_device.c--------------------------------------===//
 //
-// OpenMP API Version 5.0 Nov 2018
+// OpenMP API Version 4.5 Nov 2015
 //
 // Description:
 // This is a basic test to demonstrate target + parallel for + device clause
@@ -10,27 +10,27 @@
 #include "omp.h"
 #include "ompvv.h"
 
-#define THREADS 1024*1024*1024
+#define N 1024*1024*1024
 
 
 int Runtst(int gpu) {
   int errors = 0;
-  int *A = malloc(sizeof(int) * THREADS);
-  for (int i = 0; i < THREADS; ++i) {
+  int *A = malloc(sizeof(int) * N);
+  for (int i = 0; i < N; ++i) {
     A[i] = i;
   }
 
-#pragma omp target data map(tofrom: A[0:THREADS]) device(gpu)
+#pragma omp target data map(tofrom: A[0:N]) device(gpu)
   {
     #pragma omp target parallel for device(gpu)
-    for (int i = 0; i < THREADS; ++i) {
+    for (int i = 0; i < N; ++i) {
       A[i] = A[i] * A[i];
     }
   }
 
   // Verification
  
-  for (int i = 0; i < THREADS; ++i) {
+  for (int i = 0; i < N; ++i) {
     if (A[i] != i*i) {
       errors++;
     }
