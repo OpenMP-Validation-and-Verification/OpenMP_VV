@@ -20,23 +20,42 @@ int unified_address() {
 
    int errors = 0;
    int i;
-   int * mem_ptr = (int *)malloc(N * sizeof(int));
+   int *mem_ptr = (int *)omp_target_alloc(N * sizeof(int), omp_get_default_device());
+   int *mem_ptr2 = NULL;
 
    OMPVV_ERROR_IF(mem_ptr == NULL, "Memory was not properly allocated");
    
-   #pragma omp target map(to: mem_ptr)
+   #pragma omp target map(from:mem_ptr2) /* is_device_ptr(mem_ptr) - which is optional.  */
    {
       for (i = 0; i < N; i++) {
          mem_ptr[i] = i + 1;
       }
+      mem_ptr2 = &mem_ptr[0] + 5;
    }
+
+   /* Pointer arithmetic is permitted; assumes sizeof(int) is the same.  */
+   mem_ptr2 += 4;
    
+   #pragma omp target map(tofrom:errors) /* is_device_ptr(mem_ptr2) - which is optional.  */
    for (i = 0; i < N; i++) {
-      if(mem_ptr[i] != i + 1) {
+      if(mem_ptr2[i - 5 - 4] != i + 1) {
          errors++;
       }  
    }
-   
+
+   int *mem_ptr3 = (int*)malloc(N * sizeof(int));
+   omp_target_memcpy(mem_ptr3, mem_ptr, N * sizeof(int), 0, 0,
+                     omp_get_initial_device(), omp_get_default_device());
+
+   for (i = 0; i < N; i++) {
+      if(mem_ptr3[i] != i + 1) {
+         errors++;
+      }
+   }
+
+   free (mem_ptr3);
+   omp_target_free (mem_ptr, omp_get_default_device());
+
    return errors;
 }
 
