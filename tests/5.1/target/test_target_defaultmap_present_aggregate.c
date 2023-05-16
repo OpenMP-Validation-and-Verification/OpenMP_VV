@@ -1,12 +1,12 @@
 //===--- test_target_defaultmap_present_aggregate.c -------------------------===//
 //
-//  OpenMP API Version 5.1 Aug 2021
+//  OpenMP API Version 5.1 Aug 2020
 //
 //  This test checks behavior of the defaultmap clause when the specified 
 //  implicit-behavior is present. The variable-categories available for defaultmap
 //  are scalar, aggregate, and pointer. If implicit-behavior is present, each 
 //  variable referenced in the construct in the category specified by 
-//  variable-category is treated as if it had been listed in a map clause wih the
+//  variable-category is treated as if it had been listed in a map clause with the
 //  map-type of alloc and map-type-modifier of present.
 //
 ////===----------------------------------------------------------------------===//

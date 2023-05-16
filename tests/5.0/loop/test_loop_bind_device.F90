@@ -1,4 +1,4 @@
-!===--- test_loop_bind.F90 -------------------------------------------------===//
+!===--- test_loop_bind_device.F90 ------------------------------------------===//
 !
 ! OpenMP API Version 5.0 Nov 2018
 !
@@ -6,7 +6,8 @@
 ! clause indicates that the loop construct should apply in the context of the
 ! given binding, one of teams, parallel, or thread. Each of these bindings
 ! is tested in an appropriate context and the correctness of results of
-! array operations in the nested loop is checked.
+! array operations in the nested loop is checked. This test checks these
+! directives in a target context.
 !
 !//===----------------------------------------------------------------------===//
 
@@ -14,7 +15,7 @@
 
 #define N 32
 
-PROGRAM test_loop_bind
+PROGRAM test_loop_bind_device
   USE iso_fortran_env
   USE ompvv_lib
   USE omp_lib
@@ -47,7 +48,7 @@ CONTAINS
        z(i) = 2*i
     END DO
 
-    !$omp teams num_teams(OMPVV_NUM_TEAMS_HOST) thread_limit(OMPVV_NUM_THREADS_HOST)
+    !$omp target teams num_teams(OMPVV_NUM_TEAMS_DEVICE) thread_limit(OMPVV_NUM_THREADS_DEVICE) map(tofrom: x, y, z, num_teams)
     !$omp loop bind(teams) private(j)
     DO i = 1, N
        DO j = 1, N
@@ -60,14 +61,14 @@ CONTAINS
        num_teams = omp_get_num_teams()
     END IF
     !$omp end parallel
-    !$omp end teams
+    !$omp end target teams
 
     DO i = 1, N
        DO j = 1, N
-          OMPVV_TEST_AND_SET_VERBOSE(errors, x(j,i) .NE. (1 + y(i)*z(i)))
+          OMPVV_TEST_AND_SET(errors, x(j,i) .NE. (1 + y(i)*z(i)))
        END DO
     END DO
-
+    OMPVV_ERROR_IF(errors .NE. 0, "Test generated wrong results on the output array x.")
     OMPVV_WARNING_IF(num_teams .EQ. 1, "Test ran with one team, so parallelism of loop construct with bind(teams) can't be guaranteed.")
     OMPVV_TEST_AND_SET_VERBOSE(errors, num_teams .LT. 1)
     OMPVV_ERROR_IF(num_teams .LT. 1, "omp_get_num_teams() returned an invalid number of teams.")
@@ -94,7 +95,7 @@ CONTAINS
        z(i) = 2*i
     END DO
 
-    !$omp parallel num_threads(OMPVV_NUM_THREADS_HOST)
+    !$omp target parallel num_threads(OMPVV_NUM_THREADS_DEVICE) map(tofrom: x, y, z, num_threads)
     !$omp loop bind(parallel)
     DO i = 1, N
        DO j = 1, N
@@ -105,14 +106,15 @@ CONTAINS
     IF ( (omp_get_thread_num() .EQ. 0) .AND. (omp_get_team_num() .EQ. 0) ) THEN
        num_threads = omp_get_num_threads()
     END IF
-    !$omp end parallel
+    !$omp end target parallel
 
     DO i = 1, N
        DO j = 1, N
-          OMPVV_TEST_AND_SET_VERBOSE(errors, x(j,i) .NE. (1 + y(i)*z(i)))
+          OMPVV_TEST_AND_SET(errors, x(j,i) .NE. (1 + y(i)*z(i)))
        END DO
     END DO
 
+    OMPVV_ERROR_IF(errors .NE. 0, "Test generated wrong results on the output array x.")
     OMPVV_WARNING_IF(num_threads .EQ. 1, "Test ran with one thread, so parallelism of loop construct can't be guaranteed.")
     OMPVV_TEST_AND_SET_VERBOSE(errors, num_threads .LT. 1)
     OMPVV_ERROR_IF(num_threads .LT. 1, "omp_get_num_threads() returned an invalid number of threads.")
@@ -142,7 +144,7 @@ CONTAINS
        z(i) = 2*i
     END DO
 
-    !$omp teams num_teams(OMPVV_NUM_TEAMS_HOST) thread_limit(OMPVV_NUM_THREADS_HOST) private(x)
+    !$omp target teams num_teams(OMPVV_NUM_TEAMS_DEVICE) thread_limit(OMPVV_NUM_THREADS_DEVICE) private(x) map(tofrom: outData, y, z, num_teams)
     DO i = 1, N
        DO j = 1, N
           x(j,i) = 1
@@ -165,16 +167,17 @@ CONTAINS
           outData(omp_get_team_num()+1,j,i) = x(j,i)
        END DO
     END DO
-    !$omp end teams
+    !$omp end target teams
 
     DO i = 1, N
        DO j = 1, N
           DO k = 1, num_teams
-             OMPVV_TEST_AND_SET_VERBOSE(errors, outData(k,j,i) .NE. (1 + y(i)*z(i)))
+             OMPVV_TEST_AND_SET(errors, outData(k,j,i) .NE. (1 + y(i)*z(i)))
           END DO
        END DO
     END DO
 
+    OMPVV_ERROR_IF(errors .NE. 0, "Test generated wrong results on the output array outData.")
     OMPVV_WARNING_IF(num_teams .EQ. 1, "Test ran with one team, so parallelism of loop construct can't be guaranteed.")
     OMPVV_TEST_AND_SET_VERBOSE(errors, num_teams .LT. 1)
     OMPVV_ERROR_IF(num_teams .LT. 1, "omp_get_num_teams() returned an invalid number of teams.")
@@ -204,7 +207,7 @@ CONTAINS
        z(i) = 2*i
     END DO
 
-    !$omp parallel shared(outData) num_threads(OMPVV_NUM_THREADS_HOST) private(x)
+    !$omp target parallel shared(outData) num_threads(OMPVV_NUM_THREADS_DEVICE) private(x) map(tofrom: outData, y, z, num_threads)
     DO i = 1, N
        DO j = 1, N
           x(j,i) = 1
@@ -225,16 +228,17 @@ CONTAINS
           outData(omp_get_thread_num()+1,j,i) = x(j,i)
        END DO
     END DO
-    !$omp end parallel
+    !$omp end target parallel
 
     DO i = 1, N
        DO j = 1, N
           DO k = 1, num_threads
-             OMPVV_TEST_AND_SET_VERBOSE(errors, outData(k,j,i) .NE. (1 + y(i)*z(i)))
+             OMPVV_TEST_AND_SET(errors, outData(k,j,i) .NE. (1 + y(i)*z(i)))
           END DO
        END DO
     END DO
 
+    OMPVV_ERROR_IF(errors .NE. 0, "Test generated wrong results on the output array outData.")
     OMPVV_WARNING_IF(num_threads .EQ. 1, "Test ran with one thread, so parallelism of loop construct can't be guaranteed.")
     OMPVV_TEST_AND_SET_VERBOSE(errors, num_threads .LT. 1)
     OMPVV_ERROR_IF(num_threads .LT. 1, "omp_get_num_threads() returned an invalid number of threads.")
@@ -242,4 +246,4 @@ CONTAINS
     test_bind_thread_parallel = errors
   END FUNCTION test_bind_thread_parallel
 
-END PROGRAM test_loop_bind
+END PROGRAM test_loop_bind_device

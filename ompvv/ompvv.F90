@@ -59,6 +59,10 @@
 #define OMPVV_NUM_TEAMS_DEVICE 8
 #endif
 
+#ifndef OMPVV_NUM_TEAMS_HOST
+#define OMPVV_NUM_TEAMS_HOST 4
+#endif
+
 #ifndef OMPVV_NUM_THREADS_HOST
 #define OMPVV_NUM_THREADS_HOST 8
 #endif

@@ -46,7 +46,7 @@ CONTAINS
     END DO
 
     !$omp teams num_teams(OMPVV_NUM_TEAMS_DEVICE) thread_limit(OMPVV_NUM_THREADS_HOST)
-    !$omp loop
+    !$omp loop private(j)
     DO i = 1, N
        DO j = 1, N
           x(j,i) = x(j,i) + y(i)*z(i)
