@@ -18,6 +18,7 @@ int test_scope(){
 	int errors = 0;
 	int test_int = 1;
 	#pragma omp parallel shared(test_int)
+	#pragma omp target map(tofrom: errors)
 	{
 		#pragma omp scope firstprivate(test_int)
 		{
