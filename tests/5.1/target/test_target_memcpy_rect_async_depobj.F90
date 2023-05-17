@@ -53,7 +53,7 @@ CONTAINS
     csize = c_sizeof(hostRect(1,1)) * M * N
     devRect = omp_target_alloc(csize, t)
 
-    OMPVV_TEST_AND_SET_VERBOSE(errors, .NOT. c_associated(devRect))
+    OMPVV_ERROR_IF(.NOT. c_associated(devRect), "Error: omp_target_alloc() failed")
 
     DO i=1, N
       DO j=1, M
