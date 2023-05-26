@@ -8,48 +8,44 @@
 //===---------------------------------------------------------------------------------------===//
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <omp.h>
 #include "ompvv.h"
 
 #define N 1000
 
-int main() {
+int test_pointer() {
   int compute_array[N];
   int *p;
-  int sum = 0, result = 0, errors = 0;
+  int errors = 0;
   int i;
-  
   
   // Array initialization
   for (i = 0; i < N; i++)
     compute_array[i] = i;
   p = &compute_array[0];
 
-  int isOffloading;
-
-  OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
-
-  OMPVV_WARNING_IF(!isOffloading, "This test is running on host, the value of p[] is not copied over to the device"); 
-
-  //#pragma omp target data map(tofrom: compute_array) //To test default pointer behavior, array must be mapped before the pointer
-  #pragma omp target map(tofrom: p[:N]) map(tofrom: sum)
+  #pragma omp target map(tofrom: p[:N])
   {
     // Array modified through the pointer
-    for (i = 0; i < N; i++){
-      sum += p[i];
+    int index=0;
+    for (i = N-1; i >= 0; i--){
+      p[index] = i;
+      index++;
     }
-   
   } // end target
 
-  // Result comparison
+  // Pointer values comparison
   for (i = 0; i < N; i++)
-    if (compute_array[i] != i)  errors++;
+    if (p[i] != i) errors++;
+
+  OMPVV_ERROR_IF(errors!=0, "ERROR COUNT (DIFFERING VALUES): %d",errors);
   
-  for (i = 0; i < N; i++)
-    result += i;
-
-  OMPVV_TEST_AND_SET_VERBOSE(errors, result != sum);
-
+  return errors;
+}
+int main(){
+  int errors=0;
+  OMPVV_TEST_OFFLOADING;
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_pointer() != 0);
   OMPVV_REPORT_AND_RETURN(errors);
-
 }
