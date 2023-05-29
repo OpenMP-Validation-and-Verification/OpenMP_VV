@@ -12,7 +12,6 @@
 #include "ompvv.h"
 
 #define N 5
-#define ITERS 5
 int Runtst(int gpu) {
   omp_set_num_threads(N);
   int A[N], B[N] = {0};
@@ -21,11 +20,11 @@ int Runtst(int gpu) {
     A[i] = 0;
     B[i] = i + 1;
   }
-  int ThrdTrack[ITERS * ITERS + ITERS] = {0}; // an array of 30 elements
+  int ThrdTrack[N * N + N] = {0}; // an array of 30 elements
 #pragma omp target data map(tofrom: A, B, ThrdTrack) device(gpu)
 #pragma omp target parallel for collapse(2) shared(A, B, ThrdTrack) device(gpu)
-  for (int i = 0; i < ITERS; ++i) {
-    for (int j = 0; j < ITERS; ++j) {
+  for (int i = 0; i < N; ++i) {
+    for (int j = 0; j < N; ++j) {
       int ThrdId = omp_get_thread_num();
       ThrdTrack[ThrdId] = ThrdId;
 #pragma omp atomic
