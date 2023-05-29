@@ -4,7 +4,9 @@
 //
 //This test checks if, after offloading, the initalized pointer variable retains its 
 //original value as per the semantics of the firstprivate clause. 
-//
+//The pointer variable, nor the array it refers to, are not mapped to the device. This 
+//ensures that a matching mapped data item is not found for the pointer, so it retains
+//its original value.
 //===---------------------------------------------------------------------------------------===//
 
 #include <stdio.h>
@@ -25,7 +27,7 @@ int test_pointer() {
     compute_array[i] = i;
   p = &compute_array[0];
 
-  #pragma omp target map(tofrom: p[:N])
+  #pragma omp target
   {
     // Array modified through the pointer
     int index=0;
