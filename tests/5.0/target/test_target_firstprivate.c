@@ -14,14 +14,18 @@
 #define INIT_VAL 9999
 
 
-void Runtst(int gpu) {
+int Runtst(int gpu) {
   int *A = malloc(sizeof(int) * ELMTS), errors = 0;
+  if (A == NULL) {
+    OMPVV_ERROR("Memory allocation failed");
+    return 1;
+  }
   for (int i = 0; i < ELMTS; ++i) {
     A[i] = i;
   }
   int HostVar = INIT_VAL;
   omp_set_num_threads(ELMTS);
-#pragma omp target data map(tofrom: A[0:ELMTS]) device(gpu)
+#pragma omp target data map(tofrom: A[0:ELMTS], HostVar, errors) device(gpu)
   {
 #pragma omp target parallel for firstprivate(HostVar) device(gpu)
     for (int i = 0; i < ELMTS; ++i) {
@@ -30,6 +34,13 @@ void Runtst(int gpu) {
       } else {
         A[i] = 0;
       }
+      if (i == (ELMTS - 1)) {
+        HostVar++;
+      }
+    }
+    // The following check ensures that the HostVar is private
+    if (HostVar != INIT_VAL) {
+      errors++;
     }
   }
 
