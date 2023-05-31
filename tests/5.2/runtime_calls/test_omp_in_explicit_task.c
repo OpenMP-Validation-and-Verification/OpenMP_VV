@@ -33,7 +33,7 @@ int test_wrapper() {
     for(int i = 0; i < N; i++){
         OMPVV_TEST_AND_SET(errors, A[i] == 0);
     }
-    OMPVV_ERROR_IF(A[rand()%N] == 0, "omp_in_explicit_task() did not return correct value");
+    OMPVV_ERROR_IF(A[rand()%N] == 0, "omp_in_explicit_task() did not return correct value when called inside an explicit task");
     
     for(int i = 0; i < N; i++){
         A[i] = 1;
@@ -42,6 +42,8 @@ int test_wrapper() {
             A[i] = omp_in_explicit_task();
         }
     }
+    OMPVV_ERROR_IF(A[rand()%N] != 0, "omp_in_explicit_task() did not return correct value when called inside an implicit task");
+    
     for(int i = 0; i < N; i++){
         OMPVV_TEST_AND_SET(errors, A[i] != 0);
     }
