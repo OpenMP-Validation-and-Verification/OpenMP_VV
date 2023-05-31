@@ -23,9 +23,9 @@ int test_scope(){
 		{
 			test_int += 1;
 			OMPVV_TEST_AND_SET(errors,test_int != 2);
-      			OMPVV_ERROR_IF(errors, "firstprivate int is not updating correctly");
 		}
 	}
+	OMPVV_ERROR_IF(errors, "firstprivate int is not updating correctly");
 	OMPVV_TEST_AND_SET_VERBOSE(errors,test_int != 1);
 	OMPVV_INFOMSG_IF(test_int == 2, "test int was not firstprivate");
 	return errors;
