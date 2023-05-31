@@ -14,7 +14,7 @@
 #include "ompvv.h"
 #include <stdbool.h>
 
-#define N 1024
+#define N 256
 
 int errors;
 
@@ -33,8 +33,10 @@ int test_wrapper() {
     for(int i = 0; i < N; i++){
         OMPVV_TEST_AND_SET(errors, A[i] == 0);
     }
-    OMPVV_WARNING_IF(A[5] == 0, "omp_in_explicit_task() did not return correct value");
+    OMPVV_ERROR_IF(A[rand()%N] == 0, "omp_in_explicit_task() did not return correct value");
+    
     for(int i = 0; i < N; i++){
+        A[i] = 1;
         #pragma omp parallel for // creates IMPLICIT tasks, omp_in_explicit_task = 0
         for(int i = 0; i < N; i++){
             A[i] = omp_in_explicit_task();
