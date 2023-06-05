@@ -12,7 +12,7 @@
 
 #define THREADS 1024*1024*1024
 
-void Runtst(int gpu) {
+int Runtst(int gpu) {
   int *Hst_A = malloc(sizeof(int) * THREADS);
   int *Dev_B = (int*)omp_target_alloc(sizeof(int) * THREADS, gpu);
   int errors = 0;
