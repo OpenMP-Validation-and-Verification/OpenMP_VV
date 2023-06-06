@@ -4,7 +4,15 @@
 //
 // This test checks that the scope directive with the allocate clause is
 // working correctly.
-// This is done by specifying
+// Note: restrictions for the allocate clause require that a private clause
+// be present when allocate is used with scope.
+// The allocator() argument to the allocate clause selects one of the 
+// predefined allocators which are listed under Table 6.3 on pg. 174 
+// in the specifications.
+// 
+// In this test, the clause is used to allocate memory to an array of integers, which is then
+// written to. Each section of the array is subsequently read to check if the 
+// correct integer values are present.
 //----------------------------------------------------------------------------//
 
 #include <omp.h>
