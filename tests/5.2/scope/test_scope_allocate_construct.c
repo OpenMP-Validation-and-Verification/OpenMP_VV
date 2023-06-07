@@ -26,15 +26,18 @@ int test_allocate(){
         int errors=0;
         int arr[N];
 
-	#pragma omp target map(tofrom: errors) 
+	#pragma omp target parallel map(tofrom: errors) 
         #pragma omp scope private(arr) allocate(allocator(omp_low_lat_mem_alloc): arr)
         {
+		int err = 0;
 		for(int i=0; i< N; i++){
                 	arr[i] = i;
                 }
 		for(int j=0; j< N; j++){
-			if(arr[j] != j) errors++;
+			if(arr[j] != j) err++;
 		}
+		#pragma omp atomic update
+		errors += err;
         }
         return errors;
 }
