@@ -15,7 +15,7 @@
 
 int Runtst(int gpu) {
   int errors = 0;
-  int *A = malloc(sizeof(int) * N);
+  int *A = (int *)malloc(sizeof(int) * N);
   for (int i = 0; i < N; ++i) {
     A[i] = i;
   }
