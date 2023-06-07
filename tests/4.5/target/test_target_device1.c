@@ -46,7 +46,7 @@ int main() {
   int TotGpus = omp_get_num_devices();
   printf("TotGpus: %d\n", TotGpus);
   int errors = 0;
-  for (int gpu = 0; gpu < TotGpus; ++gpu) {
+  for (int gpu = 0; gpu <= TotGpus; ++gpu) {
     OMPVV_TEST_AND_SET_VERBOSE(errors, (Runtst(gpu) != 0)); 
   }
   OMPVV_REPORT_AND_RETURN(errors);
