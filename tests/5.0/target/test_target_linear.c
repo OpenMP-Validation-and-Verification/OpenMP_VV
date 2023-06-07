@@ -32,7 +32,7 @@ int Runtst(int gpu) {
   // Verification
  
   for (int i = 0; i < THREADS; ++i) {
-    if (A[i] != i * 2) {
+    if (A[i] != (i+1) * 2) {
       errors++;
     }
   }
