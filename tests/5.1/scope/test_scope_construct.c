@@ -4,6 +4,7 @@
 //
 //Tests the behavior of the scope construct with no clauses
 //specified.
+//Offloads to a gpu.
 //--------------------------------------------------------//
 
 #include <omp.h>
@@ -16,21 +17,24 @@
 int test_scope() {
   int errors = 0;
   int total = 0;
-  #pragma omp parallel shared(total) target(tofrom: total)
+  #pragma omp target parallel shared(total) map(tofrom: total)
 	{
 		#pragma omp scope
 		{
       #pragma omp for 
       for (int i=0; i < N; ++i){
+        #pragma omp atomic update
         ++total;
+        printf("<%i>\n",omp_get_num_threads());
       }
     }
   }
-  
+  printf("%i\n",total);
   OMPVV_TEST_AND_SET_VERBOSE(errors, total != N);
   return errors;
 }
 int main() {
+  int errors = 0;
 	OMPVV_TEST_OFFLOADING;
 	OMPVV_TEST_AND_SET_VERBOSE(errors, test_scope() != 0);
 	OMPVV_REPORT_AND_RETURN(errors);
