@@ -13,7 +13,7 @@
 #define N 1024
 
 int Runtst(int gpu) {
-  int *Hst_A = malloc(sizeof(int) * THREADS);
+  int *Hst_A = malloc(sizeof(int) * N);
   int *Dev_B = (int*)omp_target_alloc(sizeof(int) * THREADS, gpu);
   int errors = 0;
   for (int i = 0; i < THREADS; ++i) {
