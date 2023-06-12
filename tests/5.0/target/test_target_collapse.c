@@ -13,7 +13,6 @@
 
 #define N 5
 int Runtst(int gpu) {
-  omp_set_num_threads(N);
   int A[N], B[N] = {0};
   int errors = 0;
   for (int i = 0; i < N; ++i) {
