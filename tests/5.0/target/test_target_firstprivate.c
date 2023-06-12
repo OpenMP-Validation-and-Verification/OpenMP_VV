@@ -24,7 +24,6 @@ int Runtst(int gpu) {
     A[i] = i;
   }
   int HostVar = INIT_VAL;
-  omp_set_num_threads(ELMTS);
 #pragma omp target data map(tofrom: A[0:ELMTS], HostVar, errors) device(gpu)
   {
 #pragma omp target parallel for firstprivate(HostVar) device(gpu)
