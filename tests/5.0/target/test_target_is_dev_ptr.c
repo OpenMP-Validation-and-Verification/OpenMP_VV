@@ -23,7 +23,7 @@ int Runtst(int gpu) {
 #pragma omp target data map(tofrom: Hst_A[0:THREADS]) device(gpu)
   {
 #pragma omp target parallel for  is_device_ptr(Dev_B) device(gpu)
-    for (int i = 0; i < THREADS; ++i) {
+    for (int i = 0; i < N; ++i) {
       Dev_B[i] = Hst_A[i] * Hst_A[i];
       Hst_A[i] = Dev_B[i];
     }
