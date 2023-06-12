@@ -22,7 +22,7 @@ int Runtst(int gpu, int Proc) { // Proc = 0(host), 1(gpu)
 #pragma omp target data map(tofrom: A[0:N], InitDev[0:1]) if(Proc) device(gpu)
   {
 #pragma omp target parallel for if(Proc) device(gpu)
-    for (int i = 0; i < THREADS; ++i) {
+    for (int i = 0; i < N; ++i) {
       if (i == 0) {
         InitDev[0] = omp_is_initial_device();
       }
