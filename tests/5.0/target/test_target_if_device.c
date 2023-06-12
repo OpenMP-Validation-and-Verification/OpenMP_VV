@@ -13,7 +13,7 @@
 
 
 int Runtst(int gpu, int Proc) { // Proc = 0(host), 1(gpu)
-  int *A = malloc(sizeof(int) * THREADS), Errors = 0;
+  int *A = malloc(sizeof(int) * N), Errors = 0;
   int *InitDev = malloc(sizeof(int));
   for (int i = 0; i < THREADS; ++i) {
     A[i] = i;
