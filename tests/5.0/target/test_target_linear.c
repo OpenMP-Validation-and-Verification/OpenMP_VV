@@ -10,7 +10,7 @@
 #include "omp.h"
 #include "ompvv.h"
 
-#define THREADS 1024*1024*1024
+#define N 1024
 
 
 
