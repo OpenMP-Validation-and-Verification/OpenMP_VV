@@ -23,7 +23,7 @@ int Runtst(int gpu) {
 #pragma omp target data map(tofrom: A[0:N], val) device(gpu)
   {
 #pragma omp target parallel for device(gpu) linear(val:2)
-    for (int i = 0; i < THREADS; ++i) {
+    for (int i = 0; i < N; ++i) {
       val += 2;
       A[i] = val;
     }
