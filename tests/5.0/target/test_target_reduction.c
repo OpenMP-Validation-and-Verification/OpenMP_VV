@@ -23,7 +23,7 @@ int Runtst(int gpu) {
 #pragma omp target data map(tofrom: A[0:N], B[0:N], TotSum) device(gpu)
   {
 #pragma omp target parallel for reduction(+:TotSum) device(gpu)
-    for (int i = 0; i < THREADS; ++i) {
+    for (int i = 0; i < N; ++i) {
       TotSum = TotSum + A[i] + B[i];
     }
   }
