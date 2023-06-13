@@ -28,7 +28,7 @@ int Runtst(int gpu) {
     }
   }
 
-  if (TotSum != (THREADS - 1) * (THREADS)) {
+  if (TotSum != (N - 1) * (N)) {
     errors++;
   }
   free(A);
