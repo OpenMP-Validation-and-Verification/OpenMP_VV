@@ -12,15 +12,15 @@
 #define N 1024*32
 
 int Runtst(int gpu) {
-  int *A = malloc(sizeof(int) * THREADS);
-  int *B = malloc(sizeof(int) * THREADS);
+  int *A = malloc(sizeof(int) * N);
+  int *B = malloc(sizeof(int) * N);
   int errors = 0;
-  for (int i = 0; i < THREADS; ++i) {
+  for (int i = 0; i < N; ++i) {
     A[i] = i;
     B[i] = i;
   }
   int TotSum = 0;
-#pragma omp target data map(tofrom: A[0:THREADS], B[0:THREADS], TotSum) device(gpu)
+#pragma omp target data map(tofrom: A[0:N], B[0:N], TotSum) device(gpu)
   {
 #pragma omp target parallel for reduction(+:TotSum) device(gpu)
     for (int i = 0; i < THREADS; ++i) {
