@@ -9,7 +9,7 @@
 #include "omp.h"
 #include "ompvv.h"
 
-#define THREADS 1024*32
+#define N 1024*32
 
 int Runtst(int gpu) {
   int *A = malloc(sizeof(int) * THREADS);
