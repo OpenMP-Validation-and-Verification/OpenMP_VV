@@ -27,7 +27,7 @@ int unified_address() {
    if (mem_ptr == NULL)
      return ++errors;
    
-   #pragma omp target map(from:mem_ptr2) /* is_device_ptr(mem_ptr) - which is optional.  */
+   #pragma omp target map(from:mem_ptr2) defaultmap(firstprivate) /* is_device_ptr(mem_ptr) - which is optional.  */
    {
       for (i = 0; i < N; i++) {
          mem_ptr[i] = i + 1;
@@ -38,7 +38,7 @@ int unified_address() {
    /* Pointer arithmetic is permitted; assumes sizeof(int) is the same.  */
    mem_ptr2 += 4;
    
-   #pragma omp target map(tofrom:errors) /* is_device_ptr(mem_ptr2) - which is optional.  */
+   #pragma omp target map(tofrom:errors) defaultmap(to) /* is_device_ptr(mem_ptr2) - which is optional.  */
    for (i = 0; i < N; i++) {
       if(mem_ptr2[i - 5 - 4] != i + 1) {
          errors++;
