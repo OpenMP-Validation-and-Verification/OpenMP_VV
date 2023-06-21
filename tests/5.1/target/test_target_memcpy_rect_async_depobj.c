@@ -36,6 +36,8 @@ int test_target_memcpy_async_depobj() {
     double *devRect = (double *)omp_target_alloc(sizeof(double)*N*M, t);
 
     OMPVV_ERROR_IF(devRect == NULL, "Error: omp_target_alloc() failed");
+    if (devRect == NULL)
+      return ++errors;
 
     for(i = 0; i < N; i++){             //each index is set to number of their row
         for (j = 0; j < M; j++){
