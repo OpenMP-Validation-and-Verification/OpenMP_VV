@@ -54,6 +54,11 @@ CONTAINS
     devRect = omp_target_alloc(csize, t)
 
     OMPVV_ERROR_IF(.NOT. c_associated(devRect), "Error: omp_target_alloc() failed")
+    IF(.NOT. c_associated(devRect)) THEN
+      errors = errors + 1
+      test_memcpy_rect_async_depobj = errors
+      RETURN
+    END IF
 
     DO i=1, N
       DO j=1, M
