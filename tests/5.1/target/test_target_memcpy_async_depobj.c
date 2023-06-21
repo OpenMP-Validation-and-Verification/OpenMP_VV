@@ -34,6 +34,9 @@ int test_target_memcpy_async_depobj() {
     mem_dev_cpy = (double *)omp_target_alloc( sizeof(double)*N, t);
 
     OMPVV_TEST_AND_SET_VERBOSE(errors, mem_dev_cpy == NULL);
+    if(mem_dev_cpy == NULL) {
+       return errors;
+    }
 
     for(i = 0; i < N; i++){
         mem[i] = i;

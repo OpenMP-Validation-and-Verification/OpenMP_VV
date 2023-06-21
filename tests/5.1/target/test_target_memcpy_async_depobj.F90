@@ -49,6 +49,10 @@ CONTAINS
     mem_dev_cpy = omp_target_alloc(csize, t)
  
     OMPVV_TEST_AND_SET_VERBOSE(errors, .NOT. c_associated(mem_dev_cpy))
+    IF(.NOT. c_associated(mem_dev_cpy)) THEN
+      test_memcpy_async_depobj = errors
+      RETURN  
+    END IF
 
     DO i=1, N
       arr(i) = i
