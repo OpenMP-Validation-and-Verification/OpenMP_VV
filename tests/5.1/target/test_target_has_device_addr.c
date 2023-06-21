@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include "ompvv.h"
 
-#define N 1000
+#define N 1024
 
 //test by mapping to device use 'target map' construct
 int test_target_has_device_addr() {
@@ -43,7 +43,7 @@ int test_target_has_device_addr() {
   }
   #pragma omp target exit data map(release: x, arr)
   OMPVV_TEST_AND_SET(errors, first_scalar_device_addr != second_scalar_device_addr);
-  OMPVV_TEST_AND_SET(errors, first_arr_device_addr != second_arr_device_addr)
+  OMPVV_TEST_AND_SET(errors, first_arr_device_addr != second_arr_device_addr);
   return errors;
 }
 
