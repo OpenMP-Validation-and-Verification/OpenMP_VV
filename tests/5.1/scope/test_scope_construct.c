@@ -1,16 +1,18 @@
-//-------------test_scope_construct.c---------------------//
-//
-// OpenMP API Version 5.1 Aug 2021
-//
-// Tests the behavior of the scope construct with no clauses
-// specified.
-// Offloads to a device.
+//------------ test_scope_construct.c --------------------//
+// OpenMP API Version 5.1 Nov 2020
+// *****************
+// DIRECTIVE: scope
+// *****************
+// The scope directive is being tested. Scope binds to the 
+// innermost parallel region. However, since no
+// clauses are specified, there should be no modification
+// to the behavior of code execution. Therefore, the test
+// checks that the the total is updated correctly as if the
+// scope directive were not present.
 //--------------------------------------------------------//
 
-#include "ompvv.h"
 #include <omp.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include "ompvv.h"
 
 #define N 64
 
