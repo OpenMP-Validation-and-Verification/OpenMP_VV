@@ -23,9 +23,7 @@
 #include <omp.h>
 #include "ompvv.h"
 
-#ifndef N
 #define N 16
-#endif
 
 int test_otherwise() {
   int errors = 0;
