@@ -1,28 +1,31 @@
-//--------------- test_scope_allocate_construct.c ----------------------------//
+//--------------- test_metadirective_otherwise.c ----------------------------//
 // OpenMP API Version 5.2 Nov 2021
-// ************************
+// *************************
 // DIRECTIVE: metadirective
 // CLAUSES: when, otherwise 
-// ************************
+// *************************
 // The otherwise clause of the metadirective construct is being tested. The
 // metadirective construct contains a when clause, which itself contains a
 // context-selector (device = {kind(host)}) and a directive-variant (nothing).
-// The metadirective construct also contains a otherwise clause, which itself
+// The metadirective construct also contains an otherwise clause, which itself
 // contains a directive-variant (parallel for).
 // The when clause of the metadirective construct is
-// evaluated for a valid context-selector pertaining to an implementation
-// defined device of kind host. If no target construct were specified, the
-// evaluation would be true, and the directive-variant nothing would be executed
-// as if #pragma omp nothing were present. Target is present, so the
-// directive-variant of the otherwise clause will be executed. This would not 
-// occur if device = {kind(nohost)} were specified. If the given for loop 
-// executes in parallel, the test will pass.
+// evaluated for a valid context-selector pertaining to a device related 
+// characteristic of a certain kind (host), defined in the OpenMP additional
+// definitions. If no target construct were specified, the evaluation would
+// be true, and the directive-variant nothing would be executed as if 
+// #pragma omp nothing were present. Target is present, so the directive-variant
+// of the otherwise clause will be executed. This would not occur if 
+// device = {kind(nohost)} were specified. If the given for loop executes in 
+// parallel, the test will pass.
 //----------------------------------------------------------------------------//
 
 #include <omp.h>
 #include "ompvv.h"
 
+#ifndef N
 #define N 16
+#endif
 
 int test_otherwise() {
   int errors = 0;
