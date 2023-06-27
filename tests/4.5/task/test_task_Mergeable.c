@@ -1,15 +1,11 @@
-//===-- test_task_Mergeable.c ------------------------------------------------===//
+//===-- test_task_Mergeable.c -------------------------------------------===//
 //
 // OpenMP API Version 4.5 Nov 2015
 //
 // Description
 // Test case description: This test case demonstrates that mergeable clause
-// help thread avoid task creation can queing. The if condition turns out
-// false for thread 10, this enables the thread 10 acquire more tasks from
-// the queue and run resulting in higher count value.
-// 
+// combined with if clause
 //===----------------------------------------------------------------------===//
-
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -17,51 +13,80 @@
 #include "omp.h"
 #include "ompvv.h"
 #define THREADS 64
+#define MERGE 0  //  0 is for merge & 1 is for No merge
 
 
-bool IfTstPassed = true;
-int arrA[THREADS];
-int GlobalThrdId = -1;
-int count = 0;
-
-/*void WaitFunc() {
-  usleep(1000);
-}*/
-
-void WaitFunc2() {
-  usleep(1*1000*1000);
-}
-
-void foo() {
-  int ThrdId = omp_get_thread_num();
-
-#pragma omp task mergeable if(ThrdId != 10)
-  {
-    GlobalThrdId = ThrdId;
-    arrA[ThrdId] = ThrdId;
-  }
-#pragma omp critical
-  {
-    if (GlobalThrdId == 10) {
-      count++;
-    }
-  }
-  WaitFunc2();
-}
+struct Node {
+  int NodPos;
+  int MasterThrd;
+  int ExcutnThrd;
+  struct Node *Nxt;
+};
 
 
 int main() {
-  int errors = 0, TstFailed = 0;
+  int errors = 0;
   omp_set_num_threads(THREADS);
-  for (int i = 0; i < THREADS; ++i) {
-    arrA[i] = -1;
-  }
-#pragma omp parallel
-  foo();
 
-  if (count < (THREADS * 0.75)) {
-    TstFailed++;
+  // Creating Linked list
+  struct Node *Head = NULL;
+  for (int i = 0; i < 10; ++i) {
+    struct Node *temp = malloc(sizeof(struct Node));
+    temp->Nxt = NULL;
+    if (Head == NULL) {
+      Head = temp;
+    } else {
+      struct Node *tmp = Head;
+      while (tmp != NULL) {
+        if (tmp->Nxt == NULL) {
+          tmp->Nxt = temp;
+          break;
+        }
+        tmp = tmp->Nxt;
+      }
+    }
   }
-  OMPVV_TEST_AND_SET_VERBOSE(errors, (TstFailed != 0));
+
+
+#pragma omp parallel
+  {
+    struct Node *Tmp = Head;
+    int Count = 1;
+#pragma omp single
+    {
+      int OutThrdId = omp_get_thread_num();
+      while (Tmp != NULL) {
+        Count++;
+#pragma omp task mergeable if (MERGE) firstprivate(Count)
+        {
+          int IntThrdId = omp_get_thread_num();
+          Tmp->NodPos = Count;
+          Tmp->MasterThrd = OutThrdId;
+          Tmp->ExcutnThrd = IntThrdId;
+        }
+        Tmp = Tmp->Nxt;
+      }
+    }
+  }
+
+  // verifying results
+  struct Node *Tmp = Head;
+
+  int FailCount = 0;
+  while (Tmp != NULL) {
+    if (Tmp->MasterThrd != Tmp->ExcutnThrd) {
+      FailCount++;
+    }
+    Tmp = Tmp->Nxt;
+  }
+  Tmp = Head;
+  struct Node *temp = Tmp;
+  while (Tmp != NULL) {
+    temp = Tmp;
+    Tmp = Tmp->Nxt;
+    free(temp);
+  }
+
+  OMPVV_TEST_AND_SET_VERBOSE(errors, (FailCount++ != 0));
   OMPVV_REPORT_AND_RETURN(errors);
 }
