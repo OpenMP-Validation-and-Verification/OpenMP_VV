@@ -17,7 +17,7 @@
 #include <unistd.h>
 #include "omp.h"
 #include "ompvv.h"
-#define THREADS 100
+#define THREADS 64
 
 #define INIT_VAL 9999
 
@@ -32,10 +32,8 @@ void FuncABC() {
 
   {
     if (ThrdId == 0) {
-	    printf("Inside Thrd: 0\n");
       if ((GlobalVar != INIT_VAL)) {
         IfTstFailed++;
-        printf("Thrd: 0: Inside foo: GlobalVar: %d\n", GlobalVar);
       }
     } else {
       if (GlobalVar != 0) {

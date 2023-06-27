@@ -12,11 +12,7 @@
 
 #include <stdio.h>
 #include <stdbool.h>
-#ifdef _WIN32
-#include <Windows.h>
-#else
 #include <unistd.h>
-#endif
 #include "omp.h"
 #include "ompvv.h"
 
@@ -41,8 +37,9 @@ int main() {
 #pragma omp task untied if (i == (THREADS - 1))
       {
 	if (i == (THREADS - 1)) {
-          WaitFunc(); // Just to give some time for other threads to
+//          WaitFunc(); // Just to give some time for other threads to
 	  // the execution
+#pragma omp taskwait
 	  for (int j = 0; j < THREADS; ++j) {
 	    if (Arr[j] != j) {
 	      Arr[j] = j;
