@@ -20,14 +20,14 @@ int test_atomic_compare() {
 
   int arr[N];
   int errors = 0;
-  int pmax = 0, max = 0;
+  int pmax = 0, smax = 0;
 
    for(int i=0; i<N; i++){
       arr[i] = rand()%1000;
    }
    for(int i = 0; i<N; i++){ // Sets max through non-parallel methods
-      if(arr[i] > max){
-         max = arr[i];
+      if(arr[i] > smax){
+         smax = arr[i];
       }
    }
    #pragma omp parallel for shared(pmax)// Sets max using parallel for loop, using atomic to ensure max is correct
@@ -37,7 +37,7 @@ int test_atomic_compare() {
          pmax = arr[i];
       }
    }
-   OMPVV_TEST_AND_SET(errors, pmax != max);
+   OMPVV_TEST_AND_SET(errors, pmax != smax);
    return errors;
 }
 
