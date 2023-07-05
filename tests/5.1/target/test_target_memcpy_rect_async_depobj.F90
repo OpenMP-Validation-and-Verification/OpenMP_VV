@@ -41,7 +41,7 @@ CONTAINS
     errors = 0
     h = omp_get_initial_device()
     t = omp_get_default_device()
-    volume = (/ 10, 5 /)
+    volume = (/ M, N /)
     offsets = (/ 0, 0 /)
     dimensions = (/ M, N /)
     depobj_count = 1
