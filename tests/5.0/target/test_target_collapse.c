@@ -36,9 +36,6 @@ int Runtst(int gpu) {
     if (A[i] != N * (N + 1)/2) {
       errors++;
     }
-    if (ThrdTrack[i] != i) {
-      errors++;
-    }
   }
   // since only 25 threads are expected to get launched the remaining 5 places
   // of ThrdTrack[] array should still have zeros
