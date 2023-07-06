@@ -32,7 +32,7 @@ int target_update_from_discontiguous() {
     }//end target
 
 
-    #pragma omp target update from(result[0:N:2])
+    #pragma omp target update from(result[0:N/2:2])
 
   }
 
