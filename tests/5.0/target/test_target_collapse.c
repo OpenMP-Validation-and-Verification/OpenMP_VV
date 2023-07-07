@@ -21,13 +21,16 @@ int Runtst(int gpu) {
   }
   int ThrdTrack[N * N + N] = {0}; // an array of 30 elements
 #pragma omp target data map(tofrom: A, B, ThrdTrack) device(gpu)
-#pragma omp target parallel for collapse(2) shared(A, B, ThrdTrack) device(gpu)
-  for (int i = 0; i < N; ++i) {
-    for (int j = 0; j < N; ++j) {
-      int ThrdId = omp_get_thread_num();
-      ThrdTrack[ThrdId] = ThrdId;
+  {
+#pragma omp target parallel for collapse(2) shared(A, B, ThrdTrack)\
+        num_threads(N * N) device(gpu)
+    for (int i = 0; i < N; ++i) {
+      for (int j = 0; j < N; ++j) {
+        int ThrdId = omp_get_thread_num();
+        ThrdTrack[ThrdId] = ThrdId;
 #pragma omp atomic
-      A[i] += B[j];
+        A[i] += B[j];
+      }
     }
   }
 
@@ -49,7 +52,7 @@ int main() {
 
   int TotGpus = omp_get_num_devices();
   int errors = 0;
-  for (int gpu = 0; gpu <= TotGpus; ++gpu) {
+  for (int gpu = 0; gpu < TotGpus; ++gpu) {
     OMPVV_TEST_AND_SET(errors, Runtst(gpu) != 0);
   }
   OMPVV_REPORT_AND_RETURN(errors);
