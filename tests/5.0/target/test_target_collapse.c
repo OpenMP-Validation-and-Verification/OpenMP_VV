@@ -19,7 +19,6 @@ int Runtst(int gpu) {
     A[i] = 0;
     B[i] = i + 1;
   }
-  int ThrdTrack[N * N + N] = {0}; // an array of 30 elements
 #pragma omp target data map(tofrom: A, B, ThrdTrack) device(gpu)
 #pragma omp target parallel for collapse(2) shared(A, B, ThrdTrack) device(gpu)
   for (int i = 0; i < N; ++i) {
