@@ -23,8 +23,6 @@ int Runtst(int gpu) {
 #pragma omp target parallel for collapse(2) shared(A, B, ThrdTrack) device(gpu)
   for (int i = 0; i < N; ++i) {
     for (int j = 0; j < N; ++j) {
-      int ThrdId = omp_get_thread_num();
-      ThrdTrack[ThrdId] = ThrdId;
 #pragma omp atomic
       A[i] += B[j];
     }
