@@ -56,8 +56,9 @@ int test_target_pointer() {
 
 int main() {
   int errors = 0;
-  OMPVV_TEST_OFFLOADING;
-  OMPVV_TEST_AND_SET(errors, test_target_pointer() != 0)
+  int on_device = 0;
+  OMPVV_TEST_AND_SET_OFFLOADING(on_device);
+  OMPVV_TEST_AND_SET(errors, test_target_pointer() != 0 || on_device == 0)
   OMPVV_REPORT_AND_RETURN(errors);
   return errors;
 }
