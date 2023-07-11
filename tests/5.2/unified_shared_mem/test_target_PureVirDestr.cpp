@@ -65,18 +65,19 @@ class derived: public base {
 int main() {
   OMPVV_TEST_OFFLOADING;
   int *ForChild = nullptr, *ForBase = nullptr, errors = 0;
-  int TotGpus = omp_get_num_devices();
+  int TotGpus = omp_get_num_devices(), Errs;
   for (int dev = 0; dev < TotGpus; ++dev) {
+    Errs = -17;
     ForChild = reinterpret_cast<int*>(omp_target_alloc(sizeof(int), dev));
     ForBase = reinterpret_cast<int*>(omp_target_alloc(sizeof(int), dev));
 
-#pragma omp target device(dev)
+#pragma omp target device(dev) map(tofrom: Errs)
     {
       derived *d = new derived(ForBase, ForChild);
       base *b = d;
       delete b;
+      Errs = *ForChild;
     }
-    int Errs = *ForChild;
     omp_target_free(ForChild, dev);
     omp_target_free(ForBase, dev);
     OMPVV_TEST_AND_SET_VERBOSE(errors, (Errs != 1));
