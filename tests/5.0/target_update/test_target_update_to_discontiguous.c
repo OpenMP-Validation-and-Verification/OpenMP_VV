@@ -28,7 +28,7 @@ int target_update_to_discontiguous() {
       result[i] += i;
     }
 
-    #pragma omp target update to(result[0:N:2])
+    #pragma omp target update to(result[0:N/2:2])
 
     #pragma omp target map(alloc: result[0:N]) 
     {

@@ -48,7 +48,7 @@ int target_update_from_mapper() {
       s.data[i] += i ;
     }
   
-  #pragma omp target update from(s.data[0:s.len:2]) //only update even array elements
+  #pragma omp target update from(s.data[0:s.len/2:2]) //only update even array elements
   } 
   
 

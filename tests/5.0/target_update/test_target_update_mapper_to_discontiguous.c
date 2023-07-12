@@ -23,7 +23,7 @@ typedef struct newvec {
 } newvec_t;
 
 size_t i;
-int errors;
+int errors = 0;
 
 #pragma omp declare mapper(newvec_t v) map(v, v.data[0:v.len])
 
@@ -32,7 +32,6 @@ int target_update_to_mapper() {
   OMPVV_TEST_OFFLOADING;
 
   newvec_t s;
-  int errors;
 
   s.data = (double *)calloc(N,sizeof(double));
   s.len = N;
@@ -44,7 +43,7 @@ int target_update_to_mapper() {
     }
     // update even array position values from host
     // This should set them to i  
-    #pragma omp target update to(s.data[0:s.len:2])
+    #pragma omp target update to(s.data[0:s.len/2:2])
 
     //update array on the device
     #pragma omp target 
