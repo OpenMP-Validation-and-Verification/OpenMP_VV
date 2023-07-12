@@ -1,5 +1,7 @@
 //===--- test_target_memcpy_rect_async_depobj.c ----------------------------===//
 //
+//  OpenMP API Version 5.1 Nov 2020
+//
 //  Inspired from OpenMP 5.1 Examples Doc, 5.16.4 & 8.9
 //  This test utilizes the omp_target_memcpy_rect_async construct to
 //  allocate 2D memory on the device asynchronously. The construct
@@ -33,7 +35,9 @@ int test_target_memcpy_async_depobj() {
     double hostRect[N][M]; // 5x10 2D array
     double *devRect = (double *)omp_target_alloc(sizeof(double)*N*M, t);
 
-    OMPVV_TEST_AND_SET_VERBOSE(errors, devRect == NULL);
+    OMPVV_ERROR_IF(devRect == NULL, "Error: omp_target_alloc() failed");
+    if (devRect == NULL)
+      return ++errors;
 
     for(i = 0; i < N; i++){             //each index is set to number of their row
         for (j = 0; j < M; j++){
