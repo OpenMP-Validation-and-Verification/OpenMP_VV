@@ -14,7 +14,7 @@
 
 int Runtst(int gpu) {
   int *Hst_A = malloc(sizeof(int) * N);
-  int *Dev_B = (int*)omp_target_alloc(sizeof(int) * THREADS, gpu);
+  int *Dev_B = (int*)omp_target_alloc(sizeof(int) * N, gpu);
   int errors = 0;
   for (int i = 0; i < N; ++i) {
     Hst_A[i] = i;
