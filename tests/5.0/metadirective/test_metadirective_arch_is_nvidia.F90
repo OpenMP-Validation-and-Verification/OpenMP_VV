@@ -43,7 +43,7 @@ CONTAINS
     !$omp atomic write
        target_device_num = omp_get_device_num()
     !$omp end atomic
-       v3(i) = v1(i) * v2(2)
+       v3(i) = v1(i) * v2(i)
     END DO
     !$omp end metadirective
     !$omp end target
