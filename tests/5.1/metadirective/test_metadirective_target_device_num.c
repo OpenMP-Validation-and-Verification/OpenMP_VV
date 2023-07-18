@@ -23,11 +23,11 @@ int test_metadirective_target_device() {
    }
    int dev = omp_get_default_device();
 
-   #pragma omp enter data map(alloc: A)
+   #pragma omp target enter data map(alloc: A)
 
    // Expect that device_num is 0, so the array should be mapped back.
    #pragma omp metadirective \
-      when( target_device={device_num(dev)}: target defaultmap(none) map(tofrom: A)) \
+      when( target_device={device_num(dev)}: target defaultmap(none) map(always,tofrom: A)) \
       default( target defaultmap(none) map(to: A))
       for(int i = 0; i < N; i++){
          A[i] = i;
