@@ -20,7 +20,7 @@ int Runtst(int gpu) {
     Hst_A[i] = i;
   }
 
-#pragma omp target data map(tofrom: Hst_A[0:THREADS]) device(gpu)
+#pragma omp target data map(tofrom: Hst_A[0:N]) device(gpu)
   {
 #pragma omp target parallel for  is_device_ptr(Dev_B) device(gpu)
     for (int i = 0; i < N; ++i) {
@@ -31,7 +31,7 @@ int Runtst(int gpu) {
 
   // Verification
  
-  for (int i = 0; i < THREADS; ++i) {
+  for (int i = 0; i < N; ++i) {
     if (Hst_A[i] != i*i) {
       errors++;
     }
