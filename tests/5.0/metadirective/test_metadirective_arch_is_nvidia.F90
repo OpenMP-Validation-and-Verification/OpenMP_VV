@@ -16,6 +16,8 @@ PROGRAM test_metadirective_arch_is_nvidia
   USE omp_lib
   implicit none
 
+  OMPVV_TEST_OFFLOADING
+
   OMPVV_TEST_VERBOSE(test_metadirective1() .NE. 0)
 
   OMPVV_REPORT_AND_RETURN()
