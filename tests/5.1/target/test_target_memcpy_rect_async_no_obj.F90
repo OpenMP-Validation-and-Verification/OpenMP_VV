@@ -38,6 +38,7 @@ CONTAINS
     DOUBLE PRECISION, TARGET :: hostRect(M,N)
 
     errors = 0
+    fptr => null()
     h = omp_get_initial_device()
     t = omp_get_default_device()
     volume = (/ M, N /)
@@ -66,10 +67,10 @@ CONTAINS
 
     !$omp taskwait
     !$omp target is_device_ptr(devRect) device(t)
+    CALL c_f_pointer(devRect, fptr, [M*N])
     DO i=1, N
       DO j=1, M
-        CALL c_f_pointer(devRect, fptr, [M*N])
-        fptr(i*M+j) = fptr(i*M+j) * 2 ! initialize data
+        fptr((i-1)*M+j) = fptr((i-1)*M+j) * 2 ! initialize data
       END DO
     END DO
     !$omp end target
