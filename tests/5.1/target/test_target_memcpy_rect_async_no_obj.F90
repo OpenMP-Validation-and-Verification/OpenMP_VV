@@ -73,6 +73,7 @@ CONTAINS
         fptr((i-1)*M+j) = fptr((i-1)*M+j) * 2 ! initialize data
       END DO
     END DO
+    fptr => null()
     !$omp end target
 
     ! copy to host memory
