@@ -9,7 +9,6 @@
 ////===--------------------------------------------------------------------------===//
 
 #include <omp.h>
-#include <stdio.h>
 #include "ompvv.h"
 
 #define N 1024
@@ -17,28 +16,26 @@
 int taskloop_shared() {
 
   int errors = 0;
-  int i, j;
+  int s_val=0;
+  int check = -1;
 
-#pragma omp parallel
+  #pragma omp target map(tofrom: check, s_val)//map(tofrom: s_val) map(from: check)
   {
-    int s_val=0;
-    #pragma omp single
+    check = 7;
     #pragma omp taskloop shared(s_val)
-      for (i = 0; i < N; i++){
-        #pragma omp atomic
-        s_val++; 
-    }
-    #pragma omp barrier
-    #pragma omp single
-    OMPVV_TEST_AND_SET_VERBOSE(errors, s_val != N);
-  } //end parallel
+      for (int i = 0; i < N; ++i){
+        ++s_val; 
+      }
+  }
+  printf("%i check\n", check);
+  OMPVV_ERROR_IF(s_val != N, "Value of s_val should be %i, received %i", N, s_val);
+  OMPVV_TEST_AND_SET(errors, s_val != N);
   return errors;
-
 }
 
 int main() {
     int errors = 0;
     OMPVV_TEST_OFFLOADING;
-    OMPVV_TEST_AND_SET_VERBOSE(errors, taskloop_shared());
+    OMPVV_TEST_AND_SET(errors, taskloop_shared());
     OMPVV_REPORT_AND_RETURN(errors);
 }
