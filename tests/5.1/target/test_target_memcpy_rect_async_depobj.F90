@@ -39,6 +39,7 @@ CONTAINS
     INTEGER (omp_depend_kind) :: obj, obj_arr(1)
 
     errors = 0
+    fptr => null()
     h = omp_get_initial_device()
     t = omp_get_default_device()
     volume = (/ M, N /)
@@ -75,12 +76,13 @@ CONTAINS
 
     !$omp taskwait depend(depobj: obj)
     !$omp target is_device_ptr(devRect) device(t) depend(depobj: obj)
+    CALL c_f_pointer(devRect, fptr, [M*N])
     DO i=1, N
       DO j=1, M
-        CALL c_f_pointer(devRect, fptr, [M*N])
-        fptr(i*M+j) = fptr(i*M+j) * 2 ! initialize data
+        fptr((i-1)*M+j) = fptr((i-1)*M+j) * 2 ! initialize data
       END DO
     END DO
+    fptr => null()
     !$omp end target
 
     ! copy to host memory
