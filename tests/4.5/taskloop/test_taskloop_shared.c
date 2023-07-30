@@ -17,17 +17,15 @@ int taskloop_shared() {
 
   int errors = 0;
   int s_val=0;
-  int check = -1;
 
-  #pragma omp target map(tofrom: check, s_val)//map(tofrom: s_val) map(from: check)
+  #pragma omp target map(tofrom: s_val)
   {
-    check = 7;
     #pragma omp taskloop shared(s_val)
       for (int i = 0; i < N; ++i){
+        #pragma omp atomic update
         ++s_val; 
       }
   }
-  printf("%i check\n", check);
   OMPVV_ERROR_IF(s_val != N, "Value of s_val should be %i, received %i", N, s_val);
   OMPVV_TEST_AND_SET(errors, s_val != N);
   return errors;
