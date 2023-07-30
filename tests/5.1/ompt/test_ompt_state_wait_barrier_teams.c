@@ -17,7 +17,12 @@
 int test_case(){
 	int errors = 0;
 	int test_val = 0;
-	test_val = ompt_state_wait_barrier_teams;
+  #pragma omp teams
+  {
+    if (omp_get_team_num() == 0)
+	    test_val = ompt_state_wait_barrier_teams;
+  }
+  #pragma omp barrier
 	OMPVV_TEST_AND_SET_VERBOSE(errors, test_val != 22);
 	OMPVV_INFOMSG_IF(test_val == 0, "local test variable was not overwritten");
 	return errors;
