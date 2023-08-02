@@ -53,8 +53,8 @@ CONTAINS
        device_num = device_num + 1
     END DO
 
-    OMPVV_TEST_AND_SET_VERBOSE(errors, .NOT. initial_device)
-    OMPVV_ERROR_IF(.NOT. initial_device, "NVIDIA and AMD architecture not available, ran on host")
+    OMPVV_TEST_AND_SET_VERBOSE(errors, initial_device)
+    OMPVV_ERROR_IF(initial_device, "NVIDIA and AMD architecture not available, ran on host")
 
     DO i = 1, N
        OMPVV_TEST_AND_SET_VERBOSE(errors, a(i) .NE. i)

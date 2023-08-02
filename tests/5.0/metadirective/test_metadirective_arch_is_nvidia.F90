@@ -16,6 +16,8 @@ PROGRAM test_metadirective_arch_is_nvidia
   USE omp_lib
   implicit none
 
+  OMPVV_TEST_OFFLOADING
+
   OMPVV_TEST_VERBOSE(test_metadirective1() .NE. 0)
 
   OMPVV_REPORT_AND_RETURN()
@@ -43,7 +45,7 @@ CONTAINS
     !$omp atomic write
        target_device_num = omp_get_device_num()
     !$omp end atomic
-       v3(i) = v1(i) * v2(2)
+       v3(i) = v1(i) * v2(i)
     END DO
     !$omp end metadirective
     !$omp end target
