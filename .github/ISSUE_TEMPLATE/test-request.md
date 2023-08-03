@@ -3,7 +3,7 @@ name: Test request
 about: Idea for a test to be implemented
 title: ''
 labels: new test
-assignees: nolanbaker31, tmh97
+assignees: fel-cab, spophale
 
 ---
 
