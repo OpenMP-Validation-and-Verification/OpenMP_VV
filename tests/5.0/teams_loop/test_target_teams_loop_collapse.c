@@ -16,7 +16,7 @@ int main() {
   // Data Inititalize
   for (int i = 0; i < N; i++) {
     a[i] = 2*i;  // Even
-    b[i] = 2* + 1;  // Odd
+    b[i] = 2*i + 1;  // Odd
     c[i] = 0;
   }
   // Execute on target
