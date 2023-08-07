@@ -61,7 +61,7 @@ endef
 #---------------------------------------------------------------------------
 # C compilers
 #---------------------------------------------------------------------------
-CCOMPILERS?="amdclang, cc, clang, gcc, xlc, icx, nvc"
+CCOMPILERS?="amdclang, cc, clang, gcc, xlc, icx, icpx, nvc"
 C_VERSION?= echo "version unknown"
 CC?=none
 CPP?=none
@@ -93,7 +93,7 @@ ifeq ($(CC), nvc)
     CLINKFLAGS   += -O3 -mp=gpu -gpu=cc80
 endif
 
-# CRAY compilers
+# CRAY and AMD compiler wrapers
 ifeq ($(CC), cc)
   C_VERSION      = $(CC) -dumpversion
   CLINK          = $(CC)
@@ -114,7 +114,7 @@ endif
 
 # IBM XL compiler
 ifeq ($(CC), xlc)
-  C_VERSION       =  $(CC) -dumpversion
+  C_VERSION       =  echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(CC) -qversion | tail -n 1|sed 's/Version:\ //')"
   CLINK           =  $(CC)
   COFFLOADING     =  -qoffload -qsmp=omp
   C_NO_OFFLOADING =
@@ -123,10 +123,10 @@ ifeq ($(CC), xlc)
 endif
 
 # Intel ICX compiler
-ifeq ($(CC), icx)
+ifeq ($(CC), $(filter $(CC), icx icpx))
   C_VERSION       =  $(CC) -dumpversion
   CLINK           =  $(CC)
-  COFFLOADING     =  -qopenmp -fopenmp-targets=spir64 -fiopenmp
+  COFFLOADING     =  -fopenmp-targets=spir64 -fiopenmp
   C_NO_OFFLOADING =
   CFLAGS          += -lm -O3 $(COFFLOADING)
   CLINKFLAGS      += -lm -O3 $(COFFLOADING)
@@ -167,7 +167,7 @@ ifeq ($(CXX), nvc++)
     CXXLINKFLAGS   += -O3 -mp=gpu -gpu=cc80
 endif
 
-# CRAY compilers
+# CRAY and AMD compiler wrappers
 ifeq ($(CXX), CC)
   CXX_VERSION      = $(CXX) -dumpversion
   CXXLINK          = $(CXX)
@@ -188,7 +188,7 @@ endif
 
 # IBM XL compiler
 ifeq ($(CXX), xlc++)
-  CXX_VERSION       =  $(CXX) -dumpversion
+  CXX_VERSION       =  echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(CXX) -qversion | tail -n 1|sed 's/Version:\ //')"
   CXXLINK           =  $(CXX)
   CXXOFFLOADING     =  -qoffload -qsmp=omp
   CXX_NO_OFFLOADING =
@@ -200,7 +200,7 @@ endif
 ifeq ($(CXX), icpx)
   CXX_VERSION       =  $(CXX) -dumpversion
   CXXLINK           =  $(CXX)
-  CXXOFFLOADING     =  -qopenmp -fopenmp-targets=spir64 -fiopenmp
+  CXXOFFLOADING     =  -fopenmp-targets=spir64 -fiopenmp
   CXX_NO_OFFLOADING =
   CXXFLAGS          += -lm -O3 $(CXXOFFLOADING)
   CXXLINKFLAGS      += -lm -O3 $(CXXOFFLOADING)
@@ -220,7 +220,7 @@ endif
 #---------------------------------------------------------------------------
 # FORTRAN compilers
 #---------------------------------------------------------------------------
-FCOMPILERS?="amdflang, gfortran, xlf, ifx, ftn, nvfortran"
+FCOMPILERS?="amdflang, gfortran, xlf, ifx, ifort, ftn, nvfortran"
 F_VERSION?= echo "version unknown"
 
 ifeq ($(FC), amdflang)
@@ -240,9 +240,9 @@ ifeq ($(FC), nvfortran)
     FLINKFLAGS   += -O3 -mp=gpu -gpu=cc80
 endif
 
-# CRAY compilers
+# CRAY and AMD compiler wrappers
 ifeq ($(FC), ftn)
-  F_VERSION      = $(FC) -dumpversion
+  F_VERSION      = echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(FC) --version|head -n1)"
   FLINK          = cc
   FOFFLOADING    = -fopenmp
   FFLAGS         += -lm -J./ompvv -O3 $(FOFFLOADING)
@@ -253,7 +253,7 @@ endif
 ifeq ($(FC), gfortran)
   F_VERSION       =  $(FC) -dumpversion
   FLINK           =  gcc
-  FOFFLOADING     =  -foffload="-lm" -lm -fopenmp
+  FOFFLOADING     =  -foffload="-lm" -lm -fopenmp -foffload-options=-lgfortran
   F_NO_OFFLOADING =  -foffload=disable
   FFLAGS          += -O3 $(FOFFLOADING) -ffree-line-length-none -J./ompvv
   FLINKFLAGS      += -O3 $(FOFFLOADING)
@@ -262,7 +262,7 @@ endif
 
 # IBM XL compiler
 ifeq ($(FC), $(filter $(FC), xlf xlf_r))
-  F_VERSION       =  $(FC) -dumpversion
+  F_VERSION       =  echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(FC) -qversion | tail -n 1|sed 's/Version:\ //')"
   FLINK           =  xlc
   FOFFLOADING     =  -qoffload -qsmp=omp -qmoddir=./ompvv
   F_NO_OFFLOADING =
@@ -271,10 +271,10 @@ ifeq ($(FC), $(filter $(FC), xlf xlf_r))
 endif
 
 # Intel ICX compiler
-ifeq ($(FC), ifx)
-  F_VERSION       =  $(FC) -dumpversion
-  FLINK           =  ifx
-  FOFFLOADING     =  -qopenmp -fopenmp-targets=spir64 -fiopenmp
+ifeq ($(FC), $(filter $(FC), ifx ifort))
+  F_VERSION       =  echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(FC) --version|head -n1)"
+  FLINK           =  $(FC)
+  FOFFLOADING     =  -fopenmp-targets=spir64 -fiopenmp
   F_NO_OFFLOADING =
   FFLAGS          += -lm -O3 $(FOFFLOADING)
   FLINKFLAGS      += -lm -O3 $(FOFFLOADING)
