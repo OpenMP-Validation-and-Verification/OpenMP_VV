@@ -53,9 +53,8 @@ int main() {
     int ThrdId = omp_get_thread_num();
 #pragma omp task if(0)
     {
-    FuncABC();
-#pragma omp taskwait
-    GlobalVar = ThrdId;
+      FuncABC();
+      GlobalVar = ThrdId;
     }
   }
 
