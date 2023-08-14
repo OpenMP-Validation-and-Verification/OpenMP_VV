@@ -47,8 +47,10 @@ int test_get_max_teams(int offload) {
 int main() {
   int errors = 0;
   OMPVV_TEST_AND_SET(errors, test_get_max_teams(0) != 0);
+  OMPVV_REPORT(errors);
   OMPVV_TEST_OFFLOADING;
   OMPVV_TEST_AND_SET(errors, test_get_max_teams(1) != 0);
-  OMPVV_REPORT_AND_RETURN(errors);
+  OMPVV_REPORT(errors);
+  OMPVV_RETURN(errors);
   return errors;
 }
