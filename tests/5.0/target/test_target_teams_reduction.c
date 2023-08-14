@@ -25,20 +25,21 @@ int testTargetTeamsReduction() {
   for (int i = 0; i < N; i++) {
     a[i] = i;
   }
+  int num_actual_teams = 0;
   // Execute on target
-#pragma omp target teams map(to: a[0:N]) map(tofrom: sum_dev) reduction(+:total)
+#pragma omp target teams map(to: a[0:N]) map(tofrom: num_actual_teams) reduction(+:total)
   {
     for (int i = 0; i < N; i++) {
       total = total + a[i];
     }
-    sum_dev = total;
+    num_actual_teams = omp_get_num_teams();
   }
   // Validate
   int sum_host = 0;
   for (int i = 0; i < N; i++) {
     sum_host = sum_host + a[i];
   }
-  OMPVV_TEST_AND_SET_VERBOSE(errors, sum_dev != sum_host);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, total != num_actual_teams * sum_host);
   return errors;
 }
 
