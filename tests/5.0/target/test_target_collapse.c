@@ -19,8 +19,8 @@ int Runtst(int gpu) {
     A[i] = 0;
     B[i] = i + 1;
   }
-#pragma omp target data map(tofrom: A, B, ThrdTrack) device(gpu)
-#pragma omp target parallel for collapse(2) shared(A, B, ThrdTrack) device(gpu)
+#pragma omp target data map(tofrom: A, B) device(gpu)
+#pragma omp target parallel for collapse(2) shared(A, B) device(gpu)
   for (int i = 0; i < N; ++i) {
     for (int j = 0; j < N; ++j) {
 #pragma omp atomic
