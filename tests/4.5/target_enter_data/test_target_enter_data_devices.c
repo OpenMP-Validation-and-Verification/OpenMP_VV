@@ -31,13 +31,14 @@ int test_set_default_dev() {
   OMPVV_INFOMSG("initial device: %d", omp_get_initial_device());
   OMPVV_INFOMSG("default device: %d", def_dev);
 
-  int sum[num_dev], errors = 0, isHost[num_dev];
-  int h_matrix[num_dev][N], h_matrix_copy[num_dev][N];
+  // Allocate num_devices + 1 to avoid zero-sized VLA if num_devices == 0
+  int sum[num_dev+1], errors = 0, isHost[num_dev+1];
+  int h_matrix[num_dev+1][N], h_matrix_copy[num_dev+1][N];
 
   // Initialize all the matrices
   for (int dev = 0; dev < num_dev; ++dev) {
     sum[dev] = 0;
-    isHost[num_dev] = 0;
+    isHost[dev] = 0;
   }
 
   for (int dev = 0; dev < num_dev; ++dev) {
@@ -94,13 +95,14 @@ int test_device() {
   OMPVV_INFOMSG("initial device: %d", omp_get_initial_device());
   OMPVV_INFOMSG("default device: %d", omp_get_default_device());
 
-  int sum[num_dev], errors = 0, isHost[num_dev];
-  int h_matrix[num_dev][N], h_matrix_copy[num_dev][N];
+  // Allocate num_devices + 1 to avoid zero-sized VLA if num_devices == 0
+  int sum[num_dev+1], errors = 0, isHost[num_dev+1];
+  int h_matrix[num_dev+1][N], h_matrix_copy[num_dev+1][N];
 
   // Initialize all the matrices
   for (int dev = 0; dev < num_dev; ++dev) {
     sum[dev] = 0;
-    isHost[num_dev] = 0;
+    isHost[dev] = 0;
   }
   for (int dev = 0; dev < num_dev; ++dev) {
     // unstructured mapping

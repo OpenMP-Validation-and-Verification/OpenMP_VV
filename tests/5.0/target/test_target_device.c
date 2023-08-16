@@ -55,7 +55,7 @@ int test_target_device_ancestor() {
     }
     OMPVV_TEST_AND_SET_VERBOSE(errors, errors2 != 0);
 
-    OMPVV_ERROR_IF(which_device != 75, "Target region was executed on a target device. Due to ancestor device-modifier,"
+    OMPVV_ERROR_IF(which_device != 75, "Target region was executed on a target device. Due to ancestor device-modifier, "
                                          "this region should execute on a host device");
 
 
@@ -78,7 +78,7 @@ int test_target_device_device_num() {
 
     
     OMPVV_TEST_AND_SET(errors, omp_get_num_devices() <= 0);
-    OMPVV_WARNING_IF(omp_get_num_devices() <= 0, "[SKIPPED] Since no target devices were found, this test"
+    OMPVV_WARNING_IF(omp_get_num_devices() <= 0, "[SKIPPED] Since no target devices were found, this test "
                                                  "will be skipped");
 	
     if (omp_get_num_devices() > 0) {

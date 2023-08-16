@@ -69,5 +69,11 @@ int main(int argc, char *argv[]) {
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, result != seq_linked_list_sum(root));
 
+  while (root) {
+    temp = root;
+    root = root->next;
+    free(temp);
+  }
+
   OMPVV_REPORT_AND_RETURN(errors);
 }

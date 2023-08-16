@@ -438,7 +438,7 @@ report_html: $(RESULTS_JSON_OUTPUT_FILE) $(RESULTS_CSV_OUTPUT_FILE)
 	@echo " === REPORT DONE === "
 
 ifdef REPORT_ONLINE_TAG
-  # Check if the lenght is appropriate
+  # Check if the length is appropriate
   ifneq ("$(shell echo ${REPORT_ONLINE_TAG} | wc -m | grep -oh '[0-9]\+')", "10")
     $(error "REPORT_ONLINE_TAG is a 9 digit hex value. Not 9 digits")
   endif
@@ -449,7 +449,7 @@ ifdef REPORT_ONLINE_TAG
 endif
 
 ifdef REPORT_ONLINE_APPEND
-  # Check if the lenght is appropriate
+  # Check if the length is appropriate
   ifndef REPORT_ONLINE_TAG
     $(error "In order to append to an online report, it is necessary to have an REPORT_ONLINE_TAG")
   endif

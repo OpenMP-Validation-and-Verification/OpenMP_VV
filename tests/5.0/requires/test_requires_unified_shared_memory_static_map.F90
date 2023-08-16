@@ -6,7 +6,7 @@
 ! Checking for static arrays. The array is global and then accessed through 
 ! a pointer from the host and the device.
 !
-! We use the map clause on the pointer, with zero lenght array, to use the host
+! We use the map clause on the pointer, with zero length array, to use the host
 ! pointer on the device.
 !
 !===------------------------------------------------------------------------------===//

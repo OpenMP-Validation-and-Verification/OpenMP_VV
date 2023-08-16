@@ -32,7 +32,8 @@ int test_map_set_default_dev() {
   OMPVV_INFOMSG("initial device: %d", omp_get_initial_device());
   OMPVV_INFOMSG("default device: %d", def_dev);
 
-  int sum[num_dev], errors = 0;
+  // Allocate num_devices + 1 to avoid zero-sized VLA if num_devices == 0
+  int sum[num_dev+1], errors = 0;
   int* h_matrix = (int*) malloc(num_dev * N * sizeof(int));
 
   for (int dev = 0; dev < num_dev; ++dev) {
@@ -73,7 +74,8 @@ int test_map_device() {
   OMPVV_INFOMSG("initial device: %d", omp_get_initial_device());
   OMPVV_INFOMSG("default device: %d", omp_get_default_device());
 
-  int sum[num_dev], errors = 0;
+  // Allocate num_devices + 1 to avoid zero-sized VLA if num_devices == 0
+  int sum[num_dev+1], errors = 0;
   int* h_matrix = (int*) malloc(num_dev * N * sizeof(int));
 
   for (int dev = 0; dev < num_dev; ++dev) {

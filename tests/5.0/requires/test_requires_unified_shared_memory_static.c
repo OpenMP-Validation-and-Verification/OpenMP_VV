@@ -7,7 +7,7 @@
 // a pointer from the host and the device.
 //
 // We use default mapping of the pointer, which should result in mapping of a zero
-// lenght array.
+// length array.
 //
 ////===----------------------------------------------------------------------===//
 #include <omp.h>

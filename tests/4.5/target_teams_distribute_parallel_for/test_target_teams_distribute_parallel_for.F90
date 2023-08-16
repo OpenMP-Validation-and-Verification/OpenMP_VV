@@ -54,7 +54,7 @@
   
             ! Rise lack of parallelism alerts
             WRITE(msgHelper, *) "Test operated with one team.  &
-            &Parallelism of teams distribute can't be guarunteed."
+            &Parallelism of teams distribute can't be guaranteed."
             OMPVV_WARNING_IF(num_teams == 1, msgHelper);
 
             WRITE(msgHelper, *) "Test operated with one thread &

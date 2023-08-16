@@ -27,7 +27,7 @@ int test_parallel_for_allocate() {
   int successful_alloc = 0;
 
   omp_memspace_handle_t x_memspace = omp_default_mem_space;
-  omp_alloctrait_t x_traits[1] = {omp_atk_alignment, 64};
+  omp_alloctrait_t x_traits[1] = {{omp_atk_alignment, 64}};
   omp_allocator_handle_t x_alloc = omp_init_allocator(x_memspace, 1, x_traits);
 
   for (int i = 0; i < N; i++) {

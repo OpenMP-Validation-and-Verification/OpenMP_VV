@@ -17,7 +17,6 @@ int main() {
   int num_teams[OMPVV_NUM_TEAMS_DEVICE];
   int num_threads[OMPVV_NUM_THREADS_DEVICE];
   int errors[2] = {0,0};
-  int is_offloading;
 
 
   for (int x = 0; x < OMPVV_NUM_TEAMS_DEVICE; ++x) {

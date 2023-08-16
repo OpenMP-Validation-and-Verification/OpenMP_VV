@@ -41,7 +41,7 @@ int main () {
       printf("The value of the long int mapped into target region is %ld\n", long_one);
       printf("The value of the unsigned long int mapped into target region is %lu\n", unsigned_long);
       printf("The value of the long long int mapped into target region is %lld\n", long_long);
-      printf("Values of everything mapped in target region are %d, %f, %lf, %c, %hd, %hu, %ld, %lu, %lld", integer, floater, doubler, single_char,
+      printf("Values of everything mapped in target region are %d, %f, %lf, %c, %hd, %hu, %ld, %lu, %lld\n", integer, floater, doubler, single_char,
 shortie, unsigned_shortie, long_one, unsigned_long, long_long);
    }
    
