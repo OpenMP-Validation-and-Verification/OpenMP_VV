@@ -12,11 +12,10 @@
 #include <omp.h>
 #include "ompvv.h"
 
-#define N 1024*1024*512
+#define N 1024*512
 
 #pragma omp requires unified_shared_memory
 
-#pragma omp begin declare target
 class A {
   int *Ax = new int[N];
         public:
@@ -67,7 +66,6 @@ class C : public B, public A {
   }
 };
 
-#pragma omp end declare target
 
 int main() {
   OMPVV_TEST_OFFLOADING;
@@ -84,13 +82,13 @@ int main() {
       // Setting value to an array in class A through class C object
       cx.SetAx(123);
       // Verifying if the value is set
-      if ((cx.GetAx(0) != 123) && (cx.GetAx(N/2) != 123) &&
+      if ((cx.GetAx(0) != 123) || (cx.GetAx(N/2) != 123) ||
           (cx.GetAx(N-1) != 123)) {
         Errors++;
       }
       cx.SetBx(333);
       // Verifying if the value is set
-      if ((cx.GetBx(0) != 333) && (cx.GetBx(N/2) != 333) &&
+      if ((cx.GetBx(0) != 333) || (cx.GetBx(N/2) != 333) ||
           (cx.GetBx(N-1) != 333)) {
         Errors++;
       }
