@@ -19,7 +19,8 @@ int main(int argc, char** argv) {
   OMPVV_TEST_OFFLOADING;
   int count = 123, errors = 0;
 #pragma omp target data map(tofrom: count)
-#pragma omp target parallel for shared(count, IfTstPassed) default(none)
+#pragma omp target parallel for shared(count, IfTstPassed) default(none)\
+        map(tofrom: IfTstPassed)
   for (int i = 0; i < N; ++i) {
     if (count != 123) {
 #pragma omp atomic
@@ -28,7 +29,7 @@ int main(int argc, char** argv) {
   }
 
   count = 123;
-#pragma omp target parallel for default(shared)
+#pragma omp target parallel for default(shared) map(tofrom: IfTstPassed)
   for (int i = 0; i < N; ++i) {
     if (count != 123) {
 #pragma omp atomic
