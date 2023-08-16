@@ -8,13 +8,12 @@
 // 2) Testing pure virtual function on gpu
 //===----------------------------------------------------------------------===//
 
-#include<iostream>
+#include <iostream>
 #include <omp.h>
 #include "ompvv.h"
 
 
 #pragma omp requires unified_shared_memory
-#pragma omp begin declare target
 
 class Base {
   protected:
@@ -36,7 +35,6 @@ class Derived: public Base {
       return x;
     }
 };
-#pragma omp end declare target
 
 int main() {
   OMPVV_TEST_OFFLOADING;

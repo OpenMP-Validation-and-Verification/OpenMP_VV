@@ -15,7 +15,6 @@
 using namespace std;
 
 #pragma omp requires unified_shared_memory
-#pragma omp begin declare target
 class Fraction {
   int num;
   int denom;
@@ -60,7 +59,6 @@ class Fraction {
     return p;
   }
 };
-#pragma omp end declare target
 
 
 int main() {

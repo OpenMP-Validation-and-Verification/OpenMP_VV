@@ -12,10 +12,9 @@
 #include "ompvv.h"
 #include <omp.h>
 
-#define N 1024*1024*512
+#define N 1024*512
 #pragma omp requires unified_shared_memory
 
-#pragma omp begin declare target
 class A {
   int *Val = nullptr;
   public:
@@ -44,7 +43,6 @@ class A {
       delete[] Val;
     }
 };
-#pragma omp end declare target
 
 int main() {
   OMPVV_TEST_OFFLOADING;
