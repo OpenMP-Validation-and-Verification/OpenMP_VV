@@ -21,13 +21,13 @@ int testDependAddToMulSync() {
     c[i] = 0;
   }
   // Execute on target
-#pragma omp target teams loop map(tofrom: a[0:N]) depend(out: a[0:N])
+#pragma omp target teams loop map(tofrom: a[0:N]) depend(out: a[0:N]) nowait
   for (int i = 0; i < N; i++) {
     a[i] += INC;
   }
   // Dependant on Addition
 #pragma omp target teams loop map(tofrom: a[0:N], b[0:N]) depend(in: a[0:N])\
-        depend(out: b[0:N])
+        depend(out: b[0:N]) nowait
   for (int i = 0; i < N; i++) {
     b[i] = a[i]*MUL;
   }

@@ -18,7 +18,7 @@ int testDefaultMapToFrom() {
   }
 #pragma omp target teams loop defaultmap(tofrom)
   for (int i = 0; i < N; i++) {
-    host_data[i] = device_data[i];
+    host_data[i] += device_data[i];
     device_data[i] = 2*i;
   }
   // checking results
@@ -64,7 +64,7 @@ int testDefaultMapTo() {
   }
 #pragma omp target teams loop defaultmap(to)
   for (int i = 0; i < N; i++) {
-    host_data[i] = device_data[i];
+    host_data[i] += device_data[i];
   }
   // checking results
   for (int i = 0; i < N; i++) {
@@ -86,7 +86,7 @@ int testDefaultMapDefault() {
   }
 #pragma omp target teams loop defaultmap(default)
   for (int i = 0; i < N; i++) {
-    host_data[i] = device_data[i];
+    host_data[i] += device_data[i];
     device_data[i] = 2*i;
   }
   // checking results
@@ -132,7 +132,7 @@ int testDefaultMapToFromAggr() {
   }
 #pragma omp target teams loop defaultmap(tofrom:aggregate)
   for (int i = 0; i < N; i++) {
-    host_data[i] = device_data[i];
+    host_data[i] += device_data[i];
     device_data[i] = 2*i;
   }
   // checking results
@@ -190,13 +190,15 @@ int testDefaultMapToFromAggrStr() {
 */
 int testDefaultMapToFromPtr() {
   int errors = 0;
-  int *ptr = 0;
+  int *ptr[N];
 #pragma omp target teams loop defaultmap(tofrom:pointer)
   for (int i = 0; i < N; i++) {
-    ptr = (int*)0xefefefef;
+    ptr[i] = (int*)0xefefefef;
   }
   // checking results
-  OMPVV_TEST_AND_SET(errors, ptr != ((int*)0xefefefef));
+  for (int i = 0; i < N; i++) {
+    OMPVV_TEST_AND_SET(errors, ptr[i] != ((int*)0xefefefef));
+  }
   return errors;
 }
 
