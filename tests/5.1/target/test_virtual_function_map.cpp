@@ -38,12 +38,12 @@ class derived : public base {
 #pragma omp end declare target
 
 int test_case(){
+	#pragma omp target
 	int errors = 0;
 	base *bptr;
 	derived d;
 	bptr = &d;
 	int test_val = 0;
-	#pragma omp target map (tofrom: test_val)
 	test_val = bptr->test();
 	
 	return test_val;
