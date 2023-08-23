@@ -42,7 +42,7 @@ int test_otherwise() {
     OMPVV_TEST_AND_SET_VERBOSE(errors, on_host == 1);
   } else {
     OMPVV_WARNING(
-        "NO DEVICES ARE AVAILABLE, OTHERWISE CLAUSE WAS NOT ACCESSED");
+        "NO DEVICES ARE AVAILABLE, OTHERWISE CLAUSE WAS ACCESSED ON HOST");
   }
 
   return errors;
