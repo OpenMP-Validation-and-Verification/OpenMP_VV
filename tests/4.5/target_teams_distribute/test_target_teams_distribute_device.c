@@ -26,10 +26,11 @@ int main() {
   OMPVV_TEST_AND_SET_OFFLOADING(isOffloading);
 
   int num_devices = omp_get_num_devices();
-  int a[num_devices][ARRAY_SIZE];
+  // Allocate num_devices + 1 to avoid zero-sized VLA if num_devices == 0
+  int a[num_devices+1][ARRAY_SIZE];
   int b[ARRAY_SIZE];
-  int num_teams[num_devices];
-  int errors[num_devices];
+  int num_teams[num_devices+1];
+  int errors[num_devices+1];
   int sum_errors = 0;
 
   OMPVV_INFOMSG("Running tests on %d devices", num_devices);

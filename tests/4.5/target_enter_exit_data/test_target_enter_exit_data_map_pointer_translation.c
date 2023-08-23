@@ -47,7 +47,7 @@ int test_map_same_function() {
       }
     } // end target
 
-    OMPVV_INFOMSG("map(ptr) specified zero-lenght array section")
+    OMPVV_INFOMSG("map(ptr) specified zero-length array section")
 #pragma omp target map(ptr_h_array_h[:0], ptr_h_array_s[:0])
     {
       for (int i = 0; i < N; ++i) {
@@ -79,7 +79,7 @@ int test_map_same_function() {
 
 void helper_function(int *ptr_h_array_h, int *ptr_h_array_s) {
 
-    OMPVV_INFOMSG("map(ptr) specified full-lenght array section")
+    OMPVV_INFOMSG("map(ptr) specified full-length array section")
 #pragma omp target map(ptr_h_array_h[0:N], ptr_h_array_s[0:N])
     {
       for (int i = 0; i < N; ++i) {
@@ -88,7 +88,7 @@ void helper_function(int *ptr_h_array_h, int *ptr_h_array_s) {
       }
     } // end target
 
-    OMPVV_INFOMSG("map(ptr) specified zero-lenght array section")
+    OMPVV_INFOMSG("map(ptr) specified zero-length array section")
 #pragma omp target map(ptr_h_array_h[:0], ptr_h_array_s[:0])
     {
       for (int i = 0; i < N; ++i) {

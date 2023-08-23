@@ -35,7 +35,7 @@
            OMPVV_REPORT_AND_RETURN()
          END IF
          IF (.NOT. isOffloading) THEN 
-           WRITE(infoMessage, *) "Offloading is off. Mighth not be&
+           WRITE(infoMessage, *) "Offloading is off. Might not be&
            & possible to test if clause correctly "
            OMPVV_WARNING(infoMessage)
           OMPVV_REPORT_AND_RETURN()

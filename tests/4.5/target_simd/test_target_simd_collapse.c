@@ -102,7 +102,7 @@ int test_collapse2() {
   }
 
   if (num_teams == 1) {
-    OMPVV_WARNING("Test operated with one team.  Parallelism of teams distribute can't be guarunteed.");
+    OMPVV_WARNING("Test operated with one team.  Parallelism of teams distribute can't be guaranteed.");
   }
 
   free(a_mem);

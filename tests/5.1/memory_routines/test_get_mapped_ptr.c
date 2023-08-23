@@ -18,7 +18,7 @@ int test_get_mapped_ptr() {
 int * device_ptr;
 int x = 4;
 int num_devices = omp_get_num_devices(); 
-int * arr_ptrs[num_devices];
+int * arr_ptrs;
 OMPVV_INFOMSG_IF(num_devices == 0, "No devices available. ");
 // test to make sure it is NULL if no devices exist
 if (num_devices == 0) {
@@ -29,11 +29,11 @@ if (num_devices == 0) {
 }
 for (int i = 0; i < num_devices; i ++) {
 # pragma omp target enter data device(i) map(to:x)
-	arr_ptrs[i] = (int *) omp_get_mapped_ptr(&x, i);
+	arr_ptrs = (int *) omp_get_mapped_ptr(&x, i);
 
-	OMPVV_TEST_AND_SET(errors, arr_ptrs[i] == NULL);
-	OMPVV_INFOMSG_IF(arr_ptrs[i] == NULL, "get_mapped_ptr() failed on getting device pointer. ");
-	OMPVV_INFOMSG_IF(arr_ptrs[i] != NULL, "get_mapped_ptr() mapped pointer to device. ");
+	OMPVV_TEST_AND_SET(errors, arr_ptrs == NULL);
+	OMPVV_INFOMSG_IF(arr_ptrs == NULL, "get_mapped_ptr() failed on getting device pointer. ");
+	OMPVV_INFOMSG_IF(arr_ptrs != NULL, "get_mapped_ptr() mapped pointer to device. ");
 # pragma omp target exit data map(from:x)
 }
 

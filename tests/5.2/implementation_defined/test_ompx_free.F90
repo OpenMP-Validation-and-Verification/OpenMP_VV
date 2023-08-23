@@ -31,7 +31,7 @@ CONTAINS
                 INTEGER, DIMENSION(2) :: ARR_ERR
                 errors = 0
                 !$omp parallel shared(ARR_ERR) private(i)  num_threads(2)
-                !$ompx test_nonexistant
+                !$ompx test_nonexistent
                         i = omp_get_thread_num()
                         i = i + 1
                         ARR_ERR(i) = 1

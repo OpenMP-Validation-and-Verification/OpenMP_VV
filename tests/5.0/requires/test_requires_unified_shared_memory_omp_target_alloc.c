@@ -5,7 +5,7 @@
 // This test Checks for unified shared memory of an array that is allocated on 
 // the device and accessed in both host and device
 //
-// We use default mapping of pointers, which should be mappend as a zero lenght
+// We use default mapping of pointers, which should be mappend as a zero length
 // array
 //
 ////===----------------------------------------------------------------------===//

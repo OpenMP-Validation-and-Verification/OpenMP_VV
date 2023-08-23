@@ -19,7 +19,8 @@ int test_target_teams_distribute_parallel_for_devices() {
   
   int num_dev = omp_get_num_devices();
   int a[SIZE_N];
-  int isHost[num_dev];
+  // Allocate num_devices + 1 to avoid zero-sized VLA if num_devices == 0
+  int isHost[num_dev+1];
   int errors = 0;
   int i, dev;
 

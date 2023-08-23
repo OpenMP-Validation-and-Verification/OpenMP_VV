@@ -70,6 +70,7 @@ CONTAINS
     OMPVV_TEST_AND_SET_VERBOSE(errors, new_struct%s /= 1)
     OMPVV_TEST_AND_SET_VERBOSE(errors, new_struct%SA(1) /= 1)
     OMPVV_TEST_AND_SET_VERBOSE(errors, new_struct%SA(2) /= 1)
+    DEALLOCATE(B, ptr)
 
     defaultmap_with_to = errors
   END FUNCTION defaultmap_with_to
@@ -118,6 +119,7 @@ CONTAINS
     OMPVV_TEST_AND_SET_VERBOSE(errors, new_struct%s /= 10)
     OMPVV_TEST_AND_SET_VERBOSE(errors, new_struct%SA(1) /= 10)
     OMPVV_TEST_AND_SET_VERBOSE(errors, new_struct%SA(2) /= 10)
+    DEALLOCATE(B,ptr)
 
     defaultmap_with_from = errors
   END FUNCTION defaultmap_with_from
@@ -167,6 +169,7 @@ CONTAINS
     OMPVV_TEST_AND_SET_VERBOSE(errors, new_struct%s /= 11)
     OMPVV_TEST_AND_SET_VERBOSE(errors, new_struct%SA(1) /= 11)
     OMPVV_TEST_AND_SET_VERBOSE(errors, new_struct%SA(2) /= 11)
+    DEALLOCATE(B, ptr)
 
     defaultmap_with_tofrom = errors
   END FUNCTION defaultmap_with_tofrom
