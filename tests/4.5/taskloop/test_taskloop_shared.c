@@ -20,11 +20,15 @@ int taskloop_shared() {
 
   #pragma omp target map(tofrom: s_val)
   {
-    #pragma omp taskloop shared(s_val)
+    #pragma omp parallel
+    {
+      #pragma omp single
+      #pragma omp taskloop shared(s_val)
       for (int i = 0; i < N; ++i){
         #pragma omp atomic update
         ++s_val; 
       }
+    }
   }
   OMPVV_ERROR_IF(s_val != N, "Value of s_val should be %i, received %i", N, s_val);
   OMPVV_TEST_AND_SET(errors, s_val != N);
