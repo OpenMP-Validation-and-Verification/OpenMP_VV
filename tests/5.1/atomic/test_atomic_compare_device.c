@@ -17,7 +17,7 @@
 #define N 100
 
 int test_atomic_compare() {
-  OMPVV_INFOMSG("test_atomic_compare");
+  OMPVV_INFOMSG("test_atomic_compare_device");
 
   int arr[N];
   int errors = 0;
@@ -45,6 +45,7 @@ int test_atomic_compare() {
 
 int main() {
   int errors = 0;
+  OMPVV_TEST_OFFLOADING;
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_atomic_compare());
   OMPVV_REPORT_AND_RETURN(errors);
 }
