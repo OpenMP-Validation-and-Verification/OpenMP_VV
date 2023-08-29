@@ -34,7 +34,8 @@ int test_get_max_teams(int offload) {
     max_teams = omp_get_max_teams();
     #pragma omp teams 
     {
-      num_teams = omp_get_num_teams();
+      if (omp_get_team_num() == 0)
+        num_teams = omp_get_num_teams();
     }
   }
 
