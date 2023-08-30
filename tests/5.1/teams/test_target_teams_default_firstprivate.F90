@@ -36,9 +36,13 @@ CONTAINS
     not_shared = 5
     num_teams = 0
 
-    !$omp target teams default(firstprivate) map(tofrom: num_teams) shared(num_teams) num_teams(OMPVV_NUM_TEAMS_DEVICE)
+    !$omp target teams default(firstprivate) map(tofrom: num_teams,errors) shared(num_teams,errors) num_teams(OMPVV_NUM_TEAMS_DEVICE)
     IF (omp_get_team_num() .EQ. 0) then
         num_teams = omp_get_num_teams()
+        ! check first private
+        IF (not_shared .NE. 5) then
+          errors = error + 1
+        END IF
     END IF 
     DO i=1, omp_get_num_teams()
         not_shared = not_shared + 5
