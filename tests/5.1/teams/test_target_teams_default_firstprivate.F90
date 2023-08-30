@@ -41,7 +41,7 @@ CONTAINS
         num_teams = omp_get_num_teams()
         ! check first private
         IF (not_shared .NE. 5) then
-          errors = error + 1
+          errors = errors + 1
         END IF
     END IF 
     DO i=1, omp_get_num_teams()
