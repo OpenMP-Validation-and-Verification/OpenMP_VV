@@ -1,4 +1,4 @@
-//===--- test_motion_present.c --------------------------------------------------------------===//
+//===--- test_target_update_to_present.c ----------------------------------------------------===//
 //
 //  OpenMP API Version 5.1 Aug 2021
 //
@@ -21,7 +21,7 @@
 #define N 1024
 
 
-int test_motion_present() {
+int test_target_update_to_present() {
    
    int errors = 0;
 
@@ -75,6 +75,6 @@ int test_motion_present() {
 int main() {
    int errors = 0;
    OMPVV_TEST_OFFLOADING;
-   OMPVV_TEST_AND_SET_VERBOSE(errors, test_motion_present() != 0);
+   OMPVV_TEST_AND_SET_VERBOSE(errors, test_target_update_to_present() != 0);
    OMPVV_REPORT_AND_RETURN(errors);
 }           
