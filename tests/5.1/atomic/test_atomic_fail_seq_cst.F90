@@ -44,7 +44,7 @@ CONTAINS
     ELSE
       tmp = 0
       DO WHILE ( y .NE. 5 )
-        !$omp atomic compare fail(seq_cst)
+        !$omp atomic compare acquire fail(seq_cst)
         IF (y == 1) THEN
           y = 5
         END IF 
