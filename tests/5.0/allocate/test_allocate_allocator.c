@@ -15,6 +15,7 @@
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include "ompvv.h"
 
 #define N 1024
@@ -22,25 +23,40 @@
 int test_allocate_allocator() {
   int errors = 0;
 
-  int* x;
+  int n = N;
   omp_memspace_handle_t x_memspace = omp_default_mem_space;
   omp_alloctrait_t x_traits[1] = {{omp_atk_alignment, 64}};
   omp_allocator_handle_t x_alloc = omp_init_allocator(x_memspace, 1, x_traits);
+  {
+    // x and y must be in an inner scope as their lifetime must exceed the
+    // lifetime of the allocator associated with x_alloc; i.e. the lifetime
+    // must have ended before omp_destroy_allocator is called.
+    //
+    // The following two lines allocate the pointer 'x' itself
+    // (i.e. sizeof(void*) bytes) and 'y'. The omp_alloc allocates then
+    // space for the actual data stored in 'x'.
+    int* x, y[n];
+#pragma omp allocate(x,y) allocator(x_alloc)
 
+    x = (int *)omp_alloc(N * sizeof(int), x_alloc);
 
-#pragma omp allocate(x) allocator(x_alloc)
-  x = (int *)omp_alloc(N * sizeof(int), x_alloc);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, ((intptr_t) &x) % 64 != 0);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, ((intptr_t) &y) % 64 != 0);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, ((intptr_t) x) % 64 != 0);
 
-#pragma omp parallel for simd simdlen(16) aligned(x: 64)
-  for (int i = 0; i < N; i++) {
-    x[i] = i;
+#pragma omp parallel for simd simdlen(16) aligned(x, y: 64)
+    for (int i = 0; i < N; i++) {
+      x[i] = i;
+      y[i] = 3*i;
+    }
+
+    for (int i = 0; i < N; i++) {
+      OMPVV_TEST_AND_SET_VERBOSE(errors, x[i] != i);
+      OMPVV_TEST_AND_SET_VERBOSE(errors, y[i] != 3*i);
+    }
+
+    omp_free(x, x_alloc);
   }
-
-  for (int i = 0; i < N; i++) {
-    OMPVV_TEST_AND_SET_VERBOSE(errors, x[i] != i);
-  }
-
-  omp_free(x, x_alloc);
   omp_destroy_allocator(x_alloc);
 
   return errors;
