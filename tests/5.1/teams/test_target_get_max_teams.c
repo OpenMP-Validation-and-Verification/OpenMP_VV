@@ -29,9 +29,12 @@ int test_get_max_teams(int offload) {
   int max_teams;
   int num_teams = 0; // a value that is not possible for omp_get_num_teams()
 
-  #pragma omp target map(tofrom : max_teams, num_teams) if(offload)
+  #pragma omp target map(tofrom: max_teams) if(offload)
   {
     max_teams = omp_get_max_teams();
+  }
+  #pragma omp target map(tofrom : max_teams, num_teams) if(offload)
+  {
     #pragma omp teams 
     {
       if (omp_get_team_num() == 0)
