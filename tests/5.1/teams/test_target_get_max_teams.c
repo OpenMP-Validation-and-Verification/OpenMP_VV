@@ -33,7 +33,7 @@ int test_get_max_teams(int offload) {
   {
     max_teams = omp_get_max_teams();
   }
-  #pragma omp target map(tofrom : max_teams, num_teams) if(offload)
+  #pragma omp target map(tofrom : num_teams) if(offload)
   {
     #pragma omp teams 
     {
