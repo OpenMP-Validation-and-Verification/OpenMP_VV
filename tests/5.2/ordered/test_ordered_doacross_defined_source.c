@@ -39,8 +39,8 @@ int ordered_doacross(){
   #pragma omp parallel for ordered
   for(int i = 1; i < N; i++){
     a[i] = i;
-    #pragma omp ordered doacross(sink: i-2)
-    b[i-1] = a[i-2];
+    #pragma omp ordered doacross(sink: i-1)
+    b[i] = a[i-1];
     #pragma omp ordered doacross(source:i-1)
     c[i] = a[i] + b[i];
   }
