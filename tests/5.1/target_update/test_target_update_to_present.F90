@@ -31,8 +31,6 @@ PROGRAM main
     USE omp_lib
     implicit none
     
-    OMPVV_TEST_OFFLOADING
-
     OMPVV_TEST_VERBOSE(test_target_update_to_present() .ne. 0)
 
     OMPVV_REPORT_AND_RETURN()
@@ -46,6 +44,7 @@ CONTAINS
         TYPE(test_struct), TARGET :: new_struct
         INTEGER (C_INT) :: t
         TYPE (C_PTR) :: scalar_var_cptr, A_cptr, new_struct_cptr
+        LOGICAL :: isOffloadingOn
 
         scalar_var_cptr = c_loc(scalar_var)
         A_cptr = c_loc(A(1))
@@ -53,6 +52,7 @@ CONTAINS
 
         errors = 0 
         scalar_var = 1
+        isOffloadingOn = .FALSE.
         A(1) = 0
         A(51) = 50
         new_struct%s = 10
@@ -62,17 +62,22 @@ CONTAINS
         ptr(51) = 50
         ptr(52) = 51
 
+        OMPVV_TEST_AND_SET_OFFLOADING(isOffloadingOn)
+
         ! Tests OpenMP 5.1 Specification pp. 207 lines 2-4
         !$omp target update to(scalar_var, A, new_struct)
         t = omp_get_default_device()
-        IF (omp_target_is_present(scalar_var_cptr, t) .NE. 0) THEN
-            errors = errors + 1
-        END IF
-        IF (omp_target_is_present(A_cptr, t) .NE. 0) THEN
-            errors = errors + 1
-        END IF
-        IF (omp_target_is_present(new_struct_cptr, t) .NE. 0) THEN
-            errors = errors + 1
+        IF (isOffloadingOn) THEN
+            ! Skip this test if target offloading is not enabled (running on the host).
+            IF (omp_target_is_present(scalar_var_cptr, t) .NE. 0) THEN
+                errors = errors + 1
+            END IF
+            IF (omp_target_is_present(A_cptr, t) .NE. 0) THEN
+                errors = errors + 1
+            END IF
+            IF (omp_target_is_present(new_struct_cptr, t) .NE. 0) THEN
+                errors = errors + 1
+            END IF
         END IF
 
         ! Tests OpenMP 5.1 Specification pp. 207 lines 5-6
