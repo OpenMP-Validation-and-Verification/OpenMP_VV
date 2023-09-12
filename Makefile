@@ -3,16 +3,26 @@ SHELL=/bin/bash -o pipefail
 # When using make alone show the help message
 .DEFAULT_GOAL:=help
 
+
+
 ###################################################
 # OpenMP Versions. This is to support multiple
 # versions of the standard in the same testsuite
 ###################################################
 OMP_VERSION?=4.5
+TEST_LOCATION:=tests/$(OMP_VERSION)
 TEST_FOLDER_EXISTS=$(shell if [ -d tests/$(OMP_VERSION) ]; then echo "exist";fi)
 ifeq "$(TEST_FOLDER_EXISTS)" ""
   $(error The OMP_VERSION=$(OMP_VERSION) does not exist in this testsuite)
 endif
 
+###################################################
+# System specific varibles can be specified
+# in the system files sys/system/###.def
+###################################################
+ifdef REGRESSION
+	TEST_LOCATION:=regression
+endif
 
 ###################################################
 # System specific varibles can be specified
@@ -83,9 +93,9 @@ endif
 
 ifneq "$(SOURCES)" ""
 # Obtain all the possible source files for C, CPP and Fortran
-SOURCES_C := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -path "*$(SOURCES)" | grep "\.c$$")
-SOURCES_CPP := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -path "*$(SOURCES)" | grep "\.cpp$$")
-SOURCES_F := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -path "*$(SOURCES)" | grep "\(\.F90\|\.F95\|\.F03\|\.F\|\.FOR\)$$")
+SOURCES_C := $(shell find $(CURDIR)/$(TEST_LOCATION) -path "*$(SOURCES)" | grep "\.c$$")
+SOURCES_CPP := $(shell find $(CURDIR)/$(TEST_LOCATION) -path "*$(SOURCES)" | grep "\.cpp$$")
+SOURCES_F := $(shell find $(CURDIR)/$(TEST_LOCATION) -path "*$(SOURCES)" | grep "\(\.F90\|\.F95\|\.F03\|\.F\|\.FOR\)$$")
 $(info SOURCES = $(notdir $(SOURCES_C) $(SOURCES_CPP) $(SOURCES_F)))
 
 # Obtain the list of files that were previously
@@ -139,12 +149,12 @@ endif
 ifeq "$(SOURCES)" ""
 # Getting all the source files in the project
 ifdef LINK_OMPVV_LIB
-SOURCES_C := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -name "*.c")
+SOURCES_C := $(shell find $(CURDIR)/$(TEST_LOCATION) -name "*.c")
 else
-SOURCES_C := $(shell find $(CURDIR)/tests/$(OMP_VERSION) ! -name qmcpack_target_static_lib.c -name "*.c")
+SOURCES_C := $(shell find $(CURDIR)/$(TEST_LOCATION) ! -name qmcpack_target_static_lib.c -name "*.c")
 endif
-SOURCES_CPP := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -name "*.cpp")
-SOURCES_F := $(shell find $(CURDIR)/tests/$(OMP_VERSION) -name "*.F90" -o -name "*.F95" -o -name "*.F03" -o -name "*.F" -o -name "*.FOR" | grep -v "ompvv.F90")
+SOURCES_CPP := $(shell find $(CURDIR)/$(TEST_LOCATION) -name "*.cpp")
+SOURCES_F := $(shell find $(CURDIR)/$(TEST_LOCATION) -name "*.F90" -o -name "*.F95" -o -name "*.F03" -o -name "*.F" -o -name "*.FOR" | grep -v "ompvv.F90")
 
 # Find all the binary files that have been previously compiled
 TESTS_TO_RUN := $(shell test -d $(BINDIR) && \
@@ -198,6 +208,7 @@ endif
 
 .PHONY: all
 all: MessageDisplay $(ALL_DEP)
+	@echo $(TEST_LOCATION)
 	@echo "====COMPILE AND RUN DONE===="
 
 
