@@ -40,9 +40,17 @@ int test_allocate_allocator() {
 
     x = (int *)omp_alloc(N * sizeof(int), x_alloc);
 
-    OMPVV_TEST_AND_SET_VERBOSE(errors, ((intptr_t) &x) % 64 != 0);
-    OMPVV_TEST_AND_SET_VERBOSE(errors, ((intptr_t) &y) % 64 != 0);
-    OMPVV_TEST_AND_SET_VERBOSE(errors, ((intptr_t) x) % 64 != 0);
+    // OMPVV_TEST_AND_SET_VERBOSE diagnostic uses printf, which
+    // causes compiler warnigns for '% '. Hence:
+    OMPVV_TEST_AND_SET(errors, ((intptr_t) &x) % 64 != 0);
+    OMPVV_TEST_AND_SET(errors, ((intptr_t) &y) % 64 != 0);
+    OMPVV_TEST_AND_SET(errors, ((intptr_t) x) % 64 != 0);
+    OMPVV_ERROR_IF(((intptr_t) &x) % 64 != 0,
+                   "Condition (intptr_t) &x) %% 64 != 0 failed")
+    OMPVV_ERROR_IF(((intptr_t) &y) % 64 != 0,
+                   "Condition (intptr_t) &y) %% 64 != 0 failed")
+    OMPVV_ERROR_IF(((intptr_t) x) % 64 != 0,
+                   "Condition (intptr_t) x) %% 64 != 0 failed")
 
 #pragma omp parallel for simd simdlen(16) aligned(x, y: 64)
     for (int i = 0; i < N; i++) {
