@@ -43,7 +43,7 @@ int test_case(){
     bptr = &d;
     int test_val = 0;
 
-    #pragma omp target map(toform: test_val)
+    #pragma omp target map(tofrom: test_val)
     {
 	test_val = bptr->test();
     }
