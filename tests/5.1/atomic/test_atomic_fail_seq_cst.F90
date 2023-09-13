@@ -38,7 +38,7 @@ CONTAINS
     thrd = omp_get_thread_num()
     IF( thrd .EQ. 0 ) THEN
       y = 1
-      !$omp atomic write release 
+      !$omp atomic write seq_cst 
       x = 10
       !$omp end atomic
     ELSE
