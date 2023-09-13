@@ -42,6 +42,7 @@ int main() {
   // Need to check the size of structure
   Employee3 EmpPreInit;
   int Sz = sizeof(EmpPreInit);
+  int defaultDevice = omp_get_default_device();
 #pragma omp target map(tofrom: Errors, Sz)
   {
     if (Sz != sizeof(EmpPreInit)) {
@@ -58,7 +59,7 @@ int main() {
   Em1.Id = 1234;
   Em1.Age = 24;
 
-#pragma omp target device(0) map(tofrom: Errors)\
+#pragma omp target device(defaultDevice) map(tofrom: Errors)\
         map(to: RefStr, RefId, RefAge, StrSz)
   {
     for (int i = 0; i <= StrSz; ++i) {
@@ -80,7 +81,7 @@ int main() {
   RefId = 1564;
   RefAge = 34;
   StrSz = RefStr.length();
-#pragma omp target device(0) map(tofrom: Errors)\
+#pragma omp target device(defaultDevice) map(tofrom: Errors)\
         map(to: RefStr, RefId, RefAge, StrSz, Emp)
   {
     for (int i = 0; i <= StrSz; ++i) {
@@ -101,7 +102,7 @@ int main() {
   RefAge = 27;
   StrSz = RefStr.length();
 
-#pragma omp target device(0) map(tofrom: Errors)\
+#pragma omp target device(defaultDevice) map(tofrom: Errors)\
         map(to: RefStr, RefId, RefAge, StrSz)
   {
     for (int i = 0; i <= StrSz; ++i) {
@@ -121,7 +122,7 @@ int main() {
   RefAge = 37;
   StrSz = RefStr.length();
 
-#pragma omp target device(0) map(tofrom: Errors)\
+#pragma omp target device(defaultDevice) map(tofrom: Errors)\
         map(to: RefStr, RefId, RefAge, StrSz)
   {
     for (int i = 0; i <= StrSz; ++i) {
@@ -141,7 +142,7 @@ int main() {
   RefAge = 21;
   StrSz = RefStr.length();
 
-#pragma omp target device(0) map(tofrom: Errors)\
+#pragma omp target device(defaultDevice) map(tofrom: Errors)\
         map(to: RefStr, RefId, RefAge, StrSz)
   {
     for (int i = 0; i <= StrSz; ++i) {
@@ -160,7 +161,7 @@ int main() {
   RefAge = 22;
   StrSz = RefStr.length();
 
-#pragma omp target device(0) map(tofrom: Errors)\
+#pragma omp target device(defaultDevice) map(tofrom: Errors)\
         map(to: RefStr, RefId, RefAge, StrSz)
   {
     for (int i = 0; i <= StrSz; ++i) {
@@ -178,7 +179,7 @@ int main() {
   RefAge = 23;
   StrSz = RefStr.length();
 
-#pragma omp target device(0) map(tofrom: Errors)\
+#pragma omp target device(defaultDevice) map(tofrom: Errors)\
         map(to: RefStr, RefId, RefAge, StrSz)
   {
     for (int i = 0; i <= StrSz; ++i) {
@@ -197,7 +198,7 @@ int main() {
   RefId = 1122;
   RefAge = 21;
 
-#pragma omp target device(0) map(tofrom: Errors, StrPtr)\
+#pragma omp target device(defaultDevice) map(tofrom: Errors, StrPtr)\
         map(to: RefStr, RefId, RefAge, StrSz)
   {
     for (int i = 0; i <= StrSz; ++i) {
