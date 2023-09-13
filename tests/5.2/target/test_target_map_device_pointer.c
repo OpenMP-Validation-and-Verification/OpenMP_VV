@@ -44,21 +44,28 @@ int test_target_pointer() {
     p2 = (int *) 0x12345;
   }
 
-  OMPVV_ERROR_IF(errors != 0,
-                 "At least one pointer did not retain its original value");
-  OMPVV_ERROR_IF(p1 != &arr2[0],
-                 "The value of p1 was updated, p1 was not firstprivate");
-  OMPVV_ERROR_IF(p2 != NULL,
-                 "The value of p2 was updated, p2 was not firstprivate");
-  OMPVV_TEST_AND_SET(errors, (p1 != &arr2[0]) || (p2 != NULL))
+  OMPVV_TEST_OFFLOADING_PROBE;
+  OMPVV_TEST_SHARED_ENVIRONMENT_PROBE;
+
+  if (_ompvv_isOffloadingOn && !_ompvv_isSharedEnv){
+    OMPVV_ERROR_IF(errors != 0,
+                   "At least one pointer did not retain its original value");
+    OMPVV_ERROR_IF(p1 != &arr2[0],
+                   "The value of p1 was updated, p1 was not firstprivate");
+    OMPVV_ERROR_IF(p2 != NULL,
+                   "The value of p2 was updated, p2 was not firstprivate");
+    OMPVV_TEST_AND_SET(errors, (p1 != &arr2[0]) || (p2 != NULL))
+  }else{
+    OMPVV_WARNING("_ompvv_isOffloadingOn: %i, _ompvv_isSharedEnv: %i, test is invalid",
+        _ompvv_isOffloadingOn, _ompvv_isSharedEnv)
+  }
   return errors;
 }
 
 int main() {
   int errors = 0;
   int on_device = 0;
-  OMPVV_TEST_AND_SET_OFFLOADING(on_device);
-  OMPVV_TEST_AND_SET(errors, test_target_pointer() != 0 || on_device == 0)
+  OMPVV_TEST_AND_SET(errors, test_target_pointer() != 0)
   OMPVV_REPORT_AND_RETURN(errors);
   return errors;
 }
