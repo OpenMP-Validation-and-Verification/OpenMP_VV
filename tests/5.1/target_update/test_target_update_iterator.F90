@@ -2,7 +2,7 @@
 !
 !  OpenMP API Version 5.1 Aug 2021
 !
-!  This test usese the target update directive with the iterator clause
+!  This test uses the target update directive with the iterator clause
 !  to update the iterative values.
 !
 !  This example has been adapted from the 5.2 OpenMP Examples document,
