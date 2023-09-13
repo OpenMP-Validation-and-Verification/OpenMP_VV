@@ -28,8 +28,8 @@ int test_allocate_allocator() {
   omp_alloctrait_t x_traits[1] = {{omp_atk_alignment, 64}};
   omp_allocator_handle_t x_alloc = omp_init_allocator(x_memspace, 1, x_traits);
   {
-    // x and y must be in an inner scope as their lifetime must exceed the
-    // lifetime of the allocator associated with x_alloc; i.e. the lifetime
+    // x and y must be in an inner scope as their lifetime must not exceed the
+    // lifetime of the allocator associated with x_alloc; i.e. their lifetime
     // must have ended before omp_destroy_allocator is called.
     //
     // The following two lines allocate the pointer 'x' itself
