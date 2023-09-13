@@ -50,7 +50,6 @@ CONTAINS
         TYPE(test_struct), INTENT(IN), POINTER :: s
         INTEGER :: i
         s%len = N
-        ALLOCATE(s%data(N))
         DO i = 1, s%len
             s%data(i) = i + 1
         END DO
