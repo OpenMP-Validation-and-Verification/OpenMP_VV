@@ -45,7 +45,6 @@ int taskloop_simd_shared() {
 
 int main() {
     int errors = 0;
-    OMPVV_TEST_OFFLOADING;
     OMPVV_TEST_AND_SET_VERBOSE(errors, taskloop_simd_shared());
     OMPVV_REPORT_AND_RETURN(errors);
 }
