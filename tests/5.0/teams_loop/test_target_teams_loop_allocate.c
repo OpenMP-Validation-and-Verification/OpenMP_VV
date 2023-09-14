@@ -1,3 +1,11 @@
+//===-------------- test_target_teams_loop_allocate.c---------------------===//
+//
+// OpenMP API Version 5.0 Nov 2018
+// The tests in this file tests 'teams loop' construct coupled with map()
+// clause in combination with different allocator types
+//
+//===----------------------------------------------------------------------===//
+
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>

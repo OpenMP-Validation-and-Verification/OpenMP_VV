@@ -1,3 +1,12 @@
+//===----------------- test_target_teams_loop_defaultmap.c-----------------===//
+//
+// OpenMP API Version 5.0 Nov 2018
+// The tests in this file tests 'teams loop' construct coupled with defaultmap()
+// clause.
+// all the tests target the device offload using target construct
+//
+//===----------------------------------------------------------------------===//
+
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -62,7 +71,7 @@ int testDefaultMapTo() {
     device_data[i] = i;
     host_data[i] = 0;
   }
-#pragma omp target teams loop defaultmap(to)
+#pragma omp target teams loop defaultmap(to) map(from: host_data)
   for (int i = 0; i < N; i++) {
     host_data[i] += device_data[i];
   }
@@ -130,7 +139,7 @@ int testDefaultMapToFromAggr() {
     device_data[i] = i;
     host_data[i] = 0;
   }
-#pragma omp target teams loop defaultmap(tofrom:aggregate)
+#pragma omp target teams loop defaultmap(tofrom:aggregate) map(from: host_data)
   for (int i = 0; i < N; i++) {
     host_data[i] += device_data[i];
     device_data[i] = 2*i;
@@ -213,7 +222,8 @@ int testDefaultMapAlloc() {
     device_data[i] = i;
     host_data[i] = 0;
   }
-#pragma omp target teams loop defaultmap(alloc) map(to: device_data[0:N])
+#pragma omp target teams loop defaultmap(alloc) map(to: device_data[0:N])\
+         map(from: host_data)
   for (int i = 0; i < N; i++) {
     host_data[i] = device_data[i];
   }
