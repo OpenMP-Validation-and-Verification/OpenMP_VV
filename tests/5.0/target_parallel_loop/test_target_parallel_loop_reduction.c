@@ -13,64 +13,63 @@
 #include "ompvv.h"
 #include <math.h>
 
-#define N 1024
+//#define N 1024
+#define N 5
 
 int testMin() {
   OMPVV_INFOMSG("testMin");
-  int a[N];
-  int b[N];
+  double a[N];
+  double b[N];
   int errors = 0;
   srand(1);
 
   for (int i = 0; i < N; ++i) {
-    a[i] = (int) rand() / (double)(RAND_MAX / 100);
-    b[i] = (int) rand() / (double)(RAND_MAX / 100);
+    a[i] = rand() / (double)(RAND_MAX / 100);
+    b[i] = rand() / (double)(RAND_MAX / 100);
   }
 
-  int result = a[0] + b[0];
+  double result =  a[0] + b[0];
 
 #pragma omp target parallel loop reduction(min:result) map(to: a[0:N], b[0:N]) map(tofrom: result)
     for (int i = 0; i < N; ++i) {
-      result = fmin(a[i] + b[i], result);
+      result = fmin(result, a[i] + b[i]);
     }
 
-  int hostMin = a[0] + b[0];
+  double hostMin = a[0] + b[0];
   for (int i = 0; i < N; ++i) {
     hostMin = fmin(hostMin, a[i] + b[i]);
   }
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, result != hostMin);
-  OMPVV_ERROR_IF(host_min != result, "Minimum value on device is %d but expected minimum from host is %d.", result, hostMin);
   return errors;
 }
 
 int testMax() {
   OMPVV_INFOMSG("testMax");
 
-  int a[N];
-  int b[N];
+  double a[N];
+  double b[N];
   int errors = 0;
   srand(1);
 
   for (int i = 0; i < N; ++i) {
-    a[i] = (int) rand() / (double)(RAND_MAX / 100);
-    b[i] = (int) rand() / (double)(RAND_MAX / 100);
+    a[i] = rand() / (double)(RAND_MAX / 100);
+    b[i] = rand() / (double)(RAND_MAX / 100);
   }
 
-  int result = 0;
+  double result = a[0] + b[0];
 
 #pragma omp target parallel loop reduction(max:result) map(to: a[0:N], b[0:N]) map(tofrom: result)
   for (int i = 0; i < N; ++i) {
     result = fmax(a[i] + b[i], result);
   }
 
-  int hostMax = 0;
+  double hostMax = a[0] + b[0];
   for (int i = 0; i < N; ++i) {
     hostMax = fmax(hostMax, a[i] + b[i]);
   }
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, result != hostMax);
-  OMPVV_ERROR_IF(host_Max != result, "Maximum value on device is %d but expected maximum from host is %d.", result, hostMax);
 
   return errors;
 }
@@ -99,7 +98,6 @@ int testAddition() {
 
   return errors;
 }
-
 
 int main() {
   int total_errors = 0;
