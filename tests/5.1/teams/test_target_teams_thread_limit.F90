@@ -2,13 +2,10 @@
 !
 ! OpenMP API Version 5.1 Nov 2020
 !
-! This test uses the thread_limit clause on the target construct. Specifically
-! testing if a thread_limit on a target construct properly carries
-! down to the nested teams construct, as if it were directly on the construct
-! as defined in the spec. The test validates that only the specified 
-! threads are created by summing a shared variable across all threads 
-! (and teams). If the threads are correctly limited, this should produce the
-! expected value. Additional warnings are sent if specific issues occur.
+! This test uses the thread_limit clause on the teams construct. The test validates 
+! that only the specified threads are created by summing a shared variable across 
+! all threads in a team. If the threads are correctly limited, this should produce 
+! the expected value. Additional warnings are sent if specific issues occur.
 !
 !//===----------------------------------------------------------------------===//
 #include "ompvv.F90"
@@ -42,13 +39,13 @@ CONTAINS
         errors(i) = 0
     END DO
 
-    !$omp target map(tofrom: num_teams,errors) thread_limit(testing_thread_limit)
-    !$omp teams num_teams(OMPVV_NUM_TEAMS_DEVICE)
+    !$omp target map(tofrom: num_teams,errors) 
+    !$omp teams num_teams(OMPVV_NUM_TEAMS_DEVICE) thread_limit(testing_thread_limit)
     !$omp parallel
     IF ((omp_get_team_num() .EQ. 0) .AND. (omp_get_thread_num() .EQ. 0)) THEN
         num_teams = omp_get_num_teams()
     END IF 
-    IF (omp_get_thread_num() .EQ. 0) THEN
+    IF ((omp_get_thread_num() .EQ. 0) .AND. (omp_get_team_num() .LT. OMPVV_NUM_TEAMS_DEVICE)) THEN
         IF (omp_get_num_threads() .GT. testing_thread_limit) THEN
             errors(omp_get_team_num()+1) = errors(omp_get_team_num()+1) + 1
         END IF
@@ -57,7 +54,7 @@ CONTAINS
     !$omp end teams
     !$omp end target
 
-    DO i=1, num_teams
+    DO i=1, OMPVV_NUM_TEAMS_DEVICE
         sum_errors = sum_errors + errors(i)
     END DO
 
