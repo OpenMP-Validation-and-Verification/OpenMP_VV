@@ -15,7 +15,7 @@
 
 
 int Runtst(int gpu) {
-  int *A = malloc(sizeof(int) * ELMTS), errors = 0;
+  int *A = (int*) malloc(sizeof(int) * ELMTS), errors = 0;
   if (A == NULL) {
     OMPVV_ERROR("Memory allocation failed");
     return 1;
