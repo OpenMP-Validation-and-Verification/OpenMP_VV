@@ -26,10 +26,9 @@ int test_atomic_fail_acquire() {
       int thrd = omp_get_thread_num();
        if (thrd == 0) {
           y = 1;
-          #pragma omp atomic write release // or seq_cst
+          #pragma omp atomic write seq_cst
           x = 10;
        } else {
-          int tmp = 0;
           while (y != 5) {
             #pragma omp atomic compare seq_cst fail(acquire)
             if(y == 1){

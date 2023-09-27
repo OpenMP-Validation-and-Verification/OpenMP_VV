@@ -26,7 +26,6 @@ CONTAINS
   INTEGER FUNCTION test_atomic_fail_acquire()
     INTEGER:: errors, x, y
     INTEGER:: thrd
-    INTEGER:: tmp
 
     errors = 0
     x = 0
@@ -34,15 +33,14 @@ CONTAINS
 
     OMPVV_INFOMSG("test_atomic_fail_acquire")
 
-    !$omp parallel num_threads(2) private(thrd, tmp)
+    !$omp parallel num_threads(2) private(thrd)
     thrd = omp_get_thread_num()
     IF( thrd .EQ. 0 ) THEN
       y = 1
-      !$omp atomic write release 
+      !$omp atomic write seq_cst 
       x = 10
       !$omp end atomic
     ELSE
-      tmp = 0
       DO WHILE ( y .NE. 5 )
         !$omp atomic compare seq_cst fail(acquire)
         IF (y == 1) THEN
