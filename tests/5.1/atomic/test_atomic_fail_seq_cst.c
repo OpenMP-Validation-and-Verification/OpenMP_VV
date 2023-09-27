@@ -29,7 +29,6 @@ int test_atomic_fail_seq_cst() {
           #pragma omp atomic write seq_cst
           x = 10;
        } else {
-          int tmp = 0;
           while (y != 5) {
             #pragma omp atomic compare acquire fail(seq_cst)
             if(y == 1){
