@@ -220,7 +220,7 @@ endif
 #---------------------------------------------------------------------------
 # FORTRAN compilers
 #---------------------------------------------------------------------------
-FCOMPILERS?="amdflang, gfortran, xlf, ifx, ifort, ftn, nvfortran"
+FCOMPILERS?="amdflang, gfortran, xlf, xlf_r, ifx, ifort, ftn, nvfortran"
 F_VERSION?= echo "version unknown"
 
 ifeq ($(FC), amdflang)
