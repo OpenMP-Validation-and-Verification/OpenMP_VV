@@ -12,8 +12,8 @@
 #define N 1024*32
 
 int Runtst(int gpu) {
-  int *A = malloc(sizeof(int) * N);
-  int *B = malloc(sizeof(int) * N);
+  int *A = (int *) malloc(sizeof(int) * N);
+  int *B = (int *) malloc(sizeof(int) * N);
   int errors = 0;
   for (int i = 0; i < N; ++i) {
     A[i] = i;

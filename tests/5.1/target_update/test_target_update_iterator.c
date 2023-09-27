@@ -26,7 +26,7 @@ typedef struct test_struct{
 
 void init(struct test_struct *s ){
     s->len = N;
-    s->data = malloc(sizeof(int) * N);
+    s->data = (int *) malloc(sizeof(int) * N);
     for(size_t i = 0; i < s->len; i++){
         s->data[i] = i;
     }
