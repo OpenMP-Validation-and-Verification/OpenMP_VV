@@ -13,8 +13,7 @@
 #include "ompvv.h"
 #include <math.h>
 
-//#define N 1024
-#define N 5
+#define N 1024
 
 int testMin() {
   OMPVV_INFOMSG("testMin");
