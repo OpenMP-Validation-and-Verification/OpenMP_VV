@@ -1,3 +1,11 @@
+//===-------------- test_target_teams_loop_is_device_ptr.c----------------===//
+//
+// OpenMP API Version 5.0 Nov 2018
+// The tests in this file tests 'teams loop' construct coupled with is_device_ptr
+// & map() clause
+//
+//===----------------------------------------------------------------------===//
+
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
