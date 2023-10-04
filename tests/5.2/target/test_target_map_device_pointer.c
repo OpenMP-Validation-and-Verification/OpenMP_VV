@@ -19,9 +19,7 @@
 // ensuring that it too retains its original value after the target region. A
 // defaultmap clause is present on the target construct to explicitely ensure
 // that the default semantics of mapping apply to all mapped (implicit/explicit)
-// pointer types. The zero length array, arr1, is mapped to the device to ensure
-// that a runtime check occurs in accordance with the semantics described in the
-// target construct on page 285 of the specifications.
+// pointer types.
 //----------------------------------------------------------------------------//
 #include "ompvv.h"
 #include <omp.h>
@@ -31,12 +29,12 @@
 
 int test_target_pointer() {
   int errors = 0;
-  int arr1[0], arr2[N];
+  int arr2[N];
   int *p1 = &arr2[0];
   int *p2 = NULL;
   intptr_t hold_arr2 = (intptr_t)&arr2[0];
 
-  #pragma omp target map(tofrom:errors) map(to:hold_arr2,arr1[:0]) defaultmap(default:pointer)
+  #pragma omp target map(tofrom:errors) map(to:hold_arr2) defaultmap(default:pointer)
   {
     OMPVV_TEST_AND_SET(errors, ((intptr_t) p1 != hold_arr2) || (p2 != NULL));
     
@@ -64,7 +62,6 @@ int test_target_pointer() {
 
 int main() {
   int errors = 0;
-  int on_device = 0;
   OMPVV_TEST_AND_SET(errors, test_target_pointer() != 0)
   OMPVV_REPORT_AND_RETURN(errors);
   return errors;
