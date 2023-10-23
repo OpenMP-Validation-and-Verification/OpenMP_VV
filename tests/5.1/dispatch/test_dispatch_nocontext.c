@@ -41,6 +41,7 @@ void add_two(int *arr){
 
 int test_wrapper() { 
    errors = 0;
+   int err_ar[2] = {0, 0};
    bool nocontext_arg;
    add(arr);
    for(i = 0; i < N; i++){
@@ -52,8 +53,9 @@ int test_wrapper() {
       add(arr);
    
    for(i = 0; i < N; i++){
-      OMPVV_TEST_AND_SET(errors, arr[i] != i+1);
+      OMPVV_TEST_AND_SET(err_ar[0], (arr[i] != i+1) || (arr[i] != i+2));
    }
+   errors += err_ar[0];
    OMPVV_ERROR_IF(errors > 0, "Dispatch w/ nocontext true is not working properly");
 
    nocontext_arg = false;
@@ -61,9 +63,12 @@ int test_wrapper() {
       add(arr);
 
    for(i = 0; i < N; i++){
-      OMPVV_TEST_AND_SET(errors, arr[i] != i+2);
+      OMPVV_TEST_AND_SET(err_ar[1], (arr[i] != i+1) || (arr[i] != i+2));
    }
+   errors += err_ar[1];
    OMPVV_ERROR_IF(errors > 0, "Dispatch w/ nocontext false is not working properly");
+   OMPVV_WARNING_IF(errors > 0, "Dispatch is either not working or was not considered" 
+                    " by the implementation as part of the context selector.");
    return errors;
 }
 
