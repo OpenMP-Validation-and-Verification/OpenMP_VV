@@ -21,7 +21,6 @@
 
 #define N 1024
 
-int arr[N]; // implicit map array 
 int errors;
 int i = 0;
 
@@ -35,6 +34,9 @@ void add(int *arr){
 }
 
 void add_two(int *arr){
+    if (arr == NULL){
+      return;
+    }
     #pragma omp target parallel for
     for (int i = 0; i < N; i++){
         arr[i] = i+3; // Variant function adds 3 to array values
@@ -42,6 +44,7 @@ void add_two(int *arr){
 }
 
 int test_wrapper() { 
+    int *arr = (int*)malloc(sizeof(int)*N); // implicit map array 
     errors = 0;
     add(arr);
     for(i = 0; i < N; i++){
@@ -49,6 +52,7 @@ int test_wrapper() {
     } 
     OMPVV_ERROR_IF(errors > 0, "Base function is not working properly");
 
+    #pragma omp target enter data map(to:arr[0:N])
     #pragma omp dispatch
         add(arr);  
         /* array should be converted to device ptr; i.e. spec states since it is not a device ptr, "the argument
@@ -61,6 +65,8 @@ int test_wrapper() {
             errors++;
         }
     }
+    #pragma omp target exit data map(delete:arr[0:N])
+    free(arr);
     OMPVV_ERROR_IF(errors > 0, "Dispatch w/ depend is not working properly");
     return errors;
 }
