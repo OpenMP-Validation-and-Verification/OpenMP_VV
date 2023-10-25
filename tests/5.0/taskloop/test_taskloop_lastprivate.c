@@ -1,6 +1,6 @@
 //-------------------------------- test_taskloop_lastprivate.c ------------------------------------------------//
 //
-// OpenMP API Version 5.0 August 2023
+// OpenMP API Version 5.0 August 2018
 //
 // This test checks the 'taskloop' directive with the 'lastprivate' clause specified.
 // The 'taskloop' construct parallelize loops with independent iterations by creating tasks. 
