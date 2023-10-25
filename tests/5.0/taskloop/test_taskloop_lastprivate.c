@@ -29,9 +29,10 @@ int test_taskloop_lastprivate() {
     {
         #pragma omp single
         {
-            #pragma omp taskloop lastprivate(val)
+            #pragma omp taskloop lastprivate(val) 
             for (int i = 0; i < NUM_TASKS; i++) {
-                val = val + i;
+                val = i;
+                //val = val + i;
                 task_vals[i] = val; 
             }
         }
