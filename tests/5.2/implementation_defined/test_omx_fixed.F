@@ -1,44 +1,55 @@
-C===-test_ompx.F90-===/
-C
-C
-C OpenMP API Version 5.2 July 2022
-C
-C Testing 'omx' sentinel
-C
-C 'omx' sentinel is reserved for
-C implementation-defined extensions to
-C fixed source form OpenMP directives.
-C===-------------------------------===//
-#        include "ompvv.F90"
+!===-test_ompx.F-===/
+!
+!
+! OpenMP API Version 5.2 July 2022
+!
+! Testing 'omx' sentinel
+!
+! 'omx' sentinel is reserved for
+! implementation-defined extensions to
+! fixed source form OpenMP directives.
+!===-------------------------------===//
+#include "ompvv.F"
 
-#        define N 1024
-        PROGRAM test_omx
-                use iso_fortran_env
-                use ompvv_lib
-                use omp_lib
-                implicit none
+#define N 1024
+      PROGRAM test_omx
+        use iso_fortran_env
+        use ompvv_lib
+        use omp_lib
+        implicit none
+        INTEGER res
+        LOGICAL t
 
-                OMPVV_TEST_OFFLOADING
 
-                OMPVV_TEST_VERBOSE(test_fixed_omx() .ne. 2)
+        !OMPVV_TEST_OFFLOADING
+        call test_offloading("test_ompx.F", __LINE__)
 
-                OMPVV_REPORT_AND_RETURN()
-        CONTAINS
-                INTEGER FUNCTION test_fixed_omx() 
-                        INTEGER :: i
-                        INTEGER :: n
-                        INTEGER :: errors
-                        INTEGER, DIMENSION(2) :: ARR_ERR
-                        errors = 0
-                        !$omp parallel shared(ARR_ERR) private(i)  num_threads(2)
-                        !$omx test_nonexistant_omx
-                                i = omp_get_thread_num()
-                                i = i + 1
-                                ARR_ERR(i) = 1
-                        !$omp end parallel
-                        do n = 1,2
-                                errors = errors + ARR_ERR(n)
-                        end do
-                        test_fixed_omx = errors
-                END FUNCTION test_fixed_omx
-        END PROGRAM test_omx
+        res = test_fixed_omx()
+        t = res .NE. 2
+        !OMPVV_TEST_VERBOSE(res .NE. 2)
+        call test_error_verbose(t,"condition","test_ompx.F",__LINE__)
+
+        !OMPVV_REPORT_AND_RETURN()
+        res = report_and_set_errors("test_ompx.F")
+        IF( res .NE. 0) THEN
+          stop EXIT_FAILURE
+        ENDIF
+      CONTAINS
+        INTEGER FUNCTION test_fixed_omx() 
+          INTEGER :: i
+          INTEGER :: n
+          INTEGER :: errors
+          INTEGER, DIMENSION(2) :: ARR_ERR
+          errors = 0
+!$omp parallel shared(ARR_ERR) private(i)  num_threads(2)
+!$omx test_nonexistant_omx
+          i = omp_get_thread_num()
+          i = i + 1
+          ARR_ERR(i) = 1
+!$omp end parallel
+          do n = 1,2
+            errors = errors + ARR_ERR(n)
+          end do
+          test_fixed_omx = errors
+        END FUNCTION test_fixed_omx
+      END PROGRAM test_omx
