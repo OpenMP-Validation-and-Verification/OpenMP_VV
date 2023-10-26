@@ -3,8 +3,12 @@
 #  USAGE: ./run_test.sh [--env name val ...] <APP> [<LOG>].
 #   --env name val: set environment variable name to the given value
 #    <LOG>: if present then it will output of the tests in LOG.
+#  Added env SOLLVE_TIMELIMIT to control the timeout value through env
 
 export OMP_THREAD_LIMIT=$(lscpu -p | grep -c "^[0-9]")
+
+# Providing option to set time limit through SOLLVE_TIMELIMIT env
+export SOLLVE_TIMELIMIT=${SOLLVE_TIMELIMIT:-60}
 
 function report ()
 {
@@ -46,7 +50,7 @@ elif [ ! -f "$1" ]; then
 fi
 
 app=$1
-output=$(for ((idx=0; $idx < ${#env_data[*]}; idx=$((idx+2)))); do export "${env_data[$idx]}"="${env_data[$((idx+1))]}"; done; timeout 60s "$app" 2>&1)
+output=$(for ((idx=0; $idx < ${#env_data[*]}; idx=$((idx+2)))); do export "${env_data[$idx]}"="${env_data[$((idx+1))]}"; done; timeout $SOLLVE_TIMELIMIT "$app" 2>&1)
 status=$?
 output=$(printf '%s\n' "${output}" | uniq)
 
