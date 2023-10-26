@@ -1,11 +1,11 @@
 //----------------------------------- test_taskloop_firstprivate.c ----------------------------------------//
 //
-// OpenMP API Version 4.5 November 2018
+// OpenMP API Version 5.0 November 2018
 //
 // This test checks the taskloop directive with the 'firstprivate' clause specified.
 // The 'taskloop' construct parallelize loops with independent iterations by creating tasks. 
 // It allows for efficient parallel execution of loop iterations by distributing them among multiple threads. 
-// The 'firstprivate' clause ensures that each task should have private copies and initialized                                                            // private copies with the value from the master thread. 
+// The 'firstprivate' clause ensures that each task should have private copies and initialized                          // private copies with the value from the master thread. 
 // -------------------------------------------------------------------------------------------------------//
 
 #include <stdio.h>
