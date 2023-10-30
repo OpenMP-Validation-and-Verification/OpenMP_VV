@@ -28,10 +28,10 @@ int testTargetTeamsAllocateCl() {
     c[i] = 0;
   }
   // Execute on target
-#pragma omp target teams map(to: a[0:N], b[0:N]) map(from: c[0:N]) \
+#pragma omp target teams loops map(to: a[0:N], b[0:N]) map(from: c[0:N]) \
         uses_allocators(omp_cgroup_mem_alloc) \
         allocate(omp_low_lat_mem_alloc: local) private(local)
-  #pragma omp loop private(local)
+//  #pragma omp loop private(local)
   for (int i = 0; i < N; i++) {
     local = a[i] + b[i];
     c[i] = local;
@@ -60,7 +60,7 @@ int testTargetTeamsAllocateArrayDefaultAlloc() {
   // Execute on target
 #pragma omp target teams loop map(to: a[0:N], b[0:N]) map(from: c[0:N])\
         uses_allocators(omp_default_mem_alloc)\
-        allocate(omp_default_mem_alloc: local) private(local)
+        allocate(omp_default_mem_alloc: local) firstprivate(local)
   for (int i = 0; i < N; i++) {
     local[i] = a[i] + b[i];
     c[i] = local[i];
@@ -89,7 +89,7 @@ int testTargetTeamsAllocateArrayLargeCapAlloc() {
   // Execute on target
 #pragma omp target teams loop map(to: a[0:N], b[0:N]) map(from: c[0:N])\
         uses_allocators(omp_large_cap_mem_alloc)\
-        allocate(omp_large_cap_mem_alloc: local) private(local)
+        allocate(omp_large_cap_mem_alloc: local) firstprivate(local)
   for (int i = 0; i < N; i++) {
     local[i] = a[i] + b[i];
     c[i] = local[i];
@@ -145,7 +145,7 @@ int testTargetTeamsAllocateArrayHighBWAlloc() {
   // Execute on target
 #pragma omp target teams loop map(to: a[0:N], b[0:N]) map(from: c[0:N])\
         uses_allocators(omp_high_bw_mem_alloc)\
-        allocate(omp_high_bw_mem_alloc: local) private(local)
+        allocate(omp_high_bw_mem_alloc: local) firstprivate(local)
   for (int i = 0; i < N; i++) {
     local[i] = a[i] + b[i];
     c[i] = local[i];
@@ -174,7 +174,7 @@ int testTargetTeamsAllocateArrayLowLatAlloc() {
   // Execute on target
 #pragma omp target teams loop map(to: a[0:N], b[0:N]) map(from: c[0:N])\
         uses_allocators(omp_low_lat_mem_alloc)\
-        allocate(omp_low_lat_mem_alloc: local) private(local)
+        allocate(omp_low_lat_mem_alloc: local) firstprivate(local)
   for (int i = 0; i < N; i++) {
     local[i] = a[i] + b[i];
     c[i] = local[i];
@@ -203,7 +203,7 @@ int testTargetTeamsAllocateArrayCGroupAlloc() {
   // Execute on target
 #pragma omp target teams loop map(to: a[0:N], b[0:N]) map(from: c[0:N])\
         uses_allocators(omp_cgroup_mem_alloc)\
-        allocate(omp_cgroup_mem_alloc: local) private(local)
+        allocate(omp_cgroup_mem_alloc: local) firstprivate(local)
   for (int i = 0; i < N; i++) {
     local[i] = a[i] + b[i];
     c[i] = local[i];
@@ -232,7 +232,7 @@ int testTargetTeamsAllocateArrayPTeamAlloc() {
   // Execute on target
 #pragma omp target teams loop map(to: a[0:N], b[0:N]) map(from: c[0:N])\
         uses_allocators(omp_pteam_mem_alloc)\
-        allocate(omp_pteam_mem_alloc: local) private(local)
+        allocate(omp_pteam_mem_alloc: local) firstprivate(local)
   for (int i = 0; i < N; i++) {
     local[i] = a[i] + b[i];
     c[i] = local[i];
