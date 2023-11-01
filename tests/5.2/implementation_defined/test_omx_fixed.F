@@ -1,13 +1,16 @@
 !===-test_ompx.F-===/
 !
-!
 ! OpenMP API Version 5.2 July 2022
 !
 ! Testing 'omx' sentinel
 !
-! 'omx' sentinel is reserved for
-! implementation-defined extensions to
+! 'omx' sentinel is reserved for implementation-defined extensions to
 ! fixed source form OpenMP directives.
+! TODO: this program uses ompvv_lib form ompvv.F, but it was not
+! possible to use the macros defined there and used in most tests of the
+! testsuit. The macros were left as commands in case in the future
+! compilers of the ompvv.F is fixed to make the macros usable.
+! 
 !===-------------------------------===//
 #include "ompvv.F"
 
@@ -22,6 +25,9 @@
 
 
         !OMPVV_TEST_OFFLOADING
+        ! Not using the macros, since tested compilers
+        ! do not support them
+        ! __FILE__ doesn't work
         call test_offloading("test_ompx.F", __LINE__)
 
         res = test_fixed_omx()

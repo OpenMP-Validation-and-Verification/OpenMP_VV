@@ -1,8 +1,11 @@
-!===------ ompvv.F90 ------------------ OMPVV HEADER FILE FORTRAN --------===//
+!===------ ompvv.F ------------- OMPVV HEADER FILE FORTRAN -----===//
 !
 ! Header file for OMP Validation and verification test suite
+! TODO: Most of the macros are not used. It was not found a way to
+! make the compilers accept them as they were developed for the
+! ompvv.F90 from which this filed was copied and modified from
 !
-!===----------------------------------------------------------------------===//
+!===--------------------------------------------------------------===//
 #define __LINENUMBER__ __LINE__
 !#define __FILENAME__ __FILE__(INDEX(__FILE__,"/", back=.true.)+1:)
 #define __FILENAME__ __FILE__
@@ -107,7 +110,7 @@
         use omp_lib
         use iso_fortran_env
         implicit none
-      OMPVV_MODULE_REQUIRES_LINE
+       OMPVV_MODULE_REQUIRES_LINE
        LOGICAL, PRIVATE :: ompvv_isHost = .TRUE.
        INTEGER, PRIVATE :: ompvv_errors = 0
        LOGICAL, PRIVATE :: ompvv_sharedEnv
