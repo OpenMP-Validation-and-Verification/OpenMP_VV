@@ -36,6 +36,7 @@ CONTAINS
     ALLOCATE(anArray(N), anArrayCopy(N))
 
     OMPVV_ERROR_IF(.NOT. ALLOCATED(anArray), "Memory was not properly allocated")
+    OMPVV_ERROR_IF(.NOT. ALLOCATED(anArrayCopy), "Memory was not properly allocated")
 
     DO i = 1, N
       anArray(i) = i
