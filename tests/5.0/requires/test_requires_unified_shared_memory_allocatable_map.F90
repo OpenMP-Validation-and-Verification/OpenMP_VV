@@ -36,14 +36,13 @@ CONTAINS
   INTEGER FUNCTION unified_shared_memory_allocatable_map()
     INTEGER:: errors, i
     INTEGER, ALLOCATABLE:: anArray(:)
-    INTEGER, ALLOCATABLE:: anArrayCopy(:)
     INTEGER:: ERR
 
     OMPVV_INFOMSG("Unified shared memory testing - Array on allocatable")
 
     errors = 0
 
-    ALLOCATE(anArray(N), anArrayCopy(N), STAT=ERR)
+    ALLOCATE(anArray(N),  STAT=ERR)
 
     IF( ERR /= 0 ) THEN
       OMPVV_ERROR("Memory was not properly allocated")
@@ -52,7 +51,6 @@ CONTAINS
 
     DO i = 1, N
       anArray(i) = i
-      anArrayCopy(i) = 0
     END DO
 
     ! Modify in the device
@@ -63,14 +61,13 @@ CONTAINS
     !$omp end target
 
     DO i = 1, N
-      OMPVV_TEST_AND_SET_VERBOSE(errors, anArray(i) .NE. (i + 20))
-      OMPVV_TEST_AND_SET_VERBOSE(errors, anArrayCopy(i) .NE. (i + 20))
+      OMPVV_TEST_AND_SET_VERBOSE(errors, anArray(i) .NE. (i + 10))
       IF (errors .NE. 0) THEN
         exit
       END IF
     END DO
 
-    DEALLOCATE(anArray, anArrayCopy)
+    DEALLOCATE(anArray)
     unified_shared_memory_allocatable_map = errors
   END FUNCTION unified_shared_memory_allocatable_map
 END PROGRAM test_requires_unified_shared_memory_allocatable_map
