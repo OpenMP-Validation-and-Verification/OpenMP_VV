@@ -1,6 +1,6 @@
 //------------------------------------------- test_taskloop_shared.c --------------------------------------//
 //
-// OpenMP API Version 4.5 November 2018
+// OpenMP API Version 4.5 November 2015
 //
 // This test checks the 'taskloop' directive with the 'shared' clause specified.
 // The 'taskloop' construct parallelize loops with independent iterations by creating tasks. 
