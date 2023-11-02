@@ -34,23 +34,30 @@ CONTAINS
   INTEGER FUNCTION metadirectiveOnDevice()
     INTEGER :: errors, i
     INTEGER :: A(N)
+    INTEGER :: max_num_threads_target, max_num_threads_parallel
 
     errors = 0
+    max_num_threads_target = 0
+    max_num_threads_parallel = 0
 
     DO i=1, N
         A(i) = 0
     END DO
 
-    !$omp target map(tofrom: A)
+    !$omp target map(tofrom: A, max_num_threads_target, max_num_threads_parallel)
+    max_num_threads_target = omp_get_max_threads()
     ! We expect at least one of these when conditons to eval to true, thus having the nothing directive utilized
     !$omp begin metadirective &
     !$omp when( device={kind(nohost)}: nothing ) &
     !$omp when( device={arch("nvptx")}: nothing ) &
     !$omp when( implementation={vendor(amd)}: nothing ) &
-    !$omp default( parallel do )
+    !$omp default( parallel do num_threads(max_num_threads_target+1) )
     DO i=1, N
         IF( omp_in_parallel() ) THEN
             A(i) = A(i) + 1
+        END IF
+        IF( i .EQ. 1 ) THEN
+            max_num_threads_parallel = omp_get_max_threads()
         END IF
     END DO
     !$omp end metadirective
@@ -59,9 +66,10 @@ CONTAINS
     DO i=1, N
         OMPVV_TEST_AND_SET(errors, A(i) .NE. 0)
     END DO
+    OMPVV_TEST_AND_SET(errors, max_num_threads_parallel .NE. max_num_threads_target)
 
     OMPVV_INFOMSG("Test ran with a number of available devices greater than 0")
-    OMPVV_INFOMSG_IF(A(1) .EQ. 0, "Test recognized device was of arch/vendor/kind nvidia, amd, or nohost")
+    OMPVV_INFOMSG_IF(max_num_threads_parallel .EQ. max_num_threads_target, "Test recognized device was of arch/vendor/kind nvidia, amd, or nohost")
     OMPVV_WARNING_IF(A(1) .EQ. 1, "Test could not recognize if device was of arch/vendor/kind nvidia, amd or, nohost, even though there are devices available.")
 
     metadirectiveOnDevice = errors
@@ -70,22 +78,29 @@ CONTAINS
   INTEGER FUNCTION metadirectiveOnHost()
     INTEGER :: errors, i
     INTEGER :: A(N)
+    INTEGER :: max_num_threads_initial, max_num_threads_loop
 
     errors = 0
+    max_num_threads_initial = 0
+    max_num_threads_loop = 0
 
     DO i=1, N
         A(i) = 0
     END DO
 
+    max_num_threads_initial = omp_get_max_threads()
     ! We expect all of these when statements to eval to false, causing body of code to run using 'nothing' as the default pragma
     !$omp begin metadirective &
-    !$omp when( device={kind(nohost)}: parallel do ) &
-    !$omp when( device={arch("nvptx")}: parallel do) &
-    !$omp when( implementation={vendor(amd)}: parallel do ) &
+    !$omp when( device={kind(nohost)}: parallel do num_threads(max_num_threads_initial+1) ) &
+    !$omp when( device={arch("nvptx")}: parallel do num_threads(max_num_threads_initial+1) ) &
+    !$omp when( implementation={vendor(amd)}: parallel do num_threads(max_num_threads_initial+1) ) &
     !$omp default( nothing )
     DO i=1, N
         IF( omp_in_parallel() ) THEN
             A(i) = A(i) + 1
+        END IF
+        IF( i .EQ. 1 ) THEN
+            max_num_threads_loop = omp_get_max_threads()
         END IF
     END DO
     !$omp end metadirective
@@ -95,7 +110,7 @@ CONTAINS
     DO i=1, N
         OMPVV_TEST_AND_SET(errors, A(i) .NE. 0)
     END DO
-
+    OMPVV_TEST_AND_SET(errors, max_num_threads_initial .NE. max_num_threads_loop)
 
     metadirectiveOnHost = errors
   END FUNCTION metadirectiveOnHost
