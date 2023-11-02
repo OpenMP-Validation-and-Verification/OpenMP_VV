@@ -31,7 +31,6 @@ int testTargetTeamsAllocateCl() {
 #pragma omp target teams loop map(to: a[0:N], b[0:N]) map(from: c[0:N]) \
         uses_allocators(omp_cgroup_mem_alloc) \
         allocate(omp_low_lat_mem_alloc: local) firstprivate(local)
-//  #pragma omp loop private(local)
   for (int i = 0; i < N; i++) {
     local = a[i] + b[i];
     c[i] = local;
