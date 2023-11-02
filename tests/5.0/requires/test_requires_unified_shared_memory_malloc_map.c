@@ -27,11 +27,17 @@ int unified_shared_memory_malloc_map() {
 
   anArray = (int*)malloc(sizeof(int)*N);
   anArrayCopy = (int*)malloc(sizeof(int)*N);
+
   if( anArray == NULL ) {
-    OMPVV_ERROR("Memory was not properly allocated");
+    OMPVV_ERROR("Memory for anArray was not allocated");
     OMPVV_RETURN(1);
   }
 
+  if( anArrayCopy == NULL ) {
+    OMPVV_ERROR("Memory for anArrayCopy was not allocated");
+    OMPVV_RETURN(1);
+  }
+  
   for (int i = 0; i < N; i++) {
     anArray[i] = i;
     anArrayCopy[i] = 0;
