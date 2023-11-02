@@ -222,8 +222,7 @@ int testDefaultMapAlloc() {
     device_data[i] = i;
     host_data[i] = 0;
   }
-#pragma omp target teams loop defaultmap(alloc) map(to: device_data[0:N])\
-         map(from: host_data)
+#pragma omp target teams loop defaultmap(alloc) map(to: device_data[0:N])
   for (int i = 0; i < N; i++) {
     host_data[i] = device_data[i];
   }
