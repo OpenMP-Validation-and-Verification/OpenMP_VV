@@ -93,7 +93,7 @@ CONTAINS
             errors = errors + 1
         END IF
 
-        !$omp target map(tofrom: errors) defaultmap(none) map(from: scalar_var, A, new_struct)
+        !$omp target map(tofrom: errors) defaultmap(none) map(to: scalar_var, A, new_struct)
         IF(scalar_var .NE. 1) THEN
             errors = errors + 1
         END IF

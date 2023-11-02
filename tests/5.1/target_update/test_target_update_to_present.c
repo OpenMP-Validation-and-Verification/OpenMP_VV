@@ -65,7 +65,7 @@ int test_target_update_to_present() {
      errors++;
    if (!omp_target_is_present(&new_struct, omp_get_default_device()))
      errors++;
-   #pragma omp target map(tofrom: errors) defaultmap(none) map(from: scalar_var, A, new_struct)
+   #pragma omp target map(tofrom: errors) defaultmap(none) map(to: scalar_var, A, new_struct)
    {     
         if(scalar_var != 1){errors++;}
         if(A[0] != 0 || A[50] != 50){errors++;}
