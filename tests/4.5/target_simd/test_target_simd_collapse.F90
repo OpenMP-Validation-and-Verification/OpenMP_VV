@@ -1,4 +1,4 @@
-!===---- test_combined_target_simd.F90 - combined construct simd target -===//
+!===---- test_target_simd_collapse.F90 - combined construct simd target -===//
 ! 
 ! OpenMP API Version 4.5 Nov 2015
 ! 
@@ -7,8 +7,8 @@
 ! tests are limited in that they check that the expected result is created, but
 ! assume nothing in how they are mapped into a particular architecture
 !
-! This test checks if the combined construct target simd produces valid
-! results on a simple computation
+! This test checks if the combined construct target simd with collapse produces 
+! valid results on a simple computation
 !===--------------------------------------------------------------------------===//
 
 #include "ompvv.F90"
