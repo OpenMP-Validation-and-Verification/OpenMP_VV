@@ -27,7 +27,7 @@ void add_dev(int *arr);
 
 #pragma omp declare variant(add_dev) match(construct={dispatch}) 
 void add(int *arr){
-    #pragma omp parallel for
+    #pragma omp target parallel for is_device_ptr(arr)
     for (int i = 0; i < N; i++){ // Base function adds 2 to array values
         arr[i] = arr[i]+2;
     }
@@ -61,9 +61,12 @@ int test_wrapper() {
     
     #pragma omp target map(tofrom: errors)
     for(i = 0; i < N; i++){
-        OMPVV_TEST_AND_SET(errors, (arr[i] != i+4) || (arr[i] != i+2) );
+        OMPVV_TEST_AND_SET(errors, (arr[i] != i+4) && (arr[i] != i+2) );
     }
     OMPVV_ERROR_IF(errors > 0, "Dispatch w/ novariants true is not working properly");
+    OMPVV_INFOMSG_IF(errors > 0 || arr[0] == 2,
+                   "Dispatch is either not working or was not considered"
+                   " by the implementation as part of the context selector.");
     return errors;
 }
 
