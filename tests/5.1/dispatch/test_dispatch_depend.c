@@ -62,7 +62,7 @@ int test_wrapper() {
         OMPVV_TEST_AND_SET(errors, arr[i] != i+1 && arr[i] != i+3);
     }
     OMPVV_ERROR_IF(errors > 0, "Dispatch w/ depend is not working properly");
-    OMPVV_INFOMSG_IF(errors > 0,
+    OMPVV_INFOMSG_IF(errors > 0 || arr[0] == 1,
                    "Dispatch is either not working or was not considered"
                    " by the implementation as part of the context selector.");
     return errors;
