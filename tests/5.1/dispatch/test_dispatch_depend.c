@@ -18,7 +18,7 @@
 
 #define N 1024
 
-int arr[N]; // implicit map array 
+int arr[N]; 
 int errors;
 int i = 0;
 int a = 0;
@@ -34,7 +34,7 @@ void add(int *arr){
 }
 
 void add_two(int *arr){
-    OMPVV_TEST_AND_SET_VERBOSE(errors, a != 3);
+    OMPVV_TEST_AND_SET(errors, a != 3);
     OMPVV_ERROR_IF(errors > 0, "Depend clause on dispatch directive not working properly");
     for (int i = 0; i < N; i++){
         arr[i] = i+a; // Variant function adds 3 to array values
@@ -45,17 +45,26 @@ int test_wrapper() {
     errors = 0;
     add(arr);
     for(i = 0; i < N; i++){
-        OMPVV_TEST_AND_SET_VERBOSE(errors, arr[i] != i+1);
+        OMPVV_TEST_AND_SET(errors, arr[i] != i+1);
     } 
     OMPVV_ERROR_IF(errors > 0, "Base function is not working properly");
-
+    
+    #pragma omp task
+    {
+    #pragma omp taskwait depend(out:a) nowait
+    add(arr);
     #pragma omp dispatch depend(in: a)
-        add(arr);
+    add(arr);
+    }
+    #pragma omp taskwait 
 
     for(i = 0; i < N; i++){
-        OMPVV_TEST_AND_SET_VERBOSE(errors, arr[i] != i+3);
+        OMPVV_TEST_AND_SET(errors, arr[i] != i+1 && arr[i] != i+3);
     }
     OMPVV_ERROR_IF(errors > 0, "Dispatch w/ depend is not working properly");
+    OMPVV_INFOMSG_IF(errors > 0,
+                   "Dispatch is either not working or was not considered"
+                   " by the implementation as part of the context selector.");
     return errors;
 }
 
