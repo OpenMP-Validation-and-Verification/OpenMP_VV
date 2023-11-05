@@ -73,7 +73,7 @@ int test_wrapper() {
   errors += err_ar[1];
   OMPVV_ERROR_IF(errors > 0,
                  "Dispatch w/ nocontext false is not working properly");
-  OMPVV_INFOMSG_IF(errors > 0,
+  OMPVV_INFOMSG_IF(errors > 0 || arr[0] == 1,
                    "Dispatch is either not working or was not considered"
                    " by the implementation as part of the context selector.");
   return errors;
