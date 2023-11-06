@@ -68,6 +68,9 @@ int test_wrapper() {
     #pragma omp target exit data map(delete:arr[0:N])
     free(arr);
     OMPVV_ERROR_IF(errors > 0, "Dispatch w/ depend is not working properly");
+    OMPVV_INFOMSG_IF(errors > 0 || arr[0] == 1,
+                  "Dispatch is either not working or was not considered"
+                  " by the implementation as part of the context selector.");
     return errors;
 }
 
