@@ -6,7 +6,7 @@
 // The 'taskloop' construct parallelize loops with independent iterations by creating tasks. 
 // It allows for efficient parallel execution of loop iterations by distributing them among multiple threads. 
 // The 'final clause is used to ensure that all tasks in taskloop are run by same thread if the 
-// final(expression) is TRUE, else different threads are run by each task.      
+// final(expression) is TRUE, else different threads could execute the tasks.      
 //----------------------------------------------------------------------------------------------------------//
 
 #include <omp.h>

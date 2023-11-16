@@ -19,28 +19,41 @@ int test_taskloop_collapse() {
 
   int errors = 0;
 
-  int WEEK = 1, DAYS_IN_WEEK = 7, sum_with_openmp = 0, sum_without_openmp = 0;
+  int size = 200;
+  int a[(size*size)];
+  
+  int sum_without_openmp = 0, sum_with_openmp = 0;
+   
+  for(int i = 0; i < (size*size); i++) {
+   	a[i] = i;
+   }
 
    //get valid sum without openmp
-   for(int i = 1; i <= (WEEK*DAYS_IN_WEEK); i++) {
-     sum_without_openmp = sum_without_openmp + i;
+   for(int i = 0; i < (size); i++) {
+	for(int j = 0; j < size; j++) {
+	     sum_without_openmp = sum_without_openmp + (a[i]*a[j]);
+	}
    }
+   
+   //printf("sum_without_openmp: %d\n", sum_without_openmp);
 
    #pragma omp parallel num_threads(NUM_THREADS)
    {
       #pragma omp single
       {
-	#pragma omp taskloop collapse(NUM_COLLAPSE) 
-        for(int i = 1; i <= WEEK; i++) 
+	#pragma omp taskloop collapse(NUM_COLLAPSE)  
+        for(int i = 0; i < size; i++) 
 	{
-	    for(int j = 1; j <= DAYS_IN_WEEK; j++) 
+	    for(int j = 0; j < size; j++) 
 	    {
-		    #pragma omp atomic 
-		    sum_with_openmp = sum_with_openmp + (i*j);
+		    #pragma omp atomic
+		    sum_with_openmp = sum_with_openmp + (a[i]*a[j]); 
             }
 	}
       }	   
    }
+   
+   //printf("sum_with_openmp: %d\n", sum_with_openmp);
    
    OMPVV_TEST_AND_SET_VERBOSE(errors, sum_with_openmp != sum_without_openmp);
 
