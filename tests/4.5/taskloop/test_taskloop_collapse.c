@@ -35,7 +35,6 @@ int test_taskloop_collapse() {
 	}
    }
    
-   //printf("sum_without_openmp: %d\n", sum_without_openmp);
 
    #pragma omp parallel num_threads(NUM_THREADS)
    {
