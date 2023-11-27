@@ -71,13 +71,13 @@ int testDefaultMapTo() {
     device_data[i] = i;
     host_data[i] = 0;
   }
-#pragma omp target teams loop defaultmap(to) map(from: host_data)
+#pragma omp target teams loop defaultmap(to) map(tofrom: host_data)
   for (int i = 0; i < N; i++) {
     host_data[i] += device_data[i];
   }
   // checking results
   for (int i = 0; i < N; i++) {
-    OMPVV_TEST_AND_SET(errors, host_data[i] != 0);
+    OMPVV_TEST_AND_SET(errors, host_data[i] != i);
   }
   return errors;
 }
