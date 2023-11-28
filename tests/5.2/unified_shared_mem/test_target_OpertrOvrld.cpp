@@ -64,9 +64,8 @@ class Fraction {
 int main() {
   OMPVV_TEST_OFFLOADING;
   int errors = 0;
-  int *Errs = (int *)omp_target_alloc(sizeof(int), 0);
-  *Errs = 0;
-#pragma omp target
+  int Errs = 0;
+#pragma omp target map(tofrom: Errs)
   {
     Fraction f1(2, 3);
     Fraction f2(3, 4);
@@ -86,8 +85,7 @@ int main() {
     }
   }
 
-  OMPVV_TEST_AND_SET_VERBOSE(errors, (*Errs != 0));
-  omp_target_free(Errs, 0);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, (Errs != 0));
 
   OMPVV_REPORT_AND_RETURN(errors);
 }
