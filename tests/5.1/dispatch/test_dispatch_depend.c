@@ -23,7 +23,7 @@ int errors;
 int i = 0;
 int a = 0;
 
-void add_two(int *arr);
+void add_a(int *arr);
 
 #pragma omp declare variant(add_two) match(construct={dispatch})
 void add(int *arr){
@@ -33,7 +33,7 @@ void add(int *arr){
     a = 3;
 }
 
-void add_two(int *arr){
+void add_a(int *arr){
     OMPVV_TEST_AND_SET(errors, a != 3);
     OMPVV_ERROR_IF(errors > 0, "Depend clause on dispatch directive not working properly");
     for (int i = 0; i < N; i++){
@@ -61,7 +61,7 @@ int test_wrapper() {
     for(i = 0; i < N; i++){
         OMPVV_TEST_AND_SET(errors, arr[i] != i+1 && arr[i] != i+3);
     }
-    OMPVV_ERROR_IF(errors > 0, "Dispatch w/ depend is not working properly");
+
     OMPVV_INFOMSG_IF(errors > 0 || arr[0] == 1,
                    "Dispatch is either not working or was not considered"
                    " by the implementation as part of the context selector.");
