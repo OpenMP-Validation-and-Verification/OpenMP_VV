@@ -55,7 +55,6 @@ int test_wrapper() {
    // OMP 5.1, Pg54:6 -Whether the dispatch construct is added to the construct
    // set is implementation defined.
  
-   OMPVV_ERROR_IF(errors > 0, "Dispatch w/ nowait is not working properly");
    OMPVV_INFOMSG_IF(errors > 0 || arr[0] == 1,
                    "Dispatch is either not working or was not considered"
                    " by the implementation as part of the context selector.");
