@@ -63,7 +63,6 @@ int test_wrapper() {
     for(i = 0; i < N; i++){
         OMPVV_TEST_AND_SET(errors, (arr[i] != i+4) && (arr[i] != i+2) );
     }
-    OMPVV_ERROR_IF(errors > 0, "Dispatch w/ novariants true is not working properly");
     OMPVV_INFOMSG_IF(errors > 0 || arr[0] == 2,
                    "Dispatch is either not working or was not considered"
                    " by the implementation as part of the context selector.");
