@@ -25,7 +25,7 @@ int a = 0;
 
 void add_a(int *arr);
 
-#pragma omp declare variant(add_two) match(construct={dispatch})
+#pragma omp declare variant(add_a) match(construct={dispatch})
 void add(int *arr){
     for (int i = 0; i < N; i++){ // Base function adds 1 to array values
         arr[i] = i+1;
