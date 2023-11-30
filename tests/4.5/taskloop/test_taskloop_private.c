@@ -3,7 +3,7 @@
 // OpenMP API Version 4.5 August 2015
 //
 // This test checks the taskloop directive with the 'private' clause specified.
-// The 'taskloop' construct parallelize loops with independent iterations by creating tasks. 
+// The 'taskloop' construct parallelizes loops with independent iterations by creating tasks. 
 // It allows for efficient parallel execution of loop iterations by distributing them among multiple threads. 
 // The 'private' clause ensures that each task should have private copies. 
 //----------------------------------------------------------------------------------------------------------//
@@ -19,10 +19,8 @@ int test_taskloop_private() {
 
   int errors = 0;
 
-  int private_var = 10;   
-
-  int private_var_sum = private_var; 
-  int val_not_in_openmp = private_var;
+  int private_var_sum;  
+  int val_not_in_openmp = 10; 
   
    #pragma omp parallel num_threads(NUM_THREADS)
    {
@@ -30,7 +28,7 @@ int test_taskloop_private() {
       {
 	#pragma omp taskloop private(private_var_sum) 
         for(int i = 0; i < NUM_TASKS; i++) {
-	  private_var_sum = private_var_sum + i;
+	  private_var_sum = i;
 	 }      
       }	   
    }

@@ -3,7 +3,7 @@
 // OpenMP API Version 4.5 September 2015
 //
 // This test checks the 'taskloop' directive with the 'num_tasks' clause specified.
-// The 'taskloop' construct parallelize loops with independent iterations by creating tasks. 
+// The 'taskloop' construct parallelizes loops with independent iterations by creating tasks. 
 // It allows for efficient parallel execution of loop iterations by distributing them among multiple threads. 
 // The 'num_tasks' clause variable ensures that the loop iterations are shared amoung created 'num_tasks'. 
 // i.e the loop iterations are divided amoung number of tasks (each num_task group is run by same the thread).   
@@ -49,11 +49,10 @@ int test_taskloop_num_tasks() {
       }	   
    }
 
-   printf("-------------------------------------------------------\n");
-
    int threads_max = values[0]; // Assume the first element is the maximum
    
    for(int i = 0; i < NUM; i++) {
+
 	   if(values[i] > threads_max) 
 	   	threads_max = values[i]; 
    }

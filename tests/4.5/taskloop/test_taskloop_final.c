@@ -2,11 +2,11 @@
 //
 // OpenMP API Version 4.5 August 2015
 //
-// This test checks the taskloop directive with the if clause specified.
-// The 'taskloop' construct parallelize loops with independent iterations by creating tasks. 
+// This test checks the taskloop directive with the 'final' clause specified.
+// The 'taskloop' construct parallelizes loops with independent iterations by creating tasks. 
 // It allows for efficient parallel execution of loop iterations by distributing them among multiple threads. 
-// The 'final clause is used to ensure that all tasks in taskloop are run by same thread if the 
-// final(expression) is TRUE, else different threads could execute the tasks.      
+// The 'final clause is used to ensure that group of tasks in taskloop are run by same thread 'if' the 
+// 'final' (expression) is TRUE, else different threads could execute the tasks.      
 //----------------------------------------------------------------------------------------------------------//
 
 #include <omp.h>
@@ -14,12 +14,13 @@
 #include <stdlib.h>
 #include "ompvv.h"
 
-#define NUM_TASKS 10
+#define NUM_TASKS 6
 #define NUM_THREADS 10
 
 #define M 100
 
-int thread_ids[NUM_TASKS][3]; //Array 2nd diemention value i.e 3 is depend on number of omp task under taskloop
+//The 2nd dimension of this array (i.e., 3) is dependent on the number of task constructs in the taskloop construct.
+int thread_ids[NUM_TASKS][3]; 
 
 
 //if all thread ids are same, val=1 else val=0
@@ -71,6 +72,7 @@ int test_taskloop_final(int THRESHOLD) {
 			{
 	 			thread_ids[i][2] = omp_get_thread_num();
 			}
+
       		} 
    	}
   }

@@ -3,7 +3,7 @@
 // OpenMP API Version 4.5 September 2015
 //
 // This test checks the 'taskloop' directive with the 'collapse' clause specified.
-// The 'taskloop' construct parallelize loops with independent iterations by creating tasks. 
+// The 'taskloop' construct parallelizes loops with independent iterations by creating tasks. 
 // It allows for efficient parallel execution of loop iterations by distributing them among multiple threads. 
 // The 'collapse' clause ensures that multiple nested loops into a single loop.      
 //----------------------------------------------------------------------------------------------------------//
@@ -35,8 +35,6 @@ int test_taskloop_collapse() {
 	}
    }
    
-   //printf("sum_without_openmp: %d\n", sum_without_openmp);
-
    #pragma omp parallel num_threads(NUM_THREADS)
    {
       #pragma omp single
@@ -52,8 +50,6 @@ int test_taskloop_collapse() {
 	}
       }	   
    }
-   
-   //printf("sum_with_openmp: %d\n", sum_with_openmp);
    
    OMPVV_TEST_AND_SET_VERBOSE(errors, sum_with_openmp != sum_without_openmp);
 
