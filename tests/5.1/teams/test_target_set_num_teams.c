@@ -24,7 +24,10 @@ int main() {
 	int errors = 0; 
 	int num_teams = 0;
 
+#pragma omp target
+{
 	omp_set_num_teams(1);
+}
 	
 	#pragma omp target teams map(tofrom: num_teams)
 	{
