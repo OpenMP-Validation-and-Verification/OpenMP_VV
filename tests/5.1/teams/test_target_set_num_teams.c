@@ -36,8 +36,8 @@ int main() {
 		}
 	}               
 	
-	OMPVV_ERROR_IF(num_teams == 1, "Number of teams detected was not the amount set by omp_set_num_teams()");
-	OMPVV_TEST_AND_SET(errors, num_teams == 1);
+	OMPVV_ERROR_IF(num_teams != 1, "Number of teams detected was not the amount set by omp_set_num_teams()");
+	OMPVV_TEST_AND_SET(errors, num_teams != 1);
 
 	#pragma omp target teams map(tofrom: num_teams) num_teams(OMPVV_NUM_TEAMS_DEVICE)
 	{
