@@ -15,8 +15,6 @@
 #include <stdlib.h>
 #include "ompvv.h"
 
-#define N 1024
-
 int main() {
 
 	OMPVV_TEST_OFFLOADING;
@@ -24,24 +22,24 @@ int main() {
 	int errors = 0; 
 	int num_teams = 0;
 
-#pragma omp target
-{
-	omp_set_num_teams(1);
-}
+        #pragma omp target
+        {
+	  omp_set_num_teams(4);
+        }
 	
 	#pragma omp target teams map(tofrom: num_teams)
 	{
-		if (omp_get_team_num() == 0) {
+		if (omp_get_team_num() == 0 && omp_get_thread_num == 0) {
 			num_teams = omp_get_num_teams();
 		}
 	}               
 	
-	OMPVV_ERROR_IF(num_teams != 1, "Number of teams detected was not the amount set by omp_set_num_teams()");
-	OMPVV_TEST_AND_SET(errors, num_teams != 1);
+	OMPVV_ERROR_IF(num_teams != 4, "Number of teams detected was not the number set by omp_set_num_teams()");
+	OMPVV_TEST_AND_SET(errors, num_teams != 4);
 
 	#pragma omp target teams map(tofrom: num_teams) num_teams(OMPVV_NUM_TEAMS_DEVICE)
 	{
-		if (omp_get_team_num() == 0) {
+		if (omp_get_team_num() == 0 && omp_get_thread_num == 0) {
 			num_teams = omp_get_num_teams();
 		}
 	}
