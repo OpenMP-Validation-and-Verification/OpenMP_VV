@@ -29,7 +29,7 @@ int main() {
 	
 	#pragma omp target teams map(tofrom: num_teams)
 	{
-		if (omp_get_team_num() == 0 && omp_get_thread_num == 0) {
+		if (omp_get_team_num() == 0 && omp_get_thread_num() == 0) {
 			num_teams = omp_get_num_teams();
 		}
 	}               
@@ -39,7 +39,7 @@ int main() {
 
 	#pragma omp target teams map(tofrom: num_teams) num_teams(OMPVV_NUM_TEAMS_DEVICE)
 	{
-		if (omp_get_team_num() == 0 && omp_get_thread_num == 0) {
+		if (omp_get_team_num() == 0 && omp_get_thread_num() == 0) {
 			num_teams = omp_get_num_teams();
 		}
 	}
