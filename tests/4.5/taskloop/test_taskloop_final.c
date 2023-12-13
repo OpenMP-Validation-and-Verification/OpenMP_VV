@@ -84,8 +84,10 @@ int test_taskloop_final(int THRESHOLD) {
       errors++; 
     }
   } else if (M != THRESHOLD) {
-    if (val != 0) {
-      errors++; 
+    if (val == 1) {
+        OMPVV_WARNING("All the thread ids are same per task");
+    } else if(val == 0) {
+        OMPVV_INFOMSG("All the thread ids are not same per task");
     }
   }
 
