@@ -29,7 +29,7 @@ int main() {
 	
 	#pragma omp target teams map(tofrom: num_teams)
 	{
-		if (omp_get_team_num() == 0 && omp_get_thread_num() == 0) {
+		if (omp_get_team_num() == 0 ) {
 			num_teams = omp_get_num_teams();
 		}
 	}               
@@ -39,12 +39,13 @@ int main() {
 
 	#pragma omp target teams map(tofrom: num_teams) num_teams(OMPVV_NUM_TEAMS_DEVICE)
 	{
-		if (omp_get_team_num() == 0 && omp_get_thread_num() == 0) {
+		if (omp_get_team_num() == 0 ) {
 			num_teams = omp_get_num_teams();
 		}
 	}
 
 	OMPVV_ERROR_IF(num_teams != OMPVV_NUM_TEAMS_DEVICE, "Number of teams was not properly overriden by the num_teams clause");
+	
 	OMPVV_TEST_AND_SET(errors, num_teams != OMPVV_NUM_TEAMS_DEVICE);
 
 	OMPVV_REPORT_AND_RETURN(errors);
