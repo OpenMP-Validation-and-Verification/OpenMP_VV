@@ -41,9 +41,7 @@ int test_target_parallel_loop_bind() {
         }
       }
     }
-    if (omp_get_thread_num() == 0 && omp_get_team_num() == 0) {
-      num_threads = omp_get_num_threads();
-    }
+  
   // validation
   for (i = 0; i < DIM_1; i++) {
     for (j = 0; j < DIM_2; j++) {
@@ -55,16 +53,11 @@ int test_target_parallel_loop_bind() {
     }
   }
 
-
-  if ( num_threads < 1 )
-        errors++;
-  OMPVV_ERROR_IF(num_threads < 1,
-               "omp_get_num_threads() returned an invalid number of threads.");
-
   return errors;
 }
 
 int main() {
+  OMPVV_TEST_OFFLOADING;
   int errors = 0;
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, test_target_parallel_loop_bind());

@@ -60,6 +60,7 @@ int test_target_parallel_loop_collapse_lastprivate() {
 }
 
 int main() {
+    OMPVV_TEST_OFFLOADING;
     int errors = 0;
 
     OMPVV_TEST_AND_SET_VERBOSE(errors, 

@@ -15,6 +15,7 @@
 #define SIZE 1024
 
 int main() {
+    OMPVV_TEST_OFFLOADING;
     int a[SIZE];
     int b[SIZE];
     int priv_val = 12345;
@@ -28,7 +29,7 @@ int main() {
     }
 
     #pragma omp target parallel loop private(priv_val) \
-                       num_threads(OMPVV_NUM_THREADS_HOST)
+                       num_threads(OMPVV_NUM_THREADS_DEVICE)
         for (int x = 0; x < SIZE; ++x) {
             priv_val = 0;
             for (int y = 0; y < x+1; ++y) {
@@ -37,10 +38,6 @@ int main() {
 
                 b[x] = a[x] * priv_val;
         }
-
-    if (omp_get_thread_num() == 0) {
-        num_threads = omp_get_num_threads();
-    }
 
     OMPVV_TEST_AND_SET_VERBOSE(errors, priv_val != 12345);
 
