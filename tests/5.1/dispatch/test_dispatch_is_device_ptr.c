@@ -42,6 +42,7 @@ void add_dev(int *arr){
 
 int test_wrapper() { 
     int t;
+    int called_add = 0;
     errors = 0;
     t = omp_get_default_device();
     arr = (int *)omp_target_alloc( sizeof(int)*N, t);
@@ -59,13 +60,19 @@ int test_wrapper() {
     #pragma omp dispatch is_device_ptr(arr)
         add(arr);
     
-    #pragma omp target map(tofrom: errors)
+    #pragma omp target map(tofrom: errors, called_add) is_device_ptr(arr)
     for(i = 0; i < N; i++){
         OMPVV_TEST_AND_SET(errors, (arr[i] != i+4) && (arr[i] != i+2) );
+        called_add += arr[i] == i + 2;
     }
-    OMPVV_INFOMSG_IF(errors > 0 || arr[0] == 2,
+    // Note that it is implementation deﬁned in OpenMP 5.1 (and 5.2) whether
+    // the dispatch construct is added to the construct set. Only since
+    // OpenMP Technical Review 12 (TR12; second 6.0 preview) it must be added;
+    // in that case, 'add_dev' is called and called_add == 0.
+    OMPVV_INFOMSG_IF(errors > 0 || called_add > 0,
                    "Dispatch is either not working or was not considered"
                    " by the implementation as part of the context selector.");
+    omp_target_free (arr, t);
     return errors;
 }
 
