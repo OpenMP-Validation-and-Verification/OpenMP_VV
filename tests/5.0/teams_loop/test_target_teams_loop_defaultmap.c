@@ -161,10 +161,10 @@ int testDefaultMapToFromScalar() {
   int x = 0;
 #pragma omp target teams loop defaultmap(tofrom:scalar)
   for (int i = 0; i < N; i++) {
-    x = N;
+    x += i;
   }
   // checking results
-  OMPVV_TEST_AND_SET(errors, x != N);
+  OMPVV_TEST_AND_SET(errors, x != (N*(N-1)/2));
   return errors;
 }
 
