@@ -98,24 +98,24 @@ _Pragma("omp target map (from: _ompvv_isOffloadingOn)") \
 
 // Macro to check if it is a shared data environment
 #define OMPVV_TEST_SHARED_ENVIRONMENT_PROBE \
-  int _ompvv_isSharedEnv = 1; \
+  int _ompvv_isSharedEnv = 0; \
   _ompvv_isOffloadingOn = 0; \
 _Pragma("omp target map (from: _ompvv_isOffloadingOn) map(to: _ompvv_isSharedEnv)") \
   {  _ompvv_isOffloadingOn = !omp_is_initial_device();  \
-     _ompvv_isSharedEnv = 0; \
+     _ompvv_isSharedEnv = 1; \
   }
 
 // Macro to report warning if it is a shared environment
 #define OMPVV_TEST_SHARED_ENVIRONMENT {\
   OMPVV_TEST_SHARED_ENVIRONMENT_PROBE \
-  OMPVV_WARNING_IF((_ompvv_isOffloadingOn && _ompvv_isSharedEnv == 0),"This tests is running on a shared data environment between host and device. This may cause errors") \
+  OMPVV_WARNING_IF((_ompvv_isOffloadingOn && _ompvv_isSharedEnv == 1),"This tests is running on a shared data environment between host and device. This may cause errors") \
   }
 
 // Macro to report warning if it is a shared environment and set a variable for further use
 #define OMPVV_TEST_AND_SET_SHARED_ENVIRONMENT(var2set) {\
   OMPVV_TEST_SHARED_ENVIRONMENT_PROBE \
-  OMPVV_WARNING_IF((_ompvv_isOffloadingOn && _ompvv_isSharedEnv == 0),"This tests is running on a shared data environment between host and device. This may cause errors") \
-  var2set = (_ompvv_isOffloadingOn && _ompvv_isSharedEnv == 0);\
+  OMPVV_WARNING_IF((_ompvv_isOffloadingOn && _ompvv_isSharedEnv == 1),"This tests is running on a shared data environment between host and device. This may cause errors") \
+  var2set = (_ompvv_isOffloadingOn && _ompvv_isSharedEnv == 1);\
   }
 
 // Macros to provide thread and team nums if they are not specified
