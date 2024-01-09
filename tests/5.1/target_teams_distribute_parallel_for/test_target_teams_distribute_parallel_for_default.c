@@ -52,6 +52,9 @@ int DefaultPrivate() {
       ErrCount += 1;
     }
   }
+  if (CONST != 123) {
+    ErrCount++;
+  }
   return ErrCount;
 }
 
