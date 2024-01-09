@@ -1,11 +1,9 @@
 //-----------------test_target_teams_distribute_parallel_for_default.c-----
 //
-// OpenMP API Version 5.1 Mar 2023
+// OpenMP API Version 5.1 November 2020
 //
-// This test intends to test the functionality of an indirect
-// declare target region. A random int is chosen that correlates
-// to a function pointer. That function is then chosen and the
-// test ensures it runs as expected.
+// This test case targets to test default clause along with
+// target teams distribute parallel for construct
 // --------------------------------------------------------------
 
 
@@ -71,10 +69,8 @@ int DefaultShared() {
         default(shared) map(tofrom: ErrCount)
   for (int i = 0; i < 32; ++i) {
 #pragma omp atomic
-    CONST += 10;
-#pragma omp atomic
     Arr[i] += CONST;
-    if (Arr[i] != (i + 10 + 123)) {
+    if (Arr[i] != (i + 123)) {
 #pragma omp atomic
       ErrCount += 1;
     }
