@@ -33,7 +33,7 @@ int test_target_parallel_loop_bind() {
   }
 
 #pragma omp target parallel loop bind(parallel) map(tofrom: arr) \
-                       num_threads(OMPVV_NUM_THREADS_HOST)
+                       num_threads(OMPVV_NUM_THREADS_DEVICE)
   for (i = 0; i < DIM_1; i++) {
     for (j = 0; j < DIM_2; j++) {
       for (k = i; k < DIM_3; k++) {
