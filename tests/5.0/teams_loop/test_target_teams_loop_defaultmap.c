@@ -139,7 +139,7 @@ int testDefaultMapToFromAggr() {
     device_data[i] = i;
     host_data[i] = 0;
   }
-#pragma omp target teams loop defaultmap(tofrom:aggregate) map(from: host_data)
+#pragma omp target teams loop defaultmap(tofrom:aggregate) map(tofrom: host_data)
   for (int i = 0; i < N; i++) {
     host_data[i] += device_data[i];
     device_data[i] = 2*i;
