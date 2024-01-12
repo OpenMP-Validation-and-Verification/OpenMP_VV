@@ -1,4 +1,4 @@
-//===----  test_target_teams_distribute_parallel_for_reductn.c--===//
+//===----  test_target_teams_distribute_parallel_for_reduction.c--===//
 // 
 // OpenMP API Version 4.5 Nov 2015
 // 
