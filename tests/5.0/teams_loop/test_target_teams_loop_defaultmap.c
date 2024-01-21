@@ -159,7 +159,7 @@ int testDefaultMapToFromAggr() {
 int testDefaultMapToFromScalar() {
   int errors = 0;
   int x = 0;
-#pragma omp target teams loop defaultmap(tofrom:scalar)
+#pragma omp target teams loop defaultmap(tofrom:scalar) reduction(+:x)
   for (int i = 0; i < N; i++) {
     x += i;
   }
