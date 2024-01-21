@@ -27,7 +27,7 @@
         !OMPVV_TEST_OFFLOADING
         ! Not using the macros, since tested compilers
         ! do not support them
-        ! __FILE__ doesn't work
+        ! __FILE__ does not work
         call test_offloading("test_ompx.F", __LINE__)
 
         res = test_fixed_omx()
