@@ -22,7 +22,7 @@ int errors, i;
 
 int test_target_memcpy_async_no_obj() {
 
-    int h, t, i;
+    int h, t, i, err_r;
     errors = 0;
     double *mem;
     double *mem_dev_cpy;
@@ -35,17 +35,31 @@ int test_target_memcpy_async_no_obj() {
     mem = (double *)malloc( sizeof(double)*N);
     mem_dev_cpy = (double *)omp_target_alloc( sizeof(double)*N, t);
 
+    OMPVV_TEST_AND_SET_VERBOSE(errors, mem == NULL);
+    if(mem == NULL) {
+       return errors;
+    }
+
     OMPVV_TEST_AND_SET_VERBOSE(errors, mem_dev_cpy == NULL);
+    if(mem_dev_cpy == NULL) {
+       return errors;
+    }
 
     for(i = 0; i < N; i++){
         mem[i] = i;
     }   
 
     /* copy to target */
-    omp_target_memcpy_async(mem_dev_cpy, mem, sizeof(double)*N,
+    err_r = omp_target_memcpy_async(mem_dev_cpy, mem, sizeof(double)*N,
                                 0,          0,
                                 t,          h,
                                 0,          NULL);
+    if(err_r) {
+       OMPVV_ERROR("omp_target_memcpy_async returns not 0");
+       free(mem);
+       omp_target_free(mem_dev_cpy, t);
+       return errors;
+    }
 
     #pragma omp taskwait
     #pragma omp target is_device_ptr(mem_dev_cpy) device(t)

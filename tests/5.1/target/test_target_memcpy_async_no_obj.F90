@@ -49,7 +49,17 @@ CONTAINS
     csize = c_sizeof(arr(1)) * N
     mem_dev_cpy = omp_target_alloc(csize, t)
 
+    OMPVV_TEST_AND_SET_VERBOSE(errors, .NOT. c_associated(mem))
+    IF(.NOT. c_associated(mem)) THEN
+      test_memcpy_async_depobj = errors
+      RETURN
+    END IF
+
     OMPVV_TEST_AND_SET_VERBOSE(errors, .NOT. c_associated(mem_dev_cpy))
+    IF(.NOT. c_associated(mem_dev_cpy)) THEN
+      test_memcpy_async_depobj = errors
+      RETURN  
+    END IF
 
     DO i=1, N
       arr(i) = i
@@ -57,6 +67,14 @@ CONTAINS
 
     ! copy to target
     errors = omp_target_memcpy_async(mem_dev_cpy, mem, csize, dst_offset, src_offset, t, h, depobj_count)
+
+    IF(errors /= 0) THEN
+      OMPVV_ERROR("omp_target_memcpy_async returns not 0");
+      DEALLOCATE(arr)
+      CALL omp_target_free(mem_dev_cpy, t)
+      test_memcpy_async_depobj = errors
+      RETURN
+    END IF
 
     !$omp taskwait
     !$omp target is_device_ptr(mem_dev_cpy) device(t)
