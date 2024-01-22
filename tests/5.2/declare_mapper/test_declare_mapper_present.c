@@ -19,15 +19,14 @@
 
 typedef struct myvec{
     size_t len;
-    double *data;
+    int *data;
 } myvec_t;
 
 
-#pragma omp declare mapper(default:myvec_t v) map(present, tofrom: v, v.data[0:v.len]) 
 
 void init( myvec_t *s )
 { 
-  for(size_t i = 0; i < s->len; i++)
+  for(int i = 0; i < s->len; i++)
     s->data[i] = i; 
 }
 
@@ -37,16 +36,17 @@ int test_declare_mapper_present() {
   OMPVV_INFOMSG("test_declare_mapper_present");
   int errors = 0;
 
-   myvec_t s;
+  myvec_t s;
 
-   s.data = (double *)calloc(N,sizeof(double));
-   s.len  = N;
-  #pragma omp target data map(tofrom: s, s.data[0:s.len])
+  s.data = (int *)calloc(N,sizeof(int));
+  s.len  = N;
+  #pragma omp target enter data map(to: s, s.data[0:s.len])
+
+  #pragma omp declare mapper(default:myvec_t v) map(present, from: v, v.data[0:v.len]) 
+
+  #pragma omp target map(s)
   {
-    #pragma omp target
-    {
-        init(&s);
-    }
+    init(&s);
   }
 
   for (int i = 0; i < N; ++i) {
