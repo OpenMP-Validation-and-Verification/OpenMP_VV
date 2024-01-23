@@ -68,7 +68,6 @@ int DefaultShared() {
 #pragma omp target teams distribute parallel for num_teams(2) thread_limit(10)\
         default(shared) map(tofrom: ErrCount)
   for (int i = 0; i < 32; ++i) {
-#pragma omp atomic
     Arr[i] += CONST;
     if (Arr[i] != (i + 123)) {
 #pragma omp atomic
