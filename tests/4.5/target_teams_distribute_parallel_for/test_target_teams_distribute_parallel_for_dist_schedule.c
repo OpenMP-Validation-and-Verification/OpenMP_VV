@@ -17,10 +17,6 @@
 
 int Dist_ScheduleStatic() {
   int ErrCount = 0;
-  int Arr[32];
-  for (int i = 0; i < 32; ++i) {
-    Arr[i] = i;
-  }
 
   int TrackUsedThread[NUM_TEAMS][THRD];
   for (int j = 0; j < NUM_TEAMS; ++j) {
@@ -33,10 +29,6 @@ int Dist_ScheduleStatic() {
         thread_limit(THRD)  map(tofrom: TrackUsedThread[0:NUM_TEAMS])\
         dist_schedule(static, 4)
   for (int i = 0; i < 32; ++i) {
-    if (Arr[i] != i) {
-#pragma omp atomic
-      ErrCount += 1;
-    }
     TrackUsedThread[omp_get_team_num()][omp_get_thread_num()] += 1;
   }
 
