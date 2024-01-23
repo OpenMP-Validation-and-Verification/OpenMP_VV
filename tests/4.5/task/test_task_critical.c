@@ -22,26 +22,27 @@
 #include <omp.h>
 #include "ompvv.h"
 
-int testTaskWithCriticalBasic(int numThreads) {
+int testTaskWithCriticalBasic(int NThrds) {
   int errors = 0;
   int count = 0;
-  omp_set_num_threads(numThreads);
+  omp_set_num_threads(NThrds);
 #pragma omp parallel
   {
 #pragma omp task
     {
 #pragma omp critical
-    {
-      count = count + 1;
-    }
+      {
+        count = count + 1;
+      }
     }
   }
   int ret = 0;
-  if (count == numThreads) {
+  if (count == NThrds) {
     ret = 0;
   } else {
     ret = -1;
   }
+
   OMPVV_TEST_AND_SET_VERBOSE(errors, ret != 0);
   return errors;
 }
@@ -92,7 +93,9 @@ int testTaskWithCriticalAdvanced(int numThreads, int expectedVal) {
       }
     }
   }
+  
   free(A);
+
   OMPVV_TEST_AND_SET_VERBOSE(errors, countPrime != expectedVal);
   return errors;
 }
