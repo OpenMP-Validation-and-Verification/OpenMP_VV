@@ -28,14 +28,14 @@ void add_two(int *arr);
 #pragma omp declare variant(add_two) match(construct={dispatch}) 
 void add(int *arr){
     #pragma omp parallel for
-    for (int i = 0; i < N; i++){ // Base function adds 2 to array values
+    for (int i = 0; i < N; i++){ // Base function adds 1 to array values
       arr[i] = arr[i]+1;
     }
 }
 
 void add_two(int *arr){
     for (int i = 0; i < N; i++){
-      arr[i] = arr[i]+2; // Variant function adds 4 to array values
+      arr[i] = arr[i]+2; // Variant function adds 2 to array values
     }
 }
 
@@ -44,7 +44,7 @@ int test_wrapper() {
 
     add(arr);
     for(i = 0; i < N; i++){
-        OMPVV_TEST_AND_SET(errors, arr[i] != i+1);
+        OMPVV_TEST_AND_SET(errors, arr[i] != 1);
     } 
     OMPVV_ERROR_IF(errors > 0, "Base function is not working properly");
 
@@ -52,7 +52,7 @@ int test_wrapper() {
         add(arr);
    
     for(i = 0; i < N; i++){
-        OMPVV_TEST_AND_SET(errors, arr[i] != i+2);
+        OMPVV_TEST_AND_SET(errors, arr[i] != 3);
     }
     OMPVV_ERROR_IF(errors > 0, "Dispatch is not working properly");
     return errors;
