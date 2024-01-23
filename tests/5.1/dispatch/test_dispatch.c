@@ -52,13 +52,15 @@ int test_wrapper() {
         add(arr);
    
     for(i = 0; i < N; i++){
-        OMPVV_TEST_AND_SET(errors, arr[i] != 3);
+        OMPVV_TEST_AND_SET(errors, arr[i] != 3 && arr[i] != 2);
     }
-    OMPVV_ERROR_IF(errors > 0, "Dispatch is not working properly");
+    OMPVV_INFOMSG_IF(errors > 0 || arr[0] == 2,
+                   "Dispatch is either not working or was not considered"
+                   " by the implementation as part of the context selector.");
     return errors;
 }
 
 int main () {
    OMPVV_TEST_AND_SET_VERBOSE(errors, test_wrapper());
    OMPVV_REPORT_AND_RETURN(errors);
-}  
+} 
