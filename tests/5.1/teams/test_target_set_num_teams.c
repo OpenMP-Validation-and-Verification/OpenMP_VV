@@ -39,7 +39,7 @@ int main() {
 		}
 	}
 
-	OMPVV_ERROR_IF(num_teams != OMPVV_NUM_TEAMS_HOST, "Number of teams was not properly overriden by the num_teams clause");	
+	OMPVV_ERROR_IF(num_teams <= OMPVV_NUM_TEAMS_HOST, "Number of teams was not properly overriden by the num_teams clause");	
 	OMPVV_TEST_AND_SET(errors, num_teams != OMPVV_NUM_TEAMS_HOST);
 	OMPVV_REPORT_AND_RETURN(errors);
 }
