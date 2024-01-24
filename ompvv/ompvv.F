@@ -270,10 +270,12 @@
      &        TRIM(clean_fn(__FILE__)), __LINE__, TRIM(message2dis)
           !OMPVV_INFOMSG(message2dis)
           IF (ompvv_isHost) THEN
-            WRITE(*,OMPVV_HEADER_RESULT_FMT) TRIM(clean), "failed", 
+            WRITE(*,OMPVV_HEADER_RESULT_FMT)
+     &      TRIM(clean), "failed",
      &      "host"
           ELSE
-            WRITE(*,OMPVV_HEADER_RESULT_FMT) TRIM(clean), "failed", 
+            WRITE(*,OMPVV_HEADER_RESULT_FMT)
+     &      TRIM(clean), "failed",
      &      "device"
           END IF
         ELSE
@@ -282,10 +284,12 @@
      &        TRIM("Test ran with no errors")
           !OMPVV_INFOMSG("Test ran with no errors")
           IF (ompvv_isHost) THEN
-            WRITE(*,OMPVV_HEADER_RESULT_FMT) TRIM(clean), "passed", 
+            WRITE(*,OMPVV_HEADER_RESULT_FMT)
+     &      TRIM(clean), "passed",
      &      "host"
           ELSE
-            WRITE(*,OMPVV_HEADER_RESULT_FMT) TRIM(clean), "passed", 
+            WRITE(*,OMPVV_HEADER_RESULT_FMT)
+     &      TRIM(clean), "passed",
      &      "device"
           END IF
         END IF
@@ -340,9 +344,9 @@
         INTEGER ln
 #ifdef VERBOSE_MODE
         CHARACTER(len=*) msg
-        PARAMETER (msg = "This tests is running on 
-     &   a shared data environment between host and device. This may 
-     &   cause errors")
+        PARAMETER (msg = "This tests is running on " //
+     &   "a shared data environment between host and device. This " //
+     &   "may cause errors")
 #endif
 
         clean = TRIM(clean_fn(fn))
@@ -353,11 +357,13 @@
 
         call test_shared_environment_probe(ompvv_sharedEnv)
 
+#ifdef VERBOSE_MODE
         IF (ompvv_sharedEnv) THEN
           !OMPVV_WARNING_HELPER(msg, clean, ln)
           WRITE(*, OMPVV_HEADER_FMT(OMPVV_WARNING)) 
      &     TRIM(clean_fn(__FILENAME__)), __LINE__, TRIM(msg)
         END IF
+#endif
       end subroutine test_shared_environment
 
       function test_and_set_shared_environment(fn, ln)
