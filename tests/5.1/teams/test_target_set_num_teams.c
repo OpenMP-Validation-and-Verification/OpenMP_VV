@@ -30,7 +30,7 @@ int main() {
 	}               
 	
 	OMPVV_ERROR_IF(num_teams <= 4, "Number of teams detected was not the number set by omp_set_num_teams()");
-	OMPVV_TEST_AND_SET(errors, num_teams != 4);
+	OMPVV_TEST_AND_SET(errors, num_teams <= 4);
 
 	#pragma omp teams num_teams(OMPVV_NUM_TEAMS_HOST)
 	{
