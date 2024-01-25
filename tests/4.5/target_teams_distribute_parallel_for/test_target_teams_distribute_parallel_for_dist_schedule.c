@@ -17,7 +17,7 @@
 
 int Dist_ScheduleStatic() {
   int ErrCount = 0;
-
+int num_teams, num_threads;
   int TrackUsedThread[NUM_TEAMS][THRD];
   for (int j = 0; j < NUM_TEAMS; ++j) {
     for (int i = 0; i < THRD; ++i) {
