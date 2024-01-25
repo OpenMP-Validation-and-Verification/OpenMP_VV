@@ -26,7 +26,7 @@ int Dist_ScheduleStatic() {
   }
 
 #pragma omp target teams distribute parallel for num_teams(NUM_TEAMS)\
-        thread_limit(THRD)  map(tofrom: TrackUsedThread[0:NUM_TEAMS])\
+        thread_limit(THRD)  map(tofrom: TrackUsedThread[0:NUM_TEAMS], num_teams, num_threads)\
         dist_schedule(static, 4)
   for (int i = 0; i < 32; ++i) {
     TrackUsedThread[omp_get_team_num()][omp_get_thread_num()] += 1;
