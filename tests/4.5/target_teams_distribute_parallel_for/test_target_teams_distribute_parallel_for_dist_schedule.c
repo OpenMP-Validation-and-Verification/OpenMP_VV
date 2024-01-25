@@ -30,7 +30,11 @@ int num_teams, num_threads;
         dist_schedule(static, 4)
   for (int i = 0; i < 32; ++i) {
     TrackUsedThread[omp_get_team_num()][omp_get_thread_num()] += 1;
+if(omp_get_team_num()==0 && omp_get_thread_num() == 0){
+  num_teams = omp_get_num_teams();
+  num_threads = omp_get_num_threads();
   }
+    }
 
   // Check - 1: First four columns of each row should not be zero
   for (int i = 0; i < NUM_TEAMS; ++i) {
