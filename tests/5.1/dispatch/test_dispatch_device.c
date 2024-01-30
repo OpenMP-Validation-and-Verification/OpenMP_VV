@@ -29,7 +29,7 @@ void add_dev(int *arr);
 #pragma omp declare variant(add_dev) match(construct={dispatch}) 
 void add(int *arr){
    #pragma omp parallel for
-   for (int i = 0; i < N; i++){ // Base function adds 2 to array values
+   for (int i = 0; i < N; i++){ // Base function adds 1 to array values
       arr[i] = arr[i]+1;
    }
 }
@@ -42,7 +42,7 @@ void add_dev(int *arr){
 
 int test_wrapper() { 
    errors = 0;
-   int device_num = omp_get_num_devices()-1; // last available device. 
+   int device_num = omp_get_num_devices() ? omp_get_num_devices()-1 : 0;  // last available device. 
 
    add(arr);
    for(i = 0; i < N; i++){
