@@ -36,7 +36,7 @@ void add(int *arr){
 
 void add_dev(int *arr){
    for (int i = 0; i < N; i++){
-      arr[i] = arr[i]+2+omp_get_default_device(); // Variant function adds 4 to array values
+      arr[i] = arr[i]+2+omp_get_default_device(); // Variant function adds at least 2 to array values
    }
 }
 
