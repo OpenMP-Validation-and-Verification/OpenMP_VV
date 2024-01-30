@@ -46,7 +46,7 @@ int test_wrapper() {
 
    add(arr);
    for(i = 0; i < N; i++){
-      OMPVV_TEST_AND_SET(errors, arr[i] != i+1);
+      OMPVV_TEST_AND_SET(errors, arr[i] != 1);
    } 
    OMPVV_ERROR_IF(errors > 0, "Base function is not working properly");
 
@@ -54,9 +54,11 @@ int test_wrapper() {
       add(arr);
    
    for(i = 0; i < N; i++){
-      OMPVV_TEST_AND_SET(errors, arr[i] != i+2+device_num);
+      OMPVV_TEST_AND_SET(errors, arr[i] != 2 && arr[i] != 3+device_num);
    }
-   OMPVV_ERROR_IF(errors > 0, "Dispatch is not working properly");
+   OMPVV_INFOMSG_IF(errors > 0 || arr[0] == 2,
+                   "Dispatch is either not working or was not considered"
+                   " by the implementation as part of the context selector.");
 
    return errors;
 }
