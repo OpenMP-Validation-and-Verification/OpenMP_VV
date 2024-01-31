@@ -85,6 +85,7 @@ CONTAINS
     DO i=1, N
       fptr(i) = fptr(i) * 2 ! initialize data
     END DO
+    fptr => null()  ! Reset to value of the beginning of the target region
     !$omp end target
 
     ! copy to host memory
