@@ -79,6 +79,7 @@ CONTAINS
     END IF
 
     !$omp taskwait depend(depobj: obj)
+    fptr => null()  ! Avoid transfering the undefined pointer target
     !$omp target is_device_ptr(mem_dev_cpy) device(t) depend(depobj: obj)
     CALL c_f_pointer(mem_dev_cpy, fptr, [N])
     DO i=1, N
