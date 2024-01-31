@@ -1,4 +1,6 @@
-//===--- test_target_memcpy_async_depobj.c ----------------------------===//
+//===--- test_target_memcpy_async_depobj.c --------------------------------===//
+//
+//  OpenMP API Version 5.1 Nov 2020
 //
 //  Inspired from OpenMP 5.1 Examples Doc, 5.16.4 & 8.9
 //  This test utilizes the omp_target_memcpy_async construct to
@@ -6,7 +8,7 @@
 //  uses 'obj' for dependency, so that memory is only copied once
 //  the variable listed in the depend clause is changed.
 //
-////===----------------------------------------------------------------------===//
+////===--------------------------------------------------------------------===//
 
 #include <omp.h>
 #include <stdio.h>
@@ -20,7 +22,7 @@ int errors, i;
 
 int test_target_memcpy_async_depobj() {
 
-    int h, t, i;
+    int h, t, i, err_r;
     errors = 0;
     double *mem;
     double *mem_dev_cpy;
@@ -31,7 +33,15 @@ int test_target_memcpy_async_depobj() {
     mem = (double *)malloc( sizeof(double)*N);
     mem_dev_cpy = (double *)omp_target_alloc( sizeof(double)*N, t);
 
+    OMPVV_TEST_AND_SET_VERBOSE(errors, mem == NULL);
+    if(mem == NULL) {
+       return errors;
+    }
+
     OMPVV_TEST_AND_SET_VERBOSE(errors, mem_dev_cpy == NULL);
+    if(mem_dev_cpy == NULL) {
+       return errors;
+    }
 
     for(i = 0; i < N; i++){
         mem[i] = i;
@@ -41,10 +51,16 @@ int test_target_memcpy_async_depobj() {
     omp_depend_t obj_arr[1] = {obj};
 
     /* copy to device memory */
-    omp_target_memcpy_async(mem_dev_cpy, mem, sizeof(double)*N,
+    err_r = omp_target_memcpy_async(mem_dev_cpy, mem, sizeof(double)*N,
                                 0,          0,
                                 t,          h,
                                 1,          obj_arr);
+    if(err_r) {
+       OMPVV_ERROR("omp_target_memcpy_async returns not 0");
+       free(mem);
+       omp_target_free(mem_dev_cpy, t);
+       return errors;
+    }
 
     #pragma omp taskwait depend(depobj: obj)
     #pragma omp target is_device_ptr(mem_dev_cpy) device(t) depend(depobj: obj)
