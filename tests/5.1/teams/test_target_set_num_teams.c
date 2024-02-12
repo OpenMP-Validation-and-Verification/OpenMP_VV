@@ -22,12 +22,7 @@ int main() {
 	int num_teams = 0;
 	omp_set_num_teams(8);
         	
-	#pragma omp teams 
-	{
-		if (omp_get_team_num() == 0 ) {
-			num_teams = omp_get_max_teams();
-		}
-	}               
+	num_teams = omp_get_max_teams();             
 	
 	OMPVV_ERROR_IF(num_teams != 8, "Upper bound of the number of teams is not the number set by omp_set_num_teams()");
 	OMPVV_TEST_AND_SET(errors, num_teams != 8);
