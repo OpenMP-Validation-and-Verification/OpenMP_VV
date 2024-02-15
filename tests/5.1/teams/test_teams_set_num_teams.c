@@ -1,4 +1,4 @@
-//===--------------------- test_target_set_num_teams.c ----------------------===//
+//===--------------------- test_teams_set_num_teams.c ----------------------===//
 //
 // OpenMP API Version 5.1 Nov 2020
 //
