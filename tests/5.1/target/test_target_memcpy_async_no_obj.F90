@@ -30,7 +30,6 @@ CONTAINS
   INTEGER FUNCTION test_memcpy_async_no_obj()
     INTEGER :: errors, i
     DOUBLE PRECISION, TARGET, ALLOCATABLE :: arr(:)
-    DOUBLE PRECISION, POINTER :: fptr(:)
     TYPE (C_PTR) :: mem, mem_dev_cpy
     INTEGER (C_SIZE_T) :: csize, dst_offset, src_offset
     INTEGER (C_INT) :: h, t, depobj_count
