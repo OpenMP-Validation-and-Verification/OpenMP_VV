@@ -71,7 +71,7 @@ CONTAINS
       OMPVV_ERROR("omp_target_memcpy_async returns not 0");
       DEALLOCATE(arr)
       CALL omp_target_free(mem_dev_cpy, t)
-      test_memcpy_async_depobj = errors
+      test_memcpy_async_no_obj = errors
       RETURN
     END IF
 
