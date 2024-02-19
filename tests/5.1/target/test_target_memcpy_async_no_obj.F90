@@ -56,7 +56,7 @@ CONTAINS
 
     OMPVV_TEST_AND_SET_VERBOSE(errors, .NOT. c_associated(mem_dev_cpy))
     IF(.NOT. c_associated(mem_dev_cpy)) THEN
-      test_memcpy_async_depobj = errors
+      test_memcpy_async_no_obj = errors
       RETURN  
     END IF
 
