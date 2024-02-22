@@ -79,8 +79,11 @@ CONTAINS
     !$omp target is_device_ptr(mem_dev_cpy) device(t)
     !$omp teams distribute parallel do
     DO i=1, N
+      BLOCK
+      DOUBLE PRECISION, POINTER :: fptr(:)
       CALL c_f_pointer(mem_dev_cpy, fptr, [N])
       fptr(i) = fptr(i) * 2 ! initialize data on device
+      END BLOCK
     END DO
     !$omp end teams distribute parallel do
     !$omp end target
