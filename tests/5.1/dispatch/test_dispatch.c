@@ -62,7 +62,7 @@ int test_wrapper() {
 
 int main () {
     for (int i = 0; i < N; i++){
-      arr[i] = 1;
+      arr[i] = 0;
     }
    OMPVV_TEST_AND_SET_VERBOSE(errors, test_wrapper());
    OMPVV_REPORT_AND_RETURN(errors);
