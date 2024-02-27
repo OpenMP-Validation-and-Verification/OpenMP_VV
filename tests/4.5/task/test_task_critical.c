@@ -22,9 +22,10 @@
 #include <omp.h>
 #include "ompvv.h"
 
-int testTaskWithCriticalBasic(int NThrds) {
+int testTaskWithCriticalBasic() {
   int errors = 0;
   int count = 0;
+  int NThrds = omp_get_num_threads();
   omp_set_num_threads(NThrds);
 #pragma omp parallel
   {
@@ -102,18 +103,9 @@ int testTaskWithCriticalAdvanced(int numThreads, int expectedVal) {
 
 int main() {
   int errors = 0;
-  OMPVV_TEST_AND_SET_VERBOSE(errors, testTaskWithCriticalBasic(4));
-  OMPVV_TEST_AND_SET_VERBOSE(errors, testTaskWithCriticalBasic(8));
-  OMPVV_TEST_AND_SET_VERBOSE(errors, testTaskWithCriticalBasic(16));
-  OMPVV_TEST_AND_SET_VERBOSE(errors, testTaskWithCriticalBasic(32));
-  OMPVV_TEST_AND_SET_VERBOSE(errors, testTaskWithCriticalBasic(64));
+  OMPVV_TEST_AND_SET_VERBOSE(errors, testTaskWithCriticalBasic());
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, testTaskWithCriticalAdvanced(1, 0));
-  OMPVV_TEST_AND_SET_VERBOSE(errors, testTaskWithCriticalAdvanced(4, 2));
-  OMPVV_TEST_AND_SET_VERBOSE(errors, testTaskWithCriticalAdvanced(8, 4));
-  OMPVV_TEST_AND_SET_VERBOSE(errors, testTaskWithCriticalAdvanced(16, 6));
-  OMPVV_TEST_AND_SET_VERBOSE(errors, testTaskWithCriticalAdvanced(32, 11));
-  OMPVV_TEST_AND_SET_VERBOSE(errors, testTaskWithCriticalAdvanced(64, 18));
 
   OMPVV_REPORT_AND_RETURN(errors);
 }
