@@ -37,17 +37,18 @@ int test_declare_mapper_present() {
   int errors = 0;
 
   myvec_t s;
-
   s.data = (int *)calloc(N,sizeof(int));
   s.len  = N;
   #pragma omp target enter data map(to: s, s.data[0:s.len])
 
   #pragma omp declare mapper(default:myvec_t v) map(present, from: v, v.data[0:v.len]) 
 
-  #pragma omp target map(s)
+
+  #pragma omp target
   {
     init(&s);
   }
+  #pragma omp target exit data map(from: s, s.data[0:s.len])
 
   for (int i = 0; i < N; ++i) {
     OMPVV_TEST_AND_SET(errors, s.data[i] != i);
