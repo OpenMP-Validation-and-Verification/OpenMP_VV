@@ -29,6 +29,8 @@ int testTaskWithCriticalBasic() {
   omp_set_num_threads(NThrds);
 #pragma omp parallel
   {
+      NThrds = omp_get_num_threads();
+       
 #pragma omp task
     {
 #pragma omp critical
