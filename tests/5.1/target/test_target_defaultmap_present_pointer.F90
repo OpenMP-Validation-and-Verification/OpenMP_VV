@@ -33,6 +33,7 @@ CONTAINS
     INTEGER, POINTER :: ptr(:) !pointer
 
     errors = 0
+    ptr => A
 
     DO i = 1, N
         A(i) = i
@@ -40,7 +41,6 @@ CONTAINS
 
     !$omp target enter data map(to: ptr)
     !$omp target map(tofrom: errors) defaultmap(present:pointer)
-    ptr => A
     DO i = 1, N
         IF (ptr(i) .NE. i) then
             errors = errors + 1
