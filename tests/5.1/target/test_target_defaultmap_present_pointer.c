@@ -1,12 +1,12 @@
 //===--- test_target_defaultmap_present_pointer.c ---------------------------===//
 //
-//  OpenMP API Version 5.1 Aug 2021
+//  OpenMP API Version 5.1 Aug 2020
 //
 //  This test checks behavior of the defaultmap clause when the specified 
 //  implicit-behavior is present. The variable-categories available for defaultmap
 //  are scalar, aggregate, and pointer. If implicit-behavior is present, each 
 //  variable referenced in the construct in the category specified by 
-//  variable-category is treated as if it had been listed in a map clause wih the
+//  variable-category is treated as if it had been listed in a map clause with the
 //  map-type of alloc and map-type-modifier of present.
 //
 ////===----------------------------------------------------------------------===//
@@ -43,11 +43,12 @@ int test_defaultmap_present_pointer() {
          ptr[i] = 2+i;
       }
    }
+   #pragma omp target exit data map(delete: ptr)
    
    OMPVV_ERROR_IF(errors > 0, "Values were not mapped to the device properly");
    
    for (i = 0; i < N; i++) {
-      OMPVV_TEST_AND_SET_VERBOSE(errors, A[i] != 2+i);
+      OMPVV_TEST_AND_SET(errors, A[i] != 2+i);
    }
 
    return errors;
