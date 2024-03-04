@@ -48,7 +48,7 @@ CONTAINS
         ptr(i) = i + 2
     END DO
     !$omp end target
-    !$omp target exit data map(delete: ptr)
+    !$omp target exit data map(from: ptr)
 
     OMPVV_ERROR_IF(errors .GT. 0, "Values were not mapped to the device properly")
 
