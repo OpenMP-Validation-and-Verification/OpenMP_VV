@@ -5,8 +5,8 @@
 !  Inspired from OpenMP 5.1 Examples Doc, 5.16.4 & 8.9
 !  This test utilizes the omp_target_memcpy_async construct to
 !  allocate memory on the device asynchronously. The construct
-!  uses 0 for 'depobj_count', so that the clause is not dependent
-!  and memory is therefore copied synchronously.
+!  uses 0 for 'depobj_count'; therefore, the generated target task
+!  is not a dependent task, but the memory copy is still asynchronous.
 !
 !//===---------------------------------------------------------------------===//
 
