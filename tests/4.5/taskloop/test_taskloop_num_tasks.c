@@ -14,52 +14,55 @@
 #include "ompvv.h"
 
 #define NUM_THREADS 100
-#define NUM_TASKS 4
+
+#define NUM_TASKS 6
+#define NUM_ITERATIONS 12
+
+int isGroupIdsSame(int thread_ids[])
+{
+        int iterationsPerGroup = NUM_ITERATIONS / NUM_TASKS;
+
+        for(int i = 0; i < NUM_ITERATIONS; i = i+iterationsPerGroup)
+        {
+                int groupNumber = i / iterationsPerGroup;
+
+                for(int j = 0; j<iterationsPerGroup; j++) {
+                        if (thread_ids[i+j] != thread_ids[i]) {
+                                return 0; // Return false if any id is different in a group
+                        }
+                }
+        }
+
+        return 1; // Return true if all id's are same per group
+}
 
 int test_taskloop_num_tasks() {
 
   int errors = 0;
 
-  long int all_thread_sum, real_sum = 0; 
-  long int var = 0; //This variable is shared with all the tasks.  
-  
-  int NUM = 100;
+  long int var = 0; //This variable is shared with all the tasks.
 
-   //get valid sum without openmp
-   for(int i = 0; i < NUM; i++) {
-     real_sum = real_sum + i;
-   }
-
-   int thread_ids[100];
-   int values[100];
+   int thread_ids[NUM_THREADS];
+   int values[NUM_THREADS];
 
    #pragma omp parallel num_threads(NUM_THREADS)
    {
       #pragma omp single
       {
-	#pragma omp taskloop num_tasks(NUM_TASKS) 
-        for(int i = 0; i < NUM; i++) 
-	{
-	    #pragma omp atomic 
-	    var = var + i;
+        #pragma omp taskloop num_tasks(NUM_TASKS)
+        for(int i = 0; i < NUM_ITERATIONS; i++)
+        {
+            #pragma omp atomic
+            var = var + i;
 
-	    values[i] = var;
-	    thread_ids[i] = omp_get_thread_num();
-	}
-      }	   
+            values[i] = var;
+            thread_ids[i] = omp_get_thread_num();
+        }
+      }
    }
 
-   int threads_max = values[0]; // Assume the first element is the maximum
-   
-   for(int i = 0; i < NUM; i++) {
-
-	   if(values[i] > threads_max) 
-	   	threads_max = values[i]; 
-   }
-
-   all_thread_sum = threads_max;
-
-   OMPVV_TEST_AND_SET_VERBOSE(errors, real_sum != all_thread_sum);
+   //if all the tasks in a group are run by a same thread, get TRUE else FALSE
+   OMPVV_TEST_AND_SET_VERBOSE(errors, (isGroupIdsSame(thread_ids) != 1));
 
    return errors;
 }
