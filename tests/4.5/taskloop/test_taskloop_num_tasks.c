@@ -13,8 +13,6 @@
 #include <omp.h>
 #include "ompvv.h"
 
-#define NUM_THREADS 100
-
 #define NUM_TASKS 6
 #define NUM_ITERATIONS 12
 
@@ -24,8 +22,6 @@ int isGroupIdsSame(int thread_ids[])
 
         for(int i = 0; i < NUM_ITERATIONS; i = i+iterationsPerGroup)
         {
-                int groupNumber = i / iterationsPerGroup;
-
                 for(int j = 0; j<iterationsPerGroup; j++) {
                         if (thread_ids[i+j] != thread_ids[i]) {
                                 return 0; // Return false if any id is different in a group
@@ -45,7 +41,7 @@ int test_taskloop_num_tasks() {
    int thread_ids[NUM_THREADS];
    int values[NUM_THREADS];
 
-   #pragma omp parallel num_threads(NUM_THREADS)
+   #pragma omp parallel num_threads(OMPVV_NUM_THREADS_HOST) // 8 threads requested
    {
       #pragma omp single
       {
@@ -63,6 +59,7 @@ int test_taskloop_num_tasks() {
 
    //if all the tasks in a group are run by a same thread, get TRUE else FALSE
    OMPVV_TEST_AND_SET_VERBOSE(errors, (isGroupIdsSame(thread_ids) != 1));
+   OMPVV_TEST_AND_SET_VERBOSE(errors, var != ((NUM_ITERATIONS-1)*(NUM_ITERATIONS)/2);
 
    return errors;
 }
