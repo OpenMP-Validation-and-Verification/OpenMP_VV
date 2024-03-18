@@ -43,6 +43,12 @@ int test_taskloop_num_tasks() {
 
    #pragma omp parallel num_threads(OMPVV_NUM_THREADS_HOST) // 8 threads requested
    {
+   if (omp_get_thread_num() == 0){
+     if (omp_get_num_threads()==1)
+       OMPVV_WARNING("The parallel region is executing single threaded.");
+       }
+      }
+
       #pragma omp single
       {
         #pragma omp taskloop num_tasks(NUM_TASKS)
