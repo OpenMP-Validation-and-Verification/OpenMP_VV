@@ -20,24 +20,24 @@ int test_task_target() {
   int errors = 0, i;
 
 #pragma omp task shared(a) private(i)
-  #pragma omp target map(from: a)
-    #pragma omp parallel for
-      for (i = 0; i < N; i++)
-        a[i] = i;
+#pragma omp target map(from: a)
+#pragma omp parallel for
+  for (i = 0; i < N; i++)
+    a[i] = i;
    
 #pragma omp task shared(b) private(i)
-  #pragma omp target map(from: b)
-    #pragma omp parallel for
-      for (i = 0; i < N; i++)
-        b[i] = 10;
+#pragma omp target map(from: b)
+#pragma omp parallel for
+  for (i = 0; i < N; i++)
+    b[i] = 10;
 
 #pragma omp taskwait
 
 #pragma omp task shared(c) private(i)
-  #pragma omp target map(from: c) map(to:a,b)
-    #pragma omp parallel for
-      for (i = 0; i < N; i++)
-        c[i] = a[i] + b[i];
+#pragma omp target map(from: c) map(to:a,b)
+#pragma omp parallel for
+  for (i = 0; i < N; i++)
+    c[i] = a[i] + b[i];
 
 #pragma omp taskwait
 
