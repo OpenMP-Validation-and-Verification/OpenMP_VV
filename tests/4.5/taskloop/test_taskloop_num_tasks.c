@@ -24,8 +24,6 @@ int isGroupIdsSame(int thread_ids[])
 
         for(int i = 0; i < NUM_ITERATIONS; i = i+iterationsPerGroup)
         {
-                int groupNumber = i / iterationsPerGroup;
-
                 for(int j = 0; j<iterationsPerGroup; j++) {
                         if (thread_ids[i+j] != thread_ids[i]) {
                                 return 0; // Return false if any id is different in a group
@@ -38,12 +36,11 @@ int isGroupIdsSame(int thread_ids[])
 
 int test_taskloop_num_tasks() {
 
-  int errors = 0;
+   int errors = 0;
 
-  long int var = 0; //This variable is shared with all the tasks.
+   long int var = 0;
 
    int thread_ids[NUM_THREADS];
-   int values[NUM_THREADS];
 
    #pragma omp parallel num_threads(NUM_THREADS)
    {
@@ -52,10 +49,9 @@ int test_taskloop_num_tasks() {
         #pragma omp taskloop num_tasks(NUM_TASKS)
         for(int i = 0; i < NUM_ITERATIONS; i++)
         {
-            #pragma omp atomic
-            var = var + i;
+	    #pragma omp atomic 
+	    var = var + i;
 
-            values[i] = var;
             thread_ids[i] = omp_get_thread_num();
         }
       }
@@ -63,6 +59,8 @@ int test_taskloop_num_tasks() {
 
    //if all the tasks in a group are run by a same thread, get TRUE else FALSE
    OMPVV_TEST_AND_SET_VERBOSE(errors, (isGroupIdsSame(thread_ids) != 1));
+   
+   OMPVV_TEST_AND_SET_VERBOSE(errors, var != ((NUM_ITERATIONS-1)*(NUM_ITERATIONS)/2));
 
    return errors;
 }
