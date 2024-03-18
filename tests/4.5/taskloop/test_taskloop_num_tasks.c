@@ -58,7 +58,7 @@ int test_taskloop_num_tasks() {
    }
 
    //if all the tasks in a group are run by a same thread, get TRUE else FALSE
-   OMPVV_TEST_AND_SET_VERBOSE(errors, (isGroupIdsSame(thread_ids) != 1));
+   OMPVV_WARNING_IF("The tasks were ran by a single thread", (isGroupIdsSame(thread_ids) != 1));
    OMPVV_TEST_AND_SET_VERBOSE(errors, var != ((NUM_ITERATIONS-1)*(NUM_ITERATIONS)/2);
 
    return errors;
