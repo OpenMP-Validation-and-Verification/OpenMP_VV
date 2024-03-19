@@ -13,8 +13,6 @@
 #include <omp.h>
 #include "ompvv.h"
 
-#define NUM_THREADS 100
-
 #define NUM_TASKS 6
 #define NUM_ITERATIONS 12
 
@@ -24,7 +22,11 @@ int isGroupIdsSame(int thread_ids[])
 
         for(int i = 0; i < NUM_ITERATIONS; i = i+iterationsPerGroup)
         {
+<<<<<<< HEAD
                 for(int j = 0; j < iterationsPerGroup; j++) {
+=======
+                for(int j = 0; j<iterationsPerGroup; j++) {
+>>>>>>> 6ca90741a88367a7c81454b219b9c6f76684d91f
                         if (thread_ids[i+j] != thread_ids[i]) {
                                 return 0; // Return false if any id is different in a group
                         }
@@ -42,6 +44,7 @@ int test_taskloop_num_tasks() {
 
    int thread_ids[NUM_THREADS];
 
+<<<<<<< HEAD
    #pragma omp parallel num_threads(NUM_THREADS) // 8 threads requested
    {
    	if (omp_get_thread_num() == 0)
@@ -61,13 +64,38 @@ int test_taskloop_num_tasks() {
             		thread_ids[i] = omp_get_thread_num();
         	}
       	}
+=======
+   #pragma omp parallel num_threads(OMPVV_NUM_THREADS_HOST) // 8 threads requested
+   {
+   if (omp_get_thread_num() == 0){
+     if (omp_get_num_threads()==1)
+       OMPVV_WARNING("The parallel region is executing single threaded.");
+       }
+      }
 
+      #pragma omp single
+      {
+        #pragma omp taskloop num_tasks(NUM_TASKS)
+        for(int i = 0; i < NUM_ITERATIONS; i++)
+        {
+            #pragma omp atomic
+            var = var + i;
+
+            values[i] = var;
+            thread_ids[i] = omp_get_thread_num();
+        }
+      }
+>>>>>>> 6ca90741a88367a7c81454b219b9c6f76684d91f
    }
 
    //if all the tasks in a group are run by a same thread, get TRUE else FALSE
    OMPVV_WARNING_IF("The tasks were ran by a single thread", (isGroupIdsSame(thread_ids) != 1));
+<<<<<<< HEAD
    
    OMPVV_TEST_AND_SET_VERBOSE(errors, var != ((NUM_ITERATIONS-1)*(NUM_ITERATIONS)/2));
+=======
+   OMPVV_TEST_AND_SET_VERBOSE(errors, var != ((NUM_ITERATIONS-1)*(NUM_ITERATIONS)/2);
+>>>>>>> 6ca90741a88367a7c81454b219b9c6f76684d91f
 
    return errors;
 }
