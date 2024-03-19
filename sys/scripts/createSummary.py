@@ -338,7 +338,7 @@ def main():
   elif args.format and args.format[0].lower() == 'summary':
     num_tests = len(results)
     failures = []
-    acceptable_extensions = (".cpp", ".c", ".f90", ".f")				   
+    acceptable_extensions = (".cpp", ".c", ".f90")				   
     number_tests_by_file_type = dict.fromkeys( acceptable_extensions, 0)	   
     number_build_failures_by_file_type = dict.fromkeys( acceptable_extensions, 0) 
     number_pass_by_file_type = dict.fromkeys( acceptable_extensions, 0)

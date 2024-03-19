@@ -1,6 +1,6 @@
 //--------------- test_target_is_accessible.c---------------------//
 //
-// OpenMP API Version 5.1 Aug 2020
+// OpenMP API Version 5.1 Aug 2021
 //
 // This test checks that the omp_target_is_accessible device routine.
 // In this test the output of the target_is_accessible call should return
@@ -23,7 +23,7 @@ int check_device(){
 	const int buf_size = sizeof(int) * N;
 	const int dev = omp_get_default_device();
 	
-	/*Assumes that on shared-memory systems, no copy is done*/
+	/*Assumes that one shared-memory systems, no copy is done*/
 	#pragma omp target map(to: isSharedMemory)
 		isSharedMemory = 1;
 
