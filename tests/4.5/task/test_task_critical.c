@@ -30,7 +30,7 @@ int testTaskWithCriticalBasic() {
   
 #pragma omp parallel
   {
-      if(omp_get_thread_num == 0) NThrds = omp_get_num_threads();
+      if(omp_get_thread_num() == 0) NThrds = omp_get_num_threads();
        
 #pragma omp task
     {
