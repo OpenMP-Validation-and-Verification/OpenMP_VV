@@ -19,7 +19,7 @@ int test_taskloop_private() {
 
   int errors = 0;
 
-  int private_var_sum = 0; 
+  int private_var_sum;  
   int val_not_in_openmp = 10; 
   
    #pragma omp parallel num_threads(NUM_THREADS)
