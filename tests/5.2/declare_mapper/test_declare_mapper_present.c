@@ -22,6 +22,20 @@ typedef struct myvec{
     int *data;
 } myvec_t;
 
+// In addition to the present modifier, the always is requiered
+// Given that the present and default modifiers are to be tested
+// the struct has to be in the GPU prior to the default mapper
+// is tested, therefore the "omp target enter data" with "to"
+// is used. Furthermore, given that it is the "from" that is to be
+// checked, the "omp target exit data" is set to "delete"
+// in this scenario if the always is not on the declare mapper
+// the "omp target" is inside the "omp target enter data"
+// with the "map to", which would prevent the effect of the
+// declared mapped to have effects outside. Therefore, by adding
+// the always, the mapper force the update of the declared mapper
+// to be seen outside the "target data region"
+
+#pragma omp declare mapper(default:myvec_t v) map(always, present, from: v, v.len, v.data[0:v.len]) 
 
 
 void init( myvec_t *s )
@@ -39,16 +53,15 @@ int test_declare_mapper_present() {
   myvec_t s;
   s.data = (int *)calloc(N,sizeof(int));
   s.len  = N;
-  #pragma omp target enter data map(to: s, s.data[0:s.len])
 
-  #pragma omp declare mapper(default:myvec_t v) map(present, from: v, v.data[0:v.len]) 
-
+  #pragma omp target enter data map(to: s.len, s.data[0:s.len])
 
   #pragma omp target
   {
     init(&s);
   }
-  #pragma omp target exit data map(from: s, s.data[0:s.len])
+
+  #pragma omp target exit data map(delete: s.len, s.data[0:s.len])
 
   for (int i = 0; i < N; ++i) {
     OMPVV_TEST_AND_SET(errors, s.data[i] != i);
