@@ -20,7 +20,7 @@
 
 int main() {
 
-   int i, threads, errors = 0, thrd_num;
+   int i, threads, errors = 0, thrd_num, num_threads = 0;
    int  format_size = 13; //size of my_format
    char format[] = "thrd_num=%0.4n";
 
@@ -36,14 +36,15 @@ int main() {
 
    #pragma omp parallel private(thrd_num) num_threads(threads) 
    {
-      if(omp_get_num_threads() > threads) exit(1); //safety: dont exceed # of buffers
-
       thrd_num = omp_get_thread_num();
+      if(thrd_num == 0)
+        num_threads = omp_get_num_threads();
+
       omp_capture_affinity(buffer[thrd_num], (size_t) BUFFER_STORE, format);
    }
 
    // Checks if the affinity string is corrrectly captured
-   for(i = 0; i < threads; i++) {
+   for(i = 0; i < num_threads; i++) {
       char str[30];
       snprintf(str, sizeof(str), "thrd_num=%0.4d", i);
 
