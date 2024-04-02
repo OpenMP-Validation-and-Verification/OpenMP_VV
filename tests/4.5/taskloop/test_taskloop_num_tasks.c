@@ -5,8 +5,8 @@
 // This test checks the 'taskloop' directive with the 'num_tasks' clause specified.
 // The 'taskloop' construct parallelizes loops with independent iterations by creating tasks. 
 // It allows for efficient parallel execution of loop iterations by distributing them among multiple threads. 
-// The 'num_tasks' clause variable ensures that the loop iterations are shared amoung created 'num_tasks'. 
-// i.e the loop iterations are divided amoung number of tasks (each num_task group is run by same the thread).   
+// The 'num_tasks' clause variable ensures that the loop iterations are shared among created 'num_tasks'.
+// i.e the loop iterations are divided among number of tasks (each num_task group is run by same the thread).
 //----------------------------------------------------------------------------------------------------------//
 
 #include <stdio.h>
