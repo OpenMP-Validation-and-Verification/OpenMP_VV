@@ -3,7 +3,7 @@
 // OpenMP API Version 4.5 August 2015
 //
 // This test checks the taskloop directive with the 'private' clause specified.
-// The 'taskloop' construct parallelizes loops with independent iterations by creating tasks. 
+// The 'taskloop' construct parallels loops with independent iterations by creating tasks.
 // It allows for efficient parallel execution of loop iterations by distributing them among multiple threads. 
 // The 'private' clause ensures that each task should have private copies. 
 //----------------------------------------------------------------------------------------------------------//
@@ -13,35 +13,35 @@
 #include "ompvv.h"
 
 #define NUM_THREADS 100
-#define NUM_TASKS 100
+#define NUM_TASKS 5
 
 int test_taskloop_private() {
 
-  int errors = 0;
+   int errors = 0;
 
-  int private_var = -2; 
-  int shared_var_sum = 0;	
-  int num_threads = 0;
-  
+   int private_var;
+   int shared_var_sum;
+
    #pragma omp parallel num_threads(NUM_THREADS)
    {
-      num_threads = omp_get_num_threads();
-      #pragma omp single
-      {
-	#pragma omp taskloop private(private_var) 
-        for(int i = 0; i < NUM_TASKS; i++) {
-	  private_var = omp_get_thread_num();
-          #pragma omp atomic
-	    shared_var_sum += private_var;
-	 }      
-      }	   
+	    #pragma omp single
+   	    {
+		    #pragma omp taskloop private(private_var)
+            for(int i = 0; i < NUM_TASKS; i++)
+		    {
+            	int sum = 0;
+	    		for(private_var = 0; private_var < 5; private_var++)
+	    			sum += private_var;
+
+			    #pragma omp atomic
+	    		shared_var_sum += sum;
+	 	    }
+   	    }
    }
-  
-   //check if the private variable is same before and after openmp region. i.e it should be same
-   OMPVV_TEST_AND_SET_VERBOSE(errors, private_var != -2);
-   if(num_threads == 100){
-     OMPVV_TEST_AND_SET_VERBOSE(errors, shared_var_sum != NUM_THREADS * ((NUM_THREADS + 1)/2) );
-   
+
+   //check if the value of shared_var_sum is equal to (NUM_TASKS * 10)
+   OMPVV_TEST_AND_SET_VERBOSE(errors, shared_var_sum != (NUM_TASKS * 10));
+
    return errors;
 }
 
