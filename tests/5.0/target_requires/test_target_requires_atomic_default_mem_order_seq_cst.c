@@ -24,9 +24,9 @@ int test_target_atomic_seq_cst() {
   OMPVV_INFOMSG("test_target_atomic_seq_cst");
 
   int x = 0, y = 0;
-  int errors = 0;
+  int errors = 0, tmp = 0;
 
-#pragma omp target parallel num_threads(2) map(tofrom: x, y, errors)
+#pragma omp target parallel num_threads(2) map(tofrom: x, y, errors) map(to: tmp)
    {
       int thrd = omp_get_thread_num();
        if (thrd == 0) {
@@ -34,7 +34,20 @@ int test_target_atomic_seq_cst() {
           #pragma omp atomic write 
           y = 1;
        } else {
-          int tmp = 0;
+          tmp = 0;
+       }
+
+       // Instead of a else as in the original test, a separated if was included
+       // Given that the Device can be executed on SPMD, it is
+       // possible that the else can be executed first by all threads
+       // generating a deadlock on the while
+       // furthermore, it also necesary to create an else, with
+       // a shared variable to prevent the optimizer to marge the
+       // if and have the same problem than before
+       // therefore a separated if is geenrated for the code
+       // and this way it is possible to guarantee that there is
+       // no deadlock on the while
+       if (thrd == 1) {
           while (tmp == 0) {
             #pragma omp atomic read 
             tmp = y;
