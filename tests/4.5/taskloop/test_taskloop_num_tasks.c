@@ -24,11 +24,11 @@ int isGroupIdsSame(int thread_ids[])
 
         for(int i = 0; i < NUM_ITERATIONS; i = i+iterationsPerGroup)
         {
-                for(int j = 0; j<iterationsPerGroup; j++) {
-                        if (thread_ids[i+j] != thread_ids[i]) {
-                                return 0; // Return false if any id is different in a group
-                        }
-                }
+          for(int j = 0; j<iterationsPerGroup; j++) {
+            if (thread_ids[i+j] != thread_ids[i]) {
+              return 0; // Return false if any id is different in a group
+            }
+          }
         }
 
         return 1; // Return true if all id's are same per group
