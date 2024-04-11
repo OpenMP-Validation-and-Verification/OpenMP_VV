@@ -43,17 +43,14 @@ int DefaultPrivate() {
 
 #pragma omp target teams distribute parallel for num_teams(2) thread_limit(10)\
         default(private) map(to: Arr[0:32]) shared(ErrCount) map(tofrom: ErrCount)
-  {
     for (int i = 0; i < 32; ++i) {
       CONST = 10;
       Arr[i] += CONST;
       if (Arr[i] != (i + 10)) {
-        err++;
+        #pragma omp atomic
+        ErrCount++;
       }
     }
-    #pragma omp atomic
-    ErrCount += err;
-  }
   if (CONST != 123) {
     ErrCount++;
   }
@@ -73,9 +70,9 @@ int DefaultShared() {
         default(shared) map(tofrom: Arr, ErrCount)
   for (int i = 0; i < 32; ++i) {
     Arr[i] += CONST;
-  }
-  if (Arr[i] != (i + 123)) {
+    if (Arr[i] != (i + 123)) {
       ErrCount += 1;
+    }
   }
   return ErrCount;
 }
