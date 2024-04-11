@@ -15,25 +15,26 @@
 
 
 int DefaultFirstPrivate() {
-  int ErrCount = 0;
+  int ErrCount = 0, err = 0;
   int Arr[32];
   for (int i = 0; i < 32; ++i) {
     Arr[i] = i;
   }
 
 #pragma omp target teams distribute parallel for num_teams(2) thread_limit(10)\
-        default(firstprivate) map(tofrom: ErrCount)
+        default(firstprivate) shared(ErrCount) map(tofrom: ErrCount)
   for (int i = 0; i < 32; ++i) {
     if (Arr[i] != i) {
-#pragma omp atomic
-      ErrCount += 1;
+      err++;
     }
   }
+  #pragma omp atomic
+    ErrCount += err;
   return ErrCount;
 }
 
 int DefaultPrivate() {
-  int ErrCount = 0;
+  int ErrCount = 0, err = 0;
   int CONST = 123;
   int Arr[32];
   for (int i = 0; i < 32; ++i) {
@@ -41,14 +42,17 @@ int DefaultPrivate() {
   }
 
 #pragma omp target teams distribute parallel for num_teams(2) thread_limit(10)\
-        default(private) map(to: Arr[0:32]) map(tofrom: ErrCount)
-  for (int i = 0; i < 32; ++i) {
-    CONST = 10;
-    Arr[i] += CONST;
-    if (Arr[i] != (i + 10)) {
-#pragma omp atomic
-      ErrCount += 1;
+        default(private) map(to: Arr[0:32]) shared(ErrCount) map(tofrom: ErrCount)
+  {
+    for (int i = 0; i < 32; ++i) {
+      CONST = 10;
+      Arr[i] += CONST;
+      if (Arr[i] != (i + 10)) {
+        err++;
+      }
     }
+    #pragma omp atomic
+    ErrCount += err;
   }
   if (CONST != 123) {
     ErrCount++;
@@ -66,13 +70,12 @@ int DefaultShared() {
   }
 
 #pragma omp target teams distribute parallel for num_teams(2) thread_limit(10)\
-        default(shared) map(tofrom: ErrCount)
+        default(shared) map(tofrom: Arr, ErrCount)
   for (int i = 0; i < 32; ++i) {
     Arr[i] += CONST;
-    if (Arr[i] != (i + 123)) {
-#pragma omp atomic
+  }
+  if (Arr[i] != (i + 123)) {
       ErrCount += 1;
-    }
   }
   return ErrCount;
 }
