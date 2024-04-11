@@ -37,6 +37,11 @@ int main() {
    #pragma omp parallel private(thrd_num) num_threads(threads) 
    {
       thrd_num = omp_get_thread_num();
+      if(thrd_num > threads) { //safety: dont exceed # of buffers
+        OMPVV_ERROR("Number of thread greater than requested");
+        exit(1); 
+      }
+
       if(thrd_num == 0)
         num_threads = omp_get_num_threads();
 
