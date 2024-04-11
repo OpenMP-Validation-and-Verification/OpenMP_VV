@@ -63,7 +63,7 @@ int test_taskloop_num_tasks() {
 
    //To check if the num_threads actually executing the parallel region > 1
    if(num_threads == 1) 
-     OMPVV_INFOMSG("Only a single thread executed the parallel region");
+     OMPVV_WARNING("Only a single thread executed the parallel region");
    else 
      //if all the tasks in a group are run by a same thread, get TRUE else FALSE
      OMPVV_TEST_AND_SET_VERBOSE(errors, (isGroupIdsSame(thread_ids) != 1));   
