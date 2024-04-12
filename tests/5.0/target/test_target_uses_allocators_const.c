@@ -39,7 +39,8 @@ int test_uses_allocators_const() {
   device_result = x;
 }
 
-  OMPVV_TEST_AND_SET_VERBOSE(errors, result != device_result);
+  OMPVV_WARNING_IF(result != device_result,"Variable x may have been assigned to const memory space and device_result wasn't updated to the expected value, but it is correct");
+  OMPVV_WARNING_IF(result == device_result,"Variable x may or may not have been assigned to const memory space but device_result was updated to the expected value");
 
   return errors;
 }
