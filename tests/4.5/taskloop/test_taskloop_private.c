@@ -20,7 +20,7 @@ int test_taskloop_private() {
    int errors = 0;
 
    int private_var;
-   int shared_var_sum;
+   int shared_var_sum = 0;
 
    #pragma omp parallel num_threads(NUM_THREADS)
    {

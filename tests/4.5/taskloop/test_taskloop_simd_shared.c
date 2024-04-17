@@ -17,7 +17,7 @@
 int taskloop_simd_shared() {
 
   int errors = 0;
-  int i, j;
+  int i;
   int A[N], B[N], C[N];
   for(int i = 0; i < N; i++){
     A[i] = 1;
