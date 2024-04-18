@@ -51,10 +51,10 @@ int test_taskloop_num_tasks() {
         #pragma omp taskloop num_tasks(NUM_TASKS)
         for(int i = 0; i < NUM_ITERATIONS; i++)
         {
-	    #pragma omp atomic 
-	    var = var + i;
+	        #pragma omp atomic 
+	        var = var + i;
 
-            thread_ids[i] = omp_get_thread_num();
+          thread_ids[i] = omp_get_thread_num();
         }
       }
    }
@@ -62,11 +62,12 @@ int test_taskloop_num_tasks() {
    
 
    //To check if the num_threads actually executing the parallel region > 1
-   if(num_threads == 1) 
+   if(num_threads == 1) {
      OMPVV_WARNING("Only a single thread executed the parallel region");
-   else 
+   } else {
      //if all the tasks in a group are run by a same thread, get TRUE else FALSE
      OMPVV_TEST_AND_SET_VERBOSE(errors, (isGroupIdsSame(thread_ids) != 1));   
+   }
 
    OMPVV_TEST_AND_SET_VERBOSE(errors, var != ((NUM_ITERATIONS-1)*(NUM_ITERATIONS)/2));
 
