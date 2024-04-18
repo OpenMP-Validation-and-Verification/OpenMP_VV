@@ -20,36 +20,45 @@
 
 int main() {
 
-   int i, n, errors, thrd_num;
-   size_t nchars, max_req_store;
+   int i, threads, errors = 0, thrd_num, num_threads = 0;
+   int  format_size = 13; //size of my_format
+   char format[] = "thrd_num=%0.4n";
 
    char **buffer;
 
+   threads = OMPVV_NUM_THREADS_HOST;
 
-   n = omp_get_num_procs();
-   buffer = (char **)malloc( sizeof(char *) * n );
-   for (i = 0; i < n; i++) { 
-      buffer[i]=(char *)malloc( sizeof(char) * BUFFER_STORE); 
+   buffer = (char **) malloc( sizeof(char *) * threads );
+
+   for (i = 0; i < threads; i++) { 
+      buffer[i] = (char *) malloc( sizeof(char) * BUFFER_STORE); 
    }
-   errors = 0;
-   max_req_store = 0;
 
-   #pragma omp parallel private(thrd_num,nchars) reduction(max:max_req_store)
+   #pragma omp parallel private(thrd_num) num_threads(threads) 
    {
-      if(omp_get_num_threads()>n) exit(1); //safety: dont exceed # of buffers
-
-      thrd_num=omp_get_thread_num();
-      nchars=omp_capture_affinity(buffer[thrd_num],(size_t)BUFFER_STORE,NULL);
-
-      if(nchars > max_req_store) {
-         max_req_store=nchars;
+      thrd_num = omp_get_thread_num();
+      if(thrd_num > threads) { //safety: dont exceed # of buffers
+        OMPVV_ERROR("Number of thread greater than requested");
+        exit(1); 
       }
+
+      if(thrd_num == 0)
+        num_threads = omp_get_num_threads();
+
+      omp_capture_affinity(buffer[thrd_num], (size_t) BUFFER_STORE, format);
    }
 
-   OMPVV_TEST_AND_SET_VERBOSE(errors, max_req_store >= BUFFER_STORE);
-   OMPVV_ERROR_IF(max_req_store >= BUFFER_STORE, "Caution: Affinity string truncated, increase buffer size");
+   // Checks if the affinity string is corrrectly captured
+   for(i = 0; i < num_threads; i++) {
+      char str[30];
+      snprintf(str, sizeof(str), "thrd_num=%0.4d", i);
 
-   for(i = 0; i < n; i++){
+      for(int j = 0; j < format_size; ++j) {
+        if(str[j] != buffer[i][j]) {
+          errors++;
+          break;
+        }
+      }
       free(buffer[i]);
    }
 
