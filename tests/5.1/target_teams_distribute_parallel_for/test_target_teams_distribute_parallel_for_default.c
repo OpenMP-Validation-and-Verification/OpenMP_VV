@@ -15,7 +15,7 @@
 
 
 int DefaultFirstPrivate() {
-  int ErrCount = 0, err = 0;
+  int ErrCount = 0;
   int Arr[32];
   for (int i = 0; i < 32; ++i) {
     Arr[i] = i;
@@ -25,11 +25,11 @@ int DefaultFirstPrivate() {
         default(firstprivate) shared(ErrCount) map(tofrom: ErrCount)
   for (int i = 0; i < 32; ++i) {
     if (Arr[i] != i) {
-      err++;
+      #pragma omp atomic
+      ErrCount++;
     }
   }
-  #pragma omp atomic
-    ErrCount += err;
+ 
   return ErrCount;
 }
 
@@ -71,6 +71,7 @@ int DefaultShared() {
   for (int i = 0; i < 32; ++i) {
     Arr[i] += CONST;
     if (Arr[i] != (i + 123)) {
+      #pragma omp atomic
       ErrCount += 1;
     }
   }
