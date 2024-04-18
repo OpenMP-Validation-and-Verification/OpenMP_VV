@@ -3,7 +3,7 @@
 // OpenMP API Version 5.0 Nov 2018
 //
 // The tests checks the uses_allocators clause with omp_const_mem_alloc. 
-// The variable allaocated in the target region and and is used to 
+// The variable is firstprivatized in the target region and is used to 
 // modify result on device. Result is copied back to the host and checked 
 // with computed value on host.
 //
@@ -18,30 +18,26 @@
 
 int test_uses_allocators_const() {
   int errors = 0;
-  int x = 0;
+  int x = 23;
   int device_result = 0;
   int result = 0;
 
 
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
-      result += j + i ;
+      result += j + i + x ;
     }
   }
 
-#pragma omp target uses_allocators(omp_const_mem_alloc) allocate(omp_const_mem_alloc: x) firstprivate(x) map(from: device_result)
+#pragma omp target uses_allocators(omp_const_mem_alloc) allocate(omp_const_mem_alloc: x) firstprivate(x) map(from: device_result) map(tofrom: device_result)
 {
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
-      x += j + i;
+      device_result += j + i + x;
     }
   }
-  device_result = x;
 }
-
-  OMPVV_WARNING_IF(result != device_result,"Variable x may have been assigned to const memory space and device_result wasn't updated to the expected value, but it is correct");
-  OMPVV_WARNING_IF(result == device_result,"Variable x may or may not have been assigned to const memory space but device_result was updated to the expected value");
-
+  OMPVV_TEST_AND_SET_VERBOSE(errors, result != device_result);
   return errors;
 }
 
