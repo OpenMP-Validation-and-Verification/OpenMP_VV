@@ -29,7 +29,7 @@ int test_uses_allocators_const() {
     }
   }
 
-#pragma omp target uses_allocators(omp_const_mem_alloc) allocate(omp_const_mem_alloc: x) firstprivate(x) map(from: device_result) map(tofrom: device_result)
+#pragma omp target uses_allocators(omp_const_mem_alloc) allocate(omp_const_mem_alloc: x) firstprivate(x) map(tofrom: device_result)
 {
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
