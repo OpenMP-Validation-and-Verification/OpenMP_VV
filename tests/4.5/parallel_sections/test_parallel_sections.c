@@ -18,12 +18,13 @@ int Var = 0;
 // The following function waits for Var value to become 1 and then increments
 // it to Var = 1
 void function1(int *Var) {
+  int temp = -1;
   while(1) {
    #pragma omp atomic read
-    int temp = *Var
+    temp = *Var;
     
     if (temp == 1) {
-      #pragma omp atomic write
+      #pragma omp atomic update
       *Var += 1;
       break;
     }
@@ -34,12 +35,13 @@ void function1(int *Var) {
 // and then immediately it loops until Var == 3 and then increments it to
 // Var = 4
 void function2(int *Var) {
+  int temp = -1;
   while(1) {
     #pragma omp atomic read
-    int temp = *Var
+    temp = *Var;
     
     if (temp == 0) {
-      #pragma omp atomic write
+      #pragma omp atomic update
       *Var += 1;
       break;
     }
@@ -47,10 +49,10 @@ void function2(int *Var) {
 
   while(1) {
     #pragma omp atomic read
-    int temp = *Var
+    temp = *Var;
     
     if (temp == 3) {
-      #pragma omp atomic write
+      #pragma omp atomic update
       *Var += 1;
       break;
     }
@@ -59,12 +61,13 @@ void function2(int *Var) {
 
 // The following function checks if Var == 2 and then increments to Var = 3
 void function3(int *Var) {
+  int temp = -1;
   while(1) {
     #pragma omp atomic read
-    int temp = *Var
+    temp = *Var;
     
     if (*Var == 2) {
-      #pragma omp atomic write
+      #pragma omp atomic update
       *Var += 1;
       break;
     }
@@ -75,12 +78,12 @@ void function3(int *Var) {
 int main() {
   int errors = 0;
   
-#pragma omp parallel sections
+  #pragma omp parallel sections
   {
-    if(omp_num_threads() == 1) 
+    if(omp_get_num_threads() == 1) 
     {
       OMPVV_WARNING("Sections are executed by a single thread, test cannot execute.")
-      exit 0;
+      exit(0);
     }
       
     #pragma omp section
