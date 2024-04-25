@@ -82,7 +82,7 @@ int main() {
   {
     if(omp_get_num_threads() == 1) 
     {
-      OMPVV_WARNING("Sections are executed by a single thread, test cannot execute.")
+      OMPVV_WARNING("Sections are executed by a single thread, test will be aborted.")
       exit(0);
     }
       
