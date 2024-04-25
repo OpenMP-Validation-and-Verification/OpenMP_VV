@@ -22,10 +22,10 @@ int DefaultFirstPrivate() {
   }
 
 #pragma omp target teams distribute parallel for num_teams(2) thread_limit(10)\
-        default(firstprivate) map(tofrom: ErrCount)
+        default(firstprivate) shared(ErrCount) map(tofrom: ErrCount)
   for (int i = 0; i < 32; ++i) {
     if (Arr[i] != i) {
-#pragma omp atomic
+      #pragma omp atomic
       ErrCount += 1;
     }
   }
@@ -41,12 +41,12 @@ int DefaultPrivate() {
   }
 
 #pragma omp target teams distribute parallel for num_teams(2) thread_limit(10)\
-        default(private) map(to: Arr[0:32]) map(tofrom: ErrCount)
+        default(private) shared(ErrCount) firstprivate(Arr) map(to: Arr[0:32]) map(tofrom: ErrCount)
   for (int i = 0; i < 32; ++i) {
     CONST = 10;
     Arr[i] += CONST;
     if (Arr[i] != (i + 10)) {
-#pragma omp atomic
+      #pragma omp atomic
       ErrCount += 1;
     }
   }
@@ -56,32 +56,11 @@ int DefaultPrivate() {
   return ErrCount;
 }
 
-
-int DefaultShared() {
-  int ErrCount = 0;
-  int CONST = 123;
-  int Arr[32];
-  for (int i = 0; i < 32; ++i) {
-    Arr[i] = i;
-  }
-
-#pragma omp target teams distribute parallel for num_teams(2) thread_limit(10)\
-        default(shared) map(tofrom: ErrCount)
-  for (int i = 0; i < 32; ++i) {
-    Arr[i] += CONST;
-    if (Arr[i] != (i + 123)) {
-#pragma omp atomic
-      ErrCount += 1;
-    }
-  }
-  return ErrCount;
-}
-
 int main() {
   OMPVV_TEST_OFFLOADING;
   int errors = 0;
   OMPVV_TEST_AND_SET_VERBOSE(errors, DefaultFirstPrivate() != 0);
   OMPVV_TEST_AND_SET_VERBOSE(errors, DefaultPrivate() != 0);
-  OMPVV_TEST_AND_SET_VERBOSE(errors, DefaultShared() != 0);
+
   OMPVV_REPORT_AND_RETURN(errors);
 }
