@@ -33,7 +33,6 @@ int test_taskloop_reduction() {
    #pragma omp single
    #pragma omp taskloop reduction(+:sum)
    for (int i = 0; i < N; i++) {
-      #pragma omp atomic
       sum += a[i]*b[i]; 
    }
    num_threads = omp_get_num_threads();
@@ -42,7 +41,6 @@ int test_taskloop_reduction() {
    #pragma omp taskloop reduction(+:sum)
    for (int i = 0; i < N; i++) {
       #pragma omp cancel taskgroup
-      #pragma omp atomic
       sum++;
    }
 }
