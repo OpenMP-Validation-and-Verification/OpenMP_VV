@@ -19,12 +19,11 @@ void update(int* num) {
 }
 #pragma omp end declare target
 
-int test_target_nowait_argument() { 
+int test_target_nowait_argument(int is_deferred) { 
 
   int errors = 0;
-  int x = 2, y =3 ;
+  int x = 2, y = 3 ;
 
-  int is_deferred = rand()%2;
 
   #pragma omp target nowait(is_deferred) map(tofrom: x)
   {
@@ -59,7 +58,8 @@ int main(int argc, char*argv[]){
 
   int errors = 0;
 
-  OMPVV_TEST_AND_SET_VERBOSE(errors, test_target_nowait_argument() != 0);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_target_nowait_argument(0) != 0);
+  OMPVV_TEST_AND_SET_VERBOSE(errors, test_target_nowait_argument(1) != 0);
 
   OMPVV_REPORT_AND_RETURN(errors);
 
