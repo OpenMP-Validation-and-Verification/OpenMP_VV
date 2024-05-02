@@ -19,19 +19,23 @@ int Dist_ScheduleStatic() {
   int ErrCount = 0;
 int num_teams, num_threads;
 
-#pragma omp target teams distribute parallel for num_teams(OMPVV_NUM_TEAMS_DEVICE)\
-        thread_limit(OMPVV_NUM_THREADS_DEVICE)  map(tofrom: num_teams, num_threads)\
+#pragma omp target teams distribute parallel for num_teams(2)\
+        thread_limit(4)  map(tofrom: num_teams, num_threads)\
         dist_schedule(static, 4)
   for (int i = 0; i < 32; ++i) {
     if(omp_get_team_num()==0 && omp_get_thread_num() == 0){
       num_teams = omp_get_num_teams();
       num_threads = omp_get_num_threads();
     }
-    arr[i] = omp_get_thread_num();
+    arr[i] = omp_get_team_num();
   }
 
   if ((num_teams > OMPVV_NUM_TEAMS_DEVICE) || (num_threads > OMPVV_NUM_THREADS_DEVICE)) {
     ErrCount += 1;
+  }
+  if(num_teams == 1){
+    OMPVV_WARNING("Only 1 team was created, the feature cannot be tested.");
+    return ErrCount;
   }
   
   for(int i=0; i<32; i+=4){
