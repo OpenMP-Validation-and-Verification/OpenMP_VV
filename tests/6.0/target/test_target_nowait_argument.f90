@@ -6,9 +6,8 @@
     ! on the target directive is honoured.
     ! 
     !//===----------------------------------------------------------------------===//
-    !! #include "ompvv.F90"
-    
-    
+    #include "ompvv.F90"
+      
     program test_omp_target_nowait
       use iso_fortran_env
       ! use ompvv_lib
