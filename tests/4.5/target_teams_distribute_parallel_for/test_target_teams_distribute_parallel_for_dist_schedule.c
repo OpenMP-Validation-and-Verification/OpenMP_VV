@@ -26,8 +26,8 @@ int num_teams, num_threads;
     if(omp_get_team_num()==0 && omp_get_thread_num() == 0){
       num_teams = omp_get_num_teams();
       num_threads = omp_get_num_threads();
-      arr[i] = omp_get_thread_num();
     }
+    arr[i] = omp_get_thread_num();
   }
 
   if ((num_teams > OMPVV_NUM_TEAMS_DEVICE) || (num_threads > OMPVV_NUM_THREADS_DEVICE)) {
