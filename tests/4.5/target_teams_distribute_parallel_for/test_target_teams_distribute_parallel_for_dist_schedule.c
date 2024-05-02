@@ -36,7 +36,7 @@ int num_teams, num_threads;
   
   for(int i=0; i<32; i+=4){
     int temp = arr[i];
-    for(int j=0; j< 4;j++)
+    for(int j=1; j< 4;j++)
       if(arr[i+j] != temp){
         chunked = 0;
         break;
