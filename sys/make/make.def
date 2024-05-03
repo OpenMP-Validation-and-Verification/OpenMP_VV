@@ -81,6 +81,7 @@ ifeq ($(CC), amdclang)
     CLINK         =  $(CC)
     COFFLOADING   =  -fopenmp --offload-arch=native 
     COFFLOADING   +=  $(OMPV)
+    C_NO_OFFLOADING =  -fopenmp
     CFLAGS        += -lm -O3 $(COFFLOADING)
     CLINKFLAGS    += -lm -O3 $(COFFLOADING)
 endif
@@ -89,8 +90,10 @@ endif
 ifeq ($(CC), nvc)
     C_VERSION    =  $(CC) -dumpversion
     CLINK        =  $(CC)
-    CFLAGS       += -O3 -mp=gpu -gpu=cc80
-    CLINKFLAGS   += -O3 -mp=gpu -gpu=cc80
+    COFFLOADING   = -mp=gpu -gpu=cc80
+    C_NO_OFFLOADING = -mp=multicore
+    CFLAGS       += -O3 $(COFFLOADING)
+    CLINKFLAGS   += -O3 $(COFFLOADING)
 endif
 
 # CRAY and AMD compiler wrapers
@@ -98,6 +101,7 @@ ifeq ($(CC), cc)
   C_VERSION      = $(CC) -dumpversion
   CLINK          = $(CC)
   COFFLOADING    = -fopenmp
+  C_NO_OFFLOADING = -fopenmp -fno-cray-openmp
   CFLAGS         += -lm -O3 $(COFFLOADING)
   CLINKFLAGS     += -lm -O3 $(COFFLOADING)
 endif
@@ -138,7 +142,7 @@ ifeq ($(CC), clang)
   CLINK           =  $(CC)
   COFFLOADING     =  -fopenmp --offload-arch=native
   COFFLOADING     +=  $(OMPV)
-  C_NO_OFFLOADING =
+  C_NO_OFFLOADING =  -fopenmp
   CFLAGS          += -lm -O3 $(COFFLOADING)
   CLINKFLAGS      += -lm -O3 $(COFFLOADING)
 endif
@@ -155,6 +159,7 @@ ifeq ($(CXX), amdclang++)
     CXXLINK         =  $(CXX)
     CXXOFFLOADING   =  -fopenmp --offload-arch=native
     CXXOFFLOADING   +=  $(OMPV)
+    CXX_NO_OFFLOADING =  -fopenmp
     CXXFLAGS        += -std=c++11 -lm -O3 $(CXXOFFLOADING)
     CXXLINKFLAGS    += -lm -O3 $(CXXOFFLOADING)
 endif
@@ -163,8 +168,10 @@ endif
 ifeq ($(CXX), nvc++)
     CXX_VERSION    =  $(CXX) -dumpversion
     CXXLINK        =  $(CXX)
-    CXXFLAGS       += -O3 -mp=gpu -gpu=cc80
-    CXXLINKFLAGS   += -O3 -mp=gpu -gpu=cc80
+    CXXOFFLOADING   = -mp=gpu -gpu=cc80
+    CXX_NO_OFFLOADING = -mp=multicore
+    CXXFLAGS       += -O3 $(CXXOFFLOADING)
+    CXXLINKFLAGS   += -O3 $(CXXOFFLOADING)
 endif
 
 # CRAY and AMD compiler wrappers
@@ -212,7 +219,7 @@ ifeq ($(CXX), clang++)
   CXXLINK           =  $(CXX)
   CXXOFFLOADING     =  -fopenmp --offload-arch=native
   CXXOFFLOADING     +=  $(OMPV)
-  CXX_NO_OFFLOADING =
+  CXX_NO_OFFLOADING = -fopenmp
   CXXFLAGS          += -lm -std=c++11 -O3 $(CXXOFFLOADING)
   CXXLINKFLAGS      += -lm -O3 $(CXXOFFLOADING)
 endif
@@ -236,8 +243,10 @@ endif
 ifeq ($(FC), nvfortran)
     F_VERSION    =  $(FC) -dumpversion
     FLINK        =  $(FC)
-    FFLAGS       += -O3 -mp=gpu -gpu=cc80
-    FLINKFLAGS   += -O3 -mp=gpu -gpu=cc80
+    FOFFLOADING     = -mp=gpu -gpu=cc80
+    F_NO_OFFLOADING = -mp=multicore
+    FFLAGS       += -O3 $(FOFFLOADING)
+    FLINKFLAGS   += -O3 $(FOFFLOADING)
 endif
 
 # CRAY and AMD compiler wrappers
@@ -245,6 +254,7 @@ ifeq ($(FC), ftn)
   F_VERSION      = echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(FC) --version|head -n1)"
   FLINK          = cc
   FOFFLOADING    = -fopenmp
+  F_NO_OFFLOADING = -hnoomp
   FFLAGS         += -lm -J./ompvv -O3 $(FOFFLOADING)
   FLINKFLAGS     += -lm -O3 $(FOFFLOADING)
 endif
@@ -283,10 +293,9 @@ endif
 # Flang compiler
 ifeq ($(FC), $(filter $(FC), flang flang-new))
   F_VERSION       =  $(FC) -dumpversion
-  FLINK           =  clang
   FOFFLOADING     =  -fopenmp --offload-arch=native
   FOFFLOADING     +=  $(OMPV)
-  F_NO_OFFLOADING =
+  F_NO_OFFLOADING = -fopenmp
   FFLAGS          += -lm -O3 $(FOFFLOADING)
   FLINKFLAGS      += -lm -O3 $(FOFFLOADING)
 endif
