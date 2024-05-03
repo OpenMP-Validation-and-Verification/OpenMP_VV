@@ -24,31 +24,24 @@ int test_target_requires_atomic_relaxed() {
   OMPVV_INFOMSG("test_target_requires_atomic_relaxed");
 
   int x = 0, y = 0;
-  int errors = 0, tmp = 0;
+  int errors = 0;
 
-#pragma omp target parallel num_threads(2) map(tofrom: x, y, errors) map(to: tmp)
+#pragma omp target parallel num_threads(2) map(tofrom: x, y, errors)
    {
       int thrd = omp_get_thread_num();
+      int tmp = 0;
        if (thrd == 0) {
           x = 10;
           #pragma omp flush
           #pragma omp atomic write 
           y = 1;
        } else {
-          tmp = 0;
+          #pragma omp atomic read
+          tmp = y;
        }
 
-       // Instead of a else as in the original test, a separated if was included      
-       // Given that the Device can be executed on SPMD, it is
-       // possible that the else can be executed first by all threads
-       // generating a deadlock on the while
-       // furthermore, it also necesary to create an else, with
-       // a shared variable to prevent the optimizer to marge the
-       // if and have the same problem than before
-       // therefore a separated if is geenrated for the code
-       // and this way it is possible to guarantee that there is
-       // no deadlock on the while
-       if (thrd == 1) {
+       if (thrd != 0 ) {
+          tmp = 0;
           while (tmp == 0) {
             #pragma omp atomic read 
             tmp = y;
