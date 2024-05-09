@@ -42,6 +42,9 @@ int test_target_nowait_argument(int is_deferred) {
       errors++;
     }
     #pragma omp taskwait //needed to finish deferred task before return from function
+    if( x != 6){
+      errors++;
+    }
   } else {
     if( x != 18){
       errors++;
