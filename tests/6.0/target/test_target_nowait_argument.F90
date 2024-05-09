@@ -48,6 +48,9 @@
             errors = errors + 1
           endif
           !$omp taskwait  ! Ensure completion of deferred tasks
+          if (x /= 6) then
+            errors = errors + 1
+          endif
         else
           if (x /= 18) then
             errors = errors + 1
