@@ -1,4 +1,4 @@
-    !===--- test_target_nowait_argument.f90      -------------------------------===//
+    !===--- test_target_nowait_argument.F90      -------------------------------===//
     !
     ! OpenMP API Version 6.0 
     !
@@ -10,7 +10,7 @@
       
     program test_omp_target_nowait
       use iso_fortran_env
-      ! use ompvv_lib
+      use ompvv_lib
       use omp_lib
       implicit none
       integer :: errors, x, y,iter
