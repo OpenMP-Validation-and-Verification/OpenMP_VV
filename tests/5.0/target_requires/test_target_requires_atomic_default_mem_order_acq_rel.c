@@ -15,8 +15,6 @@
 #include <stdlib.h>
 #include "ompvv.h"
 
-#define N 1024
-
 #pragma omp requires atomic_default_mem_order(acq_rel)
 
 int test_target_requires_atomic_acq_rel() {
@@ -25,15 +23,20 @@ int test_target_requires_atomic_acq_rel() {
   int x = 0, y = 0;
   int errors = 0;
       
-#pragma omp target parallel num_threads(2) map(tofrom: x, y, errors)
+#pragma omp target parallel num_threads(2) map(tofrom: x, y, errors) 
    {
        int thrd = omp_get_thread_num();
+       int tmp = 0;
        if (thrd == 0) {
           x = 10;
           #pragma omp atomic write 
           y = 1;
        } else {
-          int tmp = 0;
+          #pragma omp atomic read 
+          tmp = y;
+       }
+       if (thrd != 0) {
+          tmp = 0;
           while (tmp == 0) {
             #pragma omp atomic read 
             tmp = y;
