@@ -1,8 +1,9 @@
-//===--- test_taskloop_reduction.c ------------------------------------------===//
+//===--- test_omp_cancellation_env_1.c ------------------------------------------===//
 //
 // OpenMP API Version 5.0 Nov 2018
 //
-// This test checks the taskloop directive with the reduction clause specified.
+// This test checks the cancel directive for the taskloop directive
+// The omp cancel requires OMP_CANCELLATION enviromental variable to be set
 //
 ////===----------------------------------------------------------------------===//
 
@@ -39,6 +40,7 @@ int test_taskloop_reduction() {
    #pragma omp single
    #pragma omp taskloop reduction(+:sum)
    for (int i = 0; i < N; i++) {
+      #pragma omp cancel taskgroup
       sum++;
    }
 }
@@ -48,11 +50,13 @@ int test_taskloop_reduction() {
    for (int i = 0; i < N; i++) {
       real_sum += a[i]*b[i];
    }
-   
 
-   OMPVV_TEST_AND_SET_VERBOSE(errors, sum != real_sum);
+   if (omp_get_cancellation()) {
+     OMPVV_TEST_AND_SET_VERBOSE(errors, sum == real_sum);
+   } else {
+     OMPVV_WARNING("Enviromental Variable OMP_CANCELLATION not set, omp cancel cannot be tested");
+   }
 
-   OMPVV_WARNING_IF(num_threads == 1, "Test ran with one thread, so parallelism of taskloop can't be guaranteed.");
    OMPVV_ERROR_IF(num_threads < 1, "Test returned an invalid number of threads.");
    OMPVV_TEST_AND_SET_VERBOSE(errors, num_threads < 1);
 
