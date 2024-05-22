@@ -14,11 +14,11 @@
 #include <stdlib.h>
 #include "ompvv.h"
 
-#define N 10
+#define N 1024
 
 typedef struct{
   size_t len;
-  double *data;
+  int *data;
 } T;
 
 int errors = 0;
@@ -30,7 +30,7 @@ int target_update_from_mapper() {
   T s;
   
   s.len = N;
-  s.data = (double *)calloc(N,sizeof(double));
+  s.data = (int *)calloc(N,sizeof(int));
   
   
    #pragma omp target data map(mapper(custom), to:s) 
@@ -47,7 +47,7 @@ int target_update_from_mapper() {
 
   for (int i =0; i < s.len; i++) {
     if(i%2){
-      OMPVV_TEST_AND_SET(errors, s.data[i] != 0.00);
+      OMPVV_TEST_AND_SET(errors, s.data[i] != 0);
     }
     else{
       OMPVV_TEST_AND_SET(errors, s.data[i] != 10);
