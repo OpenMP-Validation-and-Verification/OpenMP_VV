@@ -17,7 +17,7 @@
 #define N 1024
 
 typedef struct{
-  size_t len;
+  int len;
   int *data;
 } T;
 
