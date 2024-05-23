@@ -38,7 +38,7 @@ int target_update_from_mapper() {
     #pragma omp target
     { 
       for (int i = 0; i < s.len; i++) {
-        s.data[i] = 10;
+        s.data[i] = i;
       }
     }//end target
   
@@ -50,7 +50,7 @@ int target_update_from_mapper() {
       OMPVV_TEST_AND_SET(errors, s.data[i] != 0);
     }
     else{
-      OMPVV_TEST_AND_SET(errors, s.data[i] != 10);
+      OMPVV_TEST_AND_SET(errors, s.data[i] != i);
     }
   }
 
