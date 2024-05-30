@@ -17,47 +17,40 @@
 #define N 1024
 
 typedef struct{
-  size_t len;
-  double *data;
+  int len;
+  int *data;
 } T;
 
-int i;
 int errors = 0;
 
-#pragma omp declare mapper(S: T v) map(to: v, v.len, v.data[0:v.len])
+#pragma omp declare mapper(custom: T v) map(to: v, v.len, v.data[0:v.len])
 
 int target_update_from_mapper() {
   
   T s;
   
   s.len = N;
-  s.data = (double *)calloc(N,sizeof(double));
+  s.data = (int *)calloc(N,sizeof(int));
   
   
-  #pragma omp target  
+   #pragma omp target data map(mapper(custom), to:s) 
   { 
-    for (int i = 0; i < s.len; i++) {
-      s.data[i] = i;
-    }
-  }//end target
+    #pragma omp target
+    { 
+      for (int i = 0; i < s.len; i++) {
+        s.data[i] = i;
+      }
+    }//end target
   
-  #pragma omp target data map(mapper(S), to:s) 
-  { 
-    #pragma omp target map(mapper(S), to:s)
-    for (int i = 0; i < s.len; i++) {       
-      s.data[i] += i ;
-    }
-  
-  #pragma omp target update from(s.data[0:s.len/2:2]) //only update even array elements
-  } 
-  
+  #pragma omp target update from(s.data[:N/2:2]) //only update even array elements
+  }//end-target-data 
 
-  for (i =0; i < s.len; i++) {
+  for (int i =0; i < s.len; i++) {
     if(i%2){
-      OMPVV_TEST_AND_SET(errors, s.data[i] != i);
+      OMPVV_TEST_AND_SET(errors, s.data[i] != 0);
     }
     else{
-      OMPVV_TEST_AND_SET(errors, s.data[i] != 2 * i);
+      OMPVV_TEST_AND_SET(errors, s.data[i] != i);
     }
   }
 
