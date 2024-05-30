@@ -29,7 +29,7 @@ int Runtst(int gpu) {
 #pragma omp target parallel for firstprivate(HostVar) device(gpu)
     for (int i = 0; i < ELMTS; ++i) {
       if (HostVar == INIT_VAL) {
-        A[i] = A[i] * A[i];
+        A[i] = A[i] + A[i];
       } else {
         A[i] = 0;
       }
@@ -46,7 +46,7 @@ int Runtst(int gpu) {
   // Verification
   // Also validate for gpu ordinal 
   for (int i = 0; i < ELMTS; ++i) {
-    if (A[i] != i*i) {
+    if (A[i] != i+i) {
       errors++;
     }
   }
