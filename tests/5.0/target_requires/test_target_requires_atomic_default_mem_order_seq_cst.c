@@ -29,12 +29,17 @@ int test_target_atomic_seq_cst() {
 #pragma omp target parallel num_threads(2) map(tofrom: x, y, errors)
    {
       int thrd = omp_get_thread_num();
+      int tmp = 0;
        if (thrd == 0) {
           x = 10;
           #pragma omp atomic write 
           y = 1;
        } else {
-          int tmp = 0;
+          #pragma omp atomic read
+          y = tmp;
+       }
+
+       if (thrd != 0) {
           while (tmp == 0) {
             #pragma omp atomic read 
             tmp = y;
