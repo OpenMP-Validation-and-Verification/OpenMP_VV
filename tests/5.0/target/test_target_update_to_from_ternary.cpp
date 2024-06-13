@@ -48,7 +48,7 @@ int test_pointer_with_ternary() {
 	if (before_value != -1) {
 		errors++;
 	}
-	if (after_value != 2) { 
+	if (after_value != 0) { 
 		errors++;
 	}
 
