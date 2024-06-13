@@ -49,6 +49,10 @@ int test_target_update() {
 	if (after_value != 1){
 		errors++;
 	}
+
+	#pragma omp target exit data map(from: *host_pointer)
+	delete host_pointer;
+
 	OMPVV_TEST_AND_SET(errors, errors != 0);
 	return errors;
 }
