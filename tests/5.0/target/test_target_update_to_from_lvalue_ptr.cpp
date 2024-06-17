@@ -2,9 +2,10 @@
 //
 // OpenMP API Version 5.0 Nov 2018
 //
-// Tests the target update directive with to and from clauses supporting more
-// lvalue expressions
-//===----------------------------------------------------------------------===//
+// This test evaluates the target update directive using to and from clauses, 
+// supporting various lvalue expressions, such as dereferenced pointers. 
+// Additionally, it examines the map clause and its handling of lvalue expressions 
+//===------------------------------------------------------------------------===//
 
 #include <omp.h>
 #include <iostream>
