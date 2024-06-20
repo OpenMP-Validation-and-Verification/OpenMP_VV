@@ -1,4 +1,4 @@
-//===------ test_parallel_for_simd_lastprivate_conditional.c ------===//
+//===------ test_parallel_for_lastprivate_conditional.c ------===//
 //
 // OpenMP API Version 5.0 Nov 2018
 //
@@ -17,16 +17,16 @@ int test_lastprivate_conditional() {
         int a[N];
         int x = 0;
 
-        #pragma omp parallel for simd lastprivate(conditional: x)
+        #pragma omp parallel for lastprivate(conditional: x)
         for (int k = 0; k < N; k++) {
                 a[k] = k;
-                if (k == 24) {
+                if (k == 24 || k == 123) {
                         x = a[k];
 		}
         }
 
-        // Check to make sure x is set to 24.
-        if (x != 24) {
+        // Check to make sure x is set.
+        if (x != 123) {
                 errors++;
         }
 
