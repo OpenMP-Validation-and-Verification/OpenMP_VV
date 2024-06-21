@@ -22,7 +22,7 @@ int& ref() {
 
 int test_task_depend_lvalue_func() {
 	int errors = 0;
-	int value;
+	int value = 0;
 
 	#pragma omp parallel
 	{

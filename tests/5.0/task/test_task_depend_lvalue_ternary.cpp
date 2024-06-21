@@ -17,7 +17,7 @@ int test_task_depend_ternary() {
 	int a = 1;
 	int b = 0;
 	int c = -1;
-	int value;
+	int value = 0;
 
 	#pragma omp parallel
 	{

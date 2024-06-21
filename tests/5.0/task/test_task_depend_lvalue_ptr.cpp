@@ -15,7 +15,7 @@
 int test_task_depend_lvalue_ptr() {
 	int errors = 0;
 	int *ptr = new int;
-	int value;
+	int value = 0;
 
 	// Initialize the pointer to -1
 	*ptr = -1;
