@@ -10,19 +10,15 @@
 #include <iostream>
 #include "ompvv.h"
 
+#pragma omp declare target
 //Global Variable
 int var;
-
-
-//Map the variable to the device using the function
-#pragma omp declare target to(var)
-
 
 //Function that will return a reference to the variable var
 int& returnRef() {
 	return var;
 }
-
+#pragma omp end declare target
 
 
 int test_target_update(){
