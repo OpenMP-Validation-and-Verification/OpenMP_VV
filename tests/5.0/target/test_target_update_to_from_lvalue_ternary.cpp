@@ -1,10 +1,9 @@
-//===------ test_target_update_to_from_map_lvalue_ternary.cpp ----------------===//
+//===------ test_target_update_to_from_lvalue_ternary.cpp ----------------===//
 //
 // OpenMP API Version 5.0 Nov 2018
 //
 // This test evaluates the target update directive using to and from clauses, 
 // supporting various lvalue expressions, such as ternary operators. 
-// Additionally, it examines the map clause and its handling of lvalue expressions 
 //===-------------------------------------------------------------------------===//
 
 #include <omp.h>
@@ -19,9 +18,8 @@ int test_target_update() {
 	int b = 1;
 	bool c = true;
 
-	// Map the variable c ? a : b to the target device
-	// Should evaluate to a
-	#pragma omp target enter data map(to: (c ? a : b))
+	// Map the variable a and b
+	#pragma omp target enter data map(to: a, b)
 
 	// Before should be set to -1 as c is true and a is -1
 	#pragma omp target map(from: before_value)
@@ -53,28 +51,18 @@ int test_target_update() {
 
 
 	// Exit data region, mapping the variable back from the target device to the host
-	#pragma omp target exit data map(from: c ? a : b)
+	#pragma omp target exit data map(delete: a, b)
 
 	// Verify the results
-	// b should be 2 as c is false and we updated it on the device
-	if ((c ? a : b) != 2) {
-		errors++;
-	}
-	// before_value should be -1 
-	if (before_value != -1){
-		errors++;
-	}
-	// after_value should be 1 since we set b to 1
-	if (after_value != 1){
-		errors++;
-	}
-
-	OMPVV_TEST_AND_SET(errors, errors != 0);
+	OMPVV_TEST_AND_SET(errors, (c ? a : b) != 2);
+        OMPVV_TEST_AND_SET(errors, before_value != -1);
+        OMPVV_TEST_AND_SET(errors, after_value != 1);
 	return errors;
 }
 
 int main() {
 	OMPVV_TEST_OFFLOADING;
+	
 	int errors = 0;
 
 	OMPVV_TEST_AND_SET_VERBOSE(errors, test_target_update() != 0);
