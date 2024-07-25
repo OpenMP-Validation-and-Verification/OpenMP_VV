@@ -24,7 +24,6 @@ int test_lastprivate_conditional() {
                         x = a[k];
 		}
         }
-	printf("The value of x is: %d\n", x);
         // Check to make sure x is set.
         OMPVV_TEST_AND_SET(errors, x != 123);
         return errors;
