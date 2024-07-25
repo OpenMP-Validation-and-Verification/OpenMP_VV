@@ -3,7 +3,7 @@
 // OpenMP API Version 5.0 Nov 2018
 //
 // This test evaluates the lastprivate directive using the conditional clause,
-// ensuring proper behavior and variable updates in parallel regions.
+// ensuring proper behavior and variable updates.
 //===-------------------------------------------------------------===//
 
 #include <omp.h>
@@ -17,19 +17,21 @@ int test_lastprivate_conditional() {
         int a[N];
         int x = 0;
 
-        #pragma omp parallel for lastprivate(conditional: x)
+        #pragma omp target parallel for lastprivate(conditional: x) map(tofrom: x)
         for (int k = 0; k < N; k++) {
                 a[k] = k;
                 if (k == 24 || k == 123) {
                         x = a[k];
 		}
         }
+	printf("The value of x is: %d\n", x);
         // Check to make sure x is set.
-        OMPVV_TEST_AND_SET(errors, x!= 123);
+        OMPVV_TEST_AND_SET(errors, x != 123);
         return errors;
 }
 
 int main() {
+        OMPVV_TEST_OFFLOADING;
         int errors = 0;
 
         OMPVV_TEST_AND_SET_VERBOSE(errors, test_lastprivate_conditional() != 0);
