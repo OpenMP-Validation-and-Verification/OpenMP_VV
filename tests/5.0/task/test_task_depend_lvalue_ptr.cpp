@@ -37,13 +37,9 @@ int test_task_depend_lvalue_ptr() {
 		}
 	}
 
-	if (value != 1) {
-		errors++;
-	}
-	
 	delete ptr;
 	
-	OMPVV_TEST_AND_SET(errors, errors != 0);
+	OMPVV_TEST_AND_SET(errors, value != 1);
 	
 	return errors;
 }

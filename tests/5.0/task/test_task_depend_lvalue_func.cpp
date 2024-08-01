@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include "ompvv.h"
 
+#pragma omp declare target
 // Global variable var
 int var;
 
@@ -19,12 +20,12 @@ int var;
 int& ref() {
 	return var;
 }
-
+#pragma omp end declare target
 int test_task_depend_lvalue_func() {
 	int errors = 0;
 	int value = 0;
-
-	#pragma omp parallel
+	var = 0;
+	#pragma target omp parallel map(tofrom: value, ref())
 	{
 		#pragma omp single
 		{	
@@ -46,11 +47,7 @@ int test_task_depend_lvalue_func() {
 	}
 	
 	//Check if value was updated to 1
-	if (value != 1) {
-		errors++;
-	}
-
-	OMPVV_TEST_AND_SET(errors, errors != 0);
+	OMPVV_TEST_AND_SET(errors, value != 1);
 	return errors;
 }
 

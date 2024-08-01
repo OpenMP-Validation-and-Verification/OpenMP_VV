@@ -19,7 +19,7 @@ int test_task_depend_ternary() {
 	int c = -1;
 	int value = 0;
 
-	#pragma omp parallel
+	#pragma omp target parallel map(to:a,b,c) map(from: value)
 	{
 		#pragma omp single
 		{
@@ -46,11 +46,7 @@ int test_task_depend_ternary() {
 	}
 	
 	// Check to make sure value was correctly set to -1
-	if (value != -1) {
-		errors++;
-	}
-	
-	OMPVV_TEST_AND_SET(errors, errors != 0);
+	OMPVV_TEST_AND_SET(errors, value != -1);
 	return errors;
 }
 
