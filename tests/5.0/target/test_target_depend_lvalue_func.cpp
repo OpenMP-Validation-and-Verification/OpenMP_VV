@@ -1,4 +1,4 @@
-//===--- test_task_depend_lvalue_func.cpp ------------------------------------===//
+//===--- test_target_depend_lvalue_func.cpp ----------------------------------===//
 //
 // OpenMP API Version 5.0 Nov 2018
 //
