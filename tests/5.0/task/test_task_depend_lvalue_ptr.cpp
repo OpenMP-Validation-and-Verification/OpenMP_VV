@@ -20,7 +20,7 @@ int test_task_depend_lvalue_ptr() {
 	// Initialize the pointer to -1
 	*ptr = -1;
 
-	#pragma omp parallel
+	#pragma omp target parallel map(tofrom: *ptr, value)
 	{
 		#pragma omp single
 		{
