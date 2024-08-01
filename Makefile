@@ -196,6 +196,8 @@ endif
 
 endif
 
+$(ALL_DEP) $(COMP_DEP) $(RUN_TESTS): LOGTEMPFILE := $(LOGTEMPFILE)
+
 .PHONY: all
 all: MessageDisplay $(ALL_DEP)
 	@echo "====COMPILE AND RUN DONE===="
