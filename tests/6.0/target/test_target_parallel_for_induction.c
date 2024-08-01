@@ -29,7 +29,7 @@ int test_parallel_for_induction() {
         }
 
 	for (int i = 0; i < N; i++){
-		OMPVV_TEST_AND_SET(errors, arr[N] != i*2);
+		OMPVV_TEST_AND_SET(errors, arr[i] != i*2);
 	}
 
         return errors;
