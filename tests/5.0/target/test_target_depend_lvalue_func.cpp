@@ -25,7 +25,7 @@ int test_task_depend_lvalue_func() {
 	int errors = 0;
 	int value = 0;
 	var = 0;
-	#pragma target omp parallel map(tofrom: value, ref())
+	#pragma target omp parallel map(tofrom: value)
 	{
 		#pragma omp single
 		{	
