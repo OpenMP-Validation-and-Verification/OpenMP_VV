@@ -22,7 +22,7 @@ int test_parallel_for_induction() {
 		arr[i] = i;
 	}
 
-        #pragma omp target parallel for induction(x : int) map(tofrom: a[0:N])
+        #pragma omp target parallel for induction(x) map(tofrom: a[0:N])
         for (int i = 0; i < N; i++) {
 		x = i;
                 arr[i] += x;
