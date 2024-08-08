@@ -360,5 +360,5 @@ TXTNOC := "\033[0m"
 #---------------------------------------------------------------------------
 # LOGS
 #---------------------------------------------------------------------------
-LOGRANDNUM := ${shell echo $$RANDOM}
+LOGRANDNUM = ${shell echo $$RANDOM}
 LOGTEMPFILE ?= _ompvv_temp_result_.exitstatus.${LOGRANDNUM}
