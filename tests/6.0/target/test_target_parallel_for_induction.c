@@ -16,20 +16,20 @@
 int test_parallel_for_induction() {
         int errors = 0;
         int arr[N];
-	int x;
+	int x = 0;
 	// Initialize array
 	for (int i = 0; i < N; i++){
 		arr[i] = i;
 	}
 
-        #pragma omp target parallel for induction(x) map(tofrom: a[0:N])
+        #pragma omp target parallel for induction(x) map(tofrom: a[:N])
         for (int i = 0; i < N; i++) {
-		x = i;
-                arr[i] += x;
+		x =  x * x;
+                arr[i] = x;
         }
 
 	for (int i = 0; i < N; i++){
-		OMPVV_TEST_AND_SET(errors, arr[i] != i*2);
+		OMPVV_TEST_AND_SET(errors, arr[i] != i*i);
 	}
 
         return errors;
