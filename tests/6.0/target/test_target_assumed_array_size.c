@@ -25,7 +25,7 @@ int test_assumed_array_size(){
  	#pragma omp target data map(tofrom: array[0:N])	
 	#pragma omp target parallel for map(pointer[:])
 	for (int i = 0; i < N; i++){
-		*pointer[i] = i;
+		pointer[i] = i;
 	}
 
 
