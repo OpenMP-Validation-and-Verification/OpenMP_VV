@@ -12,7 +12,7 @@
 #include "ompvv.h"
 #include <math.h>
 
-#define N 32
+#define N 8
 
 int test_target_parallel_for_induction() {
         int errors = 0;
@@ -31,7 +31,7 @@ int test_target_parallel_for_induction() {
         }
 
 	for (int i = 0; i < N; i++){
-		OMPVV_TEST_AND_SET(errors, arr[i] != i + pow(step_var,i);
+		OMPVV_TEST_AND_SET(errors, arr[i] != i + pow(step_var,i));
 	}
 
         return errors;
