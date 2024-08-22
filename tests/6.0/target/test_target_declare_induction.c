@@ -38,7 +38,6 @@ int test_target_declare_induction() {
 
 	for (int i = 0; i < N; i++){
 		OMPVV_TEST_AND_SET(errors, arr[i] != induction_var * 2 * step_var);
-		step_var+=2;
 	}
 
         return errors;
