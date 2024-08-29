@@ -15,7 +15,7 @@
 
 int test_severity() {
   int return_value = 1;
-  #pragma omp parallel severity(fatal)
+  #pragma omp parallel severity(warning) message("Entering parallel region.")
   {
     if (omp_get_thread_num() == 0) --return_value;
   }
