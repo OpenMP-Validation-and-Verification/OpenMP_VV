@@ -1,7 +1,6 @@
-//--------------- test_parallel_severity.c
-//------------------------------------//
+//--------------- test_parallel_severity.c------------------------------------//
 // OpenMP API Version 6.0 August 2024
-// Pg. 318, line 22
+// Pg. 870, line 25
 // ***********
 // DIRECTIVE:parallel
 // CLAUSE:severity
@@ -16,12 +15,10 @@
 
 int test_severity() {
   int return_value = 1;
-  // clang-format off
   #pragma omp parallel severity(fatal)
   {
     if (omp_get_thread_num() == 0) --return_value;
   }
-  // clang-format on
 
   return return_value;
 }
