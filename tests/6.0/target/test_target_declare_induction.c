@@ -32,7 +32,7 @@ int test_target_declare_induction() {
         }
 
 	for (int i = 0; i < N; i++) {
-        	expected *= 2 * step_var;  
+        	expected *= pow(2 * step_var, i);  
         	OMPVV_TEST_AND_SET(errors, arr[i] != expected);
     	}
 
