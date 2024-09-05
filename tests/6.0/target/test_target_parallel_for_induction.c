@@ -24,7 +24,7 @@ int test_target_parallel_for_induction() {
 		arr[i] = 0;
 	}
 
-        #pragma omp target parallel for induction(step(step_var), *: induction_var) map(tofrom: a[:N])
+        #pragma omp target parallel for induction(step(step_var), *: induction_var) map(tofrom: arr[:N])
         for (int i = 0; i < N; i++) {
                 arr[i] = i + induction_var;
 		induction_var *= step_var;
