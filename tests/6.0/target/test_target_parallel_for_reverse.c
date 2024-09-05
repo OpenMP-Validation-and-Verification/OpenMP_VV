@@ -14,16 +14,16 @@
 
 int test_target_parallel_for_reverse() {
         int errors = 0;
-        int array[N];
 	int arrayReverse[N];
         #pragma omp target parallel for reverse map(tofrom: arrayReverse[:N])
         for (int i = 0; i < N; i++) {
-                arrayReverse[i] = i;
+                arrayReverse[i] = N - i -1;
         }
         
+	int expected = 0;
 	for (int i = N - 1; i >= 0; i--){	
-		OMPVV_TEST_AND_SET(errors, arrayReverse[i] != i);
-		printf("%d\n", i);
+		OMPVV_TEST_AND_SET(errors, arrayReverse[i] != expected);
+		expected++;
 	}
 
         return errors;
