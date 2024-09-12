@@ -40,7 +40,7 @@ PROGRAM test_target_update_mapper_from_discontiguous
 CONTAINS
     INTEGER FUNCTION test_target_update_mapper_from()
         INTEGER :: i 
-        !$omp declare mapper(newvec :: v)&
+        !$omp declare mapper(custom: newvec :: v)&
         !$omp& map(to: v, v%data(1:v%len))
 
         type(newvec) :: s
@@ -48,7 +48,7 @@ CONTAINS
         s%len = N
         s%data(1:N) = 0
 
-        !$omp target data map(to:s)
+        !$omp target data map(mapper(custom), to:s)
         !$omp target 
         DO i=1, s%len
             s%data(i) = i
