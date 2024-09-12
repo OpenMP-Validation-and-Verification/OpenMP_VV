@@ -17,15 +17,13 @@
 int test_severity() {
   int return_value = 1;
   if (_OPENMP) {
-#pragma omp parallel severity(warning)                                         \
-    message("Entering first parallel region.")
+    #pragma omp parallel severity(warning) message("Entering first parallel region.")
     {
       if (omp_get_thread_num() == 0)
         --return_value;
     }
   } else {
-#pragma omp parallel severity(warning)                                         \
-    message("Entering second parallel region.")
+    #pragma omp parallel severity(warning) message("Entering second parallel region.")
     {
     }
   }
