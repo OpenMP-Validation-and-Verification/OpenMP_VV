@@ -18,22 +18,18 @@ int test_target_reverse() {
         int arrayReverse[N];
         #pragma omp target map(tofrom: arrayReverse[:N])
         {
-
                 int counter = 0;
 		#pragma omp reverse
                 for (int i = 0; i < N; i++) {
-                        #pragma omp critical
-                        {
-                                arrayReverse[i] = counter;
-                                counter++;
-                        }
+                  arrayReverse[i] = counter;
+                  counter++;
                 }
 
         }
         int expected = 0;
         for (int i = N - 1; i >= 0; i--){
-                OMPVV_TEST_AND_SET(errors, arrayReverse[i] != expected);
-                expected++;
+          OMPVV_TEST_AND_SET(errors, arrayReverse[i] != expected);
+          expected++;
         }
 
         return errors;
