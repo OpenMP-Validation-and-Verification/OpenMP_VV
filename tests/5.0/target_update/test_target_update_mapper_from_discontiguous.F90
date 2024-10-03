@@ -16,8 +16,8 @@
 
 module my_struct
   type newvec
-    integer                     :: len
-    double precision, pointer   :: data(:)
+    integer            :: len
+    integer, pointer   :: data(:)
   end type
 end module
 
@@ -40,24 +40,30 @@ PROGRAM test_target_update_mapper_from_discontiguous
 CONTAINS
     INTEGER FUNCTION test_target_update_mapper_from()
         INTEGER :: i 
-        !$omp declare mapper(newvec :: v)&
-        !$omp& map(v, v%data(1:v%len))
+        !$omp declare mapper(custom: newvec :: v)&
+        !$omp& map(to: v, v%data(1:v%len))
 
         type(newvec) :: s
         allocate(s%data(N))
         s%len = N
-        s%data(1:N) = 0.0d0
+        s%data(1:N) = 0
 
+        !$omp target data map(mapper(custom), to:s)
         !$omp target 
-        DO i=1, s%len, 2
-           s%data(i) = i
+        DO i=1, s%len
+            s%data(i) = i
         END DO
         !$omp end target
 
-        !$omp target update from(s)
+        !$omp target update from(s%data(1:s%len:2))
+        !$omp end target data
 
-        DO i=1, s%len, 2
-           OMPVV_TEST_AND_SET(errors, s%data(i) /= i)
+        DO i=1, s%len
+           IF (modulo(i,2) .EQ. 0) THEN
+                OMPVV_TEST_AND_SET(errors, s%data(i) /= 0)
+            ELSE
+                OMPVV_TEST_AND_SET(errors, s%data(i) /= i)
+            END IF
         END DO
 
         test_target_update_mapper_from = errors

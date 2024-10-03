@@ -48,17 +48,31 @@ CONTAINS
         allocate(s%data(N))
         s%data(1:N) = 0.0d0
         s%len = N
+
+        !$omp target data map(tofrom:s)
         s%data = [(i, i=1, s%len)] 
  
-        !$omp target update to(s)
+        ! update odd array position values from host
+        ! This should set them to i
+        !$omp target update to(s%data(1:s%len:2))
 
-        !$omp target map(tofrom:errors)
+        ! update array on the device
+        !$omp target
         DO i=1, N
-            IF (s%data(i) .ne. i) THEN
-                errors = errors + 1
-            END IF
+            s%data(i) = s%data(i) + i
         END DO
         !$omp end target
+        !$omp end target data
+
+        DO i=1, s%len
+           IF (modulo(i,2) .EQ. 0) THEN
+                ! even positions should be result[i] = i
+                OMPVV_TEST_AND_SET(errors, s%data(i) /= i)
+            ELSE
+                ! odd positions should be result[i] = 2*i
+                OMPVV_TEST_AND_SET(errors, s%data(i) /= 2*i)
+            END IF
+        END DO
 
         test_target_update_mapper = errors
 
