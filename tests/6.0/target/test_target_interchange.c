@@ -2,10 +2,10 @@
 //
 // OpenMP API Version 6.0
 //
-// This test evaluates the interchagne directive, ensuring
+// This test evaluates the interchange directive, ensuring
 // proper behavior.
 //
-//===--------------------------------------------===//
+//===-------------------------------------------------===//
 
 #include <omp.h>
 #include <stdio.h>
