@@ -6,9 +6,10 @@
 // CLAUSE:looprange
 // ***********
 // The looprange clause for the fuse directive is being tested. The clause takes
-// the 4 loops and merges every 2 loops (right count) so that the total number
-// of loops is 2 (left count). The entries of the 4 * N matrix will be from 1 to
-// 4 * N. If an entry is not entered correctly, then errors will be incremented.
+// counts the number of loops (4) and begins fusion at loop 2 (left value). 2
+// loops are specified as the right value, so only 2 consecutive loops will be
+// merged. Thus, the number of remaining loops will be 3. If the array updates
+// occur incorrectly during fusion, the test will fail.
 //----------------------------------------------------------------------------//
 #include "ompvv.h"
 
@@ -19,7 +20,7 @@ int test_looprange() {
   int errors = 0;
   int j;
 
-#pragma omp fuse looprange(2, 2)
+  #pragma omp fuse looprange(2, 2)
   {
     for (j = 0; j < N; ++j)
       A[0][j] = j + 1;
