@@ -12,34 +12,26 @@
 #include "ompvv.h"
 
 #define N 10
-#define M 10
+#define M 15
 
 int test_target_interchange() {
         int errors = 0;
-	int a[N*M];
-	int b[N*M];
+	int a[N][M];
 	#pragma omp target map(tofrom: a)
         {
 	  int counter = 0;
 	  #pragma omp interchange
           for (int i = 0; i < N; i++) {
   	    for(int j = 0; j < M; j++){
-	      a[counter] = i;
-	      a[counter + 1] = j;
-	      counter += 2;
+	      a[i][j] = counter++;
 	    }
 	  }
 	}
 	int host_counter = 0;
 	for (int j = 0; j < M; j++) {
             for(int i = 0; i < N; i++){
-              b[host_counter] = i;
-              b[host_counter + 1] = j;
-              host_counter += 2;
+	        OMPVV_TEST_AND_SET(errors, a[i][j] != host_counter++);
 	    }
-	}
-	for (int i = 0; i < N * M; i++){
-	    OMPVV_TEST_AND_SET(errors, b[i] != a[i]);
 	}
         return errors;
 }
