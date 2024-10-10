@@ -16,8 +16,6 @@
 
 int test_target_interchange() {
         int errors = 0;
-        int arrayDevice[N][M];
-	int arrayHost[N][M];
 	int a[N*M];
 	int b[N*M];
 	#pragma omp target map(tofrom: a)
