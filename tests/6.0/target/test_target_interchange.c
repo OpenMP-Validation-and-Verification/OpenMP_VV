@@ -18,28 +18,30 @@ int test_target_interchange() {
         int errors = 0;
         int arrayDevice[N][M];
 	int arrayHost[N][M];
-
-	for (int i = 0; i < N; i++){
-	  for (int j = 0; j < M; j++){
-            arrayHost[i][j] = i * j;
-	    arrayDevice[i][j] = 0;
-	  }
-	}
-        
-	#pragma omp target map(tofrom: arrayDevice)
+	int a[N*M];
+	int b[N*M];
+	#pragma omp target map(tofrom: a)
         {
+	  int counter = 0;
 	  #pragma omp interchange
           for (int i = 0; i < N; i++) {
   	    for(int j = 0; j < M; j++){
-	      arrayDevice[i][j] = i*j;
+	      a[counter] = i;
+	      a[counter + 1] = j;
+	      counter += 2;
 	    }
 	  }
 	}
-
-        for (int i = 0; i < N; i++){
-	  for(int j = 0; j < M; j++){
-	    OMPVV_TEST_AND_SET(errors, arrayHost[i][j] != arrayDevice[i][j]);
-	  }
+	int host_counter = 0;
+	for (int j = 0; j < M; j++) {
+            for(int i = 0; i < N; i++){
+              b[host_counter] = i;
+              b[host_counter + 1] = j;
+              host_counter += 2;
+	    }
+	}
+	for (int i = 0; i < N * M; i++){
+	    OMPVV_TEST_AND_SET(errors, b[i] != a[i]);
 	}
         return errors;
 }
