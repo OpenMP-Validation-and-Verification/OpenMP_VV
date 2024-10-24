@@ -17,26 +17,19 @@
 int test_target_data_use_device_address() {
     int errors = 0;
     int array[N];
-    int *pointer;
 
     for (int i = 0; i < N; i++){
         array[i] = 0;
     }
 
-    pointer = &array[0];
-
     #pragma omp target data map(tofrom: array[:])
     {
-        int *device_addr;
-
-        #pragma omp target data use_device_addr(pointer[:])
+        #pragma omp target data use_device_addr(array[:])
 	{
-            device_addr = pointer;
-		
-	    #pragma omp target has_device_addr(pointer[:N])
+	    #pragma omp target has_device_addr(array[:N])
 	    {
                 for (int i = 0; i < N; i++){
-                    device_addr[i] = 1;
+                    array[i] = 1;
         	}
 	    }
 	}
