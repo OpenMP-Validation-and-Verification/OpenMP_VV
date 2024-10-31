@@ -15,30 +15,25 @@
 
 int group_sum;
 
+
 int test_target_groupprivate(){
     int errors = 0;
     int host_sum = 0;
-    int team_sum[NUM_TEAMS];
-    for (int i = 0; i < NUM_TEAMS; i++){
-        team_sum[i] = 0;
-    }
-    for (int i = 0; i < N; i++){
-            host_sum += i;
-    }
+    int team_sum = 0;
 
-    #pragma omp target teams num_teams(NUM_TEAMS) map(tofrom: team_sum[:NUM_TEAMS]) groupprivate(group_sum)
+    #pragma omp groupprivate(group_sum) device_type(nohost)
+    #pragma omp target teams num_teams(NUM_TEAMS) map(tofrom: team_sum) reduction(+: team_sum)
     {
-        group_sum = 0;
-        for (int i = 0; i < N; i++){
-            group_sum += i;
-        }
+        group_sum = omp_get_team_num();
 
-        team_sum[omp_get_team_num()] = group_sum;
+        team_sum += group_sum;
+    
     }
 
     for (int i = 0; i < NUM_TEAMS; i++){
-        OMPVV_TEST_AND_SET_VERBOSE(errors, team_sum[i] != host_sum);
+        host_sum += i;
     }
+    OMPVV_TEST_AND_SET_VERBOSE(errors, team_sum != host_sum);
     return errors;
 }
 
