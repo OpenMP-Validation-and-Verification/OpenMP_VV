@@ -10,7 +10,6 @@
 #include <stdio.h>
 #include "ompvv.h"
 
-#define N 10
 #define NUM_TEAMS 4
 
 int group_sum;
