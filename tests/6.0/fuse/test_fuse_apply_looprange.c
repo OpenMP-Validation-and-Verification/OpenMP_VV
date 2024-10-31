@@ -22,8 +22,6 @@ int test_apply_looprange() {
   int errors = 0;
   int j;
 
-//  #pragma omp tile sizes(4) apply(grid: unroll)
-//  #pragma omp tile sizes(4) apply(grid: unroll) looprange(2, 2)
   #pragma omp fuse apply(fused : unroll) looprange(2, 2)
   {
     for (j = 0; j < N; ++j)
