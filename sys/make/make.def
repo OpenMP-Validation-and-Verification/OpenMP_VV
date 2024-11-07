@@ -255,7 +255,7 @@ ifeq ($(FC), ftn)
   FLINK          = cc
   FOFFLOADING    = -fopenmp
   F_NO_OFFLOADING = -hnoomp
-  FFLAGS         += -lm -J./ompvv -O3 $(FOFFLOADING)
+  FFLAGS         += -lm -dm -O3 $(FOFFLOADING)
   FLINKFLAGS     += -lm -O3 $(FOFFLOADING)
 endif
 
