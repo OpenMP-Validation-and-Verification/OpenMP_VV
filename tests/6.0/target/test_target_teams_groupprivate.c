@@ -1,7 +1,8 @@
 //===--- test_target_groupprivate.c -----------------------------------------===//
 //
 // OpenMP API Version 6.0
-// Tests the target directive with the groupprivate directive ensuring proper behavior
+// Tests the target directive with the groupprivate directive ensuring proper 
+// behavior. 
 //
 ////===----------------------------------------------------------------------===//
 
@@ -13,14 +14,13 @@
 #define NUM_TEAMS 4
 
 int group_sum;
-
+#pragma omp groupprivate(group_sum)
 
 int test_target_groupprivate(){
     int errors = 0;
     int host_sum = 0;
     int team_sum = 0;
 
-    #pragma omp groupprivate(group_sum) device_type(nohost)
     #pragma omp target teams num_teams(NUM_TEAMS) map(tofrom: team_sum) reduction(+: team_sum)
     {
         group_sum = omp_get_team_num();
