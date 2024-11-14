@@ -14,7 +14,7 @@
 #define NUM_TEAMS 4
 
 int group_sum;
-//#pragma omp groupprivate(group_sum) device_type(nohost)
+#pragma omp groupprivate(group_sum) device_type(nohost)
 
 int test_target_groupprivate_devicetype_nohost(){
     int errors = 0;
