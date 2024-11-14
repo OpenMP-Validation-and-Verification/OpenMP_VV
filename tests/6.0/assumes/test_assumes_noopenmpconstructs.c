@@ -7,17 +7,17 @@
 // ***********
 // The no_openmp_constructs clause is used to guarantee that the section of code
 // which applies to the assumes directive does not contain any OpenMP constructs. 
-//----------------------------------------------------------------------------//
+//---------------------------------------------------------------------------------//
 #include "ompvv.h"
 
 #define N 4
 
 int test_assumes_no_openmp_constructs() {
-  int A[4][N] = {0};
   int errors = 0;
 
-  #pragma omp assumes
+  #pragma omp assume no_openmp_constructs(1)
   {
+  
   }
 
   return errors;
