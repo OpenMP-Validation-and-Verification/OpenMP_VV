@@ -13,8 +13,21 @@
 
 #define NUM_TEAMS 4
 
+#pragma omp declare target
 int group_sum;
 #pragma omp groupprivate(group_sum) device_type(nohost)
+#pragma omp end declare target
+
+int group_sum_host;
+
+int* target_var(){
+    return &group_sum;
+}
+
+#pragma omp declare variant(target_var) match(device={kind(nohost)})
+int* get_group_sum_func() {
+    return &group_sum_host;
+}
 
 int test_target_groupprivate_devicetype_nohost(){
     int errors = 0;
@@ -27,9 +40,11 @@ int test_target_groupprivate_devicetype_nohost(){
 	if (omp_get_team_num() == 0 && omp_is_initial_device()){
 	    errors++;
         }	    
-        group_sum = omp_get_team_num();
+	int *group_sum_pointer = get_group_sum_func();
+        	
+        *group_sum_pointer = omp_get_team_num();
 
-        team_sum += group_sum;
+        team_sum += *group_sum_pointer;
     
     }
 
