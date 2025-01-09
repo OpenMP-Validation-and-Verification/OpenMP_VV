@@ -233,7 +233,7 @@ F_VERSION?= echo "version unknown"
 ifeq ($(FC), amdflang)
     F_VERSION     =  $(FC) -dumpversion
     FLINK         =  amdclang++
-    FOFFLOADING   =  -fopenmp --offload-arch=native 
+    FOFFLOADING   =  -fopenmp --offload-arch=gfx90a
     FOFFLOADING   +=  $(OMPV)
     FFLAGS        += -lm -O3 $(FOFFLOADING)
     FLINKFLAGS    += -lm -O3 $(FOFFLOADING)
