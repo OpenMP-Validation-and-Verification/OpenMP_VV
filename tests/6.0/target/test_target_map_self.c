@@ -18,7 +18,7 @@ int test_target_map_self(){
     int* host_pointer = &var;
     int* device_pointer = NULL;
 
-    #pragma omp target map(self: var) map(from: device_pointer)
+    #pragma omp target map(self, to: var) map(from: device_pointer)
     {
             device_pointer = &var;
     }
