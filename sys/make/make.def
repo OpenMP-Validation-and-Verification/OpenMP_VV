@@ -64,8 +64,12 @@ endef
 CCOMPILERS?="amdclang, cc, clang, gcc, xlc, xlc_r, icx, icpx, nvc"
 C_VERSION?= echo "version unknown"
 CC?=none
-CPP?=none
+CXX?=none
 FC?=none
+
+override CC := $(notdir $(CC))
+override CXX := $(notdir $(CXX))
+override FC := $(notdir $(FC))
 
 ifeq ($(OMP_VERSION), 5.0)
    OMPV = -fopenmp-version=50
