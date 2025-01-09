@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include "ompvv.h"
 
+#pragma omp requires unified_shared_memory
 
 int test_target_map_self(){
     int errors = 0;
