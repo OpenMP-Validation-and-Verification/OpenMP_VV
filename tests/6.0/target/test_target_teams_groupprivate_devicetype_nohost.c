@@ -13,9 +13,6 @@
 
 #define NUM_TEAMS 4
 
-int group_sum;
-#pragma omp groupprivate(group_sum) device_type(nohost)
-
 int target_func(){
     return omp_get_team_num();
 }
@@ -26,6 +23,8 @@ int host_func() {
 }
 
 int test_target_groupprivate_devicetype_nohost(){
+    int group_sum;
+    #pragma omp groupprivate(group_sum) device_type(nohost)
     int errors = 0;
     int team_sum = 0;
     int host_sum = 0;
@@ -40,7 +39,6 @@ int test_target_groupprivate_devicetype_nohost(){
         team_sum += group_sum;
     
     }
-    printf("%d",team_sum);
     for (int i = 0; i < NUM_TEAMS; i++){
         host_sum += i;
     }
