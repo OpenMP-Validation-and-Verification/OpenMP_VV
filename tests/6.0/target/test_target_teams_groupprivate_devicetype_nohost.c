@@ -11,8 +11,6 @@
 #include <stdio.h>
 #include "ompvv.h"
 
-#define NUM_TEAMS 4
-
 int target_func(){
     return omp_get_team_num();
 }
@@ -28,7 +26,7 @@ int test_target_groupprivate_devicetype_nohost(){
     int errors = 0;
     int team_sum = 0;
     int host_sum = 0;
-    #pragma omp target teams num_teams(NUM_TEAMS) map(tofrom: team_sum, errors) reduction(+: team_sum)
+    #pragma omp target teams num_teams(OMPVV_NUM_TEAMS_DEVICE) map(tofrom: team_sum, errors) reduction(+: team_sum)
     
     {
 	if (omp_get_team_num() == 0 && omp_is_initial_device()){
@@ -39,7 +37,7 @@ int test_target_groupprivate_devicetype_nohost(){
         team_sum += group_sum;
     
     }
-    for (int i = 0; i < NUM_TEAMS; i++){
+    for (int i = 0; i < OMPVV_NUM_TEAMS_DEVICE; i++){
         host_sum += i;
     }
     OMPVV_TEST_AND_SET_VERBOSE(errors, team_sum != host_sum);
