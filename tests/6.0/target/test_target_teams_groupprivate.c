@@ -11,17 +11,16 @@
 #include <stdio.h>
 #include "ompvv.h"
 
-#define NUM_TEAMS 4
 
-int group_sum;
-#pragma omp groupprivate(group_sum)
 
 int test_target_groupprivate(){
+    int group_sum;
+    #pragma omp groupprivate(group_sum)
     int errors = 0;
     int host_sum = 0;
     int team_sum = 0;
 
-    #pragma omp target teams num_teams(NUM_TEAMS) map(tofrom: team_sum) reduction(+: team_sum)
+    #pragma omp target teams num_teams(OMPVV_NUM_TEAMS_DEVICE) map(tofrom: team_sum) reduction(+: team_sum)
     {
         group_sum = omp_get_team_num();
 
@@ -29,7 +28,7 @@ int test_target_groupprivate(){
     
     }
 
-    for (int i = 0; i < NUM_TEAMS; i++){
+    for (int i = 0; i < OMPVV_NUM_TEAMS_DEVICE; i++){
         host_sum += i;
     }
     OMPVV_TEST_AND_SET_VERBOSE(errors, team_sum != host_sum);
