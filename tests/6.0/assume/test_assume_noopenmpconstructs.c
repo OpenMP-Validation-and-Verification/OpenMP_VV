@@ -10,7 +10,7 @@
 // constructs. The argument supplied to the clause is the "can_assume" int
 // variable. If the variable is 1, the no_openmp_constructs assumes that the
 // assumption is true. If the variable is 0, the clause assumes that the
-// assumption is false. If the argument is not specified (void) then the default
+// assumption is false. If the argument is not specified (empty) then the default
 // assumption is true. If the clause is working correctly, then the array A will
 // be updated with the expected values and the sum of those values will be
 // checked for correctness.
@@ -26,6 +26,7 @@ int test_assumes_no_openmp_constructs() {
 
   #pragma omp assume no_openmp_constructs(can_assume)
   {
+    #pragma omp parallel for
     for (i = 0; i < N; ++i) {
       A[i] = i + 1;
     }
@@ -56,7 +57,7 @@ int test_assumes_no_openmp_constructs() {
     ++errors;
 
   sum = 0;
-  #pragma omp assume no_openmp_constructs(void)
+  #pragma omp assume no_openmp_constructs()
   {
     for (i = 0; i < N; ++i) {
       A[i] = 3 * (i + 1);
