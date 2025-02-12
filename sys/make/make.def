@@ -58,6 +58,11 @@ endef
 define log_section_footer
   -$(if $(LOG), @echo -e "*-*-*END*-*-*$(1)*-*-*$$(date)*-*-*$(2)*-*-*$(3)*-*-*$(4)*-*-*$(OMPVV_GIT_COMMIT)*-*-*\n" >> $(LOGDIR)/$(5);,)
 endef
+
+
+# Update the compiler settings, unless OMPVV_NO_COMPILER_CHANGES is set.
+ifndef OMPVV_NO_COMPILER_CHANGES
+
 #---------------------------------------------------------------------------
 # C compilers
 #---------------------------------------------------------------------------
@@ -67,9 +72,12 @@ CC?=none
 CXX?=none
 FC?=none
 
-override CC := $(notdir $(CC))
-override CXX := $(notdir $(CXX))
-override FC := $(notdir $(FC))
+# Strip directory for matching the configuration below
+# setting values according to the Makefile variable override rules
+# But the full pathname compiler will be used for compilation
+OMPVV_USED_CC := $(notdir $(CC))
+OMPVV_USED_CXX := $(notdir $(CXX))
+OMPVV_USED_FC := $(notdir $(FC))
 
 ifeq ($(OMP_VERSION), 5.0)
    OMPV = -fopenmp-version=50
@@ -80,7 +88,7 @@ else ifeq ($(OMP_VERSION), 5.2)
 endif
 
 
-ifeq ($(CC), amdclang)
+ifeq ($(OMPVV_USED_CC), amdclang)
     C_VERSION     =  $(CC) -dumpversion
     CLINK         =  $(CC)
     COFFLOADING   =  -fopenmp --offload-arch=native 
@@ -91,7 +99,7 @@ ifeq ($(CC), amdclang)
 endif
 
 # NVIDIA compiler
-ifeq ($(CC), nvc)
+ifeq ($(OMPVV_USED_CC), nvc)
     C_VERSION    =  $(CC) -dumpversion
     CLINK        =  $(CC)
     COFFLOADING   = -mp=gpu -gpu=cc80
@@ -101,7 +109,7 @@ ifeq ($(CC), nvc)
 endif
 
 # CRAY and AMD compiler wrapers
-ifeq ($(CC), cc)
+ifeq ($(OMPVV_USED_CC), cc)
   C_VERSION      = $(CC) -dumpversion
   CLINK          = $(CC)
   COFFLOADING    = -fopenmp
@@ -111,7 +119,7 @@ ifeq ($(CC), cc)
 endif
 
 # GCC compiler
-ifeq ($(CC), gcc)
+ifeq ($(OMPVV_USED_CC), gcc)
   C_VERSION       =  $(CC) -dumpversion
   CLINK           =  $(CC)
   COFFLOADING     =  -foffload="-lm" -lm -fopenmp
@@ -121,7 +129,7 @@ ifeq ($(CC), gcc)
 endif
 
 # IBM XL compiler
-ifeq ($(CC), $(filter $(CC), xlc xlc_r))
+ifeq ($(OMPVV_USED_CC), $(filter $(OMPVV_USED_CC), xlc xlc_r))
   C_VERSION       =  echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(CC) -qversion | tail -n 1|sed 's/Version:\ //')"
   CLINK           =  $(CC)
   COFFLOADING     =  -qoffload -qsmp=omp
@@ -131,7 +139,7 @@ ifeq ($(CC), $(filter $(CC), xlc xlc_r))
 endif
 
 # Intel ICX compiler
-ifeq ($(CC), $(filter $(CC), icx icpx))
+ifeq ($(OMPVV_USED_CC), $(filter $(OMPVV_USED_CC), icx icpx))
   C_VERSION       =  $(CC) -dumpversion
   CLINK           =  $(CC)
   COFFLOADING     =  -fopenmp-targets=spir64 -fiopenmp
@@ -141,7 +149,7 @@ ifeq ($(CC), $(filter $(CC), icx icpx))
 endif
 
 # Clang compiler
-ifeq ($(CC), clang)
+ifeq ($(OMPVV_USED_CC), clang)
   C_VERSION       =  $(CC) -dumpversion
   CLINK           =  $(CC)
   COFFLOADING     =  -fopenmp --offload-arch=native
@@ -158,7 +166,7 @@ endif
 CXXCOMPILERS?="amdclang++, CC, clang++, g++, xlc++, xlc++_r, icpx, nvc++"
 CXX_VERSION?= echo "version unknown"
 
-ifeq ($(CXX), amdclang++)
+ifeq ($(OMPVV_USED_CXX), amdclang++)
     CXX_VERSION     =  $(CXX) -dumpversion
     CXXLINK         =  $(CXX)
     CXXOFFLOADING   =  -fopenmp --offload-arch=native
@@ -169,7 +177,7 @@ ifeq ($(CXX), amdclang++)
 endif
 
 # NVIDIA compiler
-ifeq ($(CXX), nvc++)
+ifeq ($(OMPVV_USED_CXX), nvc++)
     CXX_VERSION    =  $(CXX) -dumpversion
     CXXLINK        =  $(CXX)
     CXXOFFLOADING   = -mp=gpu -gpu=cc80
@@ -179,7 +187,7 @@ ifeq ($(CXX), nvc++)
 endif
 
 # CRAY and AMD compiler wrappers
-ifeq ($(CXX), CC)
+ifeq ($(OMPVV_USED_CXX), CC)
   CXX_VERSION      = $(CXX) -dumpversion
   CXXLINK          = $(CXX)
   CXXOFFLOADING    = -fopenmp
@@ -188,7 +196,7 @@ ifeq ($(CXX), CC)
 endif
 
 # GCC compiler
-ifeq ($(CXX), g++)
+ifeq ($(OMPVV_USED_CXX), g++)
   CXX_VERSION       =  $(CXX) -dumpversion
   CXXLINK           =  $(CXX)
   CXXOFFLOADING     =  -foffload="-lm" -lm -fopenmp
@@ -198,7 +206,7 @@ ifeq ($(CXX), g++)
 endif
 
 # IBM XL compiler
-ifeq ($(CXX), $(filter $(CXX), xlc++ xlc++_r))
+ifeq ($(OMPVV_USED_CXX), $(filter $(OMPVV_USED_CXX), xlc++ xlc++_r))
   CXX_VERSION       =  echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(CXX) -qversion | tail -n 1|sed 's/Version:\ //')"
   CXXLINK           =  $(CXX)
   CXXOFFLOADING     =  -qoffload -qsmp=omp
@@ -208,7 +216,7 @@ ifeq ($(CXX), $(filter $(CXX), xlc++ xlc++_r))
 endif
 
 # Intel ICX compiler
-ifeq ($(CXX), icpx)
+ifeq ($(OMPVV_USED_CXX), icpx)
   CXX_VERSION       =  $(CXX) -dumpversion
   CXXLINK           =  $(CXX)
   CXXOFFLOADING     =  -fopenmp-targets=spir64 -fiopenmp
@@ -218,7 +226,7 @@ ifeq ($(CXX), icpx)
 endif
 
 # Clang compiler
-ifeq ($(CXX), clang++)
+ifeq ($(OMPVV_USED_CXX), clang++)
   CXX_VERSION       =  $(CXX) -dumpversion
   CXXLINK           =  $(CXX)
   CXXOFFLOADING     =  -fopenmp --offload-arch=native
@@ -234,7 +242,7 @@ endif
 FCOMPILERS?="amdflang, gfortran, xlf, xlf_r, ifx, ifort, ftn, nvfortran"
 F_VERSION?= echo "version unknown"
 
-ifeq ($(FC), amdflang)
+ifeq ($(OMPVV_USED_FX), amdflang)
     F_VERSION     =  $(FC) -dumpversion
     FLINK         =  amdclang++
     FOFFLOADING   =  -fopenmp --offload-arch=gfx90a
@@ -244,7 +252,7 @@ ifeq ($(FC), amdflang)
 endif
 
 # NVIDIA compiler
-ifeq ($(FC), nvfortran)
+ifeq ($(OMPVV_USED_FX), nvfortran)
     F_VERSION    =  $(FC) -dumpversion
     FLINK        =  $(FC)
     FOFFLOADING     = -mp=gpu -gpu=cc80
@@ -254,7 +262,7 @@ ifeq ($(FC), nvfortran)
 endif
 
 # CRAY and AMD compiler wrappers
-ifeq ($(FC), ftn)
+ifeq ($(OMPVV_USED_FX), ftn)
   F_VERSION      = echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(FC) --version|head -n1)"
   FLINK          = cc
   FOFFLOADING    = -fopenmp
@@ -264,7 +272,7 @@ ifeq ($(FC), ftn)
 endif
 
 # GCC compiler
-ifeq ($(FC), gfortran)
+ifeq ($(OMPVV_USED_FX), gfortran)
   F_VERSION       =  $(FC) -dumpversion
   FLINK           =  gcc
   FOFFLOADING     =  -foffload="-lm" -lm -fopenmp -foffload-options=-lgfortran
@@ -275,7 +283,7 @@ endif
 # GCC compiler
 
 # IBM XL compiler
-ifeq ($(FC), $(filter $(FC), xlf xlf_r))
+ifeq ($(OMPVV_USED_FX), $(filter $(OMPVV_USED_FX), xlf xlf_r))
   F_VERSION       =  echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(FC) -qversion | tail -n 1|sed 's/Version:\ //')"
   FLINK           =  xlc
   FOFFLOADING     =  -qoffload -qsmp=omp -qmoddir=./ompvv
@@ -285,7 +293,7 @@ ifeq ($(FC), $(filter $(FC), xlf xlf_r))
 endif
 
 # Intel ICX compiler
-ifeq ($(FC), $(filter $(FC), ifx ifort))
+ifeq ($(OMPVV_USED_FX), $(filter $(OMPVV_USED_FX), ifx ifort))
   F_VERSION       =  echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(FC) --version|head -n1)"
   FLINK           =  $(FC)
   FOFFLOADING     =  -fopenmp-targets=spir64 -fiopenmp
@@ -295,7 +303,7 @@ ifeq ($(FC), $(filter $(FC), ifx ifort))
 endif
 
 # Flang compiler
-ifeq ($(FC), $(filter $(FC), flang flang-new))
+ifeq ($(OMPVV_USED_FX), $(filter $(OMPVV_USED_FX), flang flang-new))
   F_VERSION       =  $(FC) -dumpversion
   FOFFLOADING     =  -fopenmp --offload-arch=native
   FOFFLOADING     +=  $(OMPV)
@@ -304,8 +312,8 @@ ifeq ($(FC), $(filter $(FC), flang flang-new))
   FLINKFLAGS      += -lm -O3 $(FOFFLOADING)
 endif
 
-
-
+# end of: ifndef OMPVV_NO_COMPILER_CHANGES
+endif
 
 #---------------------------------------------------------------------------
 # These macros are passed to the linker
