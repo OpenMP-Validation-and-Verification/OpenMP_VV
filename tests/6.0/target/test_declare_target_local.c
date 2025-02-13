@@ -23,7 +23,13 @@ int test_local() {
 
     }
 
-    OMPVV_TEST_AND_SET_VERBOSE(errors, local_var != 5);
+    local_var = 15;
+
+    #pragma omp target map(tofrom: device_value)
+    {
+        device_value = local_var;
+    }
+    OMPVV_TEST_AND_SET_VERBOSE(errors, device_value != 10);
     return errors;
 }
 
