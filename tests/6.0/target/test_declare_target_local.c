@@ -17,10 +17,9 @@ int test_local() {
     int errors = 0;
     int device_value = 0;
     local_var = 5;
-    #pragma omp target map(alloc: local_var)
+    #pragma omp target
     {
         local_var = 10;
-
     }
 
     local_var = 15;
