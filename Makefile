@@ -25,6 +25,8 @@ else
 endif
 -include sys/systems/$(SYSTEM).def
 
+# Set OMPVV_NO_COMPILER_MODULE_CHANGES to prevent
+# changes to the compiler settings inside make.def
 include sys/make/make.def
 
 ###################################################
