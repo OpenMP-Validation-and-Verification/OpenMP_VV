@@ -67,14 +67,15 @@ int test_assumes_no_openmp_constructs() {
     for (i = 0; i < N; ++i) {
       A[i] = 2 * (i + 1);
     }
-  }
 
-  for (i = 0; i < N; ++i) {
-    if (omp_in_parallel() == 0){
-      sum += A[i];
-      A[i] = 0;
+    for (i = 0; i < N; ++i) {
+      if (omp_in_parallel() == 0){
+        sum += A[i];
+        A[i] = 0;
+      }
     }
   }
+
   if (sum != 2 * N * (N + 1) / 2)
     ++errors;
 
