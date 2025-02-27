@@ -18,7 +18,7 @@
 int test_maptype_modifier_default() {
   int errors = 0, a = 1;
 
-  #pragma omp target map(to: a, from: a)
+  #pragma omp target map(present, tofrom:a)
   {
     a = a * N;
   }
