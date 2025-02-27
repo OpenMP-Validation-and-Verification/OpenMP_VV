@@ -20,7 +20,7 @@ int test_maptype_modifier_default() {
 
   #pragma omp target enter data map(to : a)
 
-  #pragma omp target map(present)
+  #pragma omp target map(present: a)
   {
     a = a * N;
   }
