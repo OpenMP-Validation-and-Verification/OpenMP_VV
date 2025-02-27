@@ -20,11 +20,12 @@ int test_maptype_modifier_default() {
 
   #pragma omp target enter data map(to : a)
 
-  #pragma omp target map(present, from : a)
+  #pragma omp target map(present)
   {
     a = a * N;
   }
-  #pragma omp target update from(a)
+
+  #pragma omp target exit data map(from: a)
 
   OMPVV_TEST_AND_SET_VERBOSE(errors, a != N)
   return errors;
