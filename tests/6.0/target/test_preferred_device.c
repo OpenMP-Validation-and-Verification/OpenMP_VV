@@ -14,7 +14,16 @@
 
 int test_preferred_device() {
     int errors = 0;
-    int device = 1;
+    int device;
+    int num_devices = omp_get_num_devices();
+
+    if (num_devices > 0) {
+        device = 0;
+    } 
+    else {
+        device = omp_get_initial_device();
+    }
+
     int *arr;
 
     omp_alloctrait_t trait = { omp_atk_preferred_device, device };
@@ -22,7 +31,7 @@ int test_preferred_device() {
 
     arr = (int*)omp_alloc(N*sizeof(int),preferred_dev_alloc);
 
-    #pragma omp target parallel for map(from: arr[0:N]) device(device)
+    #pragma omp target parallel for map(from: arr[0:N])
     for (int i = 0; i < N; i++) {
         arr[i] = i;
     }
