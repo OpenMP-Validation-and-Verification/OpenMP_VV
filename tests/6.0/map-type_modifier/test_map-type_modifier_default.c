@@ -6,10 +6,10 @@
 // CLAUSE:map
 // ***********
 // The default properties behavior of the map-type modifier supplied to the map
-// clause is being tested. Providing the present modifier and a from modifier
-// ensures that more than one modifier can be supplied at once to map. This is
-// in accordance with the modifier defaults column in Table 5.1 on page 159. If
-// a tofrom behavior is observed at runtime, then the test passes.
+// clause is being tested. Providing the present modifier with no additional
+// map-type modifier ensures that more than one modifier is not needed for
+// the map. This is in accordance with the modifier defaults column in Table 5.1 
+// on page 159. If a tofrom behavior is observed at runtime, then the test passes.
 //---------------------------------------------------------------------------------//
 #include "ompvv.h"
 
