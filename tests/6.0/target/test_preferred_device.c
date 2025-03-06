@@ -15,14 +15,8 @@
 int test_preferred_device() {
     int errors = 0;
     int device;
-    int num_devices = omp_get_num_devices();
 
-    if (num_devices > 0) {
-        device = 0;
-    } 
-    else {
-        device = omp_get_initial_device();
-    }
+    device = omp_get_initial_device();
 
     int *arr;
 
@@ -30,8 +24,13 @@ int test_preferred_device() {
     omp_allocator_handle_t preferred_dev_alloc = omp_init_allocator(omp_default_mem_space, 1, &trait);
 
     arr = (int*)omp_alloc(N*sizeof(int),preferred_dev_alloc);
+    if (arr == NULL) {
+        OMPVV_ERROR("Array is null");
+	errors++;
+	return errors;
+    }
 
-    #pragma omp target parallel for map(from: arr[0:N])
+    #pragma omp parallel for
     for (int i = 0; i < N; i++) {
         arr[i] = i;
     }
