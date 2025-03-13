@@ -32,7 +32,7 @@ int test_target_access_single() {
     }
     
     for (int i = 0; i < N; i++) {
-        OMPVV_TEST_AND_SET_VERBOSE(errors, array[i] != i * 10);
+        OMPVV_TEST_AND_SET_VERBOSE(errors, array[i] != i * N);
     }
     
     omp_free(array, single_allocator);
