@@ -25,7 +25,7 @@ int test_preferred_device() {
 
     arr = (int*)omp_alloc(N*sizeof(int),preferred_dev_alloc);
     if (arr == NULL) {
-        OMPVV_ERROR("Allocation failed");
+        OMPVV_ERROR("Allocation failed when using omp_alloc with preferred_dev_alloc trait");
 	errors++;
 	return errors;
     }
