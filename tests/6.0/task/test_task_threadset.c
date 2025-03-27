@@ -10,9 +10,19 @@
 
 #include <omp.h>
 #include "ompvv.h"
+#include <stdlib.h>
 
 // Define a small number for testing purposes
 #define N 1024
+
+static char env_string[] = "MY_VAR=hello";
+
+if (putenv(env_string) != 0) {
+    perror("putenv failed");
+    return 1;
+}
+const char *value = getenv("MY_VAR");
+printf("MY_VAR = %s\n", value ? value : "(not found)");
 
 void task_work(int* arr) {
   #pragma omp parallel for
@@ -30,30 +40,31 @@ void check_work(int* arr, int* errors) {
 }
 
 int test_task_threadset() {
-    int errors = 0;
+    int errors1, errors2 = 0;
     int arr1[N], arr2[N];
 
     // Test task with threadset(omp_pool)
     #pragma omp task threadset(omp_pool)
     {
+        if (omp_is_free_agent())
+            ++free_agents;
         task_work(arr1);
-        check_work(arr1, &errors);
+        check_work(arr1, &errors1);
     }
 
-    #pragma omp taskwait
-    OMPVV_TEST_VERBOSE(errors != 0);
 
     // Test task with default threadset (should be omp_team)
     #pragma omp task
     {
         task_work(arr2);
-        check_work(arr2, &errors);
+        check_work(arr2, &errors2);
     }
 
     // Wait for all tasks to complete
     #pragma omp taskwait
 
-    OMPVV_TEST_VERBOSE(errors != 0);
+    OMPVV_TEST_VERBOSE(errors1 != 0);
+    OMPVV_TEST_VERBOSE(errors2 != 0);
 
     return errors;
 }
