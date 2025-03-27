@@ -14,7 +14,7 @@
 
 int test_pin_device() {
    int errors = 0;
-   int target_device = 0;
+   int target_device = omp_get_initial_device();
    int verified_device = -1;
    
    int *arr;
