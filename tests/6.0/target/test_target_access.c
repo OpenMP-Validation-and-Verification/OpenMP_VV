@@ -24,13 +24,15 @@ int test_target_access_single() {
         array[i] = i;
     }
     
-    #pragma omp target map(tofrom: array[:N])
+    #pragma omp target  is_device_ptr(array)
     {
         for (int i = 0; i < N; i++) {
             array[i] = i * N ;
         }
     }
-    
+
+    #pragma omp target update from(array[:N])
+
     for (int i = 0; i < N; i++) {
         OMPVV_TEST_AND_SET_VERBOSE(errors, array[i] != i * N);
     }
