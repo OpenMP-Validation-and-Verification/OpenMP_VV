@@ -11,15 +11,21 @@
 #include <stdio.h>
 #include "ompvv.h"
 
+#define N 1024
+
 #pragma omp requires unified_shared_memory
 
 int test_target_map_self(){
     int errors = 0;
-    int var = 1;
+    int arr[N];
     int* host_pointer = &var;
     int* device_pointer = NULL;
-
-    #pragma omp target map(self, to: var) map(from: device_pointer)
+    
+    for(int i = 0; i < N; i++){
+        arr[i] = i;
+    }
+    
+    #pragma omp target map(self: var) map(from: device_pointer)
     {
             device_pointer = &var;
     }
