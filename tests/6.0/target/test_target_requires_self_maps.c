@@ -10,26 +10,44 @@
 #include <stdio.h>
 #include "ompvv.h"
 
+#define N 2
+
 #pragma omp requires self_maps
 
 int test_target_self_maps() {
     int errors = 0;
-    int x = 16;
+    int x[N];
     
+    for(int i = 0; i < N; i++){
+        x[i] = i;
+    }	
+	    
     #pragma omp target
     {
-        x += 4;
+        for (int i = 0; i < N; i++){
+	    x[i] += 9;
+	}
     }
-    OMPVV_TEST_AND_SET_VERBOSE(errors, x != 20);
+
+    for(int i = 0; i < N; i++){
+        OMPVV_TEST_AND_SET_VERBOSE(errors, x[i] != i + 9);
+    }
     
-    x *= 2;
-    
+    for(int i = 0; i < N; i++){
+        x[i] += 10;
+    }
+ 
     #pragma omp target
     {
-        x += 10;
+        for (int i = 0; i < N; i++){
+            x[i] *= 2;
+        }
     }
-    OMPVV_TEST_AND_SET_VERBOSE(errors, x != 50);
-    
+
+    for(int i = 0; i < N; i++){
+        OMPVV_TEST_AND_SET_VERBOSE(errors, x[i] != (i + 19) * 2);
+    }
+
     return errors;
 }
 
