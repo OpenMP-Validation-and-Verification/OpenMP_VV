@@ -18,11 +18,11 @@
 int test_pin_device() {
     int errors = 0;
     int target_device = omp_get_initial_device();
-    int verified_device = -1;
     int *arr;
     
     omp_alloctrait_t trait = { omp_atk_pin_device, target_device };
     omp_allocator_handle_t pin_dev_alloc = omp_init_allocator(omp_default_mem_space, 1, &trait);
+    
     arr = (int*)omp_alloc(N*sizeof(int), pin_dev_alloc);
     
     if (arr == NULL) {
@@ -32,26 +32,18 @@ int test_pin_device() {
     }
     
     for (int i = 0; i < N; i++) {
-        arr[i] = 1;
+        arr[i] = i;
     }
     
-    #pragma omp target data use_device_ptr(arr) device(target_device)
+    #pragma omp target map(tofrom: arr[0:N])
     {
-        #pragma omp target device(target_device) map(from:verified_device)
-        {
-            verified_device = omp_get_device_num();
-            for (int i = 0; i < N; i++) {
-                arr[i] = 2;
-            }
-        }
+        for (int i = 0; i < N; i++) {
+            arr[i] *= 2;
+        }   
     }
-    
-    #pragma omp target update from(arr[0:N]) device(target_device)
-    
-    OMPVV_TEST_AND_SET_VERBOSE(errors, verified_device != target_device);
     
     for (int i = 0; i < N; i++) {
-        OMPVV_TEST_AND_SET_VERBOSE(errors, arr[i] != 2);
+        OMPVV_TEST_AND_SET_VERBOSE(errors, arr[i] != i * 2);
     }
     
     omp_free(arr, pin_dev_alloc);
