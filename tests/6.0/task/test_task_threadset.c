@@ -14,7 +14,8 @@
 #include "ompvv.h"
 #include <omp.h>
 
-#define N 10 // not too large
+// not too large
+#define N 10
 
 int count = 0;
 
