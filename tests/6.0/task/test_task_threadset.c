@@ -6,9 +6,10 @@
 // CLAUSE:threadset
 // ***********
 // This test checks the functionality of the threadset clause with the task
-// directive. It verifies that the task is executed by a free-agent thread when
-// threadset(omp_pool) is used, and that the result of the Fibonacci calculation
-// is correct when threadset(omp_team) is used.
+// directive. The example referenced here is "5.10 Free Agent Threads" which is
+// taken from the 6.0 examples document. It checks if the task is executed by a
+// free-agent thread when threadset(omp_pool) is used, and that the result of
+// the Fibonacci calculation is correct when both omp_pool and omp_team is used.
 //----------------------------------------------------------------------------//
 
 #include "ompvv.h"
@@ -28,26 +29,26 @@ int fib_seq(int n) {
 int fib(int n, int use_pool) {
   int i, j;
 
+  if (omp_is_free_agent()) {
+    #pragma omp atomic
+    count++;
+  }
   if (n < 2)
     return n;
   if (use_pool) {
-    #pragma omp task shared(i) //threadset(omp_pool)
+    #pragma omp task // threadset(omp_pool)
     i = fib(n - 1, use_pool);
-    #pragma omp task shared(j) //threadset(omp_pool)
+    #pragma omp task // threadset(omp_pool)
     j = fib(n - 2, use_pool);
-    //if (omp_is_free_agent()) {
-    if (1==1) {
-      #pragma omp atomic
-      count++;
-    }
+    #pragma omp taskwait
   } else {
-    #pragma omp task shared(i) //threadset(omp_team)
+    #pragma omp task // threadset(omp_team)
     i = fib(n - 1, use_pool);
-    #pragma omp task shared(j) //threadset(omp_team)
+    #pragma omp task // threadset(omp_team)
     j = fib(n - 2, use_pool);
+    #pragma omp taskwait
   }
-  #pragma omp taskwait
-  
+
   return (i + j);
 }
 
