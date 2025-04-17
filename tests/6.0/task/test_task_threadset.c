@@ -25,29 +25,29 @@ int fib_seq(int n) {
   return fib_seq(n - 1) + fib_seq(n - 2);
 }
 
-int fib(int n, int use_pool, int *result) {
+int fib(int n, int use_pool) {
   int i, j;
 
   if (n < 2)
     return n;
   if (use_pool) {
     #pragma omp task shared(i) //threadset(omp_pool)
-    i = fib(n - 1, use_pool, &i);
+    i = fib(n - 1, use_pool);
     #pragma omp task shared(j) //threadset(omp_pool)
-    j = fib(n - 2, use_pool, &j);
+    j = fib(n - 2, use_pool);
+    //if (omp_is_free_agent()) {
+    if (1==1) {
+      #pragma omp atomic
+      count++;
+    }
   } else {
     #pragma omp task shared(i) //threadset(omp_team)
-    i = fib(n - 1, use_pool, &i);
+    i = fib(n - 1, use_pool);
     #pragma omp task shared(j) //threadset(omp_team)
-    j = fib(n - 2, use_pool, &j);
+    j = fib(n - 2, use_pool);
   }
   #pragma omp taskwait
-  //if (omp_is_free_agent()) {
-  if (1==1) {
-    #pragma omp atomic
-    count++;
-  }
-  *result = i + j;
+  
   return (i + j);
 }
 
@@ -55,13 +55,13 @@ int task_work(int n, int use_pool) {
   int errors = 0;
   count = 0;
   int result;
+
+  omp_set_num_threads(OMPVV_NUM_THREADS_HOST);
   #pragma omp parallel
+  #pragma omp single
   {
-    // #pragma omp task //threadset(use_pool ? omp_pool : omp_team)
-    fib(n, use_pool, &result);
+    result = fib(n, use_pool);
   }
-  // Verify if the task was executed by a free-agent thread when threadset is
-  // omp_pool
   if (use_pool) {
     OMPVV_WARNING_IF(
         count == 0,
@@ -81,10 +81,6 @@ int test_task_threadset() {
   errors += task_work(n, 1);
 
   // Test task with default threadset (should be omp_team)
-  errors += task_work(n, 0);
-
-  // Test task with num_threads clause
-  omp_set_num_teams(2);
   errors += task_work(n, 0);
 
   return errors;
