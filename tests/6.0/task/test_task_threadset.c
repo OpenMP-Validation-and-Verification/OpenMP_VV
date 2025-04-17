@@ -29,7 +29,7 @@ int fib(int n, int *result) {
   int i, j;
   if (n < 2) {
     if (omp_is_free_agent()) {
-#pragma omp atomic
+      #pragma omp atomic
       count++;
     }
     *result = n;
@@ -60,11 +60,10 @@ void task_work(int n, int use_pool) {
     OMPVV_TEST_VERBOSE(count > 0); // count should be greater than 0 if a
                                    // free-agent thread executed the task
   } else {
-    OMPVV_TEST_VERBOSE(
-        count ==
-        0); // count should be 0 if no free-agent thread executed the task
-    OMPVV_TEST_AND_SET(errors, result != fib_seq(n));
+    OMPVV_TEST_VERBOSE(count == 0); // count should be 0 if no free-agent 
+                                    // thread executed the task
   }
+  OMPVV_TEST_AND_SET(errors, result != fib_seq(n));
 }
 
 int errors = 0;
@@ -79,7 +78,7 @@ int test_task_threadset() {
   task_work(n, 0);
 
   // Test task with num_threads clause
-  omp_set_num_threads(4);
+  omp_set_num_teams(2);
   task_work(n, 0);
 
   return errors;
