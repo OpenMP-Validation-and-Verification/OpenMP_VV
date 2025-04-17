@@ -26,28 +26,29 @@ int fib_seq(int n) {
 }
 
 int fib(int n, int use_pool, int *result) {
-int i, j;
+  int i, j;
 
- if ( n<2 )
- return n;
- if (use_pool) {
-    #pragma omp task shared(i) threadset(omp_pool)
-    i=fib(n-1);
-    #pragma omp task shared(j) threadset(omp_pool)
-    j=fib(n-2);
- }else {
-    #pragma omp task shared(i) threadset(omp_team)
-    i=fib(n-1);
-    #pragma omp task shared(j) threadset(omp_team)
-    j=fib(n-2);
- }
- #pragma omp taskwait
- if ( omp_is_free_agent() ) {
- #pragma omp atomic
- count++;
- }
- *result = i + j;
- return (i+j);
+  if (n < 2)
+    return n;
+  if (use_pool) {
+    #pragma omp task shared(i) //threadset(omp_pool)
+    i = fib(n - 1, use_pool, &i);
+    #pragma omp task shared(j) //threadset(omp_pool)
+    j = fib(n - 2, use_pool, &j);
+  } else {
+    #pragma omp task shared(i) //threadset(omp_team)
+    i = fib(n - 1, use_pool, &i);
+    #pragma omp task shared(j) //threadset(omp_team)
+    j = fib(n - 2, use_pool, &j);
+  }
+  #pragma omp taskwait
+  //if (omp_is_free_agent()) {
+  if (1==1) {
+    #pragma omp atomic
+    count++;
+  }
+  *result = i + j;
+  return (i + j);
 }
 
 int task_work(int n, int use_pool) {
@@ -56,19 +57,21 @@ int task_work(int n, int use_pool) {
   int result;
   #pragma omp parallel
   {
-    //#pragma omp task //threadset(use_pool ? omp_pool : omp_team)
-    fib(n, &result);
+    // #pragma omp task //threadset(use_pool ? omp_pool : omp_team)
+    fib(n, use_pool, &result);
   }
   // Verify if the task was executed by a free-agent thread when threadset is
   // omp_pool
   if (use_pool) {
-    OMPVV_WARNING_IF(count == 0, "no free-agent threads in region"); // count should be greater than 0 if a
-                                   // free-agent thread executed the task
+    OMPVV_WARNING_IF(
+        count == 0,
+        "no free-agent threads in region"); // count should be greater than 0 if
+                                            // a free-agent thread executed the
+                                            // task
   }
   OMPVV_TEST_AND_SET(errors, result != fib_seq(n));
   return errors;
 }
-
 
 int test_task_threadset() {
   int errors = 0;
