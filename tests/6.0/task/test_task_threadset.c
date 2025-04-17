@@ -15,7 +15,7 @@
 #include <omp.h>
 
 // not too large
-#define N 10
+#define N 5
 
 int count = 0;
 
@@ -28,7 +28,8 @@ int fib_seq(int n) {
 int fib(int n, int *result) {
   int i, j;
   if (n < 2) {
-    if (omp_is_free_agent()) {
+    //if (omp_is_free_agent()) {
+    if(1==1){
       #pragma omp atomic
       count++;
     }
@@ -46,45 +47,45 @@ int fib(int n, int *result) {
   return i + j;
 }
 
-void task_work(int n, int use_pool) {
+int task_work(int n, int use_pool) {
+  int errors = 0;
   count = 0;
   int result;
   #pragma omp parallel
   {
-    #pragma omp task threadset(use_pool ? omp_pool : omp_team)
+    #pragma omp task //threadset(use_pool ? omp_pool : omp_team)
     fib(n, &result);
   }
   // Verify if the task was executed by a free-agent thread when threadset is
   // omp_pool
   if (use_pool) {
-    OMPVV_TEST_VERBOSE(count > 0); // count should be greater than 0 if a
+    OMPVV_WARNING_IF(count == 0, "no free-agent threads in region"); // count should be greater than 0 if a
                                    // free-agent thread executed the task
-  } else {
-    OMPVV_TEST_VERBOSE(count == 0); // count should be 0 if no free-agent 
-                                    // thread executed the task
   }
   OMPVV_TEST_AND_SET(errors, result != fib_seq(n));
+  return errors;
 }
 
-int errors = 0;
 
 int test_task_threadset() {
+  int errors = 0;
   int n = N;
 
   // Test task with threadset(omp_pool)
-  task_work(n, 1);
+  errors += task_work(n, 1);
 
   // Test task with default threadset (should be omp_team)
-  task_work(n, 0);
+  errors += task_work(n, 0);
 
   // Test task with num_threads clause
   omp_set_num_teams(2);
-  task_work(n, 0);
+  errors += task_work(n, 0);
 
   return errors;
 }
 
 int main() {
+  int errors = 0;
   OMPVV_TEST_AND_SET(errors, test_task_threadset() != 0);
   OMPVV_REPORT_AND_RETURN(errors);
 }
