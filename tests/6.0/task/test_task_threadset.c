@@ -29,22 +29,24 @@ int fib_seq(int n) {
 int fib(int n, int use_pool) {
   int i, j;
 
-  if (omp_is_free_agent()) {
-    #pragma omp atomic
-    count++;
+  if (use_pool) {
+    if (omp_is_free_agent()) {
+      #pragma omp atomic
+      count++;
+    }
   }
   if (n < 2)
     return n;
   if (use_pool) {
-    #pragma omp task // threadset(omp_pool)
+    #pragma omp task shared(i) threadset(omp_pool)
     i = fib(n - 1, use_pool);
-    #pragma omp task // threadset(omp_pool)
+    #pragma omp task shared(j) threadset(omp_pool)
     j = fib(n - 2, use_pool);
     #pragma omp taskwait
   } else {
-    #pragma omp task // threadset(omp_team)
+    #pragma omp task shared(i) threadset(omp_team)
     i = fib(n - 1, use_pool);
-    #pragma omp task // threadset(omp_team)
+    #pragma omp task shared(j) threadset(omp_team)
     j = fib(n - 2, use_pool);
     #pragma omp taskwait
   }
