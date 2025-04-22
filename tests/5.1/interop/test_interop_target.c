@@ -39,7 +39,7 @@ int interopTestTarget() {
 
   }
 
-  #pragma omp interop destroy(obj) nowait depend(out: A[0:N])
+  #pragma omp interop destroy(obj) depend(out: A[0:N])
 
   // Interop should be completed and cleaned up by here
   
