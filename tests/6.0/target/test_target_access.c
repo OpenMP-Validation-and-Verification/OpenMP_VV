@@ -2,18 +2,28 @@
 //
 // OpenMP API Version 6.0
 // Tests that the target_access single allocator trait works
-// as intended for basic device-host operations.
+// as intended for basic device-host operations and multiple device access.
 //
 //===----------------------------------------------------===//
 #include <omp.h>
 #include <stdio.h>
 #include "ompvv.h"
-
 #define N 16
 
 int test_target_access_single() {
     int errors = 0;
     int *array;
+    int num_devices = omp_get_num_devices();
+    
+    
+    OMPVV_TEST_AND_SET_VERBOSE(errors, num_devices < 2);
+    if (num_devices < 2) {
+        OMPVV_ERROR("This test requires at least 2 devices, but only %d found", num_devices);
+        return errors;
+    }
+    
+    int first_dev = 0;
+    int second_dev = 1; 
     
     omp_alloctrait_t trait = { omp_atk_target_access, omp_atv_single };
     omp_allocator_handle_t single_allocator = omp_init_allocator(omp_default_mem_space, 1, &trait);
@@ -24,17 +34,36 @@ int test_target_access_single() {
         array[i] = i;
     }
     
-    #pragma omp target  is_device_ptr(array)
+    #pragma omp target data map(to: array[:N]) device(first_dev)
     {
-        for (int i = 0; i < N; i++) {
-            array[i] = i * N ;
+        #pragma omp target is_device_ptr(array) device(first_dev)
+        {
+            for (int i = 0; i < N; i++) {
+                array[i] *= 2;
+            }
         }
+        
+        #pragma omp target update from(array[:N]) device(first_dev)
     }
-
-    #pragma omp target update from(array[:N])
-
+    
+    #pragma omp target data map(to: array[:N]) device(second_dev)
+    {
+        #pragma omp target is_device_ptr(array) device(second_dev)
+        {
+            for (int i = 0; i < N; i++) {
+                array[i] += 5; 
+            }
+        }
+        
+        #pragma omp target update from(array[:N]) device(second_dev)
+    }
+    
     for (int i = 0; i < N; i++) {
-        OMPVV_TEST_AND_SET_VERBOSE(errors, array[i] != i * N);
+        OMPVV_TEST_AND_SET_VERBOSE(errors, array[i] != (i * 2) + 5);
+        if (array[i] != i * N + 1) {
+            printf("Error after dev1, index %d: expected %d, got %d\n", 
+                   i, i * N + 1, array[i]);
+        }
     }
     
     omp_free(array, single_allocator);
