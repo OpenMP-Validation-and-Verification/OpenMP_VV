@@ -60,10 +60,6 @@ int test_target_access_single() {
     
     for (int i = 0; i < N; i++) {
         OMPVV_TEST_AND_SET_VERBOSE(errors, array[i] != (i * 2) + 5);
-        if (array[i] != i * N + 1) {
-            printf("Error after dev1, index %d: expected %d, got %d\n", 
-                   i, i * N + 1, array[i]);
-        }
     }
     
     omp_free(array, single_allocator);
