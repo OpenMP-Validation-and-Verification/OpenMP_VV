@@ -1,8 +1,8 @@
-//===--------------------- test_metadirective_target_device.c ---------------------===//
+//===--------------------- test_metadirective_device.c ---------------------===//
 //
 // OpenMP API Version 5.1 Nov 2020
 // 
-// Tests that target_device is recognized & will work properly when matching an nvidia
+// Tests that device is recognized & will work properly when matching an nvidia
 // GPU.
 //
 ////===---------------------------------------------------------------------===//
@@ -14,7 +14,7 @@
 
 #define N 1024
 
-int test_metadirective_target_device() {
+int test_metadirective_device() {
    int errors = 0;
    int A[N];
 
@@ -53,7 +53,7 @@ int main () {
   OMPVV_TEST_OFFLOADING;
 
   if (omp_get_num_devices() > 0) {
-    errors = test_metadirective_target_device();
+    errors = test_metadirective_device();
   } else {
     OMPVV_INFOMSG("Cannot test target_device without a target device!")
   }
