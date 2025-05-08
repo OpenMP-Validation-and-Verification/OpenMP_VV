@@ -19,14 +19,16 @@
 #include <omp.h>
 
 #define N 10
+#define can_assume 1
+#define cannot_assume 0
 
 int test_assumes_no_openmp_constructs() {
   int A[N] = {0};
-  int errors = 0, sum = 0, can_assume = 0;
+  int errors = 0, sum = 0;
   int i;
 
   //parallel for construct
-  #pragma omp assume no_openmp_constructs(can_assume)
+  #pragma omp assume no_openmp_constructs(cannot_assume)
   {
     #pragma omp parallel for
     for (i = 0; i < N; ++i) {
@@ -43,7 +45,6 @@ int test_assumes_no_openmp_constructs() {
     ++errors;
 
   sum = 0;
-  can_assume = 1;
 
   //no constructs
   #pragma omp assume no_openmp_constructs(can_assume)
@@ -82,7 +83,7 @@ int test_assumes_no_openmp_constructs() {
   sum = 0;
 
   //no constructs
-  #pragma omp assume no_openmp_constructs()
+  #pragma omp assume no_openmp_constructs
   {
     for (i = 0; i < N; ++i) {
       A[i] = 3 * (i + 1);
