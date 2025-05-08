@@ -79,6 +79,7 @@ OMPVV_USED_CC := $(notdir $(CC))
 OMPVV_USED_CXX := $(notdir $(CXX))
 OMPVV_USED_FC := $(notdir $(FC))
 
+
 ifeq ($(OMP_VERSION), 5.0)
    OMPV = -fopenmp-version=50
 else ifeq ($(OMP_VERSION), 5.1)
@@ -242,7 +243,7 @@ endif
 FCOMPILERS?="amdflang, gfortran, xlf, xlf_r, ifx, ifort, ftn, nvfortran"
 F_VERSION?= echo "version unknown"
 
-ifeq ($(OMPVV_USED_FX), amdflang)
+ifeq ($(OMPVV_USED_FC), amdflang)
     F_VERSION     =  $(FC) -dumpversion
     FLINK         =  amdclang++
     FOFFLOADING   =  -fopenmp --offload-arch=gfx90a
@@ -252,7 +253,7 @@ ifeq ($(OMPVV_USED_FX), amdflang)
 endif
 
 # NVIDIA compiler
-ifeq ($(OMPVV_USED_FX), nvfortran)
+ifeq ($(OMPVV_USED_FC), nvfortran)
     F_VERSION    =  $(FC) -dumpversion
     FLINK        =  $(FC)
     FOFFLOADING     = -mp=gpu -gpu=cc80
@@ -262,7 +263,7 @@ ifeq ($(OMPVV_USED_FX), nvfortran)
 endif
 
 # CRAY and AMD compiler wrappers
-ifeq ($(OMPVV_USED_FX), ftn)
+ifeq ($(OMPVV_USED_FC), ftn)
   F_VERSION      = echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(FC) --version|head -n1)"
   FLINK          = cc
   FOFFLOADING    = -fopenmp
@@ -272,7 +273,7 @@ ifeq ($(OMPVV_USED_FX), ftn)
 endif
 
 # GCC compiler
-ifeq ($(OMPVV_USED_FX), gfortran)
+ifeq ($(OMPVV_USED_FC), gfortran)
   F_VERSION       =  $(FC) -dumpversion
   FLINK           =  gcc
   FOFFLOADING     =  -foffload="-lm" -lm -fopenmp -foffload-options=-lgfortran
@@ -283,7 +284,7 @@ endif
 # GCC compiler
 
 # IBM XL compiler
-ifeq ($(OMPVV_USED_FX), $(filter $(OMPVV_USED_FX), xlf xlf_r))
+ifeq ($(OMPVV_USED_FC), $(filter $(OMPVV_USED_FC), xlf xlf_r))
   F_VERSION       =  echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(FC) -qversion | tail -n 1|sed 's/Version:\ //')"
   FLINK           =  xlc
   FOFFLOADING     =  -qoffload -qsmp=omp -qmoddir=./ompvv
@@ -293,7 +294,7 @@ ifeq ($(OMPVV_USED_FX), $(filter $(OMPVV_USED_FX), xlf xlf_r))
 endif
 
 # Intel ICX compiler
-ifeq ($(OMPVV_USED_FX), $(filter $(OMPVV_USED_FX), ifx ifort))
+ifeq ($(OMPVV_USED_FC), $(filter $(OMPVV_USED_FC), ifx ifort))
   F_VERSION       =  echo "$(shell $(call loadModules,$(C_COMPILER_MODULE),"shut up") $(FC) --version|head -n1)"
   FLINK           =  $(FC)
   FOFFLOADING     =  -fopenmp-targets=spir64 -fiopenmp
@@ -303,7 +304,7 @@ ifeq ($(OMPVV_USED_FX), $(filter $(OMPVV_USED_FX), ifx ifort))
 endif
 
 # Flang compiler
-ifeq ($(OMPVV_USED_FX), $(filter $(OMPVV_USED_FX), flang flang-new))
+ifeq ($(OMPVV_USED_FC), $(filter $(OMPVV_USED_FC), flang flang-new))
   F_VERSION       =  $(FC) -dumpversion
   FOFFLOADING     =  -fopenmp --offload-arch=native
   FOFFLOADING     +=  $(OMPV)
