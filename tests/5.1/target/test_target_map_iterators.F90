@@ -28,23 +28,28 @@ PROGRAM test_target_map_iterator
 CONTAINS
   INTEGER FUNCTION test_map_iterator()
     INTEGER :: errors, i, listsum
-    INTEGER, DIMENSION(N) :: test_lst
+    TYPE t
+      INTEGER, POINTER :: ptr
+    END TYPE t
+    TYPE(t), DIMENSION(N) :: test_lst
 
     errors = 0
     listsum = 0
 
     DO i=1, N
-      test_lst(i) = 1
+      allocate(test_lst(i)%ptr)
+      test_lst(i)%ptr = 1
     END DO
 
-    !$omp target map(iterator(it = 1:N), tofrom: test_lst(it))
+    !$omp target map(iterator(it = 1:N), tofrom: test_lst(it)%ptr) map(test_lst)
     DO i=1, N
-      test_lst(i) = 2
+      test_lst(i)%ptr = 2
     END DO
     !$omp end target
 
     DO i=1, N
-      listsum = listsum + test_lst(i)
+      listsum = listsum + test_lst(i)%ptr
+      deallocate(test_lst(i)%ptr)
     END DO
 
     OMPVV_TEST_AND_SET(errors, listsum .NE. 2*N)
