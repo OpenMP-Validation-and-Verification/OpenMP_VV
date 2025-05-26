@@ -83,7 +83,7 @@ int test_task_threadset() {
   // Test task with threadset(omp_pool)
   errors += task_work(n, 1);
 
-  // Test task with threadset  omp_team
+  // Test task with threadset omp_team
   errors += task_work(n, 0);
 
   return errors;
