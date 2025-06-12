@@ -315,7 +315,7 @@ $(CURDIR)/tests/4.5/application_kernels/qmcpack_target_static_lib.c.o: $(CURDIR)
 	@echo -e $(TXTGRN)"\n\n" running: $@ $(TXTNOC) $(if $(LOG), ${RECORD}$(notdir $(@:.run=.log)))
 
 # If .../test_<envname>_env_<value>...
-	$(if $(findstring _threads_reserve,$@), \
+	$(if $(findstring _THREADS_RESERVE,$@), \
   		-$(call loadModules,$(C_COMPILER_MODULE)) \
    			$(BSRUN)$(RUN_TEST) --env OMP_THREAD_LIMIT 16 \
 				--env OMP_THREADS_RESERVE "structured(5)$(comma)free_agent(2)" \
