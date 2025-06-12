@@ -313,7 +313,14 @@ $(CURDIR)/tests/4.5/application_kernels/qmcpack_target_static_lib.c.o: $(CURDIR)
 %.c.run: $(OBJS_C)
 	$(call log_section_header,"RUN",$(SYSTEM),$(@:.run=),$(LOG_NOTE),$(OMP_VERSION),$(notdir $(@:.run=.log)))
 	@echo -e $(TXTGRN)"\n\n" running: $@ $(TXTNOC) $(if $(LOG), ${RECORD}$(notdir $(@:.run=.log)))
+
 # If .../test_<envname>_env_<value>...
+	$(if $(findstring _THREADS_RESERVE,$@), \
+  		-$(call loadModules,$(C_COMPILER_MODULE)) \
+   			$(BSRUN)$(RUN_TEST) --env OMP_THREAD_LIMIT 16 \
+				--env OMP_THREADS_RESERVE "structured(5)$(comma)free_agent(2)" \
+     			$(@:.run=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.run=.log)) \
+     		&& echo "PASS" > $(LOGTEMPFILE) || echo "FAIL" > $(LOGTEMPFILE)), \
 	$(if $(findstring _env_,$@), \
 	  -$(call loadModules,$(C_COMPILER_MODULE)) \
 		 $(BSRUN)$(RUN_TEST) --env \
@@ -325,9 +332,10 @@ $(CURDIR)/tests/4.5/application_kernels/qmcpack_target_static_lib.c.o: $(CURDIR)
 	 -$(call loadModules,$(C_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.run=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.run=.log))\
 		 && echo "PASS" > $(LOGTEMPFILE) \
 		 || echo "FAIL" > $(LOGTEMPFILE)) \
-	)
+	))
 	-$(call log_section_footer,"RUN",$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.run=.log)))
 	-@$(if $(LOG), rm $(LOGTEMPFILE))
+
 
 # run c++ app rule
 %.cpp.run: $(OBJS_CPP)
