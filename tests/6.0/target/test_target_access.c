@@ -33,29 +33,23 @@ int test_target_access_single() {
     array[i] = i;
   }
   
-  // Using first device
-  #pragma omp target enter data map(to: array[:N]) device(first_dev)
-  
-  #pragma omp target is_device_ptr(array) device(first_dev)
+  // Using first device 
+  #pragma omp target map(array) device(first_dev)
   {
     for (int i = 0; i < N; i++) {
       array[i] = i * N;
     }
   }
   
-  #pragma omp target exit data map(from: array[:N]) device(first_dev)
   
   // Using second device
-  #pragma omp target enter data map(to: array[:N]) device(second_dev)
-  
-  #pragma omp target is_device_ptr(array) device(second_dev)
+  #pragma omp target map(array) device(second_dev)
   {
     for (int i = 0; i < N; i++) {
       array[i] += 5; 
     }
   }
   
-  #pragma omp target exit data map(from: array[:N]) device(second_dev)
   
   for (int i = 0; i < N; i++) {
     OMPVV_TEST_AND_SET_VERBOSE(errors, array[i] != i * N + 5);
