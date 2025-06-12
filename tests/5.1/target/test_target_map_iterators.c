@@ -19,18 +19,20 @@
 int test_case(){
 	int errors = 0;
 	int sum = 0;
-	int test_lst[N];
+	int *test_lst[N];
 	for (int i = 0; i<N; i++){
-		test_lst[i] = 1;
+		test_lst[i] = (int *) malloc(sizeof(int));
+		test_lst[i][0] = 1;
 	}
-	#pragma omp target map(iterator(it = 0:N), tofrom: test_lst[it])
+	#pragma omp target map(iterator(it = 0:N), tofrom: test_lst[it][:1]) map(to: test_lst)
 	{
 		for(int i = 0; i < N; i++){
-			test_lst[i] = 2;
+			test_lst[i][0] = 2;
 		}
 	}
 	for (int i = 0; i < N; i++){
-		sum += test_lst[i];
+		sum += test_lst[i][0];
+		free(test_lst[i]);
 	}
 	OMPVV_TEST_AND_SET(errors, (sum != 2*N));
 	return (errors);
