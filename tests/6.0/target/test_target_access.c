@@ -34,7 +34,7 @@ int test_target_access_single() {
   }
   
   // Using first device 
-  #pragma omp target map(array) device(first_dev)
+  #pragma omp target map(array[0:N]) device(first_dev)
   {
     for (int i = 0; i < N; i++) {
       array[i] = i * N;
@@ -43,7 +43,7 @@ int test_target_access_single() {
   
   
   // Using second device
-  #pragma omp target map(array) device(second_dev)
+  #pragma omp target map(array[0:N]) device(second_dev)
   {
     for (int i = 0; i < N; i++) {
       array[i] += 5; 
