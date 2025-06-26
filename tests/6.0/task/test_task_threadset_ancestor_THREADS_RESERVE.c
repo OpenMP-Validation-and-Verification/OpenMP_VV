@@ -31,16 +31,16 @@ int fib(int n, int use_pool) {
 
   if (use_pool) {
     //if (omp_is_free_agent()) {
-    //  #pragma omp atomic
-    //  count++;
+      #pragma omp atomic
+      count++;
     //}
-    #pragma omp single
-    {}
-    //for (int k = 0; k < omp_get_level(); ++k) {
+
+    for (int k = 0; k <= omp_get_level(); ++k) {
       //if (omp_ancestor_is_free_agent(k)){
-      //  count++;
+        #pragma omp atomic
+        ancestor_count++;
       //}
-    //}
+    }
   }
   if (n < 2)
     return n;
@@ -74,10 +74,10 @@ int task_work(int n, int use_pool) {
   }
   if (use_pool) {
     OMPVV_WARNING_IF(
-        count == 0,
-        "no free-agent threads in region"); // count should be greater than 0 if
-                                            // a free-agent thread executed the
-                                            // task
+        ancestor_count == 0,
+        "no ancestor free-agent threads in region"); // ancestor_count should be
+                                                     // greater than 0 if a free-agent
+                                                     // thread executed the task
   }
   OMPVV_TEST_AND_SET(errors, result != fib_seq(n));
   return errors;
