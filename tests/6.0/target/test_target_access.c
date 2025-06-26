@@ -16,7 +16,7 @@ int test_target_access_single() {
   int *array;
   int num_devices = omp_get_num_devices();
   
-  OMPVV_WARNING_IF(num_devices < 2, "Test requires at least 2 devices, but only %d found.", num_devices);
+  OMPVV_WARNING_IF(num_devices < 2, "Test requires at least 2 devices, but only %d found. \n This test will be skipped.\n", num_devices);
   if (num_devices < 2) {
     return errors;
   }
