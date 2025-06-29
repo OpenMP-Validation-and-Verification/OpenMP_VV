@@ -1,12 +1,14 @@
 //--------------test_task_threadset.c-----------------------------------------//
 // OpenMP API Version 6.0 November 2024
 // Pg. 901, line 30
+// Pg. 588, line 8
 // ***********
 // DIRECTIVE:task
 // CLAUSE:threadset
 // ***********
 // This test checks the functionality of the threadset clause with the task
-// directive. The example referenced here is "5.10 Free Agent Threads" which is
+// directive, while also checking for the correct use of the omp_is_free_agent()
+// routine. The example referenced here is "5.10 Free Agent Threads" which is
 // taken from the 6.0 examples document. It checks if the task is executed by a
 // free-agent thread when threadset(omp_pool) is used, and that the result of
 // the Fibonacci calculation is correct when both omp_pool and omp_team is used.
@@ -31,13 +33,16 @@ int fib(int n, int use_pool) {
 
   if (use_pool) {
     if (omp_is_free_agent()) {
+      // clang-format off
       #pragma omp atomic
       count++;
+      // clang-format on
     }
   }
   if (n < 2)
     return n;
   if (use_pool) {
+    // clang-format off
     #pragma omp task shared(i) threadset(omp_pool)
     i = fib(n - 1, use_pool);
     #pragma omp task shared(j) threadset(omp_pool)
@@ -49,6 +54,7 @@ int fib(int n, int use_pool) {
     #pragma omp task shared(j) threadset(omp_team)
     j = fib(n - 2, use_pool);
     #pragma omp taskwait
+    // clang-format on
   }
 
   return (i + j);
@@ -60,8 +66,10 @@ int task_work(int n, int use_pool) {
   int result;
 
   omp_set_num_threads(OMPVV_NUM_THREADS_HOST);
+  // clang-format off
   #pragma omp parallel
   #pragma omp single
+  // clang-format on
   {
     result = fib(n, use_pool);
   }
