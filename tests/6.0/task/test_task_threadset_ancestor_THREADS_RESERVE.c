@@ -1,4 +1,4 @@
-//--------------test_task_threadset.c-----------------------------------------//
+//--------------test_task_threadset_ancestor_THREADS_RESERVE.c----------------//
 // OpenMP API Version 6.0 November 2024
 // Pg. 901, line 30
 // Pg. 588, line 22
@@ -21,7 +21,7 @@
 // not too large
 #define N 5
 
-int count = 0, ancestor_count = 0;
+int ancestor_count = 0;
 
 int fib_seq(int n) {
   if (n < 2)
@@ -35,17 +35,14 @@ int fib(int n, int use_pool) {
   if (use_pool) {
     for (int k = 0; k <= omp_get_level(); ++k) {
       if (omp_ancestor_is_free_agent(k)) {
-        // clang-format off
         #pragma omp atomic
         ancestor_count++;
-        // clang-format on
       }
     }
   }
   if (n < 2)
     return n;
   if (use_pool) {
-    // clang-format off
     #pragma omp task shared(i) threadset(omp_pool)
     i = fib(n - 1, use_pool);
     #pragma omp task shared(j) threadset(omp_pool)
@@ -57,7 +54,6 @@ int fib(int n, int use_pool) {
     #pragma omp task shared(j) threadset(omp_team)
     j = fib(n - 2, use_pool);
     #pragma omp taskwait
-    // clang-format on
   }
 
   return (i + j);
@@ -65,14 +61,12 @@ int fib(int n, int use_pool) {
 
 int task_work(int n, int use_pool) {
   int errors = 0;
-  count = 0;
+  ancestor_count = 0;
   int result;
 
   omp_set_num_threads(OMPVV_NUM_THREADS_HOST);
-  // clang-format off
   #pragma omp parallel
   #pragma omp single
-  // clang-format on
   {
     result = fib(n, use_pool);
   }
