@@ -20,6 +20,9 @@ function report ()
   if [ $2 -eq 124 ]; then
     msg="FAIL: TEST HAS TIMEOUT"
   fi
+  if [ $2 -eq -667 ]; then
+    msg="SKIPPED: TEST NOT RUN"
+  fi
   if [ -n "$3" ]; then
     echo "$1: $msg. exit code: $2"
     RED='\033[0;31m'
