@@ -134,3 +134,11 @@ _Pragma("omp target map (from: _ompvv_isOffloadingOn) map(to: _ompvv_isSharedEnv
 #ifndef OMPVV_NUM_THREADS_HOST
   #define OMPVV_NUM_THREADS_HOST 8
 #endif
+
+#ifndef OMPVV_NUM_THREADS_HOST
+  #define OMPVV_NUM_THREADS_HOST 8
+#endif
+
+#ifndef OMPVV_SKIPPED_EXIT_CODE
+  #define OMPVV_SKIPPED_EXIT_CODE -667
+#endif

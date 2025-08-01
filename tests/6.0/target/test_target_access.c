@@ -7,10 +7,8 @@
 //
 //===----------------------------------------------------===//
 #include <omp.h>
-#include <stdio.h>
 #include "ompvv.h"
 #define N 16
-#define SPECIAL_CODE -667
 
 int test_target_access_single() {
   int errors = 0;
@@ -19,7 +17,7 @@ int test_target_access_single() {
 
   OMPVV_WARNING_IF(num_devices < 2, "Test requires at least 2 devices, but only %d found. \n This test will be skipped.\n", num_devices);
   if (num_devices < 2) {
-    return SPECIAL_CODE;
+    return OMPVV_SKIPPED_EXIT_CODE;
   }
   
   int first_dev = 0;
@@ -64,13 +62,12 @@ int test_target_access_single() {
 
 int main() {
   OMPVV_TEST_OFFLOADING;
-  
   int errors = 0, exit_code = 0;
-  exit_code = test_target_access_single();
+  int test_exit_code = test_target_access_single();
 
-  if(exit_code == SPECIAL_CODE) 
-    { OMPVV_REPORT_AND_RETURN(SPECIAL_CODE) }
+  if(test_exit_code == OMPVV_SKIPPED_EXIT_CODE)  
+    { OMPVV_REPORT_AND_RETURN(test_exit_code) }
   
-  OMPVV_TEST_AND_SET_VERBOSE(errors, (exit_code != 0) && (exit_code != SPECIAL_CODE))
+  OMPVV_TEST_AND_SET_VERBOSE(errors, (test_exit_code != 0))
   OMPVV_REPORT_AND_RETURN(errors)
 }
