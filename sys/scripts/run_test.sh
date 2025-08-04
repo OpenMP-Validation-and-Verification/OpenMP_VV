@@ -5,6 +5,10 @@
 #    <LOG>: if present then it will output of the tests in LOG.
 #  Added env SOLLVE_TIMELIMIT to control the timeout value through env
 
+set -x
+#set -e
+set -u
+
 export OMP_THREAD_LIMIT=$(lscpu -p | grep -c "^[0-9]")
 
 # Providing option to set time limit through SOLLVE_TIMELIMIT env
@@ -14,13 +18,14 @@ function report ()
 {
   # $1= app, $2=status, $3=output
   msg="FAIL"
+  OMPVV_SKIPPED_EXIT_CODE=-667
   if [ $2 -eq 0 ]; then
     msg="PASS"
   fi
   if [ $2 -eq 124 ]; then
     msg="FAIL: TEST HAS TIMEOUT"
   fi
-  if [ $2 -eq -667 ]; then
+  if [ $2 -eq ${OMPVV_SKIPPED_EXIT_CODE} ]; then
     msg="SKIPPED: TEST NOT RUN"
   fi
   if [ -n "$3" ]; then
@@ -33,16 +38,6 @@ function report ()
   fi
 }
 
-declare -a env_data
-while [[ "$1" = "--env" ]]; do
-  if [[ -z "$2" ]]; then
-    echo 'ERROR: Expected 'name val' arguments with --env' 1>&2
-    exit -1
-  fi
-  env_data+=("$2" "$3")
-  shift 3
-done
-
 if [ "$#" -lt "1" ]; then
   exit -1
 elif [ ! -f "$1" ]; then
@@ -52,9 +47,37 @@ elif [ ! -f "$1" ]; then
   exit -1
 fi
 
+
+declare -a env_data
+if [ "$1" = "--env" ]; then
+  while [[ "$1" = "--env" ]]; do
+    if [[ -z "$2" ]]; then
+      echo 'ERROR: Expected 'name val' arguments with --env' 1>&2
+      exit -1
+    fi
+    env_data+=("$2" "$3")
+    shift 3
+  done
+else
+  env_data=("#" "#")
+fi
+
+
 app=$1
-output=$(for ((idx=0; $idx < ${#env_data[*]}; idx=$((idx+2)))); do export "${env_data[$idx]}"="${env_data[$((idx+1))]}"; done; timeout $SOLLVE_TIMELIMIT "$app" 2>&1)
+
+output=""
+if [ ${env_data[0]} != "#" ] && [ ${env_data[1]} != "#" ]; then
+  output+=$(
+  for ((idx=0; $idx < ${#env_data[*]}; idx=$((idx+2)))); 
+  do 
+    export "${env_data[$idx]}"="${env_data[$((idx+1))]}"; 
+  done; 
+  )
+fi
+output+=$(timeout $SOLLVE_TIMELIMIT "$app" 2>&1)
+timeout $SOLLVE_TIMELIMIT "$app" 2>&1
 status=$?
+
 output=$(printf '%s\n' "${output}" | uniq)
 
 if [ -z $2 ]; then
