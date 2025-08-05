@@ -6,19 +6,19 @@
 #  Added env SOLLVE_TIMELIMIT to control the timeout value through env
 
 set -x
-#set -e
+set -e
 set -u
 
 export OMP_THREAD_LIMIT=$(lscpu -p | grep -c "^[0-9]")
 
 # Providing option to set time limit through SOLLVE_TIMELIMIT env
 export SOLLVE_TIMELIMIT=${SOLLVE_TIMELIMIT:-60}
+OMPVV_SKIPPED_EXIT_CODE=-667
 
 function report ()
 {
   # $1= app, $2=status, $3=output
   msg="FAIL"
-  OMPVV_SKIPPED_EXIT_CODE=-667
   if [ $2 -eq 0 ]; then
     msg="PASS"
   fi
@@ -66,7 +66,8 @@ fi
 app=$1
 
 output=""
-if [ ${env_data[0]} != "#" ] && [ ${env_data[1]} != "#" ]; then
+#if [ ${env_data[0]} != "#" ] && [ ${env_data[1]} != "#" ]; then
+if [ ${env_data[0]} != "#" ]; then
   output+=$(
   for ((idx=0; $idx < ${#env_data[*]}; idx=$((idx+2)))); 
   do 
@@ -74,11 +75,17 @@ if [ ${env_data[0]} != "#" ] && [ ${env_data[1]} != "#" ]; then
   done; 
   )
 fi
+
+set +e
 output+=$(timeout $SOLLVE_TIMELIMIT "$app" 2>&1)
-timeout $SOLLVE_TIMELIMIT "$app" 2>&1
 status=$?
+set -e
 
 output=$(printf '%s\n' "${output}" | uniq)
+
+if [[ ${output} == *"Test skipped"* ]]; then
+  status=OMPVV_SKIPPED_EXIT_CODE
+fi
 
 if [ -z $2 ]; then
   report $(basename $app) $status
