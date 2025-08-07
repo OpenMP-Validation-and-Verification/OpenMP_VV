@@ -5,7 +5,7 @@
 #    <LOG>: if present then it will output of the tests in LOG.
 #  Added env SOLLVE_TIMELIMIT to control the timeout value through env
 
-set -x
+#set -x #DEBUG
 set -e
 set -u
 
@@ -66,7 +66,6 @@ fi
 app=$1
 
 output=""
-#if [ ${env_data[0]} != "#" ] && [ ${env_data[1]} != "#" ]; then
 if [ ${env_data[0]} != "#" ]; then
   output+=$(
   for ((idx=0; $idx < ${#env_data[*]}; idx=$((idx+2)))); 
