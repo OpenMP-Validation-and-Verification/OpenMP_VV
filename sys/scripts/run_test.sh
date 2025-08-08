@@ -83,7 +83,7 @@ set -e
 output=$(printf '%s\n' "${output}" | uniq)
 
 if [[ ${output} == *"Test skipped"* ]]; then
-  status=OMPVV_SKIPPED_EXIT_CODE
+  status=${OMPVV_SKIPPED_EXIT_CODE}
 fi
 
 if [ -z $2 ]; then

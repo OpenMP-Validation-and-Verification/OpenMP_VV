@@ -8,6 +8,7 @@
 //===----------------------------------------------------===//
 #include <omp.h>
 #include "ompvv.h"
+
 #define N 16
 
 int test_target_access_single() {
@@ -45,7 +46,7 @@ int test_target_access_single() {
   #pragma omp target map(array[0:N]) device(second_dev)
   {
     for (int i = 0; i < N; i++) {
-      array[i] += 5; 
+      array[i] += 5;
     }
   }
   
@@ -62,10 +63,10 @@ int test_target_access_single() {
 
 int main() {
   OMPVV_TEST_OFFLOADING;
-  int errors = 0, exit_code = 0;
+  int errors = 0;
   int test_exit_code = test_target_access_single();
 
-  if(test_exit_code == OMPVV_SKIPPED_EXIT_CODE)  
+  if(test_exit_code == OMPVV_SKIPPED_EXIT_CODE)
     { OMPVV_REPORT_AND_RETURN(test_exit_code) }
   
   OMPVV_TEST_AND_SET_VERBOSE(errors, (test_exit_code != 0))
