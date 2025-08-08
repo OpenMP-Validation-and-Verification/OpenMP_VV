@@ -7,12 +7,11 @@
 // ***********
 // Code is adapted from the safesync clause example in the 6.0 examples
 // document. This example uses a ticket lock implementation which executes in
-// the target region. Certain offloading implementations may be unable to
-// properly synchronize the threads pertaining to different progress groups at
-// the end of the parallel region. The result of this can be deadlock. The
-// safesync clause is suppossed to ensure that such synchronization is possible.
-// If no deadlock or inporper update of the arrays occurs, then this indicates
-// the safesync clause was working correctly.
+// the target region. On certain device architectures, OpenMP threads may not be
+// able to synchronize with each other from logically divergent code. The result
+// of this can be deadlock. The safesync clause is suppossed to ensure that such
+// synchronization is possible. If no deadlock or improper update of the arrays
+// occurs, then this indicates the safesync clause is working correctly.
 //----------------------------------------------------------------------------//
 #include "ompvv.h"
 #include <omp.h>
@@ -22,15 +21,19 @@
 int test_directive() {
   int errors = 0;
   int a[N], b[N];
-  int count1 = 0, count2 = 0;
+  int count1 = 0, count2 = 1;
+  int num_threads = 0;
 
   for (int i = 0; i < N; i++)
-    b[i] = i;
+    b[i] = i, a[i] = 0;
 
   #pragma omp target thread_limit(OMPVV_NUM_THREADS_DEVICE) \
-    map(to : count1, count2) map(a) map(to : b)
+    map(to : count1, count2) map(a) map(to : b) map(tofrom : num_threads)
   #pragma omp parallel num_threads(OMPVV_NUM_THREADS_DEVICE) safesync(1)
   {
+    if (omp_get_thread_num() == 0) {
+      num_threads = omp_get_num_threads();
+    }
     int t, u;
     #pragma omp atomic capture
     t = ++count1;
@@ -47,7 +50,7 @@ int test_directive() {
   }
 
   for (int i = 0; i < N; i++) {
-    if (a[i] != OMPVV_NUM_THREADS_DEVICE * b[i]) {
+    if (a[i] != num_threads * b[i]) {
       ++errors;
     }
   }
