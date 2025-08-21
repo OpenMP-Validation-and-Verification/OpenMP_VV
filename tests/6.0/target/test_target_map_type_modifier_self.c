@@ -13,6 +13,8 @@
 #include "ompvv.h"
 #include <omp.h>
 
+#pragma omp requires unified_shared_memory
+
 int test_map_type_modifier_self() {
   int errors = 0;
   int scalar_value = 0;
