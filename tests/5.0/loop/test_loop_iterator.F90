@@ -28,23 +28,18 @@ CONTAINS
   INTEGER FUNCTION test_loop_iterator()
   INTEGER :: errors = 0
   REAL :: a(N)
-  INTEGER :: i, num_threads = 0
+  INTEGER :: i, temp = 0
 
-  !$omp parallel
-  !$omp single
-    num_threads = omp_get_num_threads()
-  !$omp end single
-
-  !$omp target map(a, i)
+  !$omp target map(from: temp)
   !$omp loop
   DO i = 1, N
     a(i) = i
   END DO
   !$omp end loop
+  temp = i
   !$omp end target
-  !$omp end parallel
 
-  OMPVV_TEST_AND_SET(errors, i .NE. N+1)
+  OMPVV_TEST_AND_SET(errors, temp .NE. N+1)
   test_loop_iterator = errors
 
   END FUNCTION test_loop_iterator
