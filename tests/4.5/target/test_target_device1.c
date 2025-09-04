@@ -44,7 +44,10 @@ int Runtst(int gpu) {
 int main() {
   OMPVV_TEST_OFFLOADING;
   int TotGpus = omp_get_num_devices();
-  printf("TotGpus: %d\n", TotGpus);
+  OMPVV_WARNING_IF(TotGpus < 1, "Test requires non-host devices, but none were found. \n This test will be skipped.\n");
+  if (TotGpus < 1) {
+    return OMPVV_SKIPPED_EXIT_CODE;
+  }
   int errors = 0;
   for (int gpu = 0; gpu < TotGpus; ++gpu) {
     OMPVV_TEST_AND_SET_VERBOSE(errors, (Runtst(gpu) != 0)); 
