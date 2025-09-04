@@ -25,7 +25,7 @@ int test_target_device_clause() {
 
   // Get number of devices
   int num_dev = omp_get_num_devices();
-  OMPVV_WARNING_IF(num_dev < 1, "Test requires non-host device(s), but none were found. \n This test will be skipped.\n", num_devices);
+  OMPVV_WARNING_IF(num_dev < 1, "Test requires non-host device(s), but none were found. \n This test will be skipped.\n");
   if (num_dev < 1) {
     return OMPVV_SKIPPED_EXIT_CODE;
   }
