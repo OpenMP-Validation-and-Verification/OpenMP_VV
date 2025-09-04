@@ -41,16 +41,18 @@ endef
 # Helper function: run a test command, capture its output and write PASS,
 # FAIL or SKIPPED to $(LOGTEMPFILE) based on the output.
 # ----------------------------------------------------------------------
+
 define CHECK_OUTPUT
-output=$$( $(0) ); \
+output=$$($(1)); \
 rc=$$?; \
 if echo "$$output" | grep -q "Test skipped"; then \
     echo "SKIPPED" > $(LOGTEMPFILE); \
-elif [ $$rc -eq -1 ]; then \
+elif [ $$rc -eq 0 ]; then \
     echo "PASS" > $(LOGTEMPFILE); \
 else \
     echo "FAIL" > $(LOGTEMPFILE); \
-fi
+fi; \
+echo "$$output"
 endef
 
 ##################################################
