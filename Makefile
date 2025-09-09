@@ -313,6 +313,7 @@ $(CURDIR)/tests/4.5/application_kernels/qmcpack_target_static_lib.c.o: $(CURDIR)
 %.c.run: $(OBJS_C)
 	$(call log_section_header,"RUN",$(SYSTEM),$(@:.run=),$(LOG_NOTE),$(OMP_VERSION),$(notdir $(@:.run=.log)))
 	@echo -e $(TXTGRN)"\n\n" running: $@ $(TXTNOC) $(if $(LOG), ${RECORD}$(notdir $(@:.run=.log)))
+# If .../test_<envname>_env_<value>...
 	$(if $(findstring _env_,$@), \
 	  $(call CHECK_OUTPUT, $(call loadModules,$(C_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) --env \
 	    $(shell echo "$@" | sed -e 's@.*/@@' -e 's@test_\(.*\)_env_.*@\1@' | tr 'a-z' 'A-Z') \

@@ -28,6 +28,7 @@ function report ()
   if [ $2 -eq ${OMPVV_SKIPPED_EXIT_CODE} ]; then
     msg="SKIPPED: TEST NOT RUN"
   fi
+  set +u
   if [ -n "$3" ]; then
     echo "$1: $msg. exit code: $2"
     RED='\033[0;31m'
@@ -36,6 +37,7 @@ function report ()
   else
     echo "$1: $msg. exit code: $2"
   fi
+  set -u
 }
 
 if [ "$#" -lt "1" ]; then
@@ -43,7 +45,13 @@ if [ "$#" -lt "1" ]; then
 elif [ ! -f "$1" ]; then
   RED='\033[0;31m'
   NC='\033[0m' # No Color
-  echo -e "${RED}$1: Test not found${3}${NC}" 1>&2
+  set +u
+  if [ -n "$3" ]; then
+    echo -e "${RED}$1: Test not found${3}${NC}" 1>&2
+  else
+    echo "$1: $msg, test not found."
+  fi
+  set -u
   exit -1
 fi
 
