@@ -37,6 +37,10 @@ int test_set_default_dev() {
   // Get number of devices
   int num_dev = omp_get_num_devices();
   OMPVV_INFOMSG("num_devices: %d", num_dev);
+  OMPVV_WARNING_IF(num_dev < 1, "Test requires non-host device(s), but none were found. \n This test will be skipped.\n");
+  if (num_dev < 1) {
+    return OMPVV_SKIPPED_EXIT_CODE;
+  }
 
   int def_dev = omp_get_default_device();
   OMPVV_INFOMSG("initial device: %d", omp_get_initial_device());
