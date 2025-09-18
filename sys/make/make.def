@@ -37,6 +37,24 @@ define loadModules
   $(if $(MODULE_LOAD), module load $(CUDA_MODULE) $(1) $(if $(or $(QUIET), $(2)), > /dev/null 2> /dev/null,);,)
 endef
 
+# ----------------------------------------------------------------------
+# Helper function: run a test command, capture its output and write PASS,
+# FAIL or SKIPPED to $(LOGTEMPFILE) based on the output.
+# ----------------------------------------------------------------------
+
+define CHECK_OUTPUT
+output=$$($(1)); \
+rc=$$?; \
+if echo "$$output" | grep -q "Test skipped"; then \
+    echo "SKIPPED" > $(LOGTEMPFILE); \
+elif [ $$rc -eq 0 ]; then \
+    echo "PASS" > $(LOGTEMPFILE); \
+else \
+    echo "FAIL" > $(LOGTEMPFILE); \
+fi; \
+echo "$$output"
+endef
+
 ##################################################
 # LOG HEADER AND FOOTER FORTMATS
 ##################################################

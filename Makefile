@@ -322,17 +322,13 @@ $(CURDIR)/tests/4.5/application_kernels/qmcpack_target_static_lib.c.o: $(CURDIR)
      			$(@:.run=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.run=.log)) \
      		&& echo "PASS" > $(LOGTEMPFILE) || echo "FAIL" > $(LOGTEMPFILE)), \
 	$(if $(findstring _env_,$@), \
-	  -$(call loadModules,$(C_COMPILER_MODULE)) \
-		 $(BSRUN)$(RUN_TEST) --env \
-		   $(shell echo "$@" | sed -e 's@.*/@@' -e 's@test_\(.*\)_env_.*@\1@' | tr 'a-z' 'A-Z') \
-		   $(shell echo "$@" | sed -e 's@.*/@@' -e 's@.*_env_\([^.]*\).*@\1@') \
-		   $(@:.run=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.run=.log)) \
-		 && echo "PASS" > $(LOGTEMPFILE) \
-		 || echo "FAIL" > $(LOGTEMPFILE)), \
-	 -$(call loadModules,$(C_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.run=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.run=.log))\
-		 && echo "PASS" > $(LOGTEMPFILE) \
-		 || echo "FAIL" > $(LOGTEMPFILE)) \
-	))
+
+	  $(call CHECK_OUTPUT, $(call loadModules,$(C_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) --env \
+	    $(shell echo "$@" | sed -e 's@.*/@@' -e 's@test_\(.*\)_env_.*@\1@' | tr 'a-z' 'A-Z') \
+	    $(shell echo "$@" | sed -e 's@.*/@@' -e 's@.*_env_\([^.]*\).*@\1@') \
+	    $(@:.run=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.run=.log))) ), \
+	  $(call CHECK_OUTPUT, $(call loadModules,$(C_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.run=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.run=.log))) ) \
+	)
 	-$(call log_section_footer,"RUN",$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.run=.log)))
 	-@$(if $(LOG), rm $(LOGTEMPFILE))
 
@@ -341,9 +337,7 @@ $(CURDIR)/tests/4.5/application_kernels/qmcpack_target_static_lib.c.o: $(CURDIR)
 %.cpp.run: $(OBJS_CPP)
 	$(call log_section_header,"RUN",$(SYSTEM),$(@:.run=),$(LOG_NOTE),$(OMP_VERSION),$(notdir $(@:.run=.log)))
 	@echo -e $(TXTGRN)"\n\n" running: $@ $(TXTNOC) $(if $(LOG), ${RECORD}$(notdir $(@:.run=.log)))
-	-$(call loadModules,$(CXX_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.run=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.run=.log))\
-		&& echo "PASS" > $(LOGTEMPFILE) \
-		|| echo "FAIL" > $(LOGTEMPFILE))
+	$(call CHECK_OUTPUT, $(call loadModules,$(CXX_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.run=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.run=.log))) )
 	-$(call log_section_footer,"RUN",$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.run=.log)))
 	-@$(if $(LOG), rm $(LOGTEMPFILE))
 
@@ -351,9 +345,7 @@ $(CURDIR)/tests/4.5/application_kernels/qmcpack_target_static_lib.c.o: $(CURDIR)
 %.FOR.run: $(OBJS_F)
 	$(call log_section_header,"RUN",$(SYSTEM),$(@:.FOR.run=),$(LOG_NOTE),$(OMP_VERSION),$(notdir $(@:.FOR.run=.log)))
 	@echo -e $(TXTGRN)"\n\n" running: $@ $(TXTNOC) $(if $(LOG), ${RECORD}$(notdir $(@:.FOR.run=.log)))
-	-$(call loadModules,$(F_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.FOR.run=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.FOR.run=.log))\
-		&& echo "PASS" > $(LOGTEMPFILE) \
-		|| echo "FAIL" > $(LOGTEMPFILE))
+	$(call CHECK_OUTPUT, $(call loadModules,$(F_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.FOR.run=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.FOR.run=.log))) )
 	-$(call log_section_footer,"RUN",$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.FOR.run=.log)))
 	-@$(if $(LOG), rm $(LOGTEMPFILE))
 
@@ -365,18 +357,12 @@ $(CURDIR)/tests/4.5/application_kernels/qmcpack_target_static_lib.c.o: $(CURDIR)
 %.c.runonly:
 	$(call log_section_header,"RUN",$(SYSTEM),$(@:.runonly=),$(LOG_NOTE),$(OMP_VERSION),$(notdir $(@:.runonly=.log)))
 	@echo -e $(TXTGRN)"\n\n" running previously compiled: $@ $(TXTNOC) $(if $(LOG), ${RECORD}$(notdir $(@:.runonly=.log)))
-# If .../test_<envname>_env_<value>...
 	$(if $(findstring _env_,$@), \
-	  $(call loadModules,$(C_COMPILER_MODULE)) \
-		 $(BSRUN)$(RUN_TEST) --env \
-		   $(shell echo "$@" | sed -e 's@.*/@@' -e 's@test_\(.*\)_env_.*@\1@' | tr 'a-z' 'A-Z') \
-		   $(shell echo "$@" | sed -e 's@.*/@@' -e 's@.*_env_\([^.]*\).*@\1@') \
-		   $(@:.runonly=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.runonly=.log))\
-		 && echo "PASS" > $(LOGTEMPFILE) \
-		 || echo "FAIL" > $(LOGTEMPFILE)), \
-	  $(call loadModules,$(C_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.runonly=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.runonly=.log))\
-		 && echo "PASS" > $(LOGTEMPFILE) \
-		 || echo "FAIL" > $(LOGTEMPFILE)) \
+	  $(call CHECK_OUTPUT, $(call loadModules,$(C_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) --env \
+	    $(shell echo "$@" | sed -e 's@.*/@@' -e 's@test_\(.*\)_env_.*@\1@' | tr 'a-z' 'A-Z') \
+	    $(shell echo "$@" | sed -e 's@.*/@@' -e 's@.*_env_\([^.]*\).*@\1@') \
+	    $(@:.runonly=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.runonly=.log))) ), \
+	  $(call CHECK_OUTPUT, $(call loadModules,$(C_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.runonly=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.runonly=.log))) ) \
 	)
 	-$(call log_section_footer,"RUN",$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.runonly=.log)))
 	-@$(if $(LOG), rm $(LOGTEMPFILE))
@@ -385,9 +371,7 @@ $(CURDIR)/tests/4.5/application_kernels/qmcpack_target_static_lib.c.o: $(CURDIR)
 %.cpp.runonly:
 	$(call log_section_header,"RUN",$(SYSTEM),$(@:.runonly=),$(LOG_NOTE),$(OMP_VERSION),$(notdir $(@:.runonly=.log)))
 	@echo -e $(TXTGRN)"\n\n" running previously compiled: $@ $(TXTNOC) $(if $(LOG), ${RECORD}$(notdir $(@:.runonly=.log)))
-	-$(call loadModules,$(CXX_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.runonly=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.runonly=.log))\
-		&& echo "PASS" > $(LOGTEMPFILE) \
-		|| echo "FAIL" > $(LOGTEMPFILE))
+	$(call CHECK_OUTPUT, $(call loadModules,$(CXX_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.runonly=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.runonly=.log))) )
 	-$(call log_section_footer,"RUN",$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.runonly=.log)))
 	-@$(if $(LOG), rm $(LOGTEMPFILE))
 
@@ -395,9 +379,7 @@ $(CURDIR)/tests/4.5/application_kernels/qmcpack_target_static_lib.c.o: $(CURDIR)
 %.FOR.runonly:
 	$(call log_section_header,"RUN",$(SYSTEM),$(@:.FOR.runonly=),$(LOG_NOTE),$(OMP_VERSION),$(notdir $(@:.FOR.runonly=.log)))
 	@echo -e $(TXTGRN)"\n\n" running previously compiled: $@ $(TXTNOC) $(if $(LOG), ${RECORD}$(notdir $(@:.FOR.runonly=.log)))
-	-$(call loadModules,$(F_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.FOR.runonly=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.FOR.runonly=.log))\
-		&& echo "PASS" > $(LOGTEMPFILE) \
-		|| echo "FAIL" > $(LOGTEMPFILE))
+	$(call CHECK_OUTPUT, $(call loadModules,$(F_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.FOR.runonly=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.FOR.runonly=.log))) )
 	-$(call log_section_footer,"RUN",$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.FOR.runonly=.log)))
 	-@$(if $(LOG), rm $(LOGTEMPFILE))
 
