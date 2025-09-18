@@ -97,6 +97,7 @@ OMPVV_USED_CC := $(notdir $(CC))
 OMPVV_USED_CXX := $(notdir $(CXX))
 OMPVV_USED_FC := $(notdir $(FC))
 
+
 ifeq ($(OMP_VERSION), 5.0)
    OMPV = -fopenmp-version=50
 else ifeq ($(OMP_VERSION), 5.1)
