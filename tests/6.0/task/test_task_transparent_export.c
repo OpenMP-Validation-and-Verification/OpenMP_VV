@@ -26,19 +26,19 @@ int testTaskTransparentExport(void)
             {
                 # pragma omp task shared(x, errors) depend(out: x)
                 {
-                    OMPVV_TEST_AND_SET_VERBOSE(errors, x == 0);
+                    OMPVV_TEST_AND_SET_VERBOSE(errors, x != 0);
                     ++x;
                 }
             }
 
             # pragma omp task shared(x, errors) depend(in: x)
             {
-                OMPVV_TEST_AND_SET_VERBOSE(errors, x == 1);
+                OMPVV_TEST_AND_SET_VERBOSE(errors, x != 1);
                 ++x;
             }
         }
     }
-    OMPVV_TEST_AND_SET_VERBOSE(errors, x == 2);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, x != 2);
     return errors;
 }
 

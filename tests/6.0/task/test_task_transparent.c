@@ -53,7 +53,7 @@ int testTaskTransparent(void)
             }
         }
     }
-    OMPVV_TEST_AND_SET_VERBOSE(errors, x == 5);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, x != 5);
     return errors;
 }
 
