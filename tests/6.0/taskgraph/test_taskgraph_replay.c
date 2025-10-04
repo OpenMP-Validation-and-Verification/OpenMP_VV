@@ -3,10 +3,10 @@
 // OpenMP API Version 6.0 Nov 2024
 //
 // Description
-// testTaskgraph():
-// Create a taskgraph, and ensures that the
-// the structured block is executed only once,
-// and that the task is replayed
+// testTaskgraphReplay():
+// Create a taskgraph of 'M' tasks, replay it 'N' times.
+// Ensures that the structured block is executed only once,
+// and that the tasks are replayed N times
 //===----------------------------------------------------------------------===//
 
 #include <stdio.h>

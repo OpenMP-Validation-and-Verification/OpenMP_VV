@@ -4,8 +4,8 @@
 //
 // Description
 // testTaskgraphParallel():
-// 'N' times, have multiple 'nthreads' threads construcitng/replaying the same taskgraph.
-// It should execute the strucuted block once, and the replayable task 'N*nthreads' times
+// 'N' times, have 'nthreads' threads construcitng/replaying the same taskgraph.
+// It should execute the structured block once, and the replayable task 'N*nthreads' times
 //===----------------------------------------------------------------------===//
 
 #include <stdio.h>

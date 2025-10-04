@@ -1,13 +1,16 @@
-//===-- test_taskgraph.c ------------------------------------------------===//
+//===-- test_taskgraph_id.c ------------------------------------------------===//
 //
 // OpenMP API Version 6.0 Nov 2024
 //
 // Description
 // testTaskgraphId():
-// Create 'M' taskgraphs that spawns 3 tasks
+// Create 'N' taskgraphs with id '0<=i<N' that spawns 3 tasks
 //  T1 -> T2 -> T3
-// with (T1, T3) on device, (T2) on host.
-// Replay taskgraph 'N' times
+//
+// Replay each taskgraph 'M' times
+//
+// Ensure that each strucuted block only executed once
+// Ensure that each triplets evexecuted 'N' times
 //===----------------------------------------------------------------------===//
 
 #include <stdio.h>
@@ -22,45 +25,41 @@ int testTaskgraphGraphId(void)
 
     # define N 16
     # define M 16
-    int x[M];   // number of time the structued block executed for taskgraph i
-    int y[M];   // number of time tasks executes for taskgraph i
-    memset(x, 0, sizeof(x));
-    memset(y, 0, sizeof(y));
+
+    int x = 0;
+    int y = 0;
 
     # pragma omp parallel shared(x, y)
     {
         # pragma omp single
         {
-            for (int i = 0 ; i < N ; ++i)
+            for (int j = 0 ; j < M ; ++j)
             {
-                for (int j = 0 ; j < M ; ++j)
+                for (int i = 0 ; i < N ; ++i)
                 {
-                    # pragma omp taskgraph graph_id(j)
+                    # pragma omp taskgraph graph_id(i)
                     {
-                        ++x[j];
+                        ++x;
 
-                        # pragma omp target map(tofrom: y) depend(out: y)
-                            ++y[j];
-
-                        # pragma omp task depend(out: y)
-                            ++y[j];
-
-                        # pragma omp target map(tofrom: y) depend(out: y)
-                            ++y[j];
+                        for (int i = 0 ; i < 3 ; ++i)
+                        {
+                            # pragma omp task depend(out: y) shared(y)
+                            {
+                                # pragma omp atomic
+                                    ++y;
+                            }
+                        }
                     }
                 }
             }
         }
     }
 
-    for (int j = 0 ; j < M ; ++j)
-    {
-        // each taskgraph strucuted block must have executed once
-        OMPVV_TEST_AND_SET_VERBOSE(errors, x[j] == 1);
+    // each taskgraph strucuted block must have executed once
+    OMPVV_TEST_AND_SET_VERBOSE(errors, x == N);
 
-        // each triplets must have executed N times
-        OMPVV_TEST_AND_SET_VERBOSE(errors, y[j] == 3*N);
-    }
+    // each triplets must have executed N times
+    OMPVV_TEST_AND_SET_VERBOSE(errors, y == 3*N*M);
 
     return errors;
 }

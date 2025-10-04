@@ -33,7 +33,7 @@ int testTaskgraphIf(void)
                 {
                     ++x;
 
-                    # pragma omp task
+                    # pragma omp task shared(y)
                         ++y;
                 }
             }

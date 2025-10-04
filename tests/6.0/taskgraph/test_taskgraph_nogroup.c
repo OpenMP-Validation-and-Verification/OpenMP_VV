@@ -4,10 +4,8 @@
 //
 // Description
 // testTaskgraphNoGroup():
-// Create a taskgraph, and ensures the structured block is executed once.
-// Then reexecute construct twice with if(0) and if(1),
-// and ensures that the structured block executed once,
-// and records twice
+// Create a taskgraph nogroup, replay N times,
+// and ensures the structured block is executed once.
 //===----------------------------------------------------------------------===//
 
 #include <stdio.h>

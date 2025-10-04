@@ -3,12 +3,14 @@
 // OpenMP API Version 6.0 Nov 2024
 //
 // Description
-// testTaskgrapHeterogeneoush():
-// Create a taskgraph, spawns 3 tasks
+// testTaskgraphHeterogeneous():
+// Create a taskgraph, spawns 3 dependent tasks
 //  T1 -> T2 -> T3
 // with (T1, T3) on device, (T2) on host.
 //
-// Also ensures that the structured block is executed once
+// Ensures that
+//   - the structured block is executed once
+//   - 3*N tasks executed/replayed
 //===----------------------------------------------------------------------===//
 
 #include <stdio.h>
@@ -35,13 +37,13 @@ int testTaskgraphHeterogeneous(void)
                 {
                     ++x;
 
-                    # pragma omp target nowait map(tofrom: y) depend(out: y)
+                    # pragma omp target nowait map(tofrom: y) depend(out: y) shared(y)
                         ++y;
 
-                    # pragma omp task depend(out: y)
+                    # pragma omp task depend(out: y) shared(y)
                         ++y;
 
-                    # pragma omp target nowait map(tofrom: y) depend(out: y)
+                    # pragma omp target nowait map(tofrom: y) depend(out: y) shared(y)
                         ++y;
                 }
             }
