@@ -56,10 +56,10 @@ int testTaskgraphGraphId(void)
     }
 
     // each taskgraph strucuted block must have executed once
-    OMPVV_TEST_AND_SET_VERBOSE(errors, x == N);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, x != N);
 
     // each triplets must have executed N times
-    OMPVV_TEST_AND_SET_VERBOSE(errors, y == 3*N*M);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, y != 3*N*M);
 
     return errors;
 }

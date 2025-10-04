@@ -39,8 +39,8 @@ int testTaskgraphIf(void)
             }
         }
     }
-    OMPVV_TEST_AND_SET_VERBOSE(errors, x == 1);
-    OMPVV_TEST_AND_SET_VERBOSE(errors, y == 2);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, x != 1);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, y != 2);
     return errors;
 }
 

@@ -21,7 +21,7 @@ int testTaskgraphParallel(void)
     # define N 16
     int x = 0;
     int y = 0;
-    int nthreads = 0;
+    int nthreads = -1;
 
     #pragma omp parallel shared(x, y, nthreads)
     {
@@ -43,9 +43,9 @@ int testTaskgraphParallel(void)
             }
         }
     }
-    OMPVV_TEST_AND_SET_VERBOSE(errors, nthreads >= 0);
-    OMPVV_TEST_AND_SET_VERBOSE(errors, x == 1);
-    OMPVV_TEST_AND_SET_VERBOSE(errors, y == nthreads*N);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, nthreads <= 0);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, x != 1);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, y != nthreads*N);
 
     return errors;
 }

@@ -45,8 +45,8 @@ int testTaskgraphReplay(void)
             }
         }
     }
-    OMPVV_TEST_AND_SET_VERBOSE(errors, x == 1);
-    OMPVV_TEST_AND_SET_VERBOSE(errors, y == M*N);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, x != 1);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, y != M*N);
     return errors;
 }
 

@@ -49,8 +49,8 @@ int testTaskgraphHeterogeneous(void)
             }
         }
     }
-    OMPVV_TEST_AND_SET_VERBOSE(errors, x == 1);
-    OMPVV_TEST_AND_SET_VERBOSE(errors, y == 3*N);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, x != 1);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, y != 3*N);
     return errors;
 }
 
