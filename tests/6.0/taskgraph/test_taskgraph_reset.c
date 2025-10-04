@@ -22,7 +22,7 @@ int testTaskgraphGraphReset(void)
 
     # define N 16
     # define M 16
-    _Static_assert(M % 2 == 0);
+    _Static_assert(M % 2 == 0, "M must be even");
 
     int x[M];   // number of time the structued block executed for taskgraph i
     int y[M];   // number of time tasks executes for taskgraph i
