@@ -70,7 +70,7 @@ int test_declare_target_local() {
       #pragma omp target map(tofrom: errors) device(i)
       {
         
-      if ((N)(N-1)/2 + (N)*i != sum)
+      if ((N)*(N-1)/2 + (N)*i != sum)
       ++errors;
       }
   }
