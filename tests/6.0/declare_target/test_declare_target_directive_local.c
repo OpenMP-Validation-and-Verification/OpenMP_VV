@@ -1,4 +1,5 @@
-//--------------- test_declare_target_local.c -----------------------------------------//
+//--------------- test_declare_target_local.c
+//-----------------------------------------//
 // OpenMP API Version 6.0 November 2024
 /////////////
 // Pg. 902, line 4
@@ -23,65 +24,66 @@
 //   OMPVV_TEST_AND_SET(*errors, var != 1);
 //   return;
 // }
-  int sum;
-  int x[100];
+int sum;
+int x[N];
 
-  #pragma omp declare_target local(sum, x)
-  #pragma omp begin declare_target
-  void init_x(int dev_id) {
-    for (int j = 0; j < 100; ++j) {
-        x[j] = j + dev_id;
-    }
+#pragma omp declare_target to(sum, x) // local(sum, x)
+#pragma omp begin declare_target
+void init_x(int dev_id) {
+  for (int j = 0; j < N; ++j) {
+    x[j] = j + dev_id;
   }
-  void foo(void) {
-    int i;
-    #pragma omp for reduction(+:sum)
-    for (i = 0; i < 100; i++) {
-        sum += x[i];
-    }
+}
+void foo(void) {
+  int i;
+#pragma omp for reduction(+ : sum)
+  for (i = 0; i < N; i++) {
+    sum += x[i];
   }
-  #pragma omp end declare target
-
+}
+#pragma omp end declare target
 
 int test_declare_target_local() {
   int errors = 0;
 
   int TotGpus = omp_get_num_devices();
-  OMPVV_WARNING_IF(TotGpus < 1, "Test requires non-host devices, but none were found. \n This test will be skipped.\n");
+  OMPVV_WARNING_IF(TotGpus < 1, "Test requires non-host devices, but none were "
+                                "found. \n This test will be skipped.\n");
   if (TotGpus < 1) {
     return OMPVV_SKIPPED_EXIT_CODE;
   }
 
-  for (int i = 0; i < ndev; i++) {
-      #pragma omp target device(i)
-      {
+  for (int i = 0; i < TotGpus; i++) {
+#pragma omp target device(i)
+    {
       init_x(i);
       sum = 0;
-      }
+    }
   }
 
-  for (int i = 0; i < ndev; i++) {
-      #pragma omp target parallel device(i) nowait
-      foo();
+  for (int i = 0; i < TotGpus; i++) {
+#pragma omp target parallel device(i) nowait
+    foo();
   }
-  #pragma omp taskwait
+#pragma omp taskwait
 
-  for (int i = 0; i < ndev; i++) {
-      #pragma omp target device(i)
-      {
+  for (int i = 0; i < TotGpus; i++) {
+#pragma omp target device(i)
+    {
       printf("sum: %d, device: %d\n", sum, i);
-      }
+    }
   }
 
   return errors;
 }
 
 int main() {
-  int errors = 0;
+  int errors = 0, test_exit_code = 0;
   OMPVV_TEST_OFFLOADING;
 
-  if(test_exit_code == OMPVV_SKIPPED_EXIT_CODE)
-    { OMPVV_REPORT_AND_RETURN(test_exit_code) }
+  if (test_exit_code == OMPVV_SKIPPED_EXIT_CODE) {
+    OMPVV_REPORT_AND_RETURN(test_exit_code)
+  }
 
   OMPVV_TEST_AND_SET(errors, test_declare_target_local() != 0);
   OMPVV_REPORT_AND_RETURN(errors);
