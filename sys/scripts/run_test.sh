@@ -40,6 +40,18 @@ function report ()
   set -u
 }
 
+# Consume test-specific environmental variable arguments.
+# Note: In case there are none, env ignores an empty variable array.
+declare -a env_data
+while [[ "$1" = "--env" ]]; do
+  if [[ -z "$2" ]]; then
+    echo 'ERROR: Expected 'name val' arguments with --env' 1>&2
+    exit -1
+  fi
+  env_data+=("${2}=${3}")
+  shift 3
+done
+
 if [ "$#" -lt "1" ]; then
   exit -1
 elif [ ! -f "$1" ]; then
@@ -49,42 +61,17 @@ elif [ ! -f "$1" ]; then
   if [ -n "$3" ]; then
     echo -e "${RED}$1: Test not found${3}${NC}" 1>&2
   else
-    echo "$1: $msg, test not found."
+    # TODO: Check if this is the desired output.
+    echo -e "${RED}$1: FAIL. Test not found.${NC}" 1>&2
   fi
   set -u
   exit -1
 fi
 
-
-declare -a env_data
-if [ "$1" = "--env" ]; then
-  while [[ "$1" = "--env" ]]; do
-    if [[ -z "$2" ]]; then
-      echo 'ERROR: Expected 'name val' arguments with --env' 1>&2
-      exit -1
-    fi
-    env_data+=("$2" "$3")
-    shift 3
-  done
-else
-  env_data=("#" "#")
-fi
-
-
 app=$1
 
-output=""
-if [ ${env_data[0]} != "#" ]; then
-  output+=$(
-  for ((idx=0; $idx < ${#env_data[*]}; idx=$((idx+2)))); 
-  do 
-    export "${env_data[$idx]}"="${env_data[$((idx+1))]}"; 
-  done; 
-  )
-fi
-
 set +e
-output+=$(timeout $SOLLVE_TIMELIMIT "$app" 2>&1)
+output+=$(env ${env_data[@]} timeout $SOLLVE_TIMELIMIT "$app" 2>&1)
 status=$?
 set -e
 
