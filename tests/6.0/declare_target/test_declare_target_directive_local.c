@@ -1,4 +1,4 @@
-//--------------- test_declare_target_local.c -----------------------------------------//
+//--------------- test_declare_target_directive_local.c -------------------------------//
 // OpenMP API Version 6.0 November 2024
 /////////////
 // Pg. 902, line 4
@@ -53,7 +53,7 @@ int test_declare_target_local() {
   }
 
   for (int i = 0; i < TotGpus; i++) {
-      #pragma omp target device(i)
+      #pragma omp target device(i) //map(tofrom: sum)
       {
       init_x(i);
       sum = 0;
@@ -61,18 +61,28 @@ int test_declare_target_local() {
   }
 
   for (int i = 0; i < TotGpus; i++) {
-      #pragma omp target parallel device(i) nowait
+    #pragma omp target parallel device(i) nowait//parallel device(i) nowait //map(tofrom: sum) 
+    {
       foo();
+    }
   }
   #pragma omp taskwait
 
   for (int i = 0; i < TotGpus; i++) {
-      #pragma omp target map(tofrom: errors) device(i)
+      #pragma omp target map(tofrom: errors) device(i) //map(tofrom: sum)
       {
+      //printf("sum: %d, expected: %d\n", sum, (N)*(N-1)/2 + (N)*i);
         
-      if ((N)*(N-1)/2 + (N)*i != sum)
+      if ((N)*(N-1)/2 + (N)*i != sum){
       ++errors;
       }
+      /*
+      for (int j=0; j < N; ++j){
+        printf("index %d, value %d\n", j, x[j]);
+      }
+      */
+      }
+
   }
   OMPVV_TEST_AND_SET(errors, errors != 0);
 
