@@ -1,4 +1,4 @@
-//--------------- test_declare_target_directive_local.c -------------------------------//
+//--------------- test_declare_target_local.c -------------------------------//
 // OpenMP API Version 6.0 November 2024
 /////////////
 // Pg. 902, line 4
