@@ -8,8 +8,6 @@
 //===----------------------------------------------------------------------===//
 
 #include <stdio.h>
-#include <assert.h>
-#include <stdlib.h>
 #include <omp.h>
 #include "ompvv.h"
 
