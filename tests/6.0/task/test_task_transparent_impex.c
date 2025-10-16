@@ -16,7 +16,7 @@ int testTaskTransparentImpex(void)
     int errors = 0;
     int x = 0;
 
-    #pragma omp parallel shared(x)
+    #pragma omp parallel shared(x) num_threads(OMPVV_NUM_THREADS_HOST)
     {
         # pragma omp single
         {
