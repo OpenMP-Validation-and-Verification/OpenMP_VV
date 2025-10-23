@@ -4,7 +4,7 @@
 // Pg. 902, line 4
 // ***********
 // DIRECTIVE: declare_target
-// CLAUSE:data
+// CLAUSE: local
 // The target_data directive is being used in three scenaries of various task
 // configurations for the same functional task. Because target_data is a
 // task-generating composite construct, it will have expected effects that are
