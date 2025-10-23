@@ -56,8 +56,8 @@ int errors_arr[TotGpus] = {0};
   for (int i = 0; i < TotGpus; i++) {
       #pragma omp target device(i) //map(tofrom: sum)
       {
-      init_x(i);
-      sum = 0;
+        init_x(i);
+        sum = 0;
       }
   }
 
