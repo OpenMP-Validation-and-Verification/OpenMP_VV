@@ -4,7 +4,7 @@
 //
 // Description
 // testTaskTransparentExport():
-// Ensure the correct order of execution an exporting task and its uncle task
+// Ensure the correct execution order of an exporting task and its uncle task
 //===----------------------------------------------------------------------===//
 
 #include <stdio.h>
