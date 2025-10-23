@@ -52,6 +52,7 @@ int test_declare_target_local() {
     return OMPVV_SKIPPED_EXIT_CODE;
   }
 
+int errors_arr[TotGpus] = {0};
   for (int i = 0; i < TotGpus; i++) {
       #pragma omp target device(i) //map(tofrom: sum)
       {
