@@ -70,7 +70,7 @@ int errors_arr[TotGpus] = {0};
   #pragma omp taskwait
 
   for (int i = 0; i < TotGpus; i++) {
-      #pragma omp target map(tofrom: errors) device(i) //map(tofrom: sum)
+      #pragma omp target map(tofrom: errors_arr) device(i) //map(tofrom: sum)
       {
       //printf("sum: %d, expected: %d\n", sum, (N)*(N-1)/2 + (N)*i);
         
