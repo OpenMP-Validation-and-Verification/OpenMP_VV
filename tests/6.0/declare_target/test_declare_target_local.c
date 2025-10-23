@@ -85,6 +85,9 @@ int errors_arr[TotGpus] = {0};
       }
 
   }
+  for (int i = 0; i < TotGpus; i++) {
+    errors += errors_arr[i];
+  }
   OMPVV_TEST_AND_SET(errors, errors != 0);
 
   return errors;
