@@ -3,7 +3,7 @@
 /////////////
 // Pg. 902, line 4
 // ***********
-// DIRECTIVE:target
+// DIRECTIVE: declare_target
 // CLAUSE:data
 // The target_data directive is being used in three scenaries of various task
 // configurations for the same functional task. Because target_data is a
