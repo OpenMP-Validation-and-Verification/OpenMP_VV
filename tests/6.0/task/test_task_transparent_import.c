@@ -4,7 +4,7 @@
 //
 // Description
 // testTaskTransparentImport():
-// Ensure the correct order of execution an importing task and its uncle task
+// Ensure the correct execution order of an importing task and its uncle task
 //===----------------------------------------------------------------------===//
 
 #include <stdio.h>
