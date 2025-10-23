@@ -62,7 +62,7 @@ int errors_arr[TotGpus] = {0};
   }
 
   for (int i = 0; i < TotGpus; i++) {
-    #pragma omp target parallel device(i) nowait//parallel device(i) nowait //map(tofrom: sum) 
+    #pragma omp target parallel device(i) nowait //map(tofrom: sum) 
     {
       foo();
     }
