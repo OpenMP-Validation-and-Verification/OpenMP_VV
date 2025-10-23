@@ -75,7 +75,7 @@ int errors_arr[TotGpus] = {0};
       //printf("sum: %d, expected: %d\n", sum, (N)*(N-1)/2 + (N)*i);
         
       if ((N)*(N-1)/2 + (N)*i != sum){
-      ++errors;
+        ++errors_arr[i];
       }
       /*
       for (int j=0; j < N; ++j){
