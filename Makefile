@@ -322,13 +322,12 @@ $(CURDIR)/tests/4.5/application_kernels/qmcpack_target_static_lib.c.o: $(CURDIR)
      			$(@:.run=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.run=.log)) \
      		&& echo "PASS" > $(LOGTEMPFILE) || echo "FAIL" > $(LOGTEMPFILE)), \
 	$(if $(findstring _env_,$@), \
-
 	  $(call CHECK_OUTPUT, $(call loadModules,$(C_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) --env \
 	    $(shell echo "$@" | sed -e 's@.*/@@' -e 's@test_\(.*\)_env_.*@\1@' | tr 'a-z' 'A-Z') \
 	    $(shell echo "$@" | sed -e 's@.*/@@' -e 's@.*_env_\([^.]*\).*@\1@') \
 	    $(@:.run=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.run=.log))) ), \
 	  $(call CHECK_OUTPUT, $(call loadModules,$(C_COMPILER_MODULE)) $(BSRUN)$(RUN_TEST) $(@:.run=.o) $(VERBOSE) $(if $(LOG),$(RECORD)$(notdir $(@:.run=.log))) ) \
-	)
+	))
 	-$(call log_section_footer,"RUN",$(SYSTEM),$$(cat $(LOGTEMPFILE)),$(LOG_NOTE),$(notdir $(@:.run=.log)))
 	-@$(if $(LOG), rm $(LOGTEMPFILE))
 
