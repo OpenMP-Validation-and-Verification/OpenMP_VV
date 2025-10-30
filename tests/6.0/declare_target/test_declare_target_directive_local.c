@@ -17,8 +17,9 @@
 
 int sum;
 int x[N];
+int sum_array[10];
 
-#pragma omp declare_target to(sum, x) // local(sum, x)
+#pragma omp declare_target to(sum, x, sum_array) // local(sum, x)
 #pragma omp begin declare_target
 // void init_x(int dev_id) {
 //   for (int j = 0; j < N; ++j) {
@@ -32,7 +33,8 @@ void foo(int dev_id) {
   }
   #pragma omp for reduction(+ : sum)
   for (i = 0; i < N; i++) {
-    sum += x[i];
+    //sum += x[i];
+    sum_array[dev_id] += x[i];
   }
 }
 #pragma omp end declare target
@@ -41,7 +43,7 @@ int test_declare_target_local() {
   int errors = 0;
   int TotGpus = omp_get_num_devices();
   int errors_arr[TotGpus];
-  int sum_array[TotGpus];
+  //int sum_array[TotGpus];
 
   for (int i = 0; i < TotGpus; i++) {
     sum_array[i] = 0;
@@ -63,8 +65,9 @@ int test_declare_target_local() {
   #pragma omp taskwait
 
   for (int i = 0; i < TotGpus; i++) {
-    #pragma omp target map(tofrom : errors_arr) device(i)
+    #pragma omp target map(tofrom : errors_arr, sum_array) device(i)
     {
+      printf("%d\n", sum_array[i]);
       if ((N) * (N - 1) / 2 + (N)*i != sum_array[i]) {
         ++errors_arr[i];
       }
