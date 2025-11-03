@@ -111,15 +111,6 @@ _Pragma("omp target map (from: _ompvv_isOffloadingOn) map(to: _ompvv_isSharedEnv
      _ompvv_isSharedEnv = 1; \
   }
 
-// Macro to check if it is a shared data environment
-#define OMPVV_TEST_SHARED_ENVIRONMENT_PROBE \
-  int _ompvv_isSharedEnv = 0; \
-  _ompvv_isOffloadingOn = 0; \
-_Pragma("omp target map (from: _ompvv_isOffloadingOn) map(to: _ompvv_isSharedEnv)") \
-  {  _ompvv_isOffloadingOn = !omp_is_initial_device();  \
-     _ompvv_isSharedEnv = 1; \
-  }
-
 // Macro to report warning if it is a shared environment
 #define OMPVV_TEST_SHARED_ENVIRONMENT {\
   OMPVV_TEST_SHARED_ENVIRONMENT_PROBE \
