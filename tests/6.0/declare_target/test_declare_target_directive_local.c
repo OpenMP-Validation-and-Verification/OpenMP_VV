@@ -1,4 +1,4 @@
-//--------------- test_declare_target_directive_local.c--------------------------------//
+//----------------test_declare_target_directive_local.c--------------------------------//
 // OpenMP API Version 6.0 November 2024
 // Pg. 902, line 4
 // ***********
@@ -17,24 +17,19 @@
 
 int sum;
 int x[N];
-int sum_array[10];
 
-#pragma omp declare_target to(sum, x, sum_array) // local(sum, x)
+#pragma omp declare_target local(sum, x)
 #pragma omp begin declare_target
-// void init_x(int dev_id) {
-//   for (int j = 0; j < N; ++j) {
-//       x[j] = j + dev_id;
-//   }
-// }
-void foo(int dev_id) {
-  int i;
+void init_x(int dev_id) {
   for (int j = 0; j < N; ++j) {
     x[j] = j + dev_id;
   }
+}
+
+void foo(void) {
   #pragma omp for reduction(+ : sum)
-  for (i = 0; i < N; i++) {
-    //sum += x[i];
-    sum_array[dev_id] += x[i];
+  for (int i = 0; i < N; i++) {
+    sum += x[i];
   }
 }
 #pragma omp end declare target
@@ -43,32 +38,26 @@ int test_declare_target_local() {
   int errors = 0;
   int TotGpus = omp_get_num_devices();
   int errors_arr[TotGpus];
-  //int sum_array[TotGpus];
 
   for (int i = 0; i < TotGpus; i++) {
-    sum_array[i] = 0;
     errors_arr[i] = 0;
-    // #pragma omp target device(i) map(tofrom : sum_array)
-    // {
-    //   // init_x(i);
-    //   // sum = 0;
-    //   sum_array[i] = 0;
-    // }
-  }
-
-  for (int i = 0; i < TotGpus; i++) {
-    #pragma omp target parallel device(i) nowait
     {
-      foo(i);
+      init_x(i);
+      sum = 0;
+    }
+  }
+  for (int i = 0; i < TotGpus; i++) {
+    #pragma omp target parallel device(i)
+    {
+      foo();
     }
   }
   #pragma omp taskwait
 
   for (int i = 0; i < TotGpus; i++) {
-    #pragma omp target map(tofrom : errors_arr, sum_array) device(i)
+    #pragma omp target map(tofrom : errors_arr[i]) device(i)
     {
-      printf("%d\n", sum_array[i]);
-      if ((N) * (N - 1) / 2 + (N)*i != sum_array[i]) {
+      if ((N) * (N - 1) / 2 + (N)*i != sum) {
         ++errors_arr[i];
       }
     }
