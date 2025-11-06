@@ -5,9 +5,9 @@
 // Description
 // testTaskgraphIf():
 // Call
-//  taskgraph if(1)
-//  taskgraph if(0)
-//  taskgraph if(1)
+//  taskgraph if(0) --> execute structured block, create taskgraph
+//  taskgraph if(1) --> skip
+//  taskgraph if(2) --> replay taskgraph
 // and ensures that the structured block is executed only once,
 // and records twice
 //===----------------------------------------------------------------------===//
