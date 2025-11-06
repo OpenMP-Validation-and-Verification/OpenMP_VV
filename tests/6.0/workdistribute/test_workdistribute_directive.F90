@@ -30,7 +30,6 @@ program test_omp_workdistribute
     use axpy_mod, only: axpy_workdistribute
     implicit none
 
-    !OMPVV_TEST_OFFLOADING
 
     integer :: errors = 0
     integer, parameter :: N = 1024 * 1024
@@ -39,11 +38,13 @@ program test_omp_workdistribute
     real :: y0
     real, dimension(N) :: x
     real, dimension(N) :: y
+    OMPVV_TEST_OFFLOADING
     a = 2.0
     x = 2.0  ! initialize arrays
     y = 1.0
     x0 = 2.0 ! initialize scalars for validation
     y0 = 1.0
+
     
     call axpy_workdistribute(a, x, y, N)
     IF (sum(y) / N .NE. a * x0 + y0) THEN
