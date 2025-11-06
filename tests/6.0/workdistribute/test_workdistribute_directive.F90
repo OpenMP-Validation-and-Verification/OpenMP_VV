@@ -2,7 +2,7 @@
 !
 ! OpenMP API Version 6.0 
 !
-! This test checks if the workdistribute passed to the nowait clause
+! This test checks if the workdistribute construct works with target teams
 ! 
 !===------------------------------------------------------------------------===//
 
