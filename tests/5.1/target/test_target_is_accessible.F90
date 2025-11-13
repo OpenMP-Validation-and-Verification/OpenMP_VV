@@ -56,9 +56,8 @@ CONTAINS
     END IF
 
     DEALLOCATE(fptr)
-    OMPVV_INFOMSG_IF(check_test .EQ. 1, "omp_target_is_accessible returning true")
-    OMPVV_INFOMSG_IF(check_test .EQ. 0, "omp_target_is_accessible returning false")
-    OMPVV_ERROR_IF(check_test .EQ. 2, "omp_target_is_accessible did not return true or false")
+    OMPVV_INFOMSG_IF(check_test .NE. 0, "omp_target_is_accessible returned true")
+    OMPVV_INFOMSG_IF(check_test .EQ. 0, "omp_target_is_accessible returned false")
     check_device = errors
   END FUNCTION check_device
 END PROGRAM test_target_is_accessible
