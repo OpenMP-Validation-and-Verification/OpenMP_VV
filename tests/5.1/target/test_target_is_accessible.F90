@@ -54,12 +54,11 @@ CONTAINS
       END DO
     ELSE
       OMPVV_TEST_AND_SET(errors,check_test.EQ.0)
-      OMPVV_WARNING_IF(check_test.EQ.0, "omp_target_is_accessible returned false. This test will be skipped.\n");
+      OMPVV_WARNING_IF(check_test.EQ.0, "omp_target_is_accessible returned false. This test will be skipped with error = 1.\n");
     END IF
 
     DEALLOCATE(fptr)
     OMPVV_INFOMSG_IF(check_test .NE. 0, "omp_target_is_accessible returned true")
-    OMPVV_INFOMSG_IF(check_test .EQ. 0, "omp_target_is_accessible returned false")
     check_device = errors
   END FUNCTION check_device
 END PROGRAM test_target_is_accessible
