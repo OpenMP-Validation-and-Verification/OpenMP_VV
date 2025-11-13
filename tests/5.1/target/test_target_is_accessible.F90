@@ -3,10 +3,9 @@
 ! OpenMP API Version 5.1 Nov 2020
 !
 ! This test checks that the omp_target_is_accessible device routine.
-! In this test the output of the target_is_accessible call should return
-! true because the storage indicated by the first and second arguements
-! is accessible by the targeted device. This test is closely adapdted
-! from the 5.1 OpenMP example sheet.
+! In this test if the output of the target_is_accessible returns
+! true then the pointer on the host should be a valid pointer in the 
+! device environment.
 !
 !//===---------------------------------------------------------------------===//
 
@@ -53,6 +52,9 @@ CONTAINS
       DO i=1, N
         OMPVV_TEST_AND_SET(errors, fptr(i) .NE. 5*i)
       END DO
+    ELSE
+      OMPVV_TEST_AND_SET(errors,check_test.EQ.0)
+      OMPVV_WARNING_IF(check_test.EQ.0, "omp_target_is_accessible returned false. This test will be skipped.\n");
     END IF
 
     DEALLOCATE(fptr)
