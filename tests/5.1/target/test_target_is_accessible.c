@@ -2,7 +2,7 @@
 //
 // OpenMP API Version 5.1 Aug 2020
 //
-// This test checks that the omp_target_is_accessible device routine.
+// This test checks the omp_target_is_accessible device routine.
 // In this test if the output of the target_is_accessible returns
 // true then the pointer on the host should be a valid pointer in the 
 // device environment.
