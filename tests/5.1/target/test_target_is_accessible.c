@@ -40,7 +40,6 @@ int check_device(){
 	free(ptr);
 	
 	OMPVV_INFOMSG_IF(check_test != 0, "omp_target_is_accessible returned true");
-	OMPVV_INFOMSG_IF(check_test == 0, "omp_target_is_accessible returned false");
 	
 	return errors;
 }
