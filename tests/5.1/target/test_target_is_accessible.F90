@@ -2,11 +2,10 @@
 !
 ! OpenMP API Version 5.1 Nov 2020
 !
-! This test checks that the omp_target_is_accessible device routine.
-! In this test the output of the target_is_accessible call should return
-! true because the storage indicated by the first and second arguements
-! is accessible by the targeted device. This test is closely adapdted
-! from the 5.1 OpenMP example sheet.
+! This test checks the omp_target_is_accessible device routine.
+! In this test if the output of the target_is_accessible returns
+! true then the pointer on the host should be a valid pointer in the 
+! device environment.
 !
 !//===---------------------------------------------------------------------===//
 
@@ -26,25 +25,19 @@ PROGRAM test_target_is_accessible
 
 CONTAINS
   INTEGER FUNCTION check_device()
-    INTEGER :: errors, i, isSharedMemory, N
+    INTEGER :: errors, i, N
     INTEGER, POINTER :: fptr(:)
     TYPE (C_PTR) :: ptr
     INTEGER (C_SIZE_T) :: buf_size
     INTEGER (C_INT) :: dev, check_test
 
     errors = 0
-    isSharedMemory = 0
     check_test = 2
     N = 100
     dev = omp_get_default_device()
 
-    !Assumes that on shared-memory systems, no copy is done
-    !$omp target map(to: isSharedMemory)
-    isSharedMemory = 1
-    !$omp end target
-
     ALLOCATE(fptr(N))
-    
+
     ptr = c_loc(fptr(1))
     buf_size = c_sizeof(fptr(1)) * N
 
@@ -59,13 +52,13 @@ CONTAINS
       DO i=1, N
         OMPVV_TEST_AND_SET(errors, fptr(i) .NE. 5*i)
       END DO
+    ELSE
+      OMPVV_TEST_AND_SET(errors,check_test.EQ.0)
+      OMPVV_WARNING_IF(check_test.EQ.0, "omp_target_is_accessible returned false. This test will be skipped with error = 1.\n");
     END IF
 
     DEALLOCATE(fptr)
-    OMPVV_TEST_AND_SET_VERBOSE(errors, check_test .NE. isSharedMemory)
-    OMPVV_INFOMSG_IF(check_test .EQ. 1, "Omp_target_is_accessible returning true")
-    OMPVV_INFOMSG_IF(check_test .EQ. 0, "Omp_target_is_accessible returning false")
-    OMPVV_ERROR_IF(check_test .EQ. 2, "omp_target_is_accessible did not return true or false")
+    OMPVV_INFOMSG_IF(check_test .NE. 0, "omp_target_is_accessible returned true")
     check_device = errors
   END FUNCTION check_device
 END PROGRAM test_target_is_accessible
