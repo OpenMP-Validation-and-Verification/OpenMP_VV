@@ -77,7 +77,7 @@
 #define OMPVV_TEST(condition) call test_error(condition, __FILENAME__, __LINE__)
 
 ! Macro for testing for errors
-#define OMPVV_TEST_VERBOSE(condition) call test_error_verbose(condition, "condition", __FILENAME__, __LINE__)
+#define OMPVV_TEST_VERBOSE(condition) call test_error_verbose(condition, #condition, __FILENAME__, __LINE__)
 
 ! Macro for setting errors on condition
 #define OMPVV_TEST_AND_SET(err, condition) err = err + test_and_set(condition, __FILENAME__, __LINE__)
