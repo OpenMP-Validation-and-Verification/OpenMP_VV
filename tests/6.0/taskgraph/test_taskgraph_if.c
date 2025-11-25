@@ -5,11 +5,12 @@
 // Description
 // testTaskgraphIf():
 // Call
-//  taskgraph if(0) --> execute structured block, create taskgraph
+//  taskgraph if(0) --> execute taskgraph construct, optionally creating a taskgraph record
 //  taskgraph if(1) --> skip
-//  taskgraph if(2) --> replay taskgraph
-// and ensures that the structured block is executed only once,
-// and records twice
+//  taskgraph if(2) --> execute taskgraph construct, maybe replay taskgraph
+//                      record, or optionally create a taskgraph record
+// ensures that the structured block is executed 1 or 2 times
+// ensures that tasks are executed twice
 //===----------------------------------------------------------------------===//
 
 #include <stdio.h>
@@ -39,8 +40,14 @@ int testTaskgraphIf(void)
             }
         }
     }
-    OMPVV_TEST_AND_SET_VERBOSE(errors, x != 1);
+
+    // the structured block must have been executed once or twice
+    // (once if creating a taskgraph record, twice if creating no taskgraph record)
+    OMPVV_TEST_AND_SET_VERBOSE(errors, !(x == 1 || x == 2));
+
+    // the task must execute precisely twice
     OMPVV_TEST_AND_SET_VERBOSE(errors, y != 2);
+
     return errors;
 }
 

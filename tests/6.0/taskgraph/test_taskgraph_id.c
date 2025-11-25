@@ -4,13 +4,10 @@
 //
 // Description
 // testTaskgraphId():
-// Create 'N' taskgraphs with id '0<=i<N' that spawns 3 tasks
+// M times, run N taskgraphs constructs with id '0<=i<N' that spawns 3 tasks
 //  T1 -> T2 -> T3
-//
-// Replay each taskgraph 'M' times
-//
-// Ensure that each strucuted block only executed once
-// Ensure that each triplets evexecuted 'N' times
+// Ensure that each taskgraph' structured block executed 1 to M times
+// Ensure that each triplets executed precisely M times
 //===----------------------------------------------------------------------===//
 
 #include <stdio.h>
@@ -26,8 +23,10 @@ int testTaskgraphGraphId(void)
     # define N 16
     # define M 16
 
-    int x = 0;
-    int y = 0;
+    int x[N];
+    int y[N];
+    memset(x, 0, sizeof(x));
+    memset(y, 0, sizeof(y));
 
     # pragma omp parallel shared(x, y)
     {
@@ -39,14 +38,13 @@ int testTaskgraphGraphId(void)
                 {
                     # pragma omp taskgraph graph_id(i)
                     {
-                        ++x;
-
+                        ++x[i];
                         for (int i = 0 ; i < 3 ; ++i)
                         {
                             # pragma omp task depend(out: y) shared(y)
                             {
                                 # pragma omp atomic
-                                    ++y;
+                                    ++y[i];
                             }
                         }
                     }
@@ -55,11 +53,14 @@ int testTaskgraphGraphId(void)
         }
     }
 
-    // each taskgraph strucuted block must have executed once
-    OMPVV_TEST_AND_SET_VERBOSE(errors, x != N);
+    for (int i = 0 ; i < N ; ++i)
+    {
+        // each taskgraph strucuted block must have executed 1 to M times
+        OMPVV_TEST_AND_SET_VERBOSE(errors, !(0 < x[i] && x[i] <= M));
 
-    // each triplets must have executed N times
-    OMPVV_TEST_AND_SET_VERBOSE(errors, y != 3*N*M);
+        // each triplets must have executed M times
+        OMPVV_TEST_AND_SET_VERBOSE(errors, y[i] != M);
+    }
 
     return errors;
 }

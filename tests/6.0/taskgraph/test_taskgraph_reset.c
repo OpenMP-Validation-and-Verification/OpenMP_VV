@@ -4,12 +4,12 @@
 //
 // Description
 // testTaskgraphGraphReset():
-// Create 'M' taskgraphs that spawns 3 tasks
+// Run the same taskgraph constructs N times, that spawns 3 tasks
 //  T1 -> T2 -> T3
 // with (T1, T3) on device, (T2) on host.
-// Replay taskgraphs 'N' times, while reseting every second iterations.
-// 
-// Ensures that structured block executed 'N/2' times
+// while reseting every second iterations.
+//
+// Ensures that structured block executed N/2 to N times
 //===----------------------------------------------------------------------===//
 
 #include <stdio.h>
@@ -52,8 +52,10 @@ int testTaskgraphGraphReset(void)
         }
     }
 
-    // each taskgraph strucuted block must have executed once
-    OMPVV_TEST_AND_SET_VERBOSE(errors, x != N/2);
+    // taskgraph structured block must have executed at least N/2 times (is
+    // always creating a taskgraph record), and at most N times (if never
+    // creating a taskgraph record)
+    OMPVV_TEST_AND_SET_VERBOSE(errors, (N/2 <= x && x <= N));
 
     // each triplets must have executed N times
     OMPVV_TEST_AND_SET_VERBOSE(errors, y != 3*N);

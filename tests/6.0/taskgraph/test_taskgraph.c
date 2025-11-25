@@ -4,7 +4,8 @@
 //
 // Description
 // testTaskgraph():
-// Create a taskgraph, and ensures the structured block is executed once
+// Create a taskgraph
+// Ensures the structured block is executed
 //===----------------------------------------------------------------------===//
 
 #include <stdio.h>

@@ -4,9 +4,9 @@
 //
 // Description
 // testTaskgraphReplay():
-// Create a taskgraph of 'M' tasks, replay it 'N' times.
-// Ensures that the structured block is executed only once,
-// and that the tasks are replayed N times
+// N times, run a taskgraph construct spawning M tasks
+// Ensures that the structured block is executed one to N times
+// Ensures that the tasks structured block is executed M*N times
 //===----------------------------------------------------------------------===//
 
 #include <stdio.h>
@@ -45,7 +45,7 @@ int testTaskgraphReplay(void)
             }
         }
     }
-    OMPVV_TEST_AND_SET_VERBOSE(errors, x != 1);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, !(0 < x && x <= N));
     OMPVV_TEST_AND_SET_VERBOSE(errors, y != M*N);
     return errors;
 }

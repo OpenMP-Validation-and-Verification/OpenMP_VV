@@ -9,8 +9,8 @@
 // with (T1, T3) on device, (T2) on host.
 //
 // Ensures that
-//   - the structured block is executed once
-//   - 3*N tasks executed/replayed
+//   - the structured block is executed 1 to N times
+//   - 3*N tasks are executed/replayed
 //===----------------------------------------------------------------------===//
 
 #include <stdio.h>
@@ -49,7 +49,8 @@ int testTaskgraphHeterogeneous(void)
             }
         }
     }
-    OMPVV_TEST_AND_SET_VERBOSE(errors, x != 1);
+
+    OMPVV_TEST_AND_SET_VERBOSE(errors, !(0 < x && x <= N));
     OMPVV_TEST_AND_SET_VERBOSE(errors, y != 3*N);
     return errors;
 }

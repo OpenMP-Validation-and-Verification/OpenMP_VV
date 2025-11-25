@@ -4,8 +4,10 @@
 //
 // Description
 // testTaskgraphParallel():
-// 'N' times, have 'nthreads' threads construcitng/replaying the same taskgraph.
-// It should execute the structured block once, and the replayable task 'N*nthreads' times
+// N times, have 'nthreads' threads call the same taskgraph construct
+//
+// ensure the structured block executed 1 to N times,
+// and the replayable task 'N*nthreads' times
 //===----------------------------------------------------------------------===//
 
 #include <stdio.h>
@@ -44,7 +46,7 @@ int testTaskgraphParallel(void)
         }
     }
     OMPVV_TEST_AND_SET_VERBOSE(errors, nthreads <= 0);
-    OMPVV_TEST_AND_SET_VERBOSE(errors, x != 1);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, !(0 < x && x <= N));
     OMPVV_TEST_AND_SET_VERBOSE(errors, y != nthreads*N);
 
     return errors;
