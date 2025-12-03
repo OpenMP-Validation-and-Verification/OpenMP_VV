@@ -26,6 +26,7 @@ import sys
 from pathlib import Path
 from typing import Dict, Any, List, Tuple, Optional
 from collections import Counter as _Counter
+from pdb import set_trace
 
 
 def load_results(path: Path) -> Dict[str, Dict[str, Any]]:
@@ -192,7 +193,10 @@ def main() -> None:
     diffs = compare_fields(results1, results2)
 
     if not diffs:
-        print("All tests have matching Compiler and Runtime results.")
+        for name, data in results1.items():
+            if (data['Compiler result'] == 'FAIL') or (data['Runtime result'] == 'FAIL'):
+                print(name)
+        print("Both json files have matching Compiler and Runtime results.")
         return
 
     # Extract just the test names that have any kind of difference
