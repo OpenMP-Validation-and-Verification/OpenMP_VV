@@ -85,8 +85,11 @@ program test_omp_workdistribute
     IF (sum(y) / N .NE. a * x0 + y0) THEN
         errors = errors + 1
     END IF 
-    !call array_transform(aa, bb, cc, dd, ee, n)
+    call array_transform(aa, bb, cc, dd, ee, N)
     !write (*,'(A,F4.2,A,F4.2)') 'sum ', sum(y) / N, ' expected ', a * x0 + y0
+    IF ( sum((bb + cc) ** minval(sum(bb, 1) + sum(cc, 1))) .NE. sum(ee)) THEN
+      errors = errors + 1
+    END IF
 
     OMPVV_ERROR_IF(errors /= 0, "The workdistribute directive did not perform as expected.")
     OMPVV_REPORT_AND_RETURN()
