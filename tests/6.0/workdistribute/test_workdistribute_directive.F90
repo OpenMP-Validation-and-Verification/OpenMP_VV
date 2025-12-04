@@ -1,9 +1,10 @@
 !===----test_workdistribute_directive.F90-----------------------------------===//
 !
-! OpenMP API Version 6.0 
-!
-! This test checks if the workdistribute construct works with target teams
-! 
+! OpenMP API Version 6.0 Nov 2024
+! Pg. 901
+! This test checks if the workdistribute construct works with target teams in
+! various cases which involve array manipulations. The workdistribute Construct 
+! example on page 340 of the 6.0 examples document was referenced.
 !===------------------------------------------------------------------------===//
 
 #include "ompvv.F90"
@@ -23,6 +24,24 @@ contains
     end subroutine axpy_workdistribute
 end module axpy_mod
 
+module workdistribute_2
+  implicit none
+contains
+  subroutine array_ops(aa, bb, cc, dd, ee, ff, n)
+    implicit none
+
+    integer :: n
+    real, dimension(n, n) :: aa, bb, cc
+    real, dimension(n, n) :: dd, ee, ff
+    !$omp target teams workdistribute map(to:bb,dd,ee) &
+    !$omp map(tofrom:cc) map(from:aa,ff)
+      aa = bb + cc
+      cc = dd + ee
+      ff = aa + cc
+    !$omp end target teams workdistribute
+  end subroutine array_ops
+end module workdistribute_2
+
 module workdistribute_3
   implicit none
 contains
@@ -34,13 +53,13 @@ contains
     real, dimension(n) :: dd
     real :: f
 
-    !!$omp target teams workdistribute map(to:bb,cc) &
-    !!$omp map(from:aa,dd,f,ee)
+    !$omp target teams workdistribute map(to:bb,cc) &
+    !$omp map(from:aa,dd,f,ee)
       aa = bb + cc
       dd = sum(aa, 1)
       f = minval(dd)
       ee = aa ** f
-    !!$omp end target teams workdistribute
+    !$omp end target teams workdistribute
   end subroutine array_transform
 end module workdistribute_3
 
@@ -49,6 +68,7 @@ program test_omp_workdistribute
     use ompvv_lib
     use omp_lib
     use axpy_mod, only: axpy_workdistribute
+    use workdistribute_2, only: array_ops
     use workdistribute_3, only: array_transform
     implicit none
 
@@ -62,8 +82,9 @@ program test_omp_workdistribute
     real, dimension(N) :: x
     real, dimension(N) :: y
 
-    real, dimension(N, N) :: aa, bb, cc, ee
-    real, dimension(N) :: dd
+    real, dimension(N, N) :: aa, bb, cc, ee, ff
+    real, dimension(N, N) :: dd1
+    real, dimension(N) :: dd2
     real :: f
 
     OMPVV_TEST_OFFLOADING
@@ -77,21 +98,27 @@ program test_omp_workdistribute
     aa = 2.0
     bb = 2.0
     cc = 2.0
+    dd1 = 2.0
+    dd2 = 2.0
     ee = 2.0
-    dd = 2.0
+    ff = 0.0
 
     
     call axpy_workdistribute(a, x, y, N)
     IF (sum(y) / N .NE. a * x0 + y0) THEN
         errors = errors + 1
     END IF 
-    call array_transform(aa, bb, cc, dd, ee, N)
-    !write (*,'(A,F4.2,A,F4.2)') 'sum ', sum(y) / N, ' expected ', a * x0 + y0
-    IF ( sum((bb + cc) ** minval(sum(bb, 1) + sum(cc, 1))) .NE. sum(ee)) THEN
+
+    call array_ops(aa, bb, cc, dd1, ee, ff, N)
+    IF ( sum(bb + cc + dd1 + ee) .NE. sum(ff)) THEN
       errors = errors + 1
+    END IF
+
+    call array_transform(aa, bb, cc, dd2, ee, N)
+    IF ( sum((bb + cc) ** minval(sum(bb, 1) + sum(cc, 1))) .NE. sum(ee)) THEN
+     errors = errors + 1
     END IF
 
     OMPVV_ERROR_IF(errors /= 0, "The workdistribute directive did not perform as expected.")
     OMPVV_REPORT_AND_RETURN()
 end program test_omp_workdistribute
-
