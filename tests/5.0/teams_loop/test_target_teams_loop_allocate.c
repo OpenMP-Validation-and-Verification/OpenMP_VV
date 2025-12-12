@@ -28,7 +28,8 @@ int testTargetTeamsAllocateCl() {
     c[i] = 0;
   }
   // Execute on target
-#pragma omp target teams loop map(to: a[0:N], b[0:N]) map(from: c[0:N]) \
+#pragma omp target teams distribute parallel for \
+        map(to: a[0:N], b[0:N]) map(from: c[0:N]) \
         uses_allocators(omp_low_lat_mem_alloc) \
         allocate(omp_low_lat_mem_alloc: local) firstprivate(local)
   for (int i = 0; i < N; i++) {
