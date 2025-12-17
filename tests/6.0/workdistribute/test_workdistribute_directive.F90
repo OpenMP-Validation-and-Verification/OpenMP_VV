@@ -4,7 +4,7 @@
 ! Pg. 901
 ! This test checks if the workdistribute construct works with target teams in
 ! various cases which involve array manipulations. The workdistribute Construct 
-! example on page 340 of the 6.0 examples document was referenced.
+! example in the 6.0.1 examples document was referenced.
 !===------------------------------------------------------------------------===//
 
 #include "ompvv.F90"
