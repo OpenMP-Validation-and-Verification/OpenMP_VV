@@ -19,10 +19,8 @@ contains
         real, dimension(n) :: x
         real, dimension(n) :: y
         !$omp target teams workdistribute map(to:x) map(tofrom:y)
-        !$omp target teams map(to:x) map(tofrom:y)
             y = a * x + y
         !$omp end target teams workdistribute
-        !$omp end target teams 
     end subroutine axpy_workdistribute
 end module axpy_mod
 
@@ -36,13 +34,11 @@ contains
     real, dimension(n, n) :: aa, bb, cc
     real, dimension(n, n) :: dd, ee, ff
     !$omp target teams workdistribute map(to:bb,dd,ee) &
-    !$omp target teams map(to:bb,dd,ee) &
     !$omp map(tofrom:cc) map(from:aa,ff)
       aa = bb + cc
       cc = dd + ee
       ff = aa + cc
     !$omp end target teams workdistribute
-    !$omp end target teams 
   end subroutine array_ops
 end module workdistribute_2
 
@@ -58,14 +54,12 @@ contains
     real :: f
 
     !$omp target teams workdistribute map(to:bb,cc) &
-    !$omp target teams map(to:bb,cc) &
     !$omp map(from:aa,dd,f,ee)
       aa = bb + cc
       dd = sum(aa, 1)
       f = minval(dd)
       ee = aa ** f
     !$omp end target teams workdistribute
-    !$omp end target teams 
   end subroutine array_transform
 end module workdistribute_3
 
