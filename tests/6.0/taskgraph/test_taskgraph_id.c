@@ -39,7 +39,7 @@ int testTaskgraphGraphId(void)
                     # pragma omp taskgraph graph_id(i)
                     {
                         ++x[i];
-                        for (int i = 0 ; i < 3 ; ++i)
+                        for (int k = 0 ; k < 3 ; ++k)
                         {
                             # pragma omp task depend(out: y) shared(y)
                             {
