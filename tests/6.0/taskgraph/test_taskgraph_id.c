@@ -59,7 +59,7 @@ int testTaskgraphGraphId(void)
         OMPVV_TEST_AND_SET_VERBOSE(errors, !(0 < x[i] && x[i] <= M));
 
         // each triplets must have executed M times
-        OMPVV_TEST_AND_SET_VERBOSE(errors, y[i] != M);
+        OMPVV_TEST_AND_SET_VERBOSE(errors, y[i] != 3*M);
     }
 
     return errors;
