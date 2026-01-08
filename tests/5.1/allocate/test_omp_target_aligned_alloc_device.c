@@ -21,8 +21,12 @@ int test_omp_aligned_alloc_on_device() {
   int errors = 0;
   
   omp_memspace_handle_t  memspace = omp_default_mem_space;
-  omp_alloctrait_t       traits[1] = {{omp_atk_alignment, 64}};
-  omp_allocator_handle_t alloc = omp_init_allocator(memspace,1,traits);
+  const omp_alloctrait_t traits[1] = {{omp_atk_alignment, 64}};
+  omp_alloctrait_t       traits2[1] = {{omp_atk_alignment, 8}};
+
+  /* Host-side allocator; not used in the target region, which has a private
+     copy, initialized by uses_allocators.  */
+  omp_allocator_handle_t alloc = omp_init_allocator(memspace,1,traits2);
 
   #pragma omp target map(tofrom: errors) uses_allocators(alloc(traits)) 
   {

@@ -77,7 +77,16 @@
 #define OMPVV_TEST(condition) call test_error(condition, __FILENAME__, __LINE__)
 
 ! Macro for testing for errors
-#define OMPVV_TEST_VERBOSE(condition) call test_error_verbose(condition, "condition", __FILENAME__, __LINE__)
+#ifdef __GFORTRAN__
+! gfortran invokes cpp in traditional mode that does not support the # operator.
+! Use the stringify method suggested by its manual:
+! https://gcc.gnu.org/onlinedocs/cpp/Traditional-macros.html
+#define OMPVV_STRINGIFY(x) "x"
+#define OMPVV_TEST_VERBOSE(condition) call test_error_verbose(condition, OMPVV_STRINGIFY(condition), __FILENAME__, __LINE__)
+#else
+! Assume ISO Standard C compliant preprocessor
+#define OMPVV_TEST_VERBOSE(condition) call test_error_verbose(condition, #condition, __FILENAME__, __LINE__)
+#endif
 
 ! Macro for setting errors on condition
 #define OMPVV_TEST_AND_SET(err, condition) err = err + test_and_set(condition, __FILENAME__, __LINE__)
