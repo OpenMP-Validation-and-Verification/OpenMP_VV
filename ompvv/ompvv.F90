@@ -82,7 +82,7 @@
 ! Use the stringify method suggested by its manual:
 ! https://gcc.gnu.org/onlinedocs/cpp/Traditional-macros.html
 #define OMPVV_STRINGIFY(x) "x"
-#define OMPVV_TEST_VERBOSE(condition) call test_error_verbose(condition, OMPVV_STRINGIFY(condition), __FILE__, __LINE__)
+#define OMPVV_TEST_VERBOSE(condition) call test_error_verbose(condition, OMPVV_STRINGIFY(condition), __FILENAME__, __LINE__)
 #else
 ! Assume ISO Standard C compliant preprocessor
 #define OMPVV_TEST_VERBOSE(condition) call test_error_verbose(condition, #condition, __FILENAME__, __LINE__)
