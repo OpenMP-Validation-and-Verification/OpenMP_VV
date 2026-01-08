@@ -52,10 +52,10 @@ int testTaskgraphGraphReset(void)
         }
     }
 
-    // taskgraph structured block must have executed at least N/2 times (is
-    // always creating a taskgraph record), and at most N times (if never
-    // creating a taskgraph record)
-    OMPVV_TEST_AND_SET_VERBOSE(errors, (N/2 <= x && x <= N));
+    // taskgraph structured block must have executed at least N/2 times
+    // (if always creating a taskgraph record on the first taskgraph construct encounter),
+    // and at most N times (if never creating a taskgraph record)
+    OMPVV_TEST_AND_SET_VERBOSE(errors, !(N/2 <= x && x <= N));
 
     // each triplets must have executed N times
     OMPVV_TEST_AND_SET_VERBOSE(errors, y != 3*N);
