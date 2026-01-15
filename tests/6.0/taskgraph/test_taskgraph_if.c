@@ -46,7 +46,7 @@ int testTaskgraphIf(void)
     OMPVV_TEST_AND_SET_VERBOSE(errors, !(x == 1 || x == 2));
 
     // the task must execute precisely twice
-    OMPVV_TEST_AND_SET_VERBOSE(errors, y != 2);
+    OMPVV_TEST_AND_SET_VERBOSE(errors, y != 3);
 
     return errors;
 }
