@@ -80,12 +80,12 @@ _Pragma("omp target map (from: _ompvv_isOffloadingOn)") \
 #define OMPVV_REPORT(err) { \
   OMPVV_INFOMSG("The value of " #err " is %d.", err); \
   if (_ompvv_isOffloadingOn == -1) \
-    if (err == -667) \
+    if (err == OMPVV_SKIPPED_EXIT_CODE) \
       printf("[OMPVV_RESULT: %s] Test %s.\n", __FILENAME__, "skipped"); \
     else \
       printf("[OMPVV_RESULT: %s] Test %s.\n", __FILENAME__, ((err) == 0)? "passed":"failed"); \
   else \
-    if (err == -667) \
+    if (err == OMPVV_SKIPPED_EXIT_CODE) \
       printf("[OMPVV_RESULT: %s] Test %s on the %s.\n", __FILENAME__, "skipped", (_ompvv_isOffloadingOn)? "device" : "host"); \
     else \
       printf("[OMPVV_RESULT: %s] Test %s on the %s.\n", __FILENAME__, ((err) == 0)? "passed":"failed", (_ompvv_isOffloadingOn)? "device" : "host"); \
@@ -124,6 +124,12 @@ _Pragma("omp target map (from: _ompvv_isOffloadingOn) map(to: _ompvv_isSharedEnv
   var2set = (_ompvv_isOffloadingOn && _ompvv_isSharedEnv == 1);\
   }
 
+// Macro for skipping a test
+#define OMPVV_CHECK_TO_SKIP(condition) { \
+  int SKIPPED_EXIT_CODE = OMPVV_SKIPPED_EXIT_CODE; \
+  if (condition) {OMPVV_REPORT_AND_RETURN(SKIPPED_EXIT_CODE)}; \
+ }
+
 // Macros to provide thread and team nums if they are not specified
 #ifndef OMPVV_NUM_THREADS_DEVICE
   #define OMPVV_NUM_THREADS_DEVICE 8
@@ -135,10 +141,6 @@ _Pragma("omp target map (from: _ompvv_isOffloadingOn) map(to: _ompvv_isSharedEnv
 
 #ifndef OMPVV_NUM_TEAMS_HOST
   #define OMPVV_NUM_TEAMS_HOST 4
-#endif
-
-#ifndef OMPVV_NUM_THREADS_HOST
-  #define OMPVV_NUM_THREADS_HOST 8
 #endif
 
 #ifndef OMPVV_NUM_THREADS_HOST
