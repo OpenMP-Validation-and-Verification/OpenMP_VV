@@ -36,6 +36,7 @@ int testTaskgraphParallel(void)
         {
             # pragma omp taskgraph
             {
+#pragma omp atomic update
                 ++x;
                 # pragma omp task shared(y)
                 {
