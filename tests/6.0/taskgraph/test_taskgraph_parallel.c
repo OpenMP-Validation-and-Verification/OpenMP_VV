@@ -36,8 +36,9 @@ int testTaskgraphParallel(void)
         {
             # pragma omp taskgraph
             {
-#pragma omp atomic update
-                ++x;
+                # pragma omp atomic update
+                    ++x;
+
                 # pragma omp task shared(y)
                 {
                     # pragma omp atomic
@@ -47,7 +48,7 @@ int testTaskgraphParallel(void)
         }
     }
     OMPVV_TEST_AND_SET_VERBOSE(errors, nthreads <= 0);
-    OMPVV_TEST_AND_SET_VERBOSE(errors, !(0 < x && x <= N));
+    OMPVV_TEST_AND_SET_VERBOSE(errors, !(0 <= x && x <= nthreads*N));
     OMPVV_TEST_AND_SET_VERBOSE(errors, y != nthreads*N);
 
     return errors;
