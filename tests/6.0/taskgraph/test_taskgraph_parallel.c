@@ -6,7 +6,7 @@
 // testTaskgraphParallel():
 // N times, have 'nthreads' threads call the same taskgraph construct
 //
-// ensure the structured block executed 1 to N times,
+// ensure the structured block executed 0 to N times,
 // and the replayable task 'N*nthreads' times
 //===----------------------------------------------------------------------===//
 

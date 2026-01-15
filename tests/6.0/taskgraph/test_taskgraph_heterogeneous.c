@@ -9,7 +9,9 @@
 // with (T1, T3) on device, (T2) on host.
 //
 // Ensures that
-//   - the structured block is executed 1 to N times
+//   - the structured block is executed 0 to N times
+//      - 0 if taskgraph record created prior to execution
+//      - N if taskgraph record is never created
 //   - 3*N tasks are executed/replayed
 //===----------------------------------------------------------------------===//
 
@@ -50,7 +52,7 @@ int testTaskgraphHeterogeneous(void)
         }
     }
 
-    OMPVV_TEST_AND_SET_VERBOSE(errors, !(0 < x && x <= N));
+    OMPVV_TEST_AND_SET_VERBOSE(errors, !(0 <= x && x <= N));
     OMPVV_TEST_AND_SET_VERBOSE(errors, y != 3*N);
     return errors;
 }

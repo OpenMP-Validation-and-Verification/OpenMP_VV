@@ -6,7 +6,7 @@
 // testTaskgraphId():
 // M times, run N taskgraphs constructs with id '0<=i<N' that spawns 3 tasks
 //  T1 -> T2 -> T3
-// Ensure that each taskgraph' structured block executed 1 to M times
+// Ensure that each taskgraph' structured block executed 0 to M times
 // Ensure that each triplets executed precisely M times
 //===----------------------------------------------------------------------===//
 
@@ -55,8 +55,8 @@ int testTaskgraphGraphId(void)
 
     for (int i = 0 ; i < N ; ++i)
     {
-        // each taskgraph strucuted block must have executed 1 to M times
-        OMPVV_TEST_AND_SET_VERBOSE(errors, !(0 < x[i] && x[i] <= M));
+        // each taskgraph strucuted block must have executed 0 to M times
+        OMPVV_TEST_AND_SET_VERBOSE(errors, !(0 <= x[i] && x[i] <= M));
 
         // each triplets must have executed M times
         OMPVV_TEST_AND_SET_VERBOSE(errors, y[i] != 3*M);

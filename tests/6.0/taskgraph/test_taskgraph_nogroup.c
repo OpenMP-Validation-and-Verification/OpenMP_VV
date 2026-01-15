@@ -4,8 +4,9 @@
 //
 // Description
 // testTaskgraphNoGroup():
-// Run a taskgraph nogroup construct N times,
-// ensures the structured block is executed from 1 to N times
+// Run a taskgraph nogroup construct N times with 1 task.
+// Ensures the structured block is executed from 0 to N times
+// Ensures the task is executed N times
 //===----------------------------------------------------------------------===//
 
 #include <stdio.h>
@@ -39,7 +40,7 @@ int testTaskgraphNoGroup(void)
             }
         }
     }
-    OMPVV_TEST_AND_SET_VERBOSE(errors, !(0 < x && x <= N));
+    OMPVV_TEST_AND_SET_VERBOSE(errors, !(0 <= x && x <= N));
     OMPVV_TEST_AND_SET_VERBOSE(errors, y != N);
     return errors;
 }

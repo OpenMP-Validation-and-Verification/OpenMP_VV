@@ -5,12 +5,12 @@
 // Description
 // testTaskgraphIf():
 // Call
-//  taskgraph if(0) --> execute taskgraph construct, optionally creating a taskgraph record
-//  taskgraph if(1) --> skip
-//  taskgraph if(2) --> execute taskgraph construct, maybe replay taskgraph
-//                      record, or optionally create a taskgraph record
-// ensures that the structured block is executed 1 or 2 times
-// ensures that tasks are executed twice
+//  taskgraph i=0 if(true)  --> execute taskgraph construct, optionally creating a taskgraph record
+//  taskgraph i=1 if(false) --> execute taskgraph construct, not creating a record, nor replaying a previous record
+//  taskgraph i=2 if(true)  --> execute taskgraph construct, maybe replay taskgraph record, or optionally create a taskgraph record
+//
+// Ensures that the structured block is executed when if(false) is present
+// Ensures that tasks are executed three times
 //===----------------------------------------------------------------------===//
 
 #include <stdio.h>
