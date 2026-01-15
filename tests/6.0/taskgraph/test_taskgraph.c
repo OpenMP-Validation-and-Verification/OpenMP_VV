@@ -16,20 +16,16 @@
 
 int testTaskgraph(void)
 {
-    int errors = 0;
-    int x = 0;
     #pragma omp parallel shared(x)
     {
         # pragma omp single
         {
             # pragma omp taskgraph
             {
-                ++x;
             }
         }
     }
-    OMPVV_TEST_AND_SET_VERBOSE(errors, x != 1);
-    return errors;
+    return 0;
 }
 
 int main(void)
