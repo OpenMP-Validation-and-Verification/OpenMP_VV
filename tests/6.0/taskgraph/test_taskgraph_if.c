@@ -24,7 +24,8 @@ int testTaskgraphIf(void)
     int errors = 0;
     int x = 0;
     int y = 0;
-    #pragma omp parallel shared(x, y)
+
+    # pragma omp parallel shared(x, y)
     {
         # pragma omp single
         {
@@ -32,7 +33,8 @@ int testTaskgraphIf(void)
             {
                 # pragma omp taskgraph if(i != 1)
                 {
-                    ++x;
+                    if (i == 1)
+                        ++x;
 
                     # pragma omp task shared(y)
                         ++y;
@@ -41,11 +43,10 @@ int testTaskgraphIf(void)
         }
     }
 
-    // the structured block must have been executed once or twice
-    // (once if creating a taskgraph record, twice if creating no taskgraph record)
-    OMPVV_TEST_AND_SET_VERBOSE(errors, !(x == 1 || x == 2));
+    // the structured block must have been executed at least once on i=1
+    OMPVV_TEST_AND_SET_VERBOSE(errors, x != 1);
 
-    // the task must execute precisely twice
+    // the task must have executed 3 times
     OMPVV_TEST_AND_SET_VERBOSE(errors, y != 3);
 
     return errors;
