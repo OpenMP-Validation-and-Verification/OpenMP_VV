@@ -18,11 +18,9 @@ contains
         real :: a
         real, dimension(n) :: x
         real, dimension(n) :: y
-        !!$omp target teams workdistribute map(to:x) map(tofrom:y)
-        !$omp target map(to:x) map(tofrom:y)
+        !$omp target teams workdistribute map(to:x) map(tofrom:y)
             y = a * x + y
-        !$omp end target 
-        !!$omp end target teams workdistribute
+        !$omp end target teams workdistribute
     end subroutine axpy_workdistribute
 end module axpy_mod
 
@@ -35,14 +33,12 @@ contains
     integer :: n
     real, dimension(n, n) :: aa, bb, cc
     real, dimension(n, n) :: dd, ee, ff
-    !!$omp target teams workdistribute map(to:bb,dd,ee) &
-    !$omp target map(to:bb,dd,ee) &
+    !$omp target teams workdistribute map(to:bb,dd,ee) &
     !$omp map(tofrom:cc) map(from:aa,ff)
       aa = bb + cc
       cc = dd + ee
       ff = aa + cc
-    !$omp end target 
-    !!$omp end target teams workdistribute
+    !$omp end target teams workdistribute
   end subroutine array_ops
 end module workdistribute_2
 
@@ -57,15 +53,13 @@ contains
     real, dimension(n) :: dd
     real :: f
 
-    !!$omp target teams workdistribute map(to:bb,cc) &
-    !$omp target map(to:bb,cc) &
+    !$omp target teams workdistribute map(to:bb,cc) &
     !$omp map(from:aa,dd,f,ee)
       aa = bb + cc
       dd = sum(aa, 1)
       f = minval(dd)
       ee = aa ** f
-    !$omp end target 
-    !!$omp end target teams workdistribute
+    !$omp end target teams workdistribute
   end subroutine array_transform
 end module workdistribute_3
 
@@ -122,15 +116,15 @@ program test_omp_workdistribute
       errors = errors + 1
     END IF 
 
-    ! call array_ops(aa1, bb1, cc1, dd1, ee1, ff1, N)
-    ! IF (sum(bb1 + prior_cc1 + dd1 + ee1) .NE. sum(ff1)) THEN
-    !   errors = errors + 1
-    ! END IF
+    call array_ops(aa1, bb1, cc1, dd1, ee1, ff1, N)
+    IF (sum(bb1 + prior_cc1 + dd1 + ee1) .NE. sum(ff1)) THEN
+      errors = errors + 1
+    END IF
 
-    ! call array_transform(aa2, bb2, cc2, dd2, ee2, N)
-    ! IF ( sum((bb2 + cc2) ** minval(sum(bb2, 1) + sum(cc2, 1))) .NE. sum(ee2)) THEN
-    !   errors = errors + 1
-    ! END IF
+    call array_transform(aa2, bb2, cc2, dd2, ee2, N)
+    IF ( sum((bb2 + cc2) ** minval(sum(bb2, 1) + sum(cc2, 1))) .NE. sum(ee2)) THEN
+      errors = errors + 1
+    END IF
 
     OMPVV_ERROR_IF(errors /= 0, "The workdistribute directive did not perform as expected.")
     OMPVV_REPORT_AND_RETURN()
