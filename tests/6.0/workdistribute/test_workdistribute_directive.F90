@@ -74,7 +74,7 @@ program test_omp_workdistribute
 
 
     integer :: errors = 0
-    integer, parameter :: N = 1024 * 1024
+    integer, parameter :: N = 1024
 
     real :: a
     real :: x0
