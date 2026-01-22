@@ -54,14 +54,14 @@ int test_declare_mapper_present() {
   s.data = (int *)calloc(N,sizeof(int));
   s.len  = N;
 
-  #pragma omp target enter data map(to: s.len, s.data[0:s.len])
+  #pragma omp target enter data map(to: s.len, s.data[0:s.len]) map(alloc: s.data)
 
   #pragma omp target
   {
     init(&s);
   }
 
-  #pragma omp target exit data map(delete: s.len, s.data[0:s.len])
+  #pragma omp target exit data map(delete: s.len, s.data, s.data[0:s.len])
 
   for (int i = 0; i < N; ++i) {
     OMPVV_TEST_AND_SET(errors, s.data[i] != i);
