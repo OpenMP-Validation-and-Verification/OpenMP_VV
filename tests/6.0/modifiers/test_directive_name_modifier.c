@@ -1,37 +1,32 @@
 //--------------- test_directive_name_modifier.c -----------------------------//
 // OpenMP API Version 6.0 November 2024
 // Pg. 898, line 3
-// CLAUSE:if, private
+// CLAUSE:firstprivate
 // All modifiers to clauses were extended to accept directive-name-modifiers.
-// In this case, the private clause is being used with the parallel
-// directive-name-modifier. If the threads correctly privatize thread_id,
-// then the test will pass.
+// In this case, the firstprivate clause is being used with the target
+// directive-name-modifier. If the threads correctly firstprivatize
+// shared_value, then the test will pass.
 //----------------------------------------------------------------------------//
 
 #include "ompvv.h"
 #include <omp.h>
 
-#define N OMPVV_NUM_THREADS_HOST
+#define N OMPVV_NUM_THREADS_DEVICE
 
 int test_directive_name_modifier() {
   int errors = 0;
-  int thread_array[N] = {0};
-  int thread_id = -1;
 
-#pragma omp parallel for private(parallel : thread_id)
-  {
-    for (int i = 0; i < N; i++) {
-      thread_id = omp_get_thread_num();
-      thread_array[thread_id] = thread_id;
-    }
-  }
+  int shared_value = 0;
 
+  #pragma omp target teams distribute firstprivate(target : shared_value) \
+    map(from : shared_value)
   for (int i = 0; i < N; ++i) {
-    for (int j = i + 1; j < N; ++j) {
-      if (thread_array[i] == thread_array[j])
-        errors++;
-    }
+    #pragma omp atomic update
+    shared_value++;
   }
+
+  if (shared_value != N)
+    errors++;
 
   return errors;
 }
