@@ -85,7 +85,9 @@
 #define OMPVV_TEST_VERBOSE(condition) call test_error_verbose(condition, OMPVV_STRINGIFY(condition), __FILENAME__, __LINE__)
 #else
 ! Assume ISO Standard C compliant preprocessor
-#define OMPVV_TEST_VERBOSE(condition) call test_error_verbose(condition, #condition, __FILENAME__, __LINE__)
+#define OMPVV_STRINGIFY(x) "x"
+#define OMPVV_TEST_VERBOSE(condition) call test_error_verbose(condition, OMPVV_STRINGIFY(condition), __FILENAME__, __LINE__)
+!#define OMPVV_TEST_VERBOSE(condition) call test_error_verbose(condition, #condition, __FILENAME__, __LINE__)
 #endif
 
 ! Macro for setting errors on condition
@@ -121,9 +123,10 @@ OMPVV_MODULE_REQUIRES_LINE
     LOGICAL, PRIVATE :: ompvv_isHost = .true.
     INTEGER, PRIVATE :: ompvv_errors = 0
     LOGICAL, PRIVATE :: ompvv_sharedEnv
+    !$omp declare target to(ompvv_errors)
   contains
     function clean_fn(fn)
-      CHARACTER(len = *) :: fn
+      CHARACTER(len = 10) :: fn
       CHARACTER(len = 400) :: clean_fn
       INTEGER :: fn_cut_point
 
@@ -177,8 +180,9 @@ OMPVV_MODULE_REQUIRES_LINE
 
     ! Function to test an error and register in the error variable
     subroutine test_error(condition, fn, ln)
+      !$omp declare target
       LOGICAL, INTENT(IN) :: condition
-      CHARACTER(len=*) :: fn
+      CHARACTER(len=500) :: fn
       INTEGER :: ln
 
       ! Avoid unused variables warning
@@ -221,8 +225,9 @@ OMPVV_MODULE_REQUIRES_LINE
 
     ! Function to test an error condition and return the current value of ompvv_errors
     function test_and_set(condition, fn, ln)
+      !$omp declare target
       LOGICAL, INTENT(IN) :: condition
-      CHARACTER(len=*), INTENT(IN) :: fn
+      CHARACTER(len=500), INTENT(IN) :: fn
       INTEGER, INTENT(IN) :: ln
       INTEGER :: test_and_set, err_bf
       err_bf = ompvv_errors
