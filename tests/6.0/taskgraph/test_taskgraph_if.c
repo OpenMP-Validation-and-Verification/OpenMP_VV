@@ -1,0 +1,60 @@
+//===-- test_taskgraph_if.c ------------------------------------------------===//
+//
+// OpenMP API Version 6.0 Nov 2024
+//
+// Description
+// testTaskgraphIf():
+// Call
+//  taskgraph i=0 if(true)  --> execute taskgraph construct, optionally creating a taskgraph record
+//  taskgraph i=1 if(false) --> execute taskgraph construct, not creating a record, nor replaying a previous record
+//  taskgraph i=2 if(true)  --> execute taskgraph construct, maybe replay taskgraph record, or optionally create a taskgraph record
+//
+// Ensures that the structured block is executed when if(false) is present
+// Ensures that tasks are executed three times
+//===----------------------------------------------------------------------===//
+
+#include <stdio.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <omp.h>
+#include "ompvv.h"
+
+int testTaskgraphIf(void)
+{
+    int errors = 0;
+    int x = 0;
+    int y = 0;
+
+    # pragma omp parallel shared(x, y)
+    {
+        # pragma omp single
+        {
+            for (int i = 0 ; i < 3 ; ++i)
+            {
+                # pragma omp taskgraph if(i != 1)
+                {
+                    if (i == 1)
+                        ++x;
+
+                    # pragma omp task shared(y)
+                        ++y;
+                }
+            }
+        }
+    }
+
+    // the structured block must have been executed at least once on i=1
+    OMPVV_TEST_AND_SET_VERBOSE(errors, x != 1);
+
+    // the task must have executed 3 times
+    OMPVV_TEST_AND_SET_VERBOSE(errors, y != 3);
+
+    return errors;
+}
+
+int main(void)
+{
+    int errors = 0;
+    OMPVV_TEST_AND_SET_VERBOSE(errors, testTaskgraphIf());
+    OMPVV_REPORT_AND_RETURN(errors);
+}
