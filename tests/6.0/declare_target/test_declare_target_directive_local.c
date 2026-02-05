@@ -71,7 +71,7 @@ int test_declare_target_local() {
 }
 
 int main() {
-  int errors = 0, test_exit_code = 0;
+  int errors = 0;
   int TotGpus = omp_get_num_devices();
   OMPVV_WARNING_IF(TotGpus < 1, "Test requires non-host devices, but none were "
                                 "found. \n This test will be skipped.\n");
