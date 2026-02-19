@@ -77,7 +77,7 @@
 #define OMPVV_TEST(condition) call test_error(condition, __FILENAME__, __LINE__)
 
 ! Macro for testing for errors
-#ifdef __GFORTRAN__
+#ifdef __GFORTRAN__ || _CRAYFTN
 ! gfortran invokes cpp in traditional mode that does not support the # operator.
 ! Use the stringify method suggested by its manual:
 ! https://gcc.gnu.org/onlinedocs/cpp/Traditional-macros.html
