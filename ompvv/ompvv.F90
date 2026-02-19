@@ -123,11 +123,11 @@ OMPVV_MODULE_REQUIRES_LINE
     LOGICAL, PRIVATE :: ompvv_isHost = .true.
     INTEGER, PRIVATE :: ompvv_errors = 0
     LOGICAL, PRIVATE :: ompvv_sharedEnv
-    !$omp declare target to(ompvv_errors)
+!$omp declare target to(ompvv_errors)
   contains
     function clean_fn(fn)
-      CHARACTER(len = 10) :: fn
-      CHARACTER(len = 400) :: clean_fn
+      CHARACTER(len=*) :: fn
+      CHARACTER(len=400) :: clean_fn
       INTEGER :: fn_cut_point
 
       ! Avoid unused variables warning
@@ -180,7 +180,7 @@ OMPVV_MODULE_REQUIRES_LINE
 
     ! Function to test an error and register in the error variable
     subroutine test_error(condition, fn, ln)
-      !$omp declare target
+!$omp declare target
       LOGICAL, INTENT(IN) :: condition
       CHARACTER(len=500) :: fn
       INTEGER :: ln
@@ -225,7 +225,7 @@ OMPVV_MODULE_REQUIRES_LINE
 
     ! Function to test an error condition and return the current value of ompvv_errors
     function test_and_set(condition, fn, ln)
-      !$omp declare target
+!$omp declare target
       LOGICAL, INTENT(IN) :: condition
       CHARACTER(len=500), INTENT(IN) :: fn
       INTEGER, INTENT(IN) :: ln
