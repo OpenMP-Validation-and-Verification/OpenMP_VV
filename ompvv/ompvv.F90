@@ -77,7 +77,7 @@
 #define OMPVV_TEST(condition) call test_error(condition, __FILENAME__, __LINE__)
 
 ! Macro for testing for errors
-#ifdef __GFORTRAN__
+#ifdef __GFORTRAN__ || _CRAYFTN
 ! gfortran invokes cpp in traditional mode that does not support the # operator.
 ! Use the stringify method suggested by its manual:
 ! https://gcc.gnu.org/onlinedocs/cpp/Traditional-macros.html
@@ -85,9 +85,7 @@
 #define OMPVV_TEST_VERBOSE(condition) call test_error_verbose(condition, OMPVV_STRINGIFY(condition), __FILENAME__, __LINE__)
 #else
 ! Assume ISO Standard C compliant preprocessor
-#define OMPVV_STRINGIFY(x) "x"
-#define OMPVV_TEST_VERBOSE(condition) call test_error_verbose(condition, OMPVV_STRINGIFY(condition), __FILENAME__, __LINE__)
-!#define OMPVV_TEST_VERBOSE(condition) call test_error_verbose(condition, #condition, __FILENAME__, __LINE__)
+#define OMPVV_TEST_VERBOSE(condition) call test_error_verbose(condition, #condition, __FILENAME__, __LINE__)
 #endif
 
 ! Macro for setting errors on condition
@@ -123,11 +121,10 @@ OMPVV_MODULE_REQUIRES_LINE
     LOGICAL, PRIVATE :: ompvv_isHost = .true.
     INTEGER, PRIVATE :: ompvv_errors = 0
     LOGICAL, PRIVATE :: ompvv_sharedEnv
-!$omp declare target to(ompvv_errors)
   contains
     function clean_fn(fn)
-      CHARACTER(len=*) :: fn
-      CHARACTER(len=400) :: clean_fn
+      CHARACTER(len = *) :: fn
+      CHARACTER(len = 400) :: clean_fn
       INTEGER :: fn_cut_point
 
       ! Avoid unused variables warning
@@ -180,9 +177,8 @@ OMPVV_MODULE_REQUIRES_LINE
 
     ! Function to test an error and register in the error variable
     subroutine test_error(condition, fn, ln)
-!$omp declare target
       LOGICAL, INTENT(IN) :: condition
-      CHARACTER(len=500) :: fn
+      CHARACTER(len=*) :: fn
       INTEGER :: ln
 
       ! Avoid unused variables warning
@@ -225,9 +221,8 @@ OMPVV_MODULE_REQUIRES_LINE
 
     ! Function to test an error condition and return the current value of ompvv_errors
     function test_and_set(condition, fn, ln)
-!$omp declare target
       LOGICAL, INTENT(IN) :: condition
-      CHARACTER(len=500), INTENT(IN) :: fn
+      CHARACTER(len=*), INTENT(IN) :: fn
       INTEGER, INTENT(IN) :: ln
       INTEGER :: test_and_set, err_bf
       err_bf = ompvv_errors
