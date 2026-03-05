@@ -20,7 +20,7 @@ int test_directive_name_modifier() {
   int final_shared = 0;
   int i = 0;
 
-  #pragma omp target teams distribute firstprivate(target : shared_value) \
+  #pragma omp target teams distribute firstprivate(target : shared_value) num_teams(M) \
     map(from : final_shared)
   for (i = 0; i < N; ++i) {
     #pragma omp atomic update
