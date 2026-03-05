@@ -42,7 +42,7 @@ int test_directive_name_modifier() {
   }
 
   for (i = 0; i < M; ++i) {
-    OMPVV_TEST_AND_SET(errors, shared_val_arr[i] != i);
+    OMPVV_TEST_AND_SET(errors, shared_val_arr[i] != 5 + i);
   }
   OMPVV_TEST_AND_SET(errors, shared_value != 5);
 
