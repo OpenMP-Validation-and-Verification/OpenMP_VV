@@ -11,7 +11,7 @@
 #include "ompvv.h"
 #include <omp.h>
 
-#define N OMPVV_NUM_THREADS_DEVICE
+#define N 1000
 #define M OMPVV_NUM_TEAMS_DEVICE
 
 int test_directive_name_modifier() {
@@ -20,8 +20,7 @@ int test_directive_name_modifier() {
   int final_shared = 0;
   int i = 0;
 
-  //#pragma omp target teams distribute firstprivate(target : shared_value)
-  #pragma omp target teams distribute firstprivate(shared_value) \
+  #pragma omp target teams distribute firstprivate(target : shared_value) \
     map(from : final_shared)
   for (i = 0; i < N; ++i) {
     #pragma omp atomic update
@@ -34,8 +33,8 @@ int test_directive_name_modifier() {
 
   shared_value = 5;
   int shared_val_arr[M] = {-1};
-  //#pragma omp target teams distribute firstprivate(teams : shared_value)
-  #pragma omp target teams distribute firstprivate(shared_value) \
+
+  #pragma omp target teams distribute firstprivate(teams : shared_value) \
     map(from : shared_val_arr)
   for (i = 0; i < M; ++i) {
     shared_value += omp_get_team_num();
@@ -43,7 +42,7 @@ int test_directive_name_modifier() {
   }
 
   for (i = 0; i < M; ++i) {
-    OMPVV_TEST_AND_SET(errors, shared_val_arr[i] != i*(i+1)/2);
+    OMPVV_TEST_AND_SET(errors, shared_val_arr[i] != i);
   }
   OMPVV_TEST_AND_SET(errors, shared_value != 5);
 
