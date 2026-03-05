@@ -34,7 +34,7 @@ int test_directive_name_modifier() {
   shared_value = 5;
   int shared_val_arr[M] = {-1};
 
-  #pragma omp target teams distribute firstprivate(teams : shared_value) \
+  #pragma omp target teams distribute firstprivate(teams : shared_value) num_teams(M) \
     map(from : shared_val_arr)
   for (i = 0; i < M; ++i) {
     shared_value += omp_get_team_num();
