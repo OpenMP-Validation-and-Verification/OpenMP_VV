@@ -37,10 +37,10 @@ CONTAINS
     !$omp parallel num_threads(2) private(thrd, tmp)
     thrd = omp_get_thread_num()
     IF( thrd .EQ. 0 ) THEN
-      y = 1
       !$omp atomic write seq_cst 
       x = 10
       !$omp end atomic
+      y = 1
     ELSE
       tmp = 0
       DO WHILE ( y .NE. 5 )
