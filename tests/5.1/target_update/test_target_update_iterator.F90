@@ -65,7 +65,7 @@ CONTAINS
         CALL init(new_struct)
 
         !$omp target enter data map(to: new_struct%data)
-        !$omp target map(to: new_struct, new_struct%data) map(tofrom: A) 
+        !$omp target map(to: new_struct%data) map(tofrom: A) private(i)
         ! pointer attachment
         DO i = 1, N
             A(i) = new_struct%data(i)
@@ -75,7 +75,7 @@ CONTAINS
         CALL init_again(new_struct)
         ! update with new values, (i*2)+1
         !$omp target update to(iterator(it = 1:N): new_struct%data(it))
-        !$omp target map(tofrom: A)
+        !$omp target map(tofrom: A) private(i)
         DO i = 1, N
             A(i) = A(i) + new_struct%data(i)
         END DO
