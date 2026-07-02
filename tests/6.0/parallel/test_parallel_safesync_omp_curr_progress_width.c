@@ -28,26 +28,29 @@ int test_directive() {
   for (int i = 0; i < N; i++)
     b[i] = i, a[i] = 0;
 
+  
   #pragma omp target thread_limit(OMPVV_NUM_THREADS_DEVICE) \
     map(to : count1, count2) map(a) map(to : b) map(tofrom : num_threads)
   #pragma omp parallel num_threads(OMPVV_NUM_THREADS_DEVICE) safesync(omp_curr_progress_width)
   {
-    if (omp_get_thread_num() == 0) {
-      num_threads = omp_get_num_threads();
-    }
-    int t, u;
-    #pragma omp atomic capture
-    t = ++count1;
-    do {
-      #pragma omp atomic read acquire
-      u = count2;
-    } while (u < t);
+    if(omp_get_thread_num() % omp_curr_progress_width == 0){
+      if (omp_get_thread_num() == 0) {
+        num_threads = omp_get_num_threads();
+      }
+      int t, u;
+      #pragma omp atomic capture
+      t = ++count1;
+      do {
+        #pragma omp atomic read acquire
+        u = count2;
+      } while (u < t);
 
-    for (int i = 0; i < N; i++) {
-      a[i] += b[i];
+      for (int i = 0; i < N; i++) {
+        a[i] += b[i];
+      }
+      #pragma omp atomic release
+      count2++;
     }
-    #pragma omp atomic release
-    count2++;
   }
 
   for (int i = 0; i < N; i++) {
