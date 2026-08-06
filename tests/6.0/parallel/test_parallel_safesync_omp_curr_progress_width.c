@@ -7,7 +7,7 @@
 // ***********
 // Code is adapted from the safesync clause example in the 6.0 examples
 // document. This example uses a ticket lock implementation which executes in
-// the target region. Only a single thread will execute this region.
+// the target region. Only a single thread per progress-unit will execute this region.
 // If no deadlock or improper update of the arrays
 // occurs, then this indicates the safesync clause is working correctly.
 //----------------------------------------------------------------------------//
