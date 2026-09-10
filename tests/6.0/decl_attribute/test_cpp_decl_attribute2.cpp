@@ -24,7 +24,7 @@ int main(void) {
   int errors = 0;
   int num_devices = omp_get_num_devices();
 
-  [[omp :: directive(target, map(always, from: on_host))]]
+#pragma omp target map(always, from: on_host)
   { update(); }
 
   if (num_devices > 0) {
