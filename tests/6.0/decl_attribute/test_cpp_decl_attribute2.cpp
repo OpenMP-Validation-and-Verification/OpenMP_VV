@@ -3,25 +3,29 @@
 // OpenMP API Version 6.0 November 2024
 //
 // ***********
-// DIRECTIVE:target
-// CLAUSE:map
+// DIRECTIVE:declare target
+// CLAUSE:enter
 // ***********
 //
 // This test checks the usage of the decl attribute for a directive-specification 
-// with target as the directive and map as the optional clause. The test will pass
-// when offloading succeeds or when num_devices == 0.
+// with declare target as the directive and enter as the optional clause. The test
+// will pass when offloading succeeds or when num_devices == 0.
 //
 //===-------------------------------------------------------------------------===//
 #include <omp.h>
 #include "ompvv.h"
 
+[[omp :: decl(declare target, enter)]] int on_host = 1;
+
+[[omp :: decl(declare target)]]
+void update() { on_host = omp_is_initial_device(); }
+
 int main(void) {
   int errors = 0;
-  int on_host = 1;
   int num_devices = omp_get_num_devices();
 
-  [[omp :: decl( target map(from: on_host) )]]
-  { on_host = omp_is_initial_device(); }
+#pragma omp target map(always, from: on_host)
+  { update(); }
 
   if (num_devices > 0) {
     OMPVV_ERROR_IF(
