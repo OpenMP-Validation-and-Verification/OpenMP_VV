@@ -1,4 +1,4 @@
-!===----test_workdistribute_directive.F90-----------------------------------===//
+!===----test_loop_iterator_lastprivate.F90-----------------------------------===//
 !
 ! OpenMP API Version 6.0 Nov 2024
 ! Pg. 901
