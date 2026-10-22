@@ -8,68 +8,108 @@
 
 #include "ompvv.F90"
 
-program test_loop_lastprivate_driver
+program test_loop_lastprivate
     use iso_fortran_env
     use ompvv_lib
     use omp_lib
     implicit none
 
-    integer :: errors = 0
+    integer, parameter :: m = 32, n = 10
+    integer :: errors_none, errors_parallel, errors_teams
 
-    ! Test all combinations of the two IF clauses.
-    if (.not. test_loop_lastprivate(.false., .false.)) errors = errors + 1
-    if (.not. test_loop_lastprivate(.false., .true.))  errors = errors + 1
-    if (.not. test_loop_lastprivate(.true.,  .false.)) errors = errors + 1
-    if (.not. test_loop_lastprivate(.true.,  .true.))  errors = errors + 1
+    OMPVV_TEST_OFFLOADING
 
-    OMPVV_ERROR_IF(errors /= 0, &
-        "The lastprivate behavior was not observed as expected.")
+    errors_none = test_loop_lastprivate_none()
+    errors_parallel = test_loop_lastprivate_parallel()
+    errors_teams = test_loop_lastprivate_target_teams()
+
+    OMPVV_ERROR_IF(errors_none /= 0, "Lastprivate failed without OpenMP constructs.")
+    OMPVV_ERROR_IF(errors_parallel /= 0, "Lastprivate failed with the parallel construct.")
+    OMPVV_ERROR_IF(errors_teams /= 0, "Lastprivate failed with parallel and target teams.")
 
     OMPVV_REPORT_AND_RETURN()
 
 contains
 
-    logical function test_loop_lastprivate(parallel_if, target_teams_if) &
-        result(passed)
-
-        logical, intent(in) :: parallel_if, target_teams_if
-
-        integer, parameter :: m = 32, n = 10
+    integer function test_loop_lastprivate_none() result(errors)
         real :: a(m,n)
         integer :: i, j
 
-        passed = .true.
-
-        !$omp target teams if(target: target_teams_if) &
-
-        !$omp& num_teams(4) map(tofrom: a, i, j)
-        !$omp loop bind(teams)
         do j = 1, n
-            !$omp parallel if(parallel_if)
-            !$omp loop
             do i = 1, m
                 a(i,j) = 10*i + j
             end do
-            !$omp end loop
-            !$omp end parallel
+        end do
+
+        errors = merge(1, 0, i /= m+1) &
+               + merge(1, 0, j /= n+1)
+
+        associate(aseq => reshape( &
+            [((10*i + j, i=1,m), j=1,n)], [m,n]))
+            errors = errors + merge(1, 0, any(a /= aseq))
+        end associate
+
+    end function test_loop_lastprivate_none
+
+
+    integer function test_loop_lastprivate_parallel() result(errors)
+        real :: a(m,n)
+        integer :: i, j
+
+        !$omp parallel
+        !$omp loop collapse(2)
+        do j = 1, n
+            do i = 1, m
+                a(i,j) = 10*i + j
+            end do
+        end do
+        !$omp end loop
+        !$omp end parallel
+
+        errors = merge(1, 0, i /= m+1) &
+               + merge(1, 0, j /= n+1)
+
+        associate(aseq => reshape( &
+            [((10*i + j, i=1,m), j=1,n)], [m,n]))
+            errors = errors + merge(1, 0, any(a /= aseq))
+        end associate
+
+    end function test_loop_lastprivate_parallel
+
+
+    integer function test_loop_lastprivate_target_teams() result(errors)
+        real :: a(m,n)
+        integer :: i_last(n)
+        integer :: i, j
+
+        !$omp target teams num_teams(4) map(from: a, i_last)
+        !$omp loop bind(teams)
+        do j = 1, n
+            block
+                integer :: i
+
+                !$omp parallel
+                !$omp loop
+                do i = 1, m
+                    a(i,j) = 10*i + j
+                end do
+                !$omp end loop
+                !$omp end parallel
+
+                i_last(j) = i
+            end block
         end do
         !$omp end loop
         !$omp end target teams
 
-        ! Check the implicit lastprivate behavior.
-        if (i /= m+1 .or. j /= n+1) then
-            passed = .false.
-        end if
+        errors = merge(1, 0, j /= n+1) &
+               + count(i_last /= m+1)
 
-        ! Check the array contents.
         associate(aseq => reshape( &
             [((10*i + j, i=1,m), j=1,n)], [m,n]))
-            if (any(a /= aseq)) then
-                OMPVV_WARNING("The shape of the array a is not as expected.")
-                passed = .false.
-            end if
+            errors = errors + merge(1, 0, any(a /= aseq))
         end associate
 
-    end function test_loop_lastprivate
+    end function test_loop_lastprivate_target_teams
 
-end program test_loop_lastprivate_driver
+end program test_loop_lastprivate
