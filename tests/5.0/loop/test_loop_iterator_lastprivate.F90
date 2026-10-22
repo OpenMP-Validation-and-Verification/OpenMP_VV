@@ -23,7 +23,7 @@ program test_loop_lastprivate
     errors_parallel = test_loop_lastprivate_parallel()
     errors_teams = test_loop_lastprivate_target_teams()
 
-    OMPVV_ERROR_IF(errors_none /= 0, "Lastprivate failed without OpenMP constructs.")
+    OMPVV_ERROR_IF(errors_none /= 0, "Lastprivate failed with just the loop construct.")
     OMPVV_ERROR_IF(errors_parallel /= 0, "Lastprivate failed with the parallel construct.")
     OMPVV_ERROR_IF(errors_teams /= 0, "Lastprivate failed with parallel and target teams.")
 
@@ -35,11 +35,13 @@ contains
         real :: a(m,n)
         integer :: i, j
 
+        !$omp loop bind(thread)
         do j = 1, n
             do i = 1, m
                 a(i,j) = 10*i + j
             end do
         end do
+        !$omp end loop
 
         errors = merge(1, 0, i /= m+1) &
                + merge(1, 0, j /= n+1)
@@ -57,7 +59,7 @@ contains
         integer :: i, j
 
         !$omp parallel
-        !$omp loop collapse(2)
+        !$omp loop
         do j = 1, n
             do i = 1, m
                 a(i,j) = 10*i + j
