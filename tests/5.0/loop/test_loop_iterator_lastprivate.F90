@@ -35,7 +35,7 @@ contains
         real :: a(m,n)
         integer :: i, j
 
-        !$omp loop bind(thread)
+        !$omp loop collapse(2)
         do j = 1, n
             do i = 1, m
                 a(i,j) = 10*i + j
@@ -59,7 +59,7 @@ contains
         integer :: i, j
 
         !$omp parallel
-        !$omp loop
+        !$omp loop collapse(2)
         do j = 1, n
             do i = 1, m
                 a(i,j) = 10*i + j
@@ -82,9 +82,9 @@ contains
     integer function test_loop_lastprivate_target_teams() result(errors)
         real :: a(m,n)
         integer :: i_last(n)
-        integer :: i, j
+        integer :: i, j, j_last
 
-        !$omp target teams num_teams(4) map(from: a, i_last)
+        !$omp target teams num_teams(4) map(from: a, i_last, j_last)
         !$omp loop bind(teams)
         do j = 1, n
             block
@@ -102,9 +102,10 @@ contains
             end block
         end do
         !$omp end loop
+        j_last = j
         !$omp end target teams
 
-        errors = merge(1, 0, j /= n+1) &
+        errors = merge(1, 0, j_last /= n+1) &
                + count(i_last /= m+1)
 
         associate(aseq => reshape( &
