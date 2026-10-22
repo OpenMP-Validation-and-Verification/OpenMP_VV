@@ -35,7 +35,7 @@ contains
         real :: a(m,n)
         integer :: i, j
 
-        !$omp loop collapse(2)
+        !$omp loop collapse(2) bind(thread)
         do j = 1, n
             do i = 1, m
                 a(i,j) = 10*i + j
