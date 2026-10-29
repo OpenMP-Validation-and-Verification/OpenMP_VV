@@ -93,7 +93,7 @@ _Pragma("omp target map (from: _ompvv_isOffloadingOn)") \
 
 // Macro for correct exit code
 #define OMPVV_RETURN(err) { \
-  return err; \
+  return ((err) == OMPVV_SKIPPED_EXIT_CODE) ? OMPVV_SKIPPED_EXIT_CODE : (((err) == 0) ? EXIT_SUCCESS : EXIT_FAILURE); \
 }
 
 // Macro for report and exit
