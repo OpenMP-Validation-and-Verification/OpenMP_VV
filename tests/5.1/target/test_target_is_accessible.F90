@@ -53,7 +53,7 @@ CONTAINS
         OMPVV_TEST_AND_SET(errors, fptr(i) .NE. 5*i)
       END DO
     ELSE
-      OMPVV_WARNING_IF(check_test.EQ.0, "omp_target_is_accessible returned false. The device access check is skipped.\n");
+      OMPVV_WARNING_IF(check_test.EQ.0, "omp_target_is_accessible returned false. The test will be skipped.\n");
     END IF
 
     DEALLOCATE(fptr)
