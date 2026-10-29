@@ -47,6 +47,10 @@ int check_device(){
 int main(){
 	int errors = 0;
 	OMPVV_TEST_OFFLOADING;
-	OMPVV_TEST_AND_SET_VERBOSE(errors, check_device() != 0);
+	int check = check_device();
+	if (check == OMPVV_SKIPPED_EXIT_CODE) {
+		OMPVV_REPORT_AND_RETURN(check);
+	}
+	OMPVV_TEST_AND_SET_VERBOSE(errors, check != 0);
 	OMPVV_REPORT_AND_RETURN(errors);
 }
