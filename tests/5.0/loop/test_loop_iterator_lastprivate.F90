@@ -102,7 +102,7 @@ contains
             end block
         end do
         !$omp end loop
-        j_last = j
+    
         !$omp end target teams
 
         errors = merge(1, 0, j_last /= n+1) &
