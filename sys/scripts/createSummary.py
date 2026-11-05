@@ -257,16 +257,7 @@ def interpretHeader(header):
     returned_value["date"] = header_split[2]
     returned_value["system"] = header_split[3]
     returned_value["gitCommit"] = header_split[6]
-    # returned_value["cuda_runtime_version"] = (
-    # header_split[8].strip()
-    # if len(header_split) > 9 and header_split[8].strip().lower() not in ("", "null")
-    # else None
-    # )
-    # returned_value["rocm_runtime_version"] = (
-    # header_split[9].strip()
-    # if len(header_split) > 10 and header_split[9].strip().lower() not in ("", "null")
-    # else None
-    # )
+    
     value = header_split[8].strip()
     returned_value["cuda_runtime_version"] = None if value.lower() == "null" else value
 
