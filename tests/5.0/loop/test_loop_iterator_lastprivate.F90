@@ -105,7 +105,7 @@ contains
     
         !$omp end target teams
 
-        errors = merge(1, 0, j_last /= n+1) &
+        errors = merge(1, 0, j /= n+1) &
                + count(i_last /= m+1)
 
         associate(aseq => reshape( &
