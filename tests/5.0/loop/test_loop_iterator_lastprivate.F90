@@ -84,7 +84,7 @@ contains
         integer :: i_last(n)
         integer :: i, j, j_last
 
-        !$omp target teams num_teams(4) map(from: a, i_last, j_last)
+        !$omp target teams num_teams(4) map(from: a, i_last, j)
         !$omp loop bind(teams)
         do j = 1, n
             block
