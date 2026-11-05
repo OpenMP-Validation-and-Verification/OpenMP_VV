@@ -59,6 +59,10 @@ class testResult:
     runtimePass = ""
     runtimeOutput = ""
 
+    #Runtime library versions
+    cudaRuntimeVersion = None
+    rocmRuntimeVersion = None
+
   def setTestParameters(self, newTestName, newTestPath=None, newCompilerName=None, newCompilerCommand=None, newTestCommit=None, newOMPVersion=None):
     self.testName = newTestName
     runtimeOnly = (not newTestPath)
@@ -128,7 +132,9 @@ class testResult:
         "Runtime result": self.runtimePass,
         "Runtime output": self.runtimeOutput,
         "Runtime starting date": self.startingRuntimeDate,
-        "Runtime ending date": self.endingRuntimeDate
+        "Runtime ending date": self.endingRuntimeDate,
+        "cuda_runtime_version": self.cudaRuntimeVersion,
+        "rocm_runtime_version": self.rocmRuntimeVersion
     }
   def __str__(self):
     return """ 
@@ -187,6 +193,8 @@ def parseFile(log_file):
             current_test.setTestParameters(header_info["testName"], header_info["file"], header_info["compiler"], header_info["compilerCommand"], header_info["gitCommit"], header_info["ompVersion"])
             current_test.setCompilerInit(header_info["date"], header_info["system"])
             current_state = header_info["type"]
+            current_test.cudaRuntimeVersion = header_info["cuda_runtime_version"]
+            current_test.rocmRuntimeVersion = header_info["rocm_runtime_version"]
           elif header_info["type"] == "RUN":
             # we are starting a runtime section
             if (current_test.testName == ""):
@@ -201,6 +209,8 @@ def parseFile(log_file):
               current_test.setTestParameters(header_info["testName"], newOMPVersion=header_info["ompVersion"])
             current_test.setRuntimeInit(header_info["file"], header_info["date"], header_info["system"])
             current_state = header_info["type"]
+            current_test.cudaRuntimeVersion = header_info["cuda_runtime_version"]
+            current_test.rocmRuntimeVersion = header_info["rocm_runtime_version"]
           elif header_info["type"] == "END":
             # We are ending a section
             if current_state == "COMPILE":
@@ -247,6 +257,22 @@ def interpretHeader(header):
     returned_value["date"] = header_split[2]
     returned_value["system"] = header_split[3]
     returned_value["gitCommit"] = header_split[6]
+    # returned_value["cuda_runtime_version"] = (
+    # header_split[8].strip()
+    # if len(header_split) > 9 and header_split[8].strip().lower() not in ("", "null")
+    # else None
+    # )
+    # returned_value["rocm_runtime_version"] = (
+    # header_split[9].strip()
+    # if len(header_split) > 10 and header_split[9].strip().lower() not in ("", "null")
+    # else None
+    # )
+    value = header_split[8].strip()
+    returned_value["cuda_runtime_version"] = None if value.lower() == "null" else value
+
+    value = header_split[9].strip()
+    returned_value["rocm_runtime_version"] = None if value.lower() == "null" else value
+
     returned_value["ompVersion"] = header_split[7]
     if header_split[0].startswith("BEGIN"):
       if header_split[1].startswith('COMPILE'):
