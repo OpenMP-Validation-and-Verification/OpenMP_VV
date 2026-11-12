@@ -22,8 +22,8 @@ typedef struct myvec{
     double *data;
 } myvec_t;
 
+#pragma omp declare mapper(myvec_t v) map(tofrom: v) map(iterator(it = 0:N), tofrom: v.data[it][0:v.len])
 
-#pragma omp declare mapper(myvec_t v) map(iterator(it = 0:v.len), tofrom: v.data[it]) 
 
 void init( myvec_t *s )
 { 
